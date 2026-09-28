@@ -32,12 +32,67 @@ input,textarea{width:100%;border:1px solid #cdd9d6;border-radius:14px;padding:14
 .foods{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.food{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}.food b{display:block;margin-top:6px}
 footer{padding:30px 0 50px;color:var(--muted);font-size:13px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.foods{grid-template-columns:repeat(2,1fr)}.hero{padding-top:18px}.card{padding:18px}.row .btn{width:100%;flex-basis:100%}}
+.auth-screen{position:fixed;inset:0;z-index:100;background:
+  radial-gradient(circle at 20% 15%,rgba(20,184,166,.18),transparent 32%),
+  radial-gradient(circle at 85% 8%,rgba(15,118,110,.14),transparent 30%),
+  linear-gradient(180deg,#f3fbf9 0%,#f7f9f8 100%);display:grid;place-items:center;padding:18px;overflow:auto}
+.auth-card{width:min(460px,100%);background:rgba(255,255,255,.96);border:1px solid rgba(203,220,216,.95);border-radius:30px;padding:28px;box-shadow:0 28px 70px rgba(18,54,49,.16);backdrop-filter:blur(18px)}
+.auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.auth-brand .big-logo{width:54px;height:54px;border-radius:17px;background:linear-gradient(135deg,#0f766e,#19b7a7);color:#fff;display:grid;place-items:center;font-size:25px;font-weight:950;box-shadow:0 12px 28px rgba(15,118,110,.25)}
+.auth-brand strong{font-size:21px;letter-spacing:-.02em}.auth-title{font-size:34px;line-height:1.02;letter-spacing:-.045em;margin:0 0 10px}.auth-sub{color:var(--muted);margin:0 0 22px}
+.auth-field{margin-top:14px}.auth-field label{display:block;font-size:13px;font-weight:850;margin-bottom:7px}.auth-field input{padding:15px 16px;border-radius:15px;background:#fbfdfc}
+.password-wrap{position:relative}.password-wrap input{padding-right:62px}.show-pass{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:#edf5f3;color:var(--brand);font-weight:850;border-radius:10px;padding:8px 10px}
+.auth-actions{display:grid;gap:10px;margin-top:18px}.auth-actions .btn{width:100%;font-size:15px}.auth-links{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:14px;font-size:13px}.auth-link{border:0;background:none;color:var(--brand);font-weight:800;padding:0;cursor:pointer}
+.auth-divider{display:flex;align-items:center;gap:10px;color:#8a9693;font-size:12px;margin:19px 0}.auth-divider:before,.auth-divider:after{content:"";height:1px;flex:1;background:#dce6e3}
+.auth-note{font-size:12px;color:#75827f;line-height:1.45;text-align:center;margin-top:15px}.auth-msg{margin-top:12px;border-radius:12px;padding:11px 12px;font-size:13px;display:none}.auth-msg.show{display:block}.auth-msg.info{background:#edf7f5;color:#145f57;border:1px solid #b9ded7}.auth-msg.err{background:#fff1ef;color:#8a261d;border:1px solid #efbbb5}
+.top-user{margin-left:auto;display:flex;align-items:center;gap:8px}.user-pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:850;color:var(--brand);cursor:pointer}
+body.auth-open{overflow:hidden}
+@media(max-width:520px){.auth-card{padding:22px;border-radius:24px}.auth-title{font-size:30px}.auth-links{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
-<header><div class="wrap top"><div class="logo">E</div>E-Check Kids</div></header>
+<section id="authScreen" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="big-logo">E</div>
+      <div><strong>E-Check Kids</strong><div class="muted" style="font-size:13px">Dein Einkaufsbegleiter</div></div>
+    </div>
+    <h1 class="auth-title">Willkommen zurück 👋</h1>
+    <p class="auth-sub">Melde dich an, um später Scans, Favoriten und deine persönlichen Einstellungen zu speichern.</p>
 
-<main class="wrap">
+    <div class="auth-field">
+      <label for="authEmail">E-Mail-Adresse</label>
+      <input id="authEmail" type="email" autocomplete="email" placeholder="name@beispiel.de">
+    </div>
+
+    <div class="auth-field">
+      <label for="authPassword">Passwort</label>
+      <div class="password-wrap">
+        <input id="authPassword" type="password" autocomplete="current-password" placeholder="Dein Passwort">
+        <button class="show-pass" type="button" onclick="togglePassword()">zeigen</button>
+      </div>
+    </div>
+
+    <div id="authMsg" class="auth-msg info"></div>
+
+    <div class="auth-actions">
+      <button class="btn primary" onclick="authLogin()">Anmelden</button>
+      <button class="btn soft" onclick="authSignup()">Neues Konto erstellen</button>
+    </div>
+
+    <div class="auth-links">
+      <button class="auth-link" onclick="authReset()">Passwort vergessen?</button>
+      <button class="auth-link" onclick="enterGuest()">Ohne Konto testen →</button>
+    </div>
+
+    <div class="auth-divider">sicher & kostenlos starten</div>
+    <div class="auth-note">E-Check Kids speichert keine Passwörter direkt auf dieser Webseite. Der sichere Kontozugang wird über einen Authentifizierungsdienst angebunden.</div>
+  </div>
+</section>
+
+<header id="siteHeader"><div class="wrap top"><div class="logo">E</div>E-Check Kids<div class="top-user"><button id="userButton" class="user-pill" onclick="openAuth()">Anmelden</button></div></div></header>
+
+<main id="appShell" class="wrap hidden">
 <section class="hero">
 <div class="card">
 <span class="eyebrow">Einfach • mobil • ohne App-Kauf</span>
@@ -130,7 +185,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:13px}
 </section>
 </main>
 
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.5</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.6</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -355,6 +410,79 @@ async function readIngredientsPhoto(){
   openPanel("text");analyzeIngredients();
  }catch(e){st.textContent="Texterkennung fehlgeschlagen. Zutaten können auch manuell eingefügt werden."}
 }
+
+
+var AUTH_READY=false;
+
+function showAuthMessage(text,type){
+ var el=document.getElementById("authMsg");
+ el.textContent=text;
+ el.className="auth-msg show "+(type||"info");
+}
+
+function openAuth(){
+ document.getElementById("authScreen").classList.remove("hidden");
+ document.body.classList.add("auth-open");
+}
+
+function closeAuth(){
+ document.getElementById("authScreen").classList.add("hidden");
+ document.body.classList.remove("auth-open");
+}
+
+function enterApp(label){
+ document.getElementById("appShell").classList.remove("hidden");
+ document.getElementById("userButton").textContent=label||"Gast";
+ closeAuth();
+}
+
+function enterGuest(){
+ localStorage.setItem("echeck_guest","1");
+ enterApp("Gast");
+}
+
+function togglePassword(){
+ var input=document.getElementById("authPassword");
+ var btn=document.querySelector(".show-pass");
+ if(input.type==="password"){input.type="text";btn.textContent="verbergen"}
+ else{input.type="password";btn.textContent="zeigen"}
+}
+
+function authLogin(){
+ var email=document.getElementById("authEmail").value.trim();
+ var pw=document.getElementById("authPassword").value;
+ if(!email||!pw){showAuthMessage("Bitte E-Mail und Passwort eingeben.","err");return}
+ if(!AUTH_READY){
+  showAuthMessage("Die sichere Anmeldung wird gerade eingerichtet. Du kannst die App bis dahin über „Ohne Konto testen“ benutzen.","info");
+  return;
+ }
+}
+
+function authSignup(){
+ if(!AUTH_READY){
+  showAuthMessage("Die Kontoerstellung wird gerade sicher angebunden. Bis dahin kannst du die App ohne Konto testen.","info");
+  return;
+ }
+}
+
+function authReset(){
+ var email=document.getElementById("authEmail").value.trim();
+ if(!email){showAuthMessage("Trage zuerst deine E-Mail-Adresse ein.","err");return}
+ if(!AUTH_READY){
+  showAuthMessage("Der Passwort-Reset wird zusammen mit dem sicheren Login aktiviert.","info");
+  return;
+ }
+}
+
+(function(){
+ if(localStorage.getItem("echeck_guest")==="1"){
+  document.getElementById("appShell").classList.remove("hidden");
+  document.getElementById("authScreen").classList.add("hidden");
+  document.getElementById("userButton").textContent="Gast";
+ }else{
+  document.body.classList.add("auth-open");
+ }
+})();
 
 window.addEventListener("pagehide",function(){stopScanner()});
 </script>
