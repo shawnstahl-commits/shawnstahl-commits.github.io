@@ -85,6 +85,24 @@ header{background:rgba(247,250,249,.86);border-bottom:1px solid rgba(220,231,228
 @media(max-width:700px){.wrap{width:min(100% - 22px,920px)}.top{height:64px}.dash-hero{padding:24px 20px;border-radius:25px}.dash-hero h2{font-size:29px}.action-grid{grid-template-columns:1fr 1fr}.action-tile{display:block;padding:17px}.action-tile.primary-action{grid-column:1/-1}.action-icon{margin-bottom:9px}.dash-grid{grid-template-columns:1fr}.bottom-nav{bottom:7px}.card{border-radius:22px;padding:17px}}
 @media(max-width:430px){.action-grid{grid-template-columns:1fr}.action-tile.primary-action{grid-column:auto}.action-tile{display:grid;grid-template-columns:48px 1fr;column-gap:10px}.action-icon{grid-row:1/3;margin:0}.action-tile b{align-self:end}.action-tile small{align-self:start}}
 
+
+/* E-Check Kids 4.0 — full redesign */
+:root{--v4:#087d72;--v4dark:#095e58;--v4mint:#eaf7f4;--v4ink:#132421;--v4muted:#71807d;--v4line:#e3ece9}
+.home-v4{padding:15px 0 10px}.home-hero-v4{min-height:235px;display:grid;grid-template-columns:1.2fr .8fr;align-items:center;background:#fff;border:1px solid var(--v4line);border-radius:32px;padding:30px;overflow:hidden;position:relative;box-shadow:0 18px 50px rgba(20,55,49,.06)}
+.home-copy-v4{position:relative;z-index:2}.home-kicker-v4{display:flex;align-items:center;gap:7px;color:var(--v4);font-size:11px;font-weight:900;letter-spacing:.08em}.dot-v4{width:7px;height:7px;background:#16a596;border-radius:50%;box-shadow:0 0 0 5px #dff4ef}.home-copy-v4 h1{font-size:clamp(43px,7vw,70px);line-height:.91;margin:20px 0 18px;letter-spacing:-.065em;color:var(--v4ink)}.home-copy-v4 h1 span{color:var(--v4)}.home-copy-v4 p{font-size:17px;color:var(--v4muted);max-width:470px;margin:0}
+.e-visual-v4{position:relative;height:200px}.e-core-v4{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:116px;height:116px;border-radius:34px;background:linear-gradient(145deg,#087d72,#18ad9c);color:#fff;display:grid;place-items:center;font-size:65px;font-weight:950;box-shadow:0 22px 45px rgba(8,125,114,.25),inset 0 1px rgba(255,255,255,.25)}.e-chip-v4{position:absolute;background:#fff;border:1px solid #dbe9e5;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900;color:#46615c;box-shadow:0 8px 20px rgba(30,58,53,.08)}.e-chip-v4.e1{top:8%;left:8%}.e-chip-v4.e2{top:18%;right:1%}.e-chip-v4.e3{bottom:9%;left:0}.e-chip-v4.e4{bottom:5%;right:9%;color:#a64238;background:#fff7f6;border-color:#f2d0cc}
+.scan-cta-v4{width:100%;border:0;background:linear-gradient(135deg,#08796f,#079082);color:#fff;border-radius:26px;padding:18px 20px;margin:14px 0;display:grid;grid-template-columns:54px 1fr 30px;gap:14px;align-items:center;text-align:left;box-shadow:0 16px 36px rgba(8,125,114,.20);cursor:pointer}.scan-icon-v4{width:54px;height:54px;border-radius:18px;background:rgba(255,255,255,.14);display:grid;place-items:center}.scan-icon-v4 svg{width:29px;height:29px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round}.scan-cta-v4 strong{display:block;font-size:20px}.scan-cta-v4 small{display:block;color:rgba(255,255,255,.78);margin-top:3px;font-size:13px}.cta-arrow-v4{font-size:36px;font-weight:200;text-align:right}
+.quick-grid-v4{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 14px}.quick-card-v4{border:1px solid var(--v4line);background:#fff;border-radius:23px;padding:17px;display:flex;gap:13px;align-items:center;text-align:left;cursor:pointer;box-shadow:0 8px 24px rgba(26,55,50,.035)}.quick-icon-v4{width:45px;height:45px;flex:0 0 45px;border-radius:14px;background:var(--v4mint);display:grid;place-items:center}.quick-icon-v4 svg,.family-leaf-v4 svg,.focus-icon-v4 svg{width:24px;height:24px;fill:none;stroke:var(--v4);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.quick-card-v4 b{display:block;font-size:15px;color:var(--v4ink)}.quick-card-v4 small{display:block;color:var(--v4muted);font-size:12px;margin-top:3px}
+.focus-v4{display:grid;grid-template-columns:52px 1fr;gap:15px;align-items:start;background:linear-gradient(135deg,#f4f0ff,#faf8ff);border:1px solid #e9e0fb;border-radius:24px;padding:18px;margin:14px 0}.focus-icon-v4{width:52px;height:52px;border-radius:17px;background:#ebe2ff;display:grid;place-items:center}.focus-icon-v4 svg{stroke:#7057a6}.focus-label-v4{font-size:10px;font-weight:950;letter-spacing:.1em;color:#8068ad}.focus-v4 h3{font-size:18px;margin:4px 0}.focus-v4 p{color:#736d7d;font-size:13px;margin:0;line-height:1.45}
+.family-link-v4{width:100%;display:grid;grid-template-columns:45px 1fr 20px;gap:12px;align-items:center;text-align:left;border:1px solid var(--v4line);background:#fff;border-radius:21px;padding:14px 16px;cursor:pointer}.family-leaf-v4{width:45px;height:45px;border-radius:14px;background:#f0f8ed;display:grid;place-items:center}.family-leaf-v4 svg{stroke:#568a46}.family-link-v4 b{display:block}.family-link-v4 small{display:block;color:var(--v4muted);font-size:12px;margin-top:2px}.home-section-title-v4{margin:27px 2px 11px}.home-section-title-v4 small{font-size:10px;color:var(--v4);font-weight:950;letter-spacing:.12em}.home-section-title-v4 h2{font-size:23px;margin:3px 0}.recent-v4 .dash-card h3{font-size:17px}
+.nav-svg-v4,.nav-scan-circle-v4{height:24px;display:grid;place-items:center}.nav-svg-v4 svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.nav-scan-circle-v4{width:46px;height:46px;margin:-24px auto 3px;border-radius:15px;background:linear-gradient(145deg,#087d72,#11a595);box-shadow:0 9px 22px rgba(8,125,114,.28);color:#fff}.nav-scan-circle-v4 svg{width:25px;height:25px;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round}.scan-nav-v4{overflow:visible!important}.bottom-nav{overflow:visible;padding-top:10px}
+.scan-top-v4,.fullscreen-guide-v4,.scan-instruction-v4,.scan-processing-v4{display:none}.scan-title-normal-v4 h2{margin-bottom:8px}
+.result-head-v4{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:18px 2px 12px}.result-back-v4{width:42px;height:42px;border:1px solid var(--v4line);border-radius:14px;background:#fff;font-size:29px;line-height:1;color:var(--v4ink)}.result-head-v4 div small{display:block;font-size:9px;font-weight:950;letter-spacing:.12em;color:var(--v4)}.result-head-v4 div strong{font-size:18px}.result-rescan-v4{border:0;background:var(--v4mint);color:var(--v4);font-weight:900;border-radius:13px;padding:10px 12px}.result-card-v4{padding-top:18px}.adhd-result-v4{display:grid;grid-template-columns:38px 1fr;gap:11px;background:#f5f2fc;border:1px solid #e8e0f8;border-radius:18px;padding:13px;margin:14px 0}.adhd-result-icon-v4{width:38px;height:38px;border-radius:12px;background:#e8defa;color:#715aa1;font-weight:950;display:grid;place-items:center}.adhd-result-v4 span{display:block;font-size:9px;font-weight:950;letter-spacing:.1em;color:#7c65a7}.adhd-result-v4 b{display:block;margin:2px 0 4px}.adhd-result-v4 p{margin:0;font-size:12px;color:#716b7a;line-height:1.4}.adhd-result-v4.warn{background:#fff5f4;border-color:#f3cfca}.adhd-result-v4.warn .adhd-result-icon-v4{background:#fee4e2;color:#b42318}.adhd-result-v4.warn span{color:#a4382e}
+body.scanner-fullscreen{overflow:hidden;background:#020504}body.scanner-fullscreen #siteHeader,body.scanner-fullscreen #bottomNav,body.scanner-fullscreen footer{display:none!important}body.scanner-fullscreen #appShell{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important}body.scanner-fullscreen #page-scan{display:block!important;position:fixed;inset:0;z-index:999;background:#020504;padding:0!important;margin:0!important}body.scanner-fullscreen #page-scan>section{height:100dvh}body.scanner-fullscreen #page-scan>section>.grid,body.scanner-fullscreen #panel-photo,body.scanner-fullscreen #panel-text,body.scanner-fullscreen #result{display:none!important}body.scanner-fullscreen #panel-barcode{display:block!important;height:100dvh}body.scanner-fullscreen .barcode-card-v4{position:relative;width:100%;height:100dvh;margin:0;padding:0;border:0;border-radius:0;background:#020504;overflow:hidden;box-shadow:none;color:#fff}body.scanner-fullscreen .scan-title-normal-v4,body.scanner-fullscreen #barcodeInput,body.scanner-fullscreen .barcode-card-v4>.row{display:none!important}body.scanner-fullscreen .scan-top-v4{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;position:absolute;z-index:40;top:0;left:0;right:0;padding:max(15px,env(safe-area-inset-top)) 16px 12px;background:linear-gradient(180deg,rgba(0,0,0,.62),rgba(0,0,0,0))}body.scanner-fullscreen .scan-top-v4>div{text-align:center}body.scanner-fullscreen .scan-top-v4 strong{display:block;font-size:16px}body.scanner-fullscreen .scan-top-v4 small{display:block;color:rgba(255,255,255,.64);font-size:10px;margin-top:2px}.scan-round-v4{width:40px;height:40px;border:1px solid rgba(255,255,255,.24);border-radius:50%;background:rgba(0,0,0,.28);color:#fff;font-size:26px;line-height:1;backdrop-filter:blur(8px)}body.scanner-fullscreen #nativeWrap,body.scanner-fullscreen #reader{position:absolute!important;inset:0!important;width:100%!important;height:100dvh!important;min-height:100dvh!important;margin:0!important;border-radius:0!important;background:#050807!important}body.scanner-fullscreen #nativeVideo,body.scanner-fullscreen #reader video{width:100%!important;height:100dvh!important;max-height:none!important;object-fit:cover!important;margin:0!important;border-radius:0!important}body.scanner-fullscreen #reader>div{border:0!important}body.scanner-fullscreen .guide{display:none!important}body.scanner-fullscreen .fullscreen-guide-v4{display:block;position:absolute;z-index:25;left:50%;top:46%;transform:translate(-50%,-50%);width:min(82vw,520px);height:150px;border-radius:22px;background:rgba(255,255,255,.015);box-shadow:0 0 0 9999px rgba(0,0,0,.25)}.scan-corner-v4{position:absolute;width:34px;height:34px;border-color:#fff}.scan-corner-v4.tl{left:0;top:0;border-left:3px solid;border-top:3px solid;border-radius:12px 0 0 0}.scan-corner-v4.tr{right:0;top:0;border-right:3px solid;border-top:3px solid;border-radius:0 12px 0 0}.scan-corner-v4.bl{left:0;bottom:0;border-left:3px solid;border-bottom:3px solid;border-radius:0 0 0 12px}.scan-corner-v4.br{right:0;bottom:0;border-right:3px solid;border-bottom:3px solid;border-radius:0 0 12px 0}.scan-line-v4{position:absolute;left:7%;right:7%;top:50%;height:2px;background:#24dfc7;box-shadow:0 0 15px rgba(36,223,199,.95);animation:scanSweepV4 2.1s ease-in-out infinite}@keyframes scanSweepV4{0%,100%{transform:translateY(-45px);opacity:.55}50%{transform:translateY(45px);opacity:1}}body.scanner-fullscreen .scan-instruction-v4{display:block;position:absolute;z-index:30;left:20px;right:20px;bottom:110px;text-align:center;color:#fff;text-shadow:0 2px 8px #000}body.scanner-fullscreen .scan-instruction-v4 strong{display:block;font-size:16px}body.scanner-fullscreen .scan-instruction-v4 small{display:block;color:rgba(255,255,255,.7);margin-top:4px}body.scanner-fullscreen #scanStatus{position:absolute;z-index:31;left:20px;right:20px;bottom:64px;text-align:center;color:rgba(255,255,255,.75);font-size:12px}body.scanner-fullscreen #scanError{position:absolute;z-index:45;left:18px;right:18px;bottom:80px;background:rgba(70,10,8,.88);color:#fff;border-color:rgba(255,255,255,.2);backdrop-filter:blur(10px)}body.scanner-fullscreen #photoFallback{position:absolute;z-index:44;left:18px;right:18px;bottom:18px}body.scanner-fullscreen #photoFallback .notice{display:none}body.scanner-fullscreen #photoFallback .btn{background:rgba(0,0,0,.48);color:#fff;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(10px)}body.scanner-fullscreen.scan-processing .scan-processing-v4{display:flex;position:absolute;z-index:60;inset:0;background:rgba(3,9,8,.78);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;color:#fff}body.scanner-fullscreen.scan-processing .fullscreen-guide-v4,body.scanner-fullscreen.scan-processing .scan-instruction-v4{display:none}.processing-check-v4{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:#0b927f;font-size:34px;margin-bottom:14px;box-shadow:0 0 0 10px rgba(11,146,127,.16)}.scan-processing-v4 strong{font-size:20px}.scan-processing-v4 small{margin-top:4px;color:rgba(255,255,255,.7)}
+@media(max-width:700px){.home-hero-v4{grid-template-columns:1fr;min-height:245px;padding:25px 21px}.home-copy-v4 h1{font-size:49px}.home-copy-v4 p{font-size:15px;max-width:310px}.e-visual-v4{position:absolute;right:-42px;bottom:-56px;width:195px;height:195px;opacity:.38}.e-core-v4{width:110px;height:110px;font-size:62px}.e-chip-v4{display:none}.quick-grid-v4{grid-template-columns:1fr 1fr}.quick-card-v4{display:block;padding:15px}.quick-icon-v4{margin-bottom:10px}.focus-v4{grid-template-columns:44px 1fr;padding:15px}.focus-icon-v4{width:44px;height:44px}.recent-v4{grid-template-columns:1fr}.result-head-v4{position:sticky;top:64px;z-index:12;background:rgba(247,250,249,.94);backdrop-filter:blur(16px);margin:0 -11px;padding:11px}.result-card-v4{margin-top:3px}}
+@media(max-width:430px){.quick-grid-v4{grid-template-columns:1fr 1fr}.quick-card-v4 small{display:none}.quick-card-v4 b{font-size:13px}.home-copy-v4 h1{font-size:46px}.scan-cta-v4{grid-template-columns:48px 1fr 22px}.scan-icon-v4{width:48px;height:48px}.scan-cta-v4 strong{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.scan-line-v4{animation:none}}
+
 </style>
 </head>
 <body>
@@ -131,19 +149,60 @@ header{background:rgba(247,250,249,.86);border-bottom:1px solid rgba(220,231,228
 
 <main id="appShell" class="wrap hidden">
 <section id="page-home" class="app-page active">
-  <div class="dash" style="margin-top:18px">
-   <div class="dash-hero"><div class="focus-badge">E‑NUMMERN • KINDER • ADS/ADHS</div><h2>E‑Nummern beim Einkauf schnell verstehen.</h2><p>Produkt scannen, Zusatzstoffe erkennen und Hinweise für Familien einfach erklärt bekommen.</p></div>
-   <div id="installBanner" class="install-banner"><b>📲 E‑Check Kids installieren</b><p class="muted" style="margin:5px 0 10px">Zum Startbildschirm hinzufügen und wie eine App öffnen.</p><button class="btn primary" onclick="installApp()">App installieren</button></div>
-   <div class="action-grid">
-    <button class="action-tile primary-action" onclick="goPage('scan');openPanel('barcode');startScanner()"><span class="action-icon">📷</span><b>Produkt scannen</b><small>Barcode mit der Kamera erfassen</small></button>
-    <button class="action-tile" onclick="goPage('scan');openPanel('photo')"><span class="action-icon">🧾</span><b>Zutaten fotografieren</b><small>Text erkennen und anschließend korrigieren</small></button>
-    <button class="action-tile" onclick="goPage('scan');openPanel('text')"><span class="action-icon">🔎</span><b>E‑Nummer suchen</b><small>Nummer, Name oder Zutaten eingeben</small></button>
-    <button class="action-tile" onclick="goPage('tips')"><span class="action-icon">🥕</span><b>Familien-Ideen</b><small>Praktische Ernährungstipps als Ergänzung</small></button>
-   </div>
-   <div class="adhd-strip"><div class="adhd-icon">🧠</div><div><b>Besonderer Blick auf ADS & ADHS</b><small>Wir heben relevante offizielle Kinderhinweise deutlich hervor und trennen belegte Informationen von unsicheren Zusammenhängen. Keine Diagnose oder Behandlungsempfehlung.</small></div></div><div class="dash-grid">
-    <div class="dash-card"><h3>🕘 Letzte Scans</h3><div id="historyList" class="list-empty">Noch keine Scans gespeichert.</div><button class="btn soft" style="width:100%;margin-top:10px" onclick="goPage('history')">Gesamten Verlauf</button></div>
-    <div class="dash-card"><h3>⭐ Favoriten</h3><div id="favoritesList" class="list-empty">Noch keine Favoriten gespeichert.</div><button class="btn soft" style="width:100%;margin-top:10px" onclick="goPage('favorites')">Alle Favoriten</button></div>
-   </div>
+  <div class="home-v4">
+    <section class="home-hero-v4">
+      <div class="home-copy-v4">
+        <div class="home-kicker-v4"><span class="dot-v4"></span> E-NUMMERN • KINDER • ADS/ADHS</div>
+        <h1>Wissen, was<br><span>drinsteckt.</span></h1>
+        <p>E-Nummern beim Einkauf in Sekunden erkennen und einfach verstehen.</p>
+      </div>
+      <div class="e-visual-v4" aria-hidden="true">
+        <span class="e-chip-v4 e1">E102</span>
+        <span class="e-chip-v4 e2">E338</span>
+        <div class="e-core-v4">E</div>
+        <span class="e-chip-v4 e3">E150d</span>
+        <span class="e-chip-v4 e4">E129</span>
+      </div>
+    </section>
+
+    <button class="scan-cta-v4" onclick="openFullscreenScanner()">
+      <span class="scan-icon-v4"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M8 9v6M11 8v8M14 9v6M17 8v8"/></svg></span>
+      <span><strong>Produkt scannen</strong><small>Barcode vor die Kamera halten</small></span>
+      <span class="cta-arrow-v4">›</span>
+    </button>
+
+    <div id="installBanner" class="install-banner"><b>E-Check Kids installieren</b><p class="muted" style="margin:5px 0 10px">Zum Startbildschirm hinzufügen und wie eine App öffnen.</p><button class="btn primary" onclick="installApp()">App installieren</button></div>
+
+    <div class="quick-grid-v4">
+      <button class="quick-card-v4" onclick="goPage('scan');openPanel('photo')">
+        <span class="quick-icon-v4"><svg viewBox="0 0 24 24"><path d="M4 7h3l1.2-2h7.6L17 7h3v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span>
+        <span><b>Zutaten fotografieren</b><small>Liste per Kamera erkennen</small></span>
+      </button>
+      <button class="quick-card-v4" onclick="goPage('scan');openPanel('text')">
+        <span class="quick-icon-v4"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/></svg></span>
+        <span><b>E-Nummer suchen</b><small>Nummer oder Namen prüfen</small></span>
+      </button>
+    </div>
+
+    <section class="focus-v4">
+      <div class="focus-icon-v4"><svg viewBox="0 0 24 24"><path d="M9 4.5A3.5 3.5 0 0 0 5.5 8v1A3.5 3.5 0 0 0 4 15.4 3.5 3.5 0 0 0 8 19h1M15 4.5A3.5 3.5 0 0 1 18.5 8v1a3.5 3.5 0 0 1 1.5 6.4A3.5 3.5 0 0 1 16 19h-1M9 4.5V20M15 4.5V20M9 9h2M13 14h2"/></svg></div>
+      <div>
+        <span class="focus-label-v4">BESONDERER FOKUS</span>
+        <h3>ADS & ADHS bei Kindern</h3>
+        <p>Offizielle Kinderhinweise werden besonders deutlich markiert. Unklare Zusammenhänge stellen wir nicht als bewiesen dar.</p>
+      </div>
+    </section>
+
+    <button class="family-link-v4" onclick="goPage('tips')">
+      <span class="family-leaf-v4"><svg viewBox="0 0 24 24"><path d="M20 4C12 4 6 7.5 6 14c0 2.5 1.8 4 4 4 6.5 0 9-8 10-14Z"/><path d="M4 20c3-6 7-9 12-11"/></svg></span>
+      <span><b>Ideen für den Familienalltag</b><small>Praktische Ernährungstipps als Ergänzung</small></span><span>›</span>
+    </button>
+
+    <div class="home-section-title-v4"><div><small>DEINE APP</small><h2>Zuletzt verwendet</h2></div></div>
+    <div class="dash-grid recent-v4">
+      <div class="dash-card"><h3>Letzte Scans</h3><div id="historyList" class="list-empty">Noch keine Scans gespeichert.</div><button class="btn soft" style="width:100%;margin-top:10px" onclick="goPage('history')">Gesamten Verlauf</button></div>
+      <div class="dash-card"><h3>Favoriten</h3><div id="favoritesList" class="list-empty">Noch keine Favoriten gespeichert.</div><button class="btn soft" style="width:100%;margin-top:10px" onclick="goPage('favorites')">Alle Favoriten</button></div>
+    </div>
   </div>
  </section>
  <section id="page-scan" class="app-page"><section>
@@ -154,9 +213,13 @@ header{background:rgba(247,250,249,.86);border-bottom:1px solid rgba(220,231,228
 </div>
 
 <div id="panel-barcode" class="panel active">
-<div class="card">
-<h2>Barcode scannen</h2>
-<p class="muted">Barcode groß und gerade halten, etwa 10–20 cm Abstand. Spiegelungen vermeiden.</p>
+<div class="card barcode-card-v4">
+<div class="scan-top-v4">
+  <button class="scan-round-v4" onclick="closeFullscreenScanner()" aria-label="Scanner schließen">×</button>
+  <div><strong>Produkt scannen</strong><small>E-Check Kids</small></div>
+  <span class="scan-top-spacer-v4"></span>
+</div>
+<div class="scan-title-normal-v4"><h2>Barcode scannen</h2><p class="muted">Barcode groß und gerade halten, etwa 10–20 cm Abstand. Spiegelungen vermeiden.</p></div>
 <input id="barcodeInput" inputmode="numeric" autocomplete="off" placeholder="Barcode-Nummer, z. B. 3017624010701">
 <div class="row">
 <button class="btn primary" onclick="startScanner()">📷 Kamera starten</button>
@@ -167,6 +230,9 @@ header{background:rgba(247,250,249,.86);border-bottom:1px solid rgba(220,231,228
 <video id="nativeVideo" playsinline muted></video><div class="guide"></div>
 </div>
 <div id="reader" class="hidden"></div>
+<div class="fullscreen-guide-v4" aria-hidden="true"><div class="scan-corner-v4 tl"></div><div class="scan-corner-v4 tr"></div><div class="scan-corner-v4 bl"></div><div class="scan-corner-v4 br"></div><div class="scan-line-v4"></div></div>
+<div class="scan-instruction-v4"><strong>Barcode in den Rahmen halten</strong><small>Die Erkennung startet automatisch</small></div>
+<div class="scan-processing-v4"><div class="processing-check-v4">✓</div><strong>Barcode erkannt</strong><small>Produkt wird geprüft …</small></div>
 <div id="scanStatus" class="status"></div>
 <div id="scanError" class="error hidden"></div>
 <div id="photoFallback" class="hidden">
@@ -287,13 +353,13 @@ header{background:rgba(247,250,249,.86);border-bottom:1px solid rgba(220,231,228
 </section>
 </main>
 <nav id="bottomNav" class="bottom-nav hidden">
- <button class="nav-btn active" data-page="home" onclick="goPage('home')"><span>⌂</span>Home</button>
- <button class="nav-btn" data-page="scan" onclick="goPage('scan')"><span>▦</span>Scannen</button>
- <button class="nav-btn" data-page="history" onclick="goPage('history')"><span>🕘</span>Verlauf</button>
- <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span>★</span>Favoriten</button>
- <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span>●</span>Profil</button>
+ <button class="nav-btn active" data-page="home" onclick="goPage('home')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"/></svg></span>Home</button>
+ <button class="nav-btn scan-nav-v4" data-page="scan" onclick="openFullscreenScanner()"><span class="nav-scan-circle-v4"><svg viewBox="0 0 24 24"><path d="M5 9V6a1 1 0 0 1 1-1h3M15 5h3a1 1 0 0 1 1 1v3M19 15v3a1 1 0 0 1-1 1h-3M9 19H6a1 1 0 0 1-1-1v-3M9 9v6M12 8v8M15 9v6"/></svg></span>Scannen</button>
+ <button class="nav-btn" data-page="history" onclick="goPage('history')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.6"/><path d="M4 4v4.6h4.6M12 8v5l3 2"/></svg></span>Verlauf</button>
+ <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
+ <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 3.0 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 4.0 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -359,13 +425,31 @@ function setStatus(t){document.getElementById("scanStatus").textContent=t}
 function error(t){var e=document.getElementById("scanError");e.textContent=t;e.classList.remove("hidden")}
 function clearError(){var e=document.getElementById("scanError");e.textContent="";e.classList.add("hidden")}
 
+function openFullscreenScanner(){
+ goPage("scan");
+ openPanel("barcode");
+ document.getElementById("result").innerHTML="";
+ document.body.classList.add("scanner-fullscreen");
+ document.body.classList.remove("scan-processing");
+ setTimeout(function(){startScanner()},80);
+}
+async function closeFullscreenScanner(){
+ await stopScanner();
+ document.body.classList.remove("scanner-fullscreen","scan-processing");
+ goPage("home");
+}
+function revealScanResults(){
+ document.body.classList.remove("scanner-fullscreen","scan-processing");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
 function foundCode(raw){
  if(locked)return;
  var code=String(raw||"").replace(/\D/g,"");
  if(code.length<8||code.length>14)return;
  locked=true;
  document.getElementById("barcodeInput").value=code;
- setStatus("✓ Barcode erkannt: "+code);
+ setStatus("✓ Barcode erkannt: "+code);document.body.classList.add("scan-processing");
  try{if(navigator.vibrate)navigator.vibrate([80,40,80])}catch(e){}
  stopScanner().then(function(){lookupBarcode(code)}).finally(function(){setTimeout(function(){locked=false},900)});
 }
@@ -441,14 +525,15 @@ async function lookupBarcode(forced){
   var r=await fetch(u,{headers:{"Accept":"application/json"}});
   if(!r.ok)throw new Error("HTTP "+r.status);
   var d=await r.json(),p=d.product;
-  if(!p){setStatus("Produkt nicht gefunden.");document.getElementById("result").innerHTML='<div class="card"><div class="notice warn"><b>Produkt nicht gefunden.</b><br>Du kannst die Zutatenliste fotografieren oder eintippen.</div></div>';return}
-  setStatus("✓ Produkt gefunden");
+  if(!p){setStatus("Produkt nicht gefunden.");revealScanResults();document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Nicht gefunden</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="notice warn"><b>Produkt nicht gefunden.</b><br>Du kannst die Zutatenliste fotografieren oder eintippen.</div></div>';return}
+  setStatus("✓ Produkt gefunden");revealScanResults();
   var ing=p.ingredients_text_de||p.ingredients_text||p.ingredients_text_en||"";
   var nums=detectE(ing,p.additives_tags||[]);
   var pic=p.image_front_url?'<img src="'+esc(p.image_front_url)+'" alt="">':'';
   var kidsCount=nums.filter(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0}).length;
-  var head='<div class="card"><div class="product">'+pic+'<div><div class="name">'+esc(p.product_name_de||p.product_name||"Produkt")+'</div><div class="muted">'+esc(p.brands||"")+'</div><span class="chip">Barcode '+esc(code)+'</span></div></div>'
-   +'<div class="result-summary"><div class="metric"><strong>'+nums.length+'</strong><small>Zusatzstoffe</small></div><div class="metric"><strong>'+kidsCount+'</strong><small>EU-Kinderhinweise</small></div><div class="metric"><strong>'+(kidsCount?'⚠':'✓')+'</strong><small>Hinweis</small></div></div>';
+  var head='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Produkt geprüft</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card result-card-v4"><div class="product">'+pic+'<div><div class="name">'+esc(p.product_name_de||p.product_name||"Produkt")+'</div><div class="muted">'+esc(p.brands||"")+'</div><span class="chip">Barcode '+esc(code)+'</span></div></div>'
+   +'<div class="result-summary"><div class="metric"><strong>'+nums.length+'</strong><small>E-Nummern</small></div><div class="metric"><strong>'+kidsCount+'</strong><small>Kinderhinweise</small></div><div class="metric"><strong>'+(kidsCount?'⚠':'✓')+'</strong><small>Status</small></div></div>';
+  head+=renderAdhdFocus(nums);
   head+=renderE(nums);
   head+=renderBetterAlternatives(p,nums);
   if(!ing)head+='<div class="notice warn" style="margin-top:12px">Für dieses Produkt sind keine Zutaten gespeichert. Fotografiere die Zutatenliste, um sie trotzdem zu prüfen.</div>';
@@ -463,7 +548,7 @@ async function lookupBarcode(forced){
     await updateCurrentFavoriteButton();
   }
   document.getElementById("result").scrollIntoView({behavior:"smooth"});
- }catch(e){setStatus("Produktabfrage fehlgeschlagen.");error("Internetverbindung prüfen und erneut versuchen.")}
+ }catch(e){revealScanResults();setStatus("Produktabfrage fehlgeschlagen.");error("Internetverbindung prüfen und erneut versuchen.")}
 }
 
 function detectE(text,tags){
@@ -471,6 +556,15 @@ function detectE(text,tags){
  while((m=re.exec(text||""))!==null)s.add("E"+m[1].toUpperCase());
  (tags||[]).forEach(function(t){var x=String(t).match(/e[\-:]?(\d{3,4}[a-z]?)/i);if(x)s.add("E"+x[1].toUpperCase())});
  return Array.from(s).sort(function(a,b){return parseInt(a.slice(1))-parseInt(b.slice(1))});
+}
+
+function renderAdhdFocus(nums){
+ var euKids=["E102","E104","E110","E122","E124","E129"];
+ var hits=(nums||[]).filter(function(n){return euKids.indexOf(n)>=0});
+ if(hits.length){
+  return '<div class="adhd-result-v4 warn"><div class="adhd-result-icon-v4">!</div><div><span>ADS/ADHS-FOKUS</span><b>EU-Kinderhinweis vorhanden</b><p>Mindestens eine erkannte E-Nummer gehört zu den Farbstoffen mit dem vorgeschriebenen Hinweis: „Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen.“</p></div></div>';
+ }
+ return '<div class="adhd-result-v4"><div class="adhd-result-icon-v4">i</div><div><span>ADS/ADHS-FOKUS</span><b>Kein EU-Kinderhinweis erkannt</b><p>Keine der erkannten E-Nummern gehört zu den sechs Farbstoffen mit diesem speziellen EU-Kinderhinweis. Das ist keine allgemeine Aussage darüber, ob ein Stoff ADHS beeinflusst.</p></div></div>';
 }
 
 function renderE(nums){
@@ -578,6 +672,7 @@ async function readIngredientsPhoto(){
 var deferredInstallPrompt=null;
 
 function goPage(name){
+ if(name!=="scan")document.body.classList.remove("scanner-fullscreen","scan-processing");
  stopScanner();
  document.querySelectorAll(".app-page").forEach(function(x){x.classList.remove("active")});
  var p=document.getElementById("page-"+name);if(p)p.classList.add("active");
