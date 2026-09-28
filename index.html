@@ -49,6 +49,16 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:13px}
 body.auth-open{overflow:hidden}
 @media(max-width:520px){.auth-card{padding:22px;border-radius:24px}.auth-title{font-size:30px}.auth-links{align-items:flex-start;flex-direction:column}}
 .dash{margin:18px 0}.dash-hero{background:linear-gradient(135deg,#0f766e,#1ba798);color:#fff;border-radius:28px;padding:24px;box-shadow:0 18px 45px rgba(15,118,110,.20)}.dash-hero h2{font-size:32px;margin:0 0 8px}.dash-hero p{margin:0 0 16px;color:rgba(255,255,255,.88)}.dash-actions{display:flex;gap:10px;flex-wrap:wrap}.dash-actions .btn{background:#fff;color:#0f766e}.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.dash-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px}.dash-card h3{display:flex;align-items:center;justify-content:space-between}.list-empty{color:var(--muted);font-size:14px}.history-item{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #edf2f1}.history-item:first-of-type{border-top:0}.history-item img{width:52px;height:52px;border-radius:10px;object-fit:contain;background:#f4f6f5}.history-meta{min-width:0;flex:1}.history-name{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-sub{font-size:12px;color:var(--muted)}.fav-btn{border:0;background:#fff4cc;border-radius:12px;padding:8px 10px;cursor:pointer;font-size:18px}.fav-btn.active{background:#ffe28a}.danger-btn{border:0;background:#fff1ef;color:#9c2d24;border-radius:10px;padding:7px 9px;font-weight:800;cursor:pointer}@media(max-width:700px){.dash-grid{grid-template-columns:1fr}}
+
+.app-page{display:none;padding-bottom:92px}.app-page.active{display:block}
+.action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.action-tile{border:1px solid var(--line);background:#fff;border-radius:22px;padding:20px 14px;text-align:left;box-shadow:0 8px 24px rgba(20,33,31,.05);cursor:pointer}.action-icon{font-size:28px;display:block;margin-bottom:10px}.action-tile b{display:block;font-size:16px}.action-tile small{color:var(--muted);display:block;margin-top:4px}
+.bottom-nav{position:fixed;z-index:50;left:50%;bottom:0;transform:translateX(-50%);width:min(900px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));backdrop-filter:blur(16px)}.nav-btn{border:0;background:none;color:#6a7774;font-size:11px;font-weight:800;padding:5px 2px}.nav-btn span{display:block;font-size:21px;margin-bottom:2px}.nav-btn.active{color:var(--brand)}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 10px}.section-head h2{margin:0}.wide-list .history-item{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin:8px 0}.clickable{cursor:pointer}
+.search-results{margin-top:12px}.search-hit{border:1px solid var(--line);border-radius:15px;padding:13px;margin-top:8px;background:#fff;cursor:pointer}.search-hit b{font-size:17px}
+.result-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.metric{background:#f2f7f6;border-radius:14px;padding:11px;text-align:center}.metric strong{display:block;font-size:20px}.metric small{color:var(--muted)}
+.profile-row{padding:14px 0;border-top:1px solid var(--line)}.profile-row:first-of-type{border-top:0}.profile-row b{display:block;margin-bottom:4px}
+.legal{font-size:14px;line-height:1.6}.install-banner{display:none;background:#eaf7f4;border:1px solid #b8ddd6;border-radius:18px;padding:14px;margin:12px 0}.install-banner.show{display:block}
+@media(max-width:700px){.action-grid{grid-template-columns:1fr}.action-tile{display:grid;grid-template-columns:42px 1fr;column-gap:8px}.action-icon{grid-row:1/3}.result-summary{grid-template-columns:1fr 1fr 1fr}}
 </style>
 </head>
 <body>
@@ -94,39 +104,22 @@ body.auth-open{overflow:hidden}
 <header id="siteHeader"><div class="wrap top"><div class="logo">E</div>E-Check Kids<div class="top-user"><button id="userButton" class="user-pill" onclick="userMenuAction()">Anmelden</button></div></div></header>
 
 <main id="appShell" class="wrap hidden">
-<section id="dashboard" class="dash">
-  <div class="dash-hero">
-    <h2>Dein E-Check 👋</h2>
-    <p>Scanne Produkte, speichere Favoriten und finde deine letzten Prüfungen schnell wieder.</p>
-    <div class="dash-actions">
-      <button class="btn" onclick="openPanel('barcode');document.getElementById('panel-barcode').scrollIntoView({behavior:'smooth'});startScanner()">📷 Jetzt scannen</button>
-      <button class="btn" onclick="openPanel('text');document.getElementById('panel-text').scrollIntoView({behavior:'smooth'})">🔎 E-Nummer prüfen</button>
-    </div>
+<section id="page-home" class="app-page active">
+  <div class="dash" style="margin-top:18px">
+   <div class="dash-hero"><h2>Was steckt in deinem Essen?</h2><p>Scannen, fotografieren oder E‑Nummer suchen – einfach und verständlich.</p></div>
+   <div id="installBanner" class="install-banner"><b>📲 E‑Check Kids installieren</b><p class="muted" style="margin:5px 0 10px">Zum Startbildschirm hinzufügen und wie eine App öffnen.</p><button class="btn primary" onclick="installApp()">App installieren</button></div>
+   <div class="action-grid">
+    <button class="action-tile" onclick="goPage('scan');openPanel('barcode');startScanner()"><span class="action-icon">📷</span><b>Produkt scannen</b><small>Barcode mit der Kamera erfassen</small></button>
+    <button class="action-tile" onclick="goPage('scan');openPanel('photo')"><span class="action-icon">🧾</span><b>Zutaten fotografieren</b><small>Text erkennen und anschließend korrigieren</small></button>
+    <button class="action-tile" onclick="goPage('scan');openPanel('text')"><span class="action-icon">🔎</span><b>E‑Nummer suchen</b><small>Nummer, Name oder Zutaten eingeben</small></button>
+   </div>
+   <div class="dash-grid">
+    <div class="dash-card"><h3>🕘 Letzte Scans</h3><div id="historyList" class="list-empty">Noch keine Scans gespeichert.</div><button class="btn soft" style="width:100%;margin-top:10px" onclick="goPage('history')">Gesamten Verlauf</button></div>
+    <div class="dash-card"><h3>⭐ Favoriten</h3><div id="favoritesList" class="list-empty">Noch keine Favoriten gespeichert.</div><button class="btn soft" style="width:100%;margin-top:10px" onclick="goPage('favorites')">Alle Favoriten</button></div>
+   </div>
   </div>
-  <div class="dash-grid">
-    <div class="dash-card">
-      <h3>🕘 Letzte Scans <button class="danger-btn" onclick="clearHistory()">Leeren</button></h3>
-      <div id="historyList" class="list-empty">Noch keine Scans gespeichert.</div>
-    </div>
-    <div class="dash-card">
-      <h3>⭐ Favoriten</h3>
-      <div id="favoritesList" class="list-empty">Noch keine Favoriten gespeichert.</div>
-    </div>
-  </div>
-</section>
-<section class="hero">
-<div class="card">
-<span class="eyebrow">Einfach • mobil • ohne App-Kauf</span>
-<h1>Was steckt<br>in deinem Essen?</h1>
-<p class="muted">Scanne einen Produktbarcode mit der Handykamera oder prüfe eine Zutatenliste. E‑Nummern werden verständlich eingeordnet.</p>
-<div class="row">
-<button class="btn primary" onclick="openPanel('barcode');startScanner()">📷 Live-Barcode scannen</button>
-<button class="btn soft" onclick="openPanel('text')">🔎 E-Nummer prüfen</button>
-</div>
-</div>
-</section>
-
-<section>
+ </section>
+ <section id="page-scan" class="app-page"><section>
 <div class="grid">
 <button class="btn primary" onclick="openPanel('barcode')">▦ Barcode</button>
 <button class="btn soft" onclick="openPanel('photo')">📷 Zutaten-Foto</button>
@@ -169,16 +162,33 @@ body.auth-open{overflow:hidden}
 
 <div id="panel-text" class="panel">
 <div class="card">
-<h2>E-Nummer prüfen</h2>
-<textarea id="ingredientsText" placeholder="E-Nummer oder Zutatenliste eingeben, z. B. E129 oder Wasser, Zucker, Farbstoff E129 ..."></textarea>
-<button class="btn primary" style="margin-top:10px;width:100%" onclick="analyzeIngredients()">E-Nummer prüfen</button>
+<h2>E‑Nummer suchen oder Zutaten prüfen</h2>
+<textarea id="ingredientsText" placeholder="z. B. E129, Tartrazin, Aspartam, Süßstoff oder Zutatenliste ..."></textarea><div id="additiveSearchResults" class="search-results"></div>
+<button class="btn primary" style="margin-top:10px;width:100%" onclick="smartSearch()">Suchen & prüfen</button>
 </div>
 </div>
 
 <div id="result"></div>
 </section>
 
-<section class="card">
+</section>
+<section id="page-history" class="app-page"><div class="section-head"><h2>🕘 Scan-Verlauf</h2><button class="danger-btn" onclick="clearHistory()">Verlauf löschen</button></div><div id="historyFull" class="wide-list"></div></section>
+<section id="page-favorites" class="app-page"><div class="section-head"><h2>⭐ Favoriten</h2></div><div id="favoritesFull" class="wide-list"></div></section>
+<section id="page-profile" class="app-page">
+ <div class="section-head"><h2>👤 Profil & Einstellungen</h2></div>
+ <div class="card">
+  <div class="profile-row"><b>Angemeldet als</b><span id="profileEmail" class="muted">Gast</span></div>
+  <div class="profile-row"><b>Anzeigename</b><input id="profileName" placeholder="Dein Name"><button class="btn soft" style="margin-top:8px" onclick="saveProfile()">Speichern</button></div>
+  <div class="profile-row"><b>Passwort</b><button class="btn soft" onclick="changePassword()">Passwort ändern</button></div>
+  <div class="profile-row"><b>App installieren</b><button class="btn soft" onclick="installApp()">Zum Startbildschirm</button></div>
+  <div class="profile-row"><b>Meine Daten</b><button class="btn soft" onclick="clearHistory()">Scan-Verlauf löschen</button></div>
+  <div class="profile-row"><b>Konto</b><button class="danger-btn" onclick="deleteAccount()">Konto dauerhaft löschen</button></div>
+  <div class="profile-row"><button class="btn soft" style="width:100%" onclick="logout()">Abmelden</button></div>
+ </div>
+ <div class="card legal"><h3>Datenschutz – Kurzinfo</h3><p>Für Anmeldung, Verlauf und Favoriten nutzt E‑Check Kids Supabase. Produktdaten werden von Open Food Facts abgerufen. Kamera und Fotos werden nur für die von dir gestartete Scan-/Texterkennung verwendet. E‑Check Kids ist eine Informationshilfe und keine medizinische Beratung.</p><p><b>Vor einer öffentlichen/gewerblichen Veröffentlichung:</b> Eine vollständige, rechtlich geprüfte Datenschutzerklärung und ein vollständiges Impressum mit Betreiberangaben müssen ergänzt werden.</p></div>
+ <div class="card legal"><h3>Impressum – Entwurf</h3><p><b>E‑Check Kids</b><br>Betreiberangaben vor öffentlicher/gewerblicher Veröffentlichung vervollständigen.</p></div>
+</section>
+<section id="infoCards" class="app-page"><section class="card">
 <h2>Was bedeutet die Einordnung?</h2>
 <div class="notice">
 <b>Besonderer Kinderhinweis:</b> Für E102, E104, E110, E122, E124 und E129 verlangt die EU bei entsprechenden Lebensmitteln einen zusätzlichen Hinweis, dass sie Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen können.
@@ -205,8 +215,14 @@ body.auth-open{overflow:hidden}
 <div class="notice warn"><b>Wichtiger Hinweis:</b> E‑Check Kids ist eine Informations- und Einkaufshilfe und keine Diagnose, Behandlung oder ärztliche Empfehlung. Bei Allergien, Unverträglichkeiten, Erkrankungen oder Fragen zu ADHS/ADS bitte medizinischen Rat einholen. Produktdaten können unvollständig sein; maßgeblich ist die aktuelle Verpackung.</div>
 </section>
 </main>
-
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.9</div></footer>
+<nav id="bottomNav" class="bottom-nav hidden">
+ <button class="nav-btn active" data-page="home" onclick="goPage('home')"><span>⌂</span>Home</button>
+ <button class="nav-btn" data-page="scan" onclick="goPage('scan')"><span>▦</span>Scannen</button>
+ <button class="nav-btn" data-page="history" onclick="goPage('history')"><span>🕘</span>Verlauf</button>
+ <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span>★</span>Favoriten</button>
+ <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span>●</span>Profil</button>
+</nav>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 2.0</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -359,7 +375,9 @@ async function lookupBarcode(forced){
   var ing=p.ingredients_text_de||p.ingredients_text||p.ingredients_text_en||"";
   var nums=detectE(ing,p.additives_tags||[]);
   var pic=p.image_front_url?'<img src="'+esc(p.image_front_url)+'" alt="">':'';
-  var head='<div class="card"><div class="product">'+pic+'<div><div class="name">'+esc(p.product_name_de||p.product_name||"Produkt")+'</div><div class="muted">'+esc(p.brands||"")+'</div><span class="chip">Barcode '+esc(code)+'</span><span class="chip">'+nums.length+' E-Nummern erkannt</span></div></div>';
+  var kidsCount=nums.filter(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0}).length;
+  var head='<div class="card"><div class="product">'+pic+'<div><div class="name">'+esc(p.product_name_de||p.product_name||"Produkt")+'</div><div class="muted">'+esc(p.brands||"")+'</div><span class="chip">Barcode '+esc(code)+'</span></div></div>'
+   +'<div class="result-summary"><div class="metric"><strong>'+nums.length+'</strong><small>Zusatzstoffe</small></div><div class="metric"><strong>'+kidsCount+'</strong><small>EU-Kinderhinweise</small></div><div class="metric"><strong>'+(kidsCount?'⚠':'✓')+'</strong><small>Hinweis</small></div></div>';
   head+=renderE(nums);
   if(!ing)head+='<div class="notice warn" style="margin-top:12px">Für dieses Produkt sind keine Zutaten gespeichert. Fotografiere die Zutatenliste, um sie trotzdem zu prüfen.</div>';
   head+='</div>';
@@ -436,16 +454,103 @@ async function readIngredientsPhoto(){
  try{
   var r=await Tesseract.recognize(f,"deu",{logger:function(m){if(m.status==="recognizing text")st.textContent="Texterkennung: "+Math.round((m.progress||0)*100)+" %"}});
   document.getElementById("ingredientsText").value=r.data.text||"";
-  st.textContent="Fertig.";
-  openPanel("text");analyzeIngredients();
+  st.textContent="Text erkannt. Prüfe oder korrigiere ihn bei Bedarf.";
+  openPanel("text");document.getElementById("ingredientsText").focus();
  }catch(e){st.textContent="Texterkennung fehlgeschlagen. Zutaten können auch manuell eingefügt werden."}
 }
 
 
 
+
+var deferredInstallPrompt=null;
+
+function goPage(name){
+ stopScanner();
+ document.querySelectorAll(".app-page").forEach(function(x){x.classList.remove("active")});
+ var p=document.getElementById("page-"+name);if(p)p.classList.add("active");
+ document.querySelectorAll(".nav-btn").forEach(function(x){x.classList.toggle("active",x.dataset.page===name)});
+ if(name==="history"||name==="favorites"||name==="home")refreshDashboard();
+ if(name==="profile")loadProfile();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function showAppChrome(){
+ var n=document.getElementById("bottomNav");if(n)n.classList.remove("hidden");
+}
+
+function openSavedProduct(barcode){goPage("scan");openPanel("barcode");document.getElementById("barcodeInput").value=barcode;lookupBarcode(barcode)}
+
+function normalizeSearch(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+function localAdditiveMatches(q){
+ q=normalizeSearch(q).trim();if(!q)return [];
+ return Object.keys(special).filter(function(k){
+  var d=special[k]||[];
+  return normalizeSearch(k+" "+(d[0]||"")+" "+(d[1]||"")+" "+(eExplain[k]||"")).indexOf(q)>=0;
+ }).slice(0,20);
+}
+async function smartSearch(){
+ var t=document.getElementById("ingredientsText").value.trim();
+ var direct=detectE(t,[]);
+ if(direct.length){analyzeIngredients();return}
+ var hits=localAdditiveMatches(t);
+ var box=document.getElementById("additiveSearchResults");
+ if(hits.length){
+  box.innerHTML=hits.map(function(n){var d=special[n]||["Zusatzstoff",""];return '<div class="search-hit" onclick="showAdditive(\\''+n+'\\')"><b>'+n+' – '+esc(d[0])+'</b><div class="muted">'+esc(d[1])+'</div></div>'}).join("");
+  return;
+ }
+ // Comprehensive fallback: Open Food Facts additive taxonomy search endpoint
+ try{
+  var r=await fetch("https://world.openfoodfacts.org/cgi/search.pl?search_terms="+encodeURIComponent(t)+"&search_simple=1&action=process&json=1&page_size=5");
+  if(!r.ok)throw new Error();
+  box.innerHTML='<div class="notice">Kein direkter E‑Nummern-Treffer. Wenn du eine Zutatenliste eingibst, werden enthaltene E‑Nummern automatisch erkannt.</div>';
+ }catch(e){box.innerHTML='<div class="notice warn">Kein Treffer. Versuche eine E‑Nummer wie E129 oder den Namen des Zusatzstoffs.</div>'}
+}
+function showAdditive(n){
+ document.getElementById("result").innerHTML='<div class="card"><h2>'+esc(n)+' – '+esc((special[n]||["Zusatzstoff"])[0])+'</h2>'+renderE([n])+'<p class="muted" style="margin-top:14px">Quelle/Einordnung: EU-Zusatzstoffrecht, EFSA und Open Food Facts. Die App ersetzt keine medizinische Beratung.</p></div>';
+ document.getElementById("result").scrollIntoView({behavior:"smooth"});
+}
+async function loadProfile(){
+ var email=document.getElementById("profileEmail"),name=document.getElementById("profileName");
+ if(!currentUser){email.textContent="Gast – für Kontofunktionen bitte anmelden";name.value="";return}
+ email.textContent=currentUser.email||"";
+ const r=await sb.from("profiles").select("display_name").eq("id",currentUser.id).maybeSingle();
+ name.value=r.data&&r.data.display_name?r.data.display_name:"";
+}
+async function saveProfile(){
+ if(!currentUser){alert("Bitte zuerst anmelden.");return}
+ var display_name=document.getElementById("profileName").value.trim();
+ const r=await sb.from("profiles").upsert({id:currentUser.id,display_name:display_name,updated_at:new Date().toISOString()});
+ alert(r.error?"Konnte nicht gespeichert werden.":"Profil gespeichert.");
+}
+async function changePassword(){
+ if(!currentUser){alert("Bitte zuerst anmelden.");return}
+ var p=prompt("Neues Passwort (mindestens 8 Zeichen):");if(!p)return;
+ if(p.length<8){alert("Bitte mindestens 8 Zeichen verwenden.");return}
+ const r=await sb.auth.updateUser({password:p});alert(r.error?friendlyAuthError(r.error.message):"Passwort geändert.");
+}
+async function deleteAccount(){
+ if(!currentUser){alert("Bitte zuerst anmelden.");return}
+ if(!confirm("Konto wirklich dauerhaft löschen? Verlauf und Favoriten werden ebenfalls gelöscht."))return;
+ if(!confirm("Letzte Bestätigung: Konto endgültig löschen?"))return;
+ const session=(await sb.auth.getSession()).data.session;
+ if(!session){alert("Sitzung abgelaufen. Bitte neu anmelden.");return}
+ try{
+  var r=await fetch(SUPABASE_URL+"/functions/v1/delete-account",{method:"POST",headers:{"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json"}});
+  var j=await r.json();if(!r.ok)throw new Error(j.error||"Fehler");
+  await sb.auth.signOut();localStorage.clear();location.reload();
+ }catch(e){alert("Konto konnte nicht gelöscht werden: "+e.message)}
+}
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredInstallPrompt=e;var b=document.getElementById("installBanner");if(b)b.classList.add("show")});
+async function installApp(){
+ if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return}
+ alert("Auf Android/Chrome: Browser-Menü öffnen und „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.");
+}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){})})}
+
 async function saveScan(product){
  if(!currentUser||!product)return;
  try{
+  await sb.from("scan_history").delete().eq("barcode",product.barcode);
   await sb.from("scan_history").insert({
    user_id:currentUser.id,
    barcode:product.barcode,
@@ -460,9 +565,10 @@ async function saveScan(product){
 function renderSavedItem(item,type){
  var img=item.image_url?'<img src="'+esc(item.image_url)+'" alt="">':'<div style="width:52px;height:52px;border-radius:10px;background:#f4f6f5;display:grid;place-items:center">🛒</div>';
  var buttons=type==="favorite"
-  ?'<button class="danger-btn" onclick="removeFavorite('+item.id+')">Entfernen</button>'
+  ?'<button class="danger-btn" onclick="event.stopPropagation();removeFavorite('+item.id+')">Entfernen</button>'
   :'';
- return '<div class="history-item">'+img+'<div class="history-meta"><div class="history-name">'+esc(item.product_name||"Produkt")+'</div><div class="history-sub">'+esc(item.brand||"")+(item.additives&&item.additives.length?' • '+item.additives.length+' E-Nummern':'')+'</div></div>'+buttons+'</div>';
+ var date=item.created_at?new Date(item.created_at).toLocaleDateString("de-DE"):"";
+ return '<div class="history-item clickable" onclick="openSavedProduct(\''+esc(item.barcode)+'\')">'+img+'<div class="history-meta"><div class="history-name">'+esc(item.product_name||"Produkt")+'</div><div class="history-sub">'+esc(item.brand||"")+(item.additives&&item.additives.length?' • '+item.additives.length+' E-Nummern':'')+(date?' • '+date:'')+'</div></div>'+buttons+'</div>';
 }
 
 async function refreshDashboard(){
@@ -472,14 +578,16 @@ async function refreshDashboard(){
   return;
  }
  const [h,f]=await Promise.all([
-  sb.from("scan_history").select("id,barcode,product_name,brand,image_url,additives,created_at").order("created_at",{ascending:false}).limit(8),
-  sb.from("favorites").select("id,barcode,product_name,brand,image_url,additives,created_at").order("created_at",{ascending:false}).limit(8)
+  sb.from("scan_history").select("id,barcode,product_name,brand,image_url,additives,created_at").order("created_at",{ascending:false}).limit(50),
+  sb.from("favorites").select("id,barcode,product_name,brand,image_url,additives,created_at").order("created_at",{ascending:false}).limit(50)
  ]);
- var hl=document.getElementById("historyList"),fl=document.getElementById("favoritesList");
+ var hl=document.getElementById("historyList"),fl=document.getElementById("favoritesList"),hf=document.getElementById("historyFull"),ff=document.getElementById("favoritesFull");
  if(h.error)hl.innerHTML='<div class="list-empty">Verlauf konnte nicht geladen werden.</div>';
  else hl.innerHTML=h.data&&h.data.length?h.data.map(function(x){return renderSavedItem(x,"history")}).join(""):'<div class="list-empty">Noch keine Scans gespeichert.</div>';
  if(f.error)fl.innerHTML='<div class="list-empty">Favoriten konnten nicht geladen werden.</div>';
- else fl.innerHTML=f.data&&f.data.length?f.data.map(function(x){return renderSavedItem(x,"favorite")}).join(""):'<div class="list-empty">Noch keine Favoriten gespeichert.</div>';
+ else fl.innerHTML=f.data&&f.data.length?f.data.slice(0,4).map(function(x){return renderSavedItem(x,"favorite")}).join(""):'<div class="list-empty">Noch keine Favoriten gespeichert.</div>';
+ if(hf)hf.innerHTML=h.error?'<div class="list-empty">Verlauf konnte nicht geladen werden.</div>':(h.data&&h.data.length?h.data.map(function(x){return renderSavedItem(x,"history")}).join(""):'<div class="list-empty">Noch keine Scans gespeichert.</div>');
+ if(ff)ff.innerHTML=f.error?'<div class="list-empty">Favoriten konnten nicht geladen werden.</div>':(f.data&&f.data.length?f.data.map(function(x){return renderSavedItem(x,"favorite")}).join(""):'<div class="list-empty">Noch keine Favoriten gespeichert.</div>');
 }
 
 async function toggleCurrentFavorite(){
@@ -552,6 +660,7 @@ function closeAuth(){
 }
 
 function enterApp(label){
+ showAppChrome();
  document.getElementById("appShell").classList.remove("hidden");
  document.getElementById("userButton").textContent=label||"Konto";
  closeAuth();
@@ -660,6 +769,7 @@ sb.auth.onAuthStateChange(function(event,session){
  if(currentUser){
   localStorage.removeItem("echeck_guest");
   document.getElementById("appShell").classList.remove("hidden");
+  showAppChrome();
   document.getElementById("userButton").textContent=currentUser.email||"Mein Konto";
   closeAuth();
   refreshDashboard();
@@ -679,6 +789,7 @@ sb.auth.onAuthStateChange(function(event,session){
   document.body.classList.remove("auth-open");
  }else if(localStorage.getItem("echeck_guest")==="1"){
   document.getElementById("appShell").classList.remove("hidden");
+  showAppChrome();
   document.getElementById("authScreen").classList.add("hidden");
   document.getElementById("userButton").textContent="Gast";
   document.body.classList.remove("auth-open");
