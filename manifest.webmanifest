@@ -1,0 +1,9 @@
+{
+  "name": "E-Check Kids",
+  "short_name": "E-Check",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f8f7",
+  "theme_color": "#0f766e",
+  "lang": "de"
+}
