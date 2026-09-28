@@ -1059,7 +1059,7 @@ async function installApp(){
  if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return}
  alert("Auf Android/Chrome: Browser-Menü öffnen und „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.");
 }
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=29",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=30",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){})})}
 
 async function saveScan(product){
  if(!currentUser||!product)return;
