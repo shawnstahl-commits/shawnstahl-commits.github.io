@@ -59,7 +59,8 @@ body.auth-open{overflow:hidden}
 .profile-row{padding:14px 0;border-top:1px solid var(--line)}.profile-row:first-of-type{border-top:0}.profile-row b{display:block;margin-bottom:4px}
 .legal{font-size:14px;line-height:1.6}
 .health-hero{background:linear-gradient(135deg,#e9f8ef,#f7fbef);border:1px solid #cfe8d7;border-radius:24px;padding:20px;margin-bottom:14px}
-.health-hero h2{font-size:30px;margin-bottom:8px}.health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.health-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px}.health-card .health-icon{font-size:30px;display:block;margin-bottom:8px}.health-card h3{font-size:18px}.health-card p{margin:5px 0;color:var(--muted);font-size:14px}.swap-list{display:grid;gap:9px;margin-top:12px}.swap{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;background:#f7faf9;border-radius:14px;padding:11px;font-size:14px}.swap strong:last-child{color:var(--brand)}.idea-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.idea-tag{background:#edf7f4;color:#185f57;border-radius:999px;padding:8px 10px;font-size:13px;font-weight:800}.source-link{color:var(--brand);font-weight:800;text-decoration:none}.source-link:hover{text-decoration:underline}@media(max-width:650px){.health-grid{grid-template-columns:1fr}.swap{grid-template-columns:1fr auto 1fr;font-size:13px}}
+.health-hero h2{font-size:30px;margin-bottom:8px}.health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.health-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px}.health-card .health-icon{font-size:30px;display:block;margin-bottom:8px}.health-card h3{font-size:18px}.health-card p{margin:5px 0;color:var(--muted);font-size:14px}.swap-list{display:grid;gap:9px;margin-top:12px}.swap{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;background:#f7faf9;border-radius:14px;padding:11px;font-size:14px}.swap strong:last-child{color:var(--brand)}.idea-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.idea-tag{background:#edf7f4;color:#185f57;border-radius:999px;padding:8px 10px;font-size:13px;font-weight:800}.source-link{color:var(--brand);font-weight:800;text-decoration:none}
+.alt-section{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}.alt-title{display:flex;align-items:center;gap:8px;margin-bottom:5px}.alt-title h3{font-size:22px;margin:0}.alt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}.alt-card{border:1px solid #cfe5dc;background:#f7fcfa;border-radius:17px;padding:14px}.alt-card strong{display:block;margin-bottom:5px}.alt-card p{font-size:13px;color:var(--muted);margin:0;line-height:1.45}.alt-check{margin-top:10px;background:#eef8f4;border-radius:14px;padding:12px;font-size:13px}.alt-check b{color:var(--brand)}@media(max-width:600px){.alt-grid{grid-template-columns:1fr}}.source-link:hover{text-decoration:underline}@media(max-width:650px){.health-grid{grid-template-columns:1fr}.swap{grid-template-columns:1fr auto 1fr;font-size:13px}}
 .install-banner{display:none;background:#eaf7f4;border:1px solid #b8ddd6;border-radius:18px;padding:14px;margin:12px 0}.install-banner.show{display:block}
 @media(max-width:700px){.action-grid{grid-template-columns:1fr}.action-tile{display:grid;grid-template-columns:42px 1fr;column-gap:8px}.action-icon{grid-row:1/3}.result-summary{grid-template-columns:1fr 1fr 1fr}}
 </style>
@@ -270,7 +271,7 @@ body.auth-open{overflow:hidden}
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span>★</span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span>●</span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 2.2</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 2.3</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -413,7 +414,7 @@ async function lookupBarcode(forced){
  if(!code){setStatus("Bitte Barcode eingeben oder scannen.");return}
  setStatus("🔎 Produkt wird gesucht …");clearError();
  try{
-  var fields="code,product_name,product_name_de,brands,image_front_url,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,nutriscore_grade";
+  var fields="code,product_name,product_name_de,brands,image_front_url,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,nutriscore_grade,categories,categories_tags,nutriments";
   var u="https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields="+encodeURIComponent(fields);
   var r=await fetch(u,{headers:{"Accept":"application/json"}});
   if(!r.ok)throw new Error("HTTP "+r.status);
@@ -427,6 +428,7 @@ async function lookupBarcode(forced){
   var head='<div class="card"><div class="product">'+pic+'<div><div class="name">'+esc(p.product_name_de||p.product_name||"Produkt")+'</div><div class="muted">'+esc(p.brands||"")+'</div><span class="chip">Barcode '+esc(code)+'</span></div></div>'
    +'<div class="result-summary"><div class="metric"><strong>'+nums.length+'</strong><small>Zusatzstoffe</small></div><div class="metric"><strong>'+kidsCount+'</strong><small>EU-Kinderhinweise</small></div><div class="metric"><strong>'+(kidsCount?'⚠':'✓')+'</strong><small>Hinweis</small></div></div>';
   head+=renderE(nums);
+  head+=renderBetterAlternatives(p,nums);
   if(!ing)head+='<div class="notice warn" style="margin-top:12px">Für dieses Produkt sind keine Zutaten gespeichert. Fotografiere die Zutatenliste, um sie trotzdem zu prüfen.</div>';
   head+='</div>';
   document.getElementById("result").innerHTML=head;
@@ -473,6 +475,47 @@ function renderE(nums){
       +(kids?'<div class="eu-warning">⚠ Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen.</div>':'')
       +'</div>';
  });
+ return out;
+}
+
+function renderBetterAlternatives(p,nums){
+ var cats=normalizeSearch(((p.categories||"")+" "+((p.categories_tags||[]).join(" "))));
+ var n=p.nutriments||{};
+ var sugar=Number(n.sugars_100g);
+ var ideas=[];
+ function add(icon,title,text){ideas.push({icon:icon,title:title,text:text})}
+
+ if(/beverage|drink|soft-drink|soda|cola|limonade|getrank|boisson/.test(cats)){
+  add("💧","Wasser oder ungesüßtes Getränk","Für den Alltag ist Wasser die einfachste Alternative. Ungesüßter Tee ist ebenfalls eine Option.");
+ }else if(/breakfast-cereal|cereal|muesli|musli|granola|fruhstuck/.test(cats)){
+  add("🥣","Haferflocken oder weniger gesüßtes Müsli","Vergleiche ähnliche Produkte und achte auf den Zuckergehalt. Haferflocken lassen sich selbst mit Obst kombinieren.");
+ }else if(/yogurt|yoghurt|joghurt/.test(cats)){
+  add("🥛","Naturjoghurt + Obst","Naturjoghurt lässt sich selbst mit frischem Obst oder Beeren kombinieren und du bestimmst die Süße selbst.");
+ }else if(/bread|brot|toast/.test(cats)){
+  add("🌾","Vollkorn-Variante vergleichen","Bei Brot und Toast kannst du nach einer Vollkornvariante mit möglichst übersichtlicher Zutatenliste schauen.");
+ }else if(/biscuit|cookie|cake|confection|chocolate|candy|snack|keks|suss|sweet/.test(cats)){
+  add("🍎","Einfacher Snack","Je nach Situation können Obst, Naturjoghurt oder eine andere wenig verarbeitete Zwischenmahlzeit eine Alternative sein.");
+ }else if(/juice|nectar|saft/.test(cats)){
+  add("💧","Wasser als Alltagsgetränk","Saft kann süß schmecken und Zucker enthalten. Für den Alltag ist Wasser die einfachere Getränkeoption.");
+ }else{
+  add("🛒","Ähnliches Produkt vergleichen","Suche in derselben Produktgruppe nach einer Variante mit übersichtlicherer Zutatenliste und vergleiche die Nährwertangaben.");
+ }
+
+ if(Number.isFinite(sugar)&&sugar>0){
+  add("🍬","Zucker vergleichen","Dieses Produkt ist mit "+esc(sugar.toFixed(1).replace(".",","))+" g Zucker pro 100 g/ml hinterlegt. Beim Vergleich kannst du eine Variante mit weniger Zucker wählen.");
+ }
+ if(nums&&nums.length){
+  add("🧾","Zusatzstoffe vergleichen","Hier wurden "+nums.length+" E-Nummer"+(nums.length===1?"":"n")+" erkannt. Eine Alternative kann eine kürzere Zutatenliste bzw. weniger erkannte Zusatzstoffe haben.");
+ }
+ if(nums&&nums.some(function(x){return ["E102","E104","E110","E122","E124","E129"].indexOf(x)>=0})){
+  add("🧒","EU-Kinderhinweis beachten","Wenn du speziell für Kinder vergleichst, kannst du nach einer Variante ohne die hier erkannte E-Nummer mit EU-Kinderhinweis suchen.");
+ }
+
+ var seen={},unique=ideas.filter(function(x){var k=x.title; if(seen[k])return false;seen[k]=1;return true}).slice(0,4);
+ var out='<div class="alt-section"><div class="alt-title"><span style="font-size:25px">🥕</span><h3>Bessere Alternativen</h3></div>'
+  +'<p class="muted" style="margin:0">Keine pauschale Bewertung: Diese Vorschläge helfen dir, ähnliche Produkte anhand einfacher Kriterien zu vergleichen.</p><div class="alt-grid">';
+ unique.forEach(function(x){out+='<div class="alt-card"><strong>'+x.icon+' '+esc(x.title)+'</strong><p>'+x.text+'</p></div>'});
+ out+='</div><div class="alt-check"><b>Beim Einkauf vergleichen:</b> Zutatenliste • Zucker • erkannte Zusatzstoffe • passende Vollkorn-/Naturvariante</div></div>';
  return out;
 }
 
