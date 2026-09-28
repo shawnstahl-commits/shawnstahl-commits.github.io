@@ -360,7 +360,7 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 4.0 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 4.1 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -573,6 +573,14 @@ function renderAdhdFocus(nums){
 function renderE(nums){
  if(!nums.length)return '<div class="notice" style="margin-top:12px"><b>Keine E-Nummer erkannt.</b><br>Das bedeutet nicht automatisch, dass das Produkt gesund oder ungesund ist.</div>';
  var euKids=["E102","E104","E110","E122","E124","E129"];
+ var kidUse={
+  "E102":"Farbstoff – wird verwendet, um Lebensmitteln und Getränken eine gelbe Farbe zu geben.",
+  "E104":"Farbstoff – wird verwendet, um Lebensmitteln und Getränken eine gelbe bis gelbgrüne Farbe zu geben.",
+  "E110":"Farbstoff – wird verwendet, um Lebensmitteln und Getränken eine gelb-orange bis orange Farbe zu geben.",
+  "E122":"Farbstoff – wird verwendet, um Lebensmitteln und Getränken eine rote bis dunkelrote Farbe zu geben.",
+  "E124":"Farbstoff – wird verwendet, um Lebensmitteln und Getränken eine kräftige rote Farbe zu geben.",
+  "E129":"Farbstoff – wird verwendet, um Lebensmitteln und Getränken eine rote Farbe zu geben."
+ };
  var hasKids=nums.some(function(n){return euKids.indexOf(n)>=0});
  var out=hasKids
   ?'<div class="notice danger" style="margin-top:12px"><b>⚠ EU-Kinderwarnhinweis erkannt</b><br>Mindestens einer der gefundenen Farbstoffe gehört zu den sechs E-Nummern mit zusätzlichem EU-Kennzeichnungshinweis.</div>'
@@ -589,6 +597,7 @@ function renderE(nums){
   out+='<div class="eitem '+(kids?'eu-kids':'')+'">'
       +'<span class="etag '+cls+'">'+(kids?'⚠ EU-Kinderhinweis':esc(d[1]))+'</span>'
       +'<div style="font-size:21px;font-weight:950;padding-right:8px">'+esc(n)+' – '+esc(d[0])+'</div>'
+      +(kids?'<div style="margin-top:12px;font-weight:900">Wofür wird es verwendet?</div><p class="muted" style="margin-top:5px">'+esc(kidUse[n]||"Farbstoff – wird eingesetzt, um Lebensmitteln und Getränken Farbe zu geben.")+'</p>':'')
       +'<div style="margin-top:10px;font-weight:900">Was ist das?</div>'
       +'<p class="muted" style="margin-top:5px">'+esc(detail)+'</p>'
       +(kids?'<div class="eu-warning">⚠ Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen.</div>':'')
