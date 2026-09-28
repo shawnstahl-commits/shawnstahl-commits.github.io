@@ -222,11 +222,11 @@ body.auth-open{overflow:hidden}
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span>★</span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span>●</span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 2.0</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 2.1</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
 <script>
 var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,currentProduct=null;
 
@@ -633,8 +633,42 @@ async function clearHistory(){
 
 const SUPABASE_URL="https://jnnqpxpbtqavloltpaow.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_O5jzIaWkpkaHUf_r_Y_uDQ_XuAtawnw";
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const AUTH_STORAGE_KEY="sb-jnnqpxpbtqavloltpaow-auth-token";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
+ auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+});
 let currentUser=null;
+
+function readStoredSession(){
+ try{
+  var s=JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY)||"null");
+  if(!s||!s.access_token||!s.user)return null;
+  if(s.expires_at&&s.expires_at<Math.floor(Date.now()/1000)-30)return null;
+  return s;
+ }catch(e){return null}
+}
+
+async function directPasswordLogin(email,pw){
+ var controller=new AbortController();
+ var timer=setTimeout(function(){controller.abort()},12000);
+ try{
+  var r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{
+   method:"POST",
+   headers:{"apikey":SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json"},
+   body:JSON.stringify({email:email,password:pw}),
+   signal:controller.signal
+  });
+  var j=await r.json().catch(function(){return {}});
+  if(!r.ok)throw new Error(j.msg||j.message||j.error_description||j.error||"Anmeldung fehlgeschlagen.");
+  if(!j.expires_at&&j.expires_in)j.expires_at=Math.floor(Date.now()/1000)+Number(j.expires_in);
+  localStorage.setItem(AUTH_STORAGE_KEY,JSON.stringify(j));
+  localStorage.removeItem("echeck_guest");
+  currentUser=j.user||null;
+  showAuthMessage("Anmeldung erfolgreich – E-Check Kids wird geöffnet …","info");
+  setTimeout(function(){location.replace(location.pathname+"?v=22&login=ok")},250);
+  return true;
+ }finally{clearTimeout(timer)}
+}
 
 function showAuthMessage(text,type){
  var el=document.getElementById("authMsg");
@@ -694,12 +728,12 @@ async function authLogin(){
  var pw=document.getElementById("authPassword").value;
  if(!email||!pw){showAuthMessage("Bitte E-Mail und Passwort eingeben.","err");return}
  showAuthMessage("Anmeldung läuft …","info");
- const {data,error}=await sb.auth.signInWithPassword({email:email,password:pw});
- if(error){showAuthMessage(friendlyAuthError(error.message),"err");return}
- currentUser=data.user||null;
- localStorage.removeItem("echeck_guest");
- enterApp(currentUser&&currentUser.email?currentUser.email:"Mein Konto");
- refreshDashboard();
+ try{
+  await directPasswordLogin(email,pw);
+ }catch(e){
+  if(e&&e.name==="AbortError")showAuthMessage("Die Anmeldung hat zu lange gedauert. Bitte Internetverbindung prüfen und erneut versuchen.","err");
+  else showAuthMessage(friendlyAuthError(e&&e.message?e.message:String(e)),"err");
+ }
 }
 
 function strongPassword(p){return p.length>=8&&/[a-z]/.test(p)&&/[A-Z]/.test(p)&&/[0-9]/.test(p)&&/[^A-Za-z0-9]/.test(p)}
@@ -765,31 +799,32 @@ async function setNewPasswordAfterRecovery(){
 
 sb.auth.onAuthStateChange(function(event,session){
  currentUser=session&&session.user?session.user:null;
- if(event==="PASSWORD_RECOVERY"){
-  setTimeout(setNewPasswordAfterRecovery,250);
- }
+ if(event==="PASSWORD_RECOVERY")setTimeout(setNewPasswordAfterRecovery,250);
  if(currentUser){
   localStorage.removeItem("echeck_guest");
   document.getElementById("appShell").classList.remove("hidden");
   showAppChrome();
   document.getElementById("userButton").textContent=currentUser.email||"Mein Konto";
   closeAuth();
-  refreshDashboard();
+  setTimeout(function(){refreshDashboard()},0);
  }else if(event==="SIGNED_OUT"){
   document.getElementById("userButton").textContent="Anmelden";
  }
 });
 
 (async function initAuth(){
- const {data}=await sb.auth.getSession();
- if(data&&data.session&&data.session.user){
-  currentUser=data.session.user;
+ var stored=readStoredSession();
+ if(stored&&stored.user){
+  currentUser=stored.user;
   document.getElementById("appShell").classList.remove("hidden");
+  showAppChrome();
   document.getElementById("userButton").textContent=currentUser.email||"Mein Konto";
   document.getElementById("authScreen").classList.add("hidden");
-  refreshDashboard();
   document.body.classList.remove("auth-open");
- }else if(localStorage.getItem("echeck_guest")==="1"){
+  setTimeout(function(){refreshDashboard()},250);
+  return;
+ }
+ if(localStorage.getItem("echeck_guest")==="1"){
   document.getElementById("appShell").classList.remove("hidden");
   showAppChrome();
   document.getElementById("authScreen").classList.add("hidden");
