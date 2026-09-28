@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f766e">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>E-Check Kids</title>
 <meta name="description" content="E-Nummern per Barcode oder Zutatenliste prüfen. Informationshilfe, keine medizinische Beratung.">
 <link rel="manifest" href="manifest.webmanifest">
@@ -127,7 +130,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:13px}
 </section>
 </main>
 
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.5</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -150,6 +153,9 @@ var special={
 "E226":["Calciumsulfit","Empfindlichkeit möglich"],
 "E227":["Calciumhydrogensulfit","Empfindlichkeit möglich"],
 "E228":["Kaliumhydrogensulfit","Empfindlichkeit möglich"],
+"E150A":["Einfacher Zuckerkulör","Farbstoff"],
+"E150B":["Sulfitlaugen-Zuckerkulör","Farbstoff"],
+"E150C":["Ammoniak-Zuckerkulör","Farbstoff"],
 "E150D":["Ammoniumsulfit-Zuckerkulör","Farbstoff"],
 "E338":["Phosphorsäure","Säuerungsmittel / Säureregulator"],
 "E330":["Citronensäure","Säuerungsmittel / Säureregulator"],
@@ -298,16 +304,23 @@ function renderE(nums){
  var hasKids=nums.some(function(n){return euKids.indexOf(n)>=0});
  var out=hasKids
   ?'<div class="notice danger" style="margin-top:12px"><b>⚠ EU-Kinderwarnhinweis erkannt</b><br>Mindestens einer der gefundenen Farbstoffe gehört zu den sechs E-Nummern mit zusätzlichem EU-Kennzeichnungshinweis.</div>'
-  :'<div class="notice" style="margin-top:12px"><b>E-Nummern gefunden.</b></div>';
+  :'<div class="notice" style="margin-top:12px"><b>E-Nummern gefunden – Erklärung:</b></div>';
 
  nums.forEach(function(n){
-  var d=special[n]||["Zusatzstoff","Gefunden"];
+  var d=special[n]||["Zusatzstoff (Name noch nicht hinterlegt)","Gefunden"];
   var kids=euKids.indexOf(n)>=0;
   var cls=kids?"red":(n==="E211"||n.indexOf("E22")===0?"amber":"blue");
   var detail=kids
    ?"Dieser Farbstoff gehört zu den sechs Stoffen, für die die EU einen zusätzlichen Kinderhinweis bei der Kennzeichnung verlangt."
    :(eExplain[n]||"Diese E-Nummer wurde erkannt. Eine E-Nummer ist nicht automatisch gleichbedeutend mit gesundheitsschädlich.");
-  out+='<div class="eitem '+(kids?'eu-kids':'')+'"><span class="etag '+cls+'">'+(kids?'⚠ EU-Kinderhinweis':esc(d[1]))+'</span><b>'+esc(n)+' – '+esc(d[0])+'</b><p class="muted">'+esc(detail)+'</p>'+(kids?'<div class="eu-warning">⚠ Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen.</div>':'')+'</div>';
+
+  out+='<div class="eitem '+(kids?'eu-kids':'')+'">'
+      +'<span class="etag '+cls+'">'+(kids?'⚠ EU-Kinderhinweis':esc(d[1]))+'</span>'
+      +'<div style="font-size:21px;font-weight:950;padding-right:8px">'+esc(n)+' – '+esc(d[0])+'</div>'
+      +'<div style="margin-top:10px;font-weight:900">Was ist das?</div>'
+      +'<p class="muted" style="margin-top:5px">'+esc(detail)+'</p>'
+      +(kids?'<div class="eu-warning">⚠ Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen.</div>':'')
+      +'</div>';
  });
  return out;
 }
