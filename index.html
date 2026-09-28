@@ -129,6 +129,11 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
 .saved-image-wrap-v53{width:52px;height:52px;border-radius:11px;background:#f4f6f5;display:grid;place-items:center;overflow:hidden;flex:0 0 52px}.saved-image-wrap-v53 img{width:52px;height:52px;object-fit:contain}.saved-image-fallback-v53{width:52px;height:52px;display:grid;place-items:center;color:#82908c;font-size:21px}.saved-image-fallback-v53.hidden{display:none}
 @media(max-width:520px){.product .scan-product-img-v53,.product>.product-image-fallback-v53{width:82px;height:100px}}
 
+
+/* Allergies + compare reliability 5.4 */
+.allergen-grid-v54{display:grid;grid-template-columns:1fr 1fr;gap:8px}.allergen-choice-v54{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;padding:10px;background:#fff;font-size:12px}.allergen-choice-v54 input{margin-top:2px;accent-color:var(--brand)}.allergy-disclaimer-v54{margin-top:11px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;padding:11px;color:#7c3f10;font-size:12px;line-height:1.45}.allergy-disclaimer-v54.compact{margin-top:7px}.allergy-alert-v54,.allergy-info-v54{margin-top:12px;border-radius:17px;padding:13px 14px;display:flex;flex-direction:column;gap:4px}.allergy-alert-v54.danger{background:#fff1f1;border:1px solid #fecaca;color:#991b1b}.allergy-alert-v54.trace{background:#fff8e8;border:1px solid #fde68a;color:#854d0e}.allergy-alert-v54.ok,.allergy-info-v54{background:#f3faf8;border:1px solid #cfe8e2;color:#285f56}.allergy-alert-v54 span,.allergy-info-v54 span{font-size:13px;line-height:1.4}.compare-manual-v54{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:2px}.compare-manual-v54 input{min-width:0;padding:9px 8px;font-size:11px}.compare-manual-v54 .btn{padding:9px 8px;font-size:11px}
+@media(max-width:520px){.allergen-grid-v54{grid-template-columns:1fr}.compare-manual-v54{grid-template-columns:1fr}.compare-manual-v54 .btn{width:100%}}
+
 </style>
 </head>
 <body>
@@ -407,8 +412,8 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
    <p>Scanne nacheinander zwei Produkte. E-Check Kids vergleicht die hinterlegten Produktdaten sachlich miteinander – ohne pauschal „gut“ oder „schlecht“ zu bewerten.</p>
  </div>
  <div class="compare-slots-v52">
-   <div id="compareSlotA" class="compare-slot-v52"><div class="compare-letter-v52">A</div><div class="compare-placeholder-v52"><b>Produkt A</b><small>Noch nicht gescannt</small></div><button class="btn primary" onclick="openCompareScanner('A')">A scannen</button></div>
-   <div id="compareSlotB" class="compare-slot-v52"><div class="compare-letter-v52">B</div><div class="compare-placeholder-v52"><b>Produkt B</b><small>Noch nicht gescannt</small></div><button class="btn primary" onclick="openCompareScanner('B')">B scannen</button></div>
+   <div id="compareSlotA" class="compare-slot-v52"><div class="compare-letter-v52">A</div><div class="compare-placeholder-v52"><b>Produkt A</b><small>Noch nicht gescannt</small></div><button class="btn primary" onclick="openCompareScanner('A')">A scannen</button><div class="compare-manual-v54"><input id="compareBarcodeA" inputmode="numeric" placeholder="Barcode A"><button class="btn soft" onclick="lookupCompareManual('A')">Suchen</button></div></div>
+   <div id="compareSlotB" class="compare-slot-v52"><div class="compare-letter-v52">B</div><div class="compare-placeholder-v52"><b>Produkt B</b><small>Noch nicht gescannt</small></div><button class="btn primary" onclick="openCompareScanner('B')">B scannen</button><div class="compare-manual-v54"><input id="compareBarcodeB" inputmode="numeric" placeholder="Barcode B"><button class="btn soft" onclick="lookupCompareManual('B')">Suchen</button></div></div>
  </div>
  <div id="compareResult" class="compare-result-v52"></div>
  <div class="notice" style="margin-top:14px"><b>Beta-Test:</b> Der Produktvergleich ist während der Entwicklung frei testbar. Produktdaten können unvollständig sein; maßgeblich bleibt die Verpackung.</div>
@@ -419,6 +424,13 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
   <div class="profile-row"><b>Angemeldet als</b><span id="profileEmail" class="muted">Gast</span></div>
   <div class="profile-row"><b>Anzeigename</b><input id="profileName" placeholder="Dein Name"><button class="btn soft" style="margin-top:8px" onclick="saveProfile()">Speichern</button></div>
   <div class="profile-row plus-profile-row-v5"><b>E-Check Kids Plus</b><div class="plan-line-v5"><span id="profilePlanBadge" class="plan-badge-v5">FREE</span><span id="profilePlanText" class="muted">Basis-Tarif</span></div><button class="btn primary" style="margin-top:9px" onclick="goPage('plus')">Plus ansehen</button></div>
+  <div class="profile-row">
+   <b>Allergien & Unverträglichkeiten</b>
+   <p class="muted" style="margin:5px 0 10px">Wähle relevante EU-Hauptallergene. Treffer werden beim Scan besonders hervorgehoben.</p>
+   <div id="allergenChoices" class="allergen-grid-v54"></div>
+   <button class="btn soft" style="margin-top:10px" onclick="saveAllergenPreferences()">Allergene speichern</button>
+   <div class="allergy-disclaimer-v54"><b>Wichtig:</b> E-Check Kids kann Allergene nur anhand der verfügbaren Produktdaten erkennen. Angaben können fehlen, veraltet oder falsch sein. Maßgeblich ist immer die aktuelle Verpackung. Die App gibt keine Garantie auf Allergenfreiheit und darf bei Allergien nicht als alleinige Entscheidungsgrundlage verwendet werden.</div>
+  </div>
   <div class="profile-row"><b>Passwort</b><button class="btn soft" onclick="changePassword()">Passwort ändern</button></div>
   <div class="profile-row"><b>App installieren</b><button class="btn soft" onclick="installApp()">Zum Startbildschirm</button></div>
   <div class="profile-row"><b>Meine Daten</b><button class="btn soft" onclick="clearHistory()">Scan-Verlauf löschen</button></div>
@@ -462,13 +474,13 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.3 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.4 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
 <script>
-var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null};
+var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[];
 
 var special={
 "E102":["Tartrazin","EU-Kinderhinweis"],
@@ -820,15 +832,81 @@ function setStatus(t){document.getElementById("scanStatus").textContent=t}
 function error(t){var e=document.getElementById("scanError");e.textContent=t;e.classList.remove("hidden")}
 function clearError(){var e=document.getElementById("scanError");e.textContent="";e.classList.add("hidden")}
 
+var ALLERGENS_V54=[
+ {id:"gluten",label:"Glutenhaltiges Getreide",tags:["en:gluten"]},
+ {id:"crustaceans",label:"Krebstiere",tags:["en:crustaceans"]},
+ {id:"eggs",label:"Eier",tags:["en:eggs"]},
+ {id:"fish",label:"Fisch",tags:["en:fish"]},
+ {id:"peanuts",label:"Erdnüsse",tags:["en:peanuts"]},
+ {id:"soybeans",label:"Soja",tags:["en:soybeans"]},
+ {id:"milk",label:"Milch",tags:["en:milk"]},
+ {id:"nuts",label:"Schalenfrüchte / Nüsse",tags:["en:nuts"]},
+ {id:"celery",label:"Sellerie",tags:["en:celery"]},
+ {id:"mustard",label:"Senf",tags:["en:mustard"]},
+ {id:"sesame-seeds",label:"Sesam",tags:["en:sesame-seeds"]},
+ {id:"sulphur-dioxide-and-sulphites",label:"Schwefeldioxid / Sulfite",tags:["en:sulphur-dioxide-and-sulphites"]},
+ {id:"lupin",label:"Lupinen",tags:["en:lupin"]},
+ {id:"molluscs",label:"Weichtiere",tags:["en:molluscs"]}
+];
+function renderAllergenChoices(){
+ var box=document.getElementById("allergenChoices");if(!box)return;
+ box.innerHTML=ALLERGENS_V54.map(function(a){
+  var checked=selectedAllergens.indexOf(a.id)>=0?"checked":"";
+  return '<label class="allergen-choice-v54"><input type="checkbox" value="'+esc(a.id)+'" '+checked+'><span>'+esc(a.label)+'</span></label>';
+ }).join("");
+}
+async function saveAllergenPreferences(){
+ if(!currentUser){alert("Bitte zuerst anmelden.");return}
+ var ids=[...document.querySelectorAll("#allergenChoices input:checked")].map(function(x){return x.value});
+ const r=await sb.from("profiles").update({allergens:ids,updated_at:new Date().toISOString()}).eq("id",currentUser.id);
+ if(r.error){alert("Allergene konnten nicht gespeichert werden.");return}
+ selectedAllergens=ids;alert("Allergene gespeichert.");
+}
+function allergenLabel(id){
+ var a=ALLERGENS_V54.find(function(x){return x.id===id});return a?a.label:id;
+}
+function detectSelectedAllergens(p){
+ var all=(p&&p.allergens_tags)||[], traces=(p&&p.traces_tags)||[];
+ var contains=[],traceHits=[];
+ selectedAllergens.forEach(function(id){
+  var a=ALLERGENS_V54.find(function(x){return x.id===id});if(!a)return;
+  if(a.tags.some(function(t){return all.indexOf(t)>=0}))contains.push(id);
+  else if(a.tags.some(function(t){return traces.indexOf(t)>=0}))traceHits.push(id);
+ });
+ return {contains:contains,traces:traceHits};
+}
+function renderAllergenAlert(p){
+ if(!selectedAllergens.length)return '<div class="allergy-info-v54"><b>Allergie-Check nicht eingerichtet.</b><span>Im Profil kannst du relevante Allergene auswählen.</span></div>';
+ var hit=detectSelectedAllergens(p),out='';
+ if(hit.contains.length){
+  out+='<div class="allergy-alert-v54 danger"><b>⚠ Enthält laut Produktdaten:</b><span>'+esc(hit.contains.map(allergenLabel).join(", "))+'</span></div>';
+ }
+ if(hit.traces.length){
+  out+='<div class="allergy-alert-v54 trace"><b>Spurenhinweis laut Produktdaten:</b><span>'+esc(hit.traces.map(allergenLabel).join(", "))+'</span></div>';
+ }
+ if(!hit.contains.length&&!hit.traces.length){
+  out+='<div class="allergy-alert-v54 ok"><b>Kein ausgewähltes Allergen erkannt.</b><span>Das ist keine Garantie auf Allergenfreiheit.</span></div>';
+ }
+ out+='<div class="allergy-disclaimer-v54 compact"><b>Keine Garantie:</b> Produktdaten können unvollständig, veraltet oder falsch sein. Prüfe bei Allergien immer die aktuelle Verpackung und Spurenhinweise.</div>';
+ return out;
+}
+function lookupCompareManual(slot){
+ var el=document.getElementById("compareBarcode"+slot),code=String(el&&el.value||"").replace(/\D/g,"");
+ if(!code){alert("Bitte Barcode eingeben.");return}
+ lookupCompareProduct(code,slot);
+}
+
 function openFullscreenScanner(target){
- compareTargetSlot=target||null;
  document.body.classList.remove("scan-result-mode");
  goPage("scan");
+ compareTargetSlot=target||null;
  openPanel("barcode");
  document.getElementById("result").innerHTML="";
+ var title=document.querySelector(".scan-top-v4 strong");
+ if(title)title.textContent=compareTargetSlot?"Produkt "+compareTargetSlot+" scannen":"Produkt scannen";
  document.body.classList.add("scanner-fullscreen");
  document.body.classList.remove("scan-processing");
- setTimeout(function(){startScanner()},80);
+ setTimeout(function(){startScanner()},160);
 }
 function openCompareScanner(slot){openFullscreenScanner(slot)}
 async function closeFullscreenScanner(){
@@ -955,7 +1033,7 @@ function robustProductImage(urls,cls,alt){
 async function lookupCompareProduct(code,slot){
  setStatus("Produkt "+slot+" wird geladen …");
  try{
-  var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,categories,categories_tags,nutriments";
+  var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,categories,categories_tags,nutriments";
   var u="https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields="+encodeURIComponent(fields);
   var r=await fetch(u,{headers:{"Accept":"application/json"}});
   if(!r.ok)throw new Error("HTTP "+r.status);
@@ -995,7 +1073,7 @@ function compareCounts(p){
 function compareProductCard(slot,p){
  if(!p)return '<div class="compare-letter-v52">'+slot+'</div><div class="compare-placeholder-v52"><b>Produkt '+slot+'</b><small>Noch nicht gescannt</small></div><button class="btn primary" onclick="openCompareScanner(&quot;'+slot+'&quot;)">'+slot+' scannen</button>';
  var img=robustProductImage(p.image_urls&&p.image_urls.length?p.image_urls:(p.image?[p.image]:[]),"compare-product-img-v53",p.name);
- return '<div class="compare-letter-v52">'+slot+'</div><div class="compare-product-v52">'+img+'<div><b>'+esc(p.name)+'</b><small>'+esc(p.brand||"")+'</small><small>'+esc(p.barcode)+'</small></div></div><button class="btn soft" onclick="openCompareScanner(&quot;'+slot+'&quot;)">Neu scannen</button>';
+ return '<div class="compare-letter-v52">'+slot+'</div><div class="compare-product-v52">'+img+'<div><b>'+esc(p.name)+'</b><small>'+esc(p.brand||"")+'</small><small>'+esc(p.barcode)+'</small></div></div><button class="btn soft" onclick="openCompareScanner(&quot;'+slot+'&quot;)">Neu scannen</button><div class="compare-manual-v54"><input id="compareBarcode'+slot+'" inputmode="numeric" placeholder="Barcode '+slot+'"><button class="btn soft" onclick="lookupCompareManual(&quot;'+slot+'&quot;)">Suchen</button></div>';
 }
 function fmtSugar(v){return v==null?"keine Daten":v.toFixed(1).replace(".",",")+" g"}
 function renderComparison(){
@@ -1026,7 +1104,7 @@ async function lookupBarcode(forced){
  if(!code){setStatus("Bitte Barcode eingeben oder scannen.");return}
  setStatus("🔎 Produkt wird gesucht …");clearError();
  try{
-  var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,nutriscore_grade,categories,categories_tags,nutriments";
+  var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,nutriscore_grade,categories,categories_tags,nutriments";
   var u="https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields="+encodeURIComponent(fields);
   var r=await fetch(u,{headers:{"Accept":"application/json"}});
   if(!r.ok)throw new Error("HTTP "+r.status);
@@ -1040,6 +1118,7 @@ async function lookupBarcode(forced){
   var kidsCount=nums.filter(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0}).length;
   var head='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Produkt geprüft</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card result-card-v4"><div class="product">'+pic+'<div><div class="name">'+esc(p.product_name_de||p.product_name||"Produkt")+'</div><div class="muted">'+esc(p.brands||"")+'</div><span class="chip">Barcode '+esc(code)+'</span></div></div>'
    +'<div class="result-summary"><div class="metric"><strong>'+nums.length+'</strong><small>E-Nummern</small></div><div class="metric"><strong>'+kidsCount+'</strong><small>Kinderhinweise</small></div><div class="metric"><strong>'+(kidsCount?'⚠':'✓')+'</strong><small>Status</small></div></div>';
+  head+=renderAllergenAlert(p);
   head+=renderAdhdFocus(nums);
   head+=renderE(nums);
   head+=renderBetterAlternatives(p,nums);
@@ -1261,10 +1340,12 @@ async function loadSubscriptionStatus(){
 
 async function loadProfile(){
  var email=document.getElementById("profileEmail"),name=document.getElementById("profileName");
- if(!currentUser){email.textContent="Gast – für Kontofunktionen bitte anmelden";name.value="";loadSubscriptionStatus();return}
+ if(!currentUser){email.textContent="Gast – für Kontofunktionen bitte anmelden";name.value="";selectedAllergens=[];renderAllergenChoices();loadSubscriptionStatus();return}
  email.textContent=currentUser.email||"";
- const r=await sb.from("profiles").select("display_name").eq("id",currentUser.id).maybeSingle();
+ const r=await sb.from("profiles").select("display_name,allergens").eq("id",currentUser.id).maybeSingle();
  name.value=r.data&&r.data.display_name?r.data.display_name:"";
+ selectedAllergens=r.data&&Array.isArray(r.data.allergens)?r.data.allergens:[];
+ renderAllergenChoices();
  await loadSubscriptionStatus();
 }
 async function saveProfile(){
@@ -1296,7 +1377,7 @@ async function installApp(){
  if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return}
  alert("Auf Android/Chrome: Browser-Menü öffnen und „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.");
 }
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=34",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=35",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){})})}
 
 async function saveScan(product){
  if(!currentUser||!product)return;
