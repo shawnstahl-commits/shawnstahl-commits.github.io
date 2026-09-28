@@ -495,7 +495,7 @@ async function smartSearch(){
  var hits=localAdditiveMatches(t);
  var box=document.getElementById("additiveSearchResults");
  if(hits.length){
-  box.innerHTML=hits.map(function(n){var d=special[n]||["Zusatzstoff",""];return '<div class="search-hit" onclick="showAdditive(\\''+n+'\\')"><b>'+n+' – '+esc(d[0])+'</b><div class="muted">'+esc(d[1])+'</div></div>'}).join("");
+  box.innerHTML=hits.map(function(n){var d=special[n]||["Zusatzstoff",""];return '<div class="search-hit" onclick="showAdditive(&quot;'+esc(n)+'&quot;)"><b>'+esc(n)+' – '+esc(d[0])+'</b><div class="muted">'+esc(d[1])+'</div></div>'}).join("");
   return;
  }
  // Comprehensive fallback: Open Food Facts additive taxonomy search endpoint
