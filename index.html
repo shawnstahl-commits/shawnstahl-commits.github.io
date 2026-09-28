@@ -82,7 +82,7 @@ body.auth-open{overflow:hidden}
         <input id="authPassword" type="password" autocomplete="current-password" placeholder="Dein Passwort">
         <button class="show-pass" type="button" onclick="togglePassword()">zeigen</button>
       </div>
-    </div>
+    </div><div class="muted" style="font-size:12px;margin-top:6px">Bei neuen Konten: mindestens 8 Zeichen, Groß-/Kleinbuchstabe, Zahl & Sonderzeichen.</div>
 
     <div id="authMsg" class="auth-msg info"></div>
 
@@ -525,7 +525,7 @@ async function saveProfile(){
 async function changePassword(){
  if(!currentUser){alert("Bitte zuerst anmelden.");return}
  var p=prompt("Neues Passwort (mindestens 8 Zeichen):");if(!p)return;
- if(p.length<8){alert("Bitte mindestens 8 Zeichen verwenden.");return}
+ if(!strongPassword(p)){alert("Bitte mindestens 8 Zeichen mit Groß-/Kleinbuchstabe, Zahl und Sonderzeichen verwenden.");return}
  const r=await sb.auth.updateUser({password:p});alert(r.error?friendlyAuthError(r.error.message):"Passwort geändert.");
 }
 async function deleteAccount(){
@@ -684,7 +684,7 @@ function friendlyAuthError(msg){
  if(/invalid login credentials/i.test(m)) return "E-Mail oder Passwort ist nicht korrekt.";
  if(/email not confirmed/i.test(m)) return "Bitte bestätige zuerst deine E-Mail-Adresse.";
  if(/user already registered/i.test(m)) return "Für diese E-Mail gibt es bereits ein Konto.";
- if(/password should be at least/i.test(m)) return "Das Passwort ist zu kurz. Bitte mindestens 6 Zeichen verwenden.";
+ if(/password should be at least/i.test(m)) return "Das Passwort ist zu kurz. Bitte mindestens 8 Zeichen verwenden.";
  if(/rate limit/i.test(m)) return "Zu viele Versuche. Bitte kurz warten und später erneut versuchen.";
  return m||"Es ist ein Fehler aufgetreten.";
 }
@@ -702,11 +702,13 @@ async function authLogin(){
  refreshDashboard();
 }
 
+function strongPassword(p){return p.length>=8&&/[a-z]/.test(p)&&/[A-Z]/.test(p)&&/[0-9]/.test(p)&&/[^A-Za-z0-9]/.test(p)}
+
 async function authSignup(){
  var email=document.getElementById("authEmail").value.trim();
  var pw=document.getElementById("authPassword").value;
  if(!email||!pw){showAuthMessage("Bitte E-Mail und Passwort eingeben.","err");return}
- if(pw.length<6){showAuthMessage("Das Passwort muss mindestens 6 Zeichen haben.","err");return}
+ if(!strongPassword(pw)){showAuthMessage("Mindestens 8 Zeichen mit Groß-/Kleinbuchstabe, Zahl und Sonderzeichen verwenden.","err");return}
  showAuthMessage("Konto wird erstellt …","info");
  const {data,error}=await sb.auth.signUp({
   email:email,
@@ -753,9 +755,9 @@ function userMenuAction(){
 }
 
 async function setNewPasswordAfterRecovery(){
- var p1=prompt("Neues Passwort eingeben (mindestens 6 Zeichen):");
+ var p1=prompt("Neues Passwort: mindestens 8 Zeichen mit Groß-/Kleinbuchstabe, Zahl und Sonderzeichen.");
  if(!p1)return;
- if(p1.length<6){alert("Das Passwort muss mindestens 6 Zeichen haben.");return}
+ if(!strongPassword(p1)){alert("Bitte mindestens 8 Zeichen mit Groß-/Kleinbuchstabe, Zahl und Sonderzeichen verwenden.");return}
  const {error}=await sb.auth.updateUser({password:p1});
  if(error){alert("Passwort konnte nicht geändert werden: "+friendlyAuthError(error.message));return}
  alert("Passwort wurde geändert.");
