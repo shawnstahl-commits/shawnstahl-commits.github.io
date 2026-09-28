@@ -57,7 +57,10 @@ body.auth-open{overflow:hidden}
 .search-results{margin-top:12px}.search-hit{border:1px solid var(--line);border-radius:15px;padding:13px;margin-top:8px;background:#fff;cursor:pointer}.search-hit b{font-size:17px}
 .result-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.metric{background:#f2f7f6;border-radius:14px;padding:11px;text-align:center}.metric strong{display:block;font-size:20px}.metric small{color:var(--muted)}
 .profile-row{padding:14px 0;border-top:1px solid var(--line)}.profile-row:first-of-type{border-top:0}.profile-row b{display:block;margin-bottom:4px}
-.legal{font-size:14px;line-height:1.6}.install-banner{display:none;background:#eaf7f4;border:1px solid #b8ddd6;border-radius:18px;padding:14px;margin:12px 0}.install-banner.show{display:block}
+.legal{font-size:14px;line-height:1.6}
+.health-hero{background:linear-gradient(135deg,#e9f8ef,#f7fbef);border:1px solid #cfe8d7;border-radius:24px;padding:20px;margin-bottom:14px}
+.health-hero h2{font-size:30px;margin-bottom:8px}.health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.health-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px}.health-card .health-icon{font-size:30px;display:block;margin-bottom:8px}.health-card h3{font-size:18px}.health-card p{margin:5px 0;color:var(--muted);font-size:14px}.swap-list{display:grid;gap:9px;margin-top:12px}.swap{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;background:#f7faf9;border-radius:14px;padding:11px;font-size:14px}.swap strong:last-child{color:var(--brand)}.idea-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.idea-tag{background:#edf7f4;color:#185f57;border-radius:999px;padding:8px 10px;font-size:13px;font-weight:800}.source-link{color:var(--brand);font-weight:800;text-decoration:none}.source-link:hover{text-decoration:underline}@media(max-width:650px){.health-grid{grid-template-columns:1fr}.swap{grid-template-columns:1fr auto 1fr;font-size:13px}}
+.install-banner{display:none;background:#eaf7f4;border:1px solid #b8ddd6;border-radius:18px;padding:14px;margin:12px 0}.install-banner.show{display:block}
 @media(max-width:700px){.action-grid{grid-template-columns:1fr}.action-tile{display:grid;grid-template-columns:42px 1fr;column-gap:8px}.action-icon{grid-row:1/3}.result-summary{grid-template-columns:1fr 1fr 1fr}}
 </style>
 </head>
@@ -112,6 +115,7 @@ body.auth-open{overflow:hidden}
     <button class="action-tile" onclick="goPage('scan');openPanel('barcode');startScanner()"><span class="action-icon">📷</span><b>Produkt scannen</b><small>Barcode mit der Kamera erfassen</small></button>
     <button class="action-tile" onclick="goPage('scan');openPanel('photo')"><span class="action-icon">🧾</span><b>Zutaten fotografieren</b><small>Text erkennen und anschließend korrigieren</small></button>
     <button class="action-tile" onclick="goPage('scan');openPanel('text')"><span class="action-icon">🔎</span><b>E‑Nummer suchen</b><small>Nummer, Name oder Zutaten eingeben</small></button>
+    <button class="action-tile" onclick="goPage('tips')"><span class="action-icon">🥕</span><b>Gesunde Ideen</b><small>Einfache Tipps für Frühstück, Brotdose & Snacks</small></button>
    </div>
    <div class="dash-grid">
     <div class="dash-card"><h3>🕘 Letzte Scans</h3><div id="historyList" class="list-empty">Noch keine Scans gespeichert.</div><button class="btn soft" style="width:100%;margin-top:10px" onclick="goPage('history')">Gesamten Verlauf</button></div>
@@ -172,6 +176,50 @@ body.auth-open{overflow:hidden}
 </section>
 
 </section>
+<section id="page-tips" class="app-page">
+ <div class="section-head"><h2>🥕 Gesunde Ideen</h2><button class="btn soft" onclick="goPage('home')">← Zurück</button></div>
+ <div class="health-hero">
+  <span class="eyebrow">Einfach im Familienalltag</span>
+  <h2>Gute Auswahl, ohne komplizierte Regeln</h2>
+  <p>Hier findest du praktische Ideen für abwechslungsreiches Essen. Die Tipps orientieren sich an allgemeinen Ernährungsempfehlungen und sind keine medizinische oder ADHS-/ADS-Behandlung.</p>
+ </div>
+
+ <div class="health-grid">
+  <div class="health-card"><span class="health-icon">💧</span><h3>Trinken</h3><p>Wasser und ungesüßter Tee sind die einfachste Wahl für den Alltag. Süße Getränke eher selten.</p><div class="idea-tags"><span class="idea-tag">Wasser</span><span class="idea-tag">Ungesüßter Tee</span><span class="idea-tag">Wasser + Obstscheiben</span></div></div>
+  <div class="health-card"><span class="health-icon">🌈</span><h3>Obst & Gemüse</h3><p>Abwechslung zählt: verschiedene Farben und Sorten über den Tag verteilen.</p><div class="idea-tags"><span class="idea-tag">Apfel</span><span class="idea-tag">Beeren</span><span class="idea-tag">Gurke</span><span class="idea-tag">Paprika</span><span class="idea-tag">Möhren</span></div></div>
+  <div class="health-card"><span class="health-icon">🌾</span><h3>Vollkorn & Sattmacher</h3><p>Vollkornbrot, Haferflocken, Vollkornnudeln oder Naturreis liefern Ballaststoffe und passen gut in Familienmahlzeiten.</p><div class="idea-tags"><span class="idea-tag">Haferflocken</span><span class="idea-tag">Vollkornbrot</span><span class="idea-tag">Kartoffeln</span></div></div>
+  <div class="health-card"><span class="health-icon">🥚</span><h3>Eiweißquellen</h3><p>Zum Beispiel Naturjoghurt, Eier, Hülsenfrüchte oder Fisch. Pflanzliche Quellen wie Linsen, Bohnen und Kichererbsen bringen Abwechslung.</p><div class="idea-tags"><span class="idea-tag">Naturjoghurt</span><span class="idea-tag">Ei</span><span class="idea-tag">Linsen</span><span class="idea-tag">Hummus</span></div></div>
+ </div>
+
+ <div class="card" style="margin-top:14px">
+  <h2>🎒 Ideen für die Brotdose</h2>
+  <p class="muted">Einfach kombinieren: Vollkorn + Obst/Gemüse + eine passende Eiweißquelle + Wasser.</p>
+  <div class="idea-tags"><span class="idea-tag">Vollkornbrot + Käse + Gurke</span><span class="idea-tag">Naturjoghurt + Beeren + Hafer</span><span class="idea-tag">Gemüsesticks + Hummus</span><span class="idea-tag">Vollkornbrot + Ei + Paprika</span><span class="idea-tag">Apfel + Naturjoghurt</span></div>
+ </div>
+
+ <div class="card">
+  <h2>🔁 Einfach tauschen</h2>
+  <p class="muted">Es geht nicht um Verbote. Kleine Änderungen können eine Mahlzeit ausgewogener machen.</p>
+  <div class="swap-list">
+   <div class="swap"><span>Limo / Eistee</span><b>→</b><strong>Wasser / ungesüßter Tee</strong></div>
+   <div class="swap"><span>Stark gezuckertes Müsli</span><b>→</b><strong>Haferflocken + Obst</strong></div>
+   <div class="swap"><span>Süßes Gebäck als Pause</span><b>→</b><strong>Vollkornbrot + Obst/Gemüse</strong></div>
+   <div class="swap"><span>Fruchtjoghurt mit viel Zucker</span><b>→</b><strong>Naturjoghurt + frisches Obst</strong></div>
+  </div>
+ </div>
+
+ <div class="card">
+  <h2>🧒 Für Kinder wichtig</h2>
+  <p>Regelmäßige Mahlzeiten und eine abwechslungsreiche Auswahl sind wichtiger als ein einzelnes „perfektes“ Lebensmittel. Bei kleinen Kindern müssen Lebensmittel außerdem altersgerecht angeboten werden; ganze harte Nüsse können zum Beispiel ein Verschluckrisiko darstellen.</p>
+  <div class="notice warn"><b>ADHS/ADS:</b> Diese Ernährungstipps sind allgemeine Alltagshilfen. Sie behaupten nicht, ADHS/ADS zu behandeln oder Symptome zu heilen.</div>
+ </div>
+
+ <div class="card legal">
+  <h3>Quellen & Orientierung</h3>
+  <p>Die Inhalte orientieren sich an den Empfehlungen der Deutschen Gesellschaft für Ernährung (DGE) und Informationen des Bundeszentrums für Ernährung (BZfE).</p>
+  <p><a class="source-link" href="https://www.dge.de/gesunde-ernaehrung/gut-essen-und-trinken/dge-empfehlungen/" target="_blank" rel="noopener">DGE: Gut essen und trinken ↗</a><br><a class="source-link" href="https://www.bzfe.de/presse/pressemeldungen-archiv/warum-fruehstueck-und-zwischenmahlzeiten-fuer-kinder-wichtig-sind" target="_blank" rel="noopener">BZfE: Frühstück & Zwischenmahlzeiten für Kinder ↗</a></p>
+ </div>
+</section>
 <section id="page-history" class="app-page"><div class="section-head"><h2>🕘 Scan-Verlauf</h2><button class="danger-btn" onclick="clearHistory()">Verlauf löschen</button></div><div id="historyFull" class="wide-list"></div></section>
 <section id="page-favorites" class="app-page"><div class="section-head"><h2>⭐ Favoriten</h2></div><div id="favoritesFull" class="wide-list"></div></section>
 <section id="page-profile" class="app-page">
@@ -222,7 +270,7 @@ body.auth-open{overflow:hidden}
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span>★</span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span>●</span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 2.1</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 2.2</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
