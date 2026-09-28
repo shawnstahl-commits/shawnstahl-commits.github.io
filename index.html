@@ -86,11 +86,11 @@ body.auth-open{overflow:hidden}
     </div>
 
     <div class="auth-divider">sicher & kostenlos starten</div>
-    <div class="auth-note">E-Check Kids speichert keine Passwörter direkt auf dieser Webseite. Der sichere Kontozugang wird über einen Authentifizierungsdienst angebunden.</div>
+    <div class="auth-note">Dein Passwort wird sicher über Supabase Auth verarbeitet und nicht in dieser GitHub-Seite gespeichert.</div>
   </div>
 </section>
 
-<header id="siteHeader"><div class="wrap top"><div class="logo">E</div>E-Check Kids<div class="top-user"><button id="userButton" class="user-pill" onclick="openAuth()">Anmelden</button></div></div></header>
+<header id="siteHeader"><div class="wrap top"><div class="logo">E</div>E-Check Kids<div class="top-user"><button id="userButton" class="user-pill" onclick="userMenuAction()">Anmelden</button></div></div></header>
 
 <main id="appShell" class="wrap hidden">
 <section class="hero">
@@ -185,10 +185,11 @@ body.auth-open{overflow:hidden}
 </section>
 </main>
 
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.6</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.7</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null;
 
@@ -412,7 +413,10 @@ async function readIngredientsPhoto(){
 }
 
 
-var AUTH_READY=false;
+const SUPABASE_URL="https://jnnqpxpbtqavloltpaow.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_O5jzIaWkpkaHUf_r_Y_uDQ_XuAtawnw";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let currentUser=null;
 
 function showAuthMessage(text,type){
  var el=document.getElementById("authMsg");
@@ -420,7 +424,14 @@ function showAuthMessage(text,type){
  el.className="auth-msg show "+(type||"info");
 }
 
+function clearAuthMessage(){
+ var el=document.getElementById("authMsg");
+ el.textContent="";
+ el.className="auth-msg info";
+}
+
 function openAuth(){
+ clearAuthMessage();
  document.getElementById("authScreen").classList.remove("hidden");
  document.body.classList.add("auth-open");
 }
@@ -432,11 +443,12 @@ function closeAuth(){
 
 function enterApp(label){
  document.getElementById("appShell").classList.remove("hidden");
- document.getElementById("userButton").textContent=label||"Gast";
+ document.getElementById("userButton").textContent=label||"Konto";
  closeAuth();
 }
 
 function enterGuest(){
+ currentUser=null;
  localStorage.setItem("echeck_guest","1");
  enterApp("Gast");
 }
@@ -448,37 +460,115 @@ function togglePassword(){
  else{input.type="password";btn.textContent="zeigen"}
 }
 
-function authLogin(){
+function friendlyAuthError(msg){
+ var m=String(msg||"");
+ if(/invalid login credentials/i.test(m)) return "E-Mail oder Passwort ist nicht korrekt.";
+ if(/email not confirmed/i.test(m)) return "Bitte bestätige zuerst deine E-Mail-Adresse.";
+ if(/user already registered/i.test(m)) return "Für diese E-Mail gibt es bereits ein Konto.";
+ if(/password should be at least/i.test(m)) return "Das Passwort ist zu kurz. Bitte mindestens 6 Zeichen verwenden.";
+ if(/rate limit/i.test(m)) return "Zu viele Versuche. Bitte kurz warten und später erneut versuchen.";
+ return m||"Es ist ein Fehler aufgetreten.";
+}
+
+async function authLogin(){
  var email=document.getElementById("authEmail").value.trim();
  var pw=document.getElementById("authPassword").value;
  if(!email||!pw){showAuthMessage("Bitte E-Mail und Passwort eingeben.","err");return}
- if(!AUTH_READY){
-  showAuthMessage("Die sichere Anmeldung wird gerade eingerichtet. Du kannst die App bis dahin über „Ohne Konto testen“ benutzen.","info");
-  return;
+ showAuthMessage("Anmeldung läuft …","info");
+ const {data,error}=await sb.auth.signInWithPassword({email:email,password:pw});
+ if(error){showAuthMessage(friendlyAuthError(error.message),"err");return}
+ currentUser=data.user||null;
+ localStorage.removeItem("echeck_guest");
+ enterApp(currentUser&&currentUser.email?currentUser.email:"Mein Konto");
+}
+
+async function authSignup(){
+ var email=document.getElementById("authEmail").value.trim();
+ var pw=document.getElementById("authPassword").value;
+ if(!email||!pw){showAuthMessage("Bitte E-Mail und Passwort eingeben.","err");return}
+ if(pw.length<6){showAuthMessage("Das Passwort muss mindestens 6 Zeichen haben.","err");return}
+ showAuthMessage("Konto wird erstellt …","info");
+ const {data,error}=await sb.auth.signUp({
+  email:email,
+  password:pw,
+  options:{emailRedirectTo:"https://shawnstahl-commits.github.io/"}
+ });
+ if(error){showAuthMessage(friendlyAuthError(error.message),"err");return}
+ if(data.session){
+  currentUser=data.user||null;
+  localStorage.removeItem("echeck_guest");
+  enterApp(currentUser&&currentUser.email?currentUser.email:"Mein Konto");
+ }else{
+  showAuthMessage("Konto erstellt. Bitte öffne die Bestätigungs-E-Mail und klicke auf den Link. Danach kannst du dich anmelden.","info");
  }
 }
 
-function authSignup(){
- if(!AUTH_READY){
-  showAuthMessage("Die Kontoerstellung wird gerade sicher angebunden. Bis dahin kannst du die App ohne Konto testen.","info");
-  return;
- }
-}
-
-function authReset(){
+async function authReset(){
  var email=document.getElementById("authEmail").value.trim();
  if(!email){showAuthMessage("Trage zuerst deine E-Mail-Adresse ein.","err");return}
- if(!AUTH_READY){
-  showAuthMessage("Der Passwort-Reset wird zusammen mit dem sicheren Login aktiviert.","info");
-  return;
+ showAuthMessage("Reset-Link wird gesendet …","info");
+ const {error}=await sb.auth.resetPasswordForEmail(email,{
+  redirectTo:"https://shawnstahl-commits.github.io/"
+ });
+ if(error){showAuthMessage(friendlyAuthError(error.message),"err");return}
+ showAuthMessage("E-Mail ist unterwegs. Öffne den Link darin und lege anschließend ein neues Passwort fest.","info");
+}
+
+async function logout(){
+ await sb.auth.signOut();
+ currentUser=null;
+ localStorage.removeItem("echeck_guest");
+ document.getElementById("appShell").classList.add("hidden");
+ document.getElementById("userButton").textContent="Anmelden";
+ openAuth();
+ showAuthMessage("Du bist abgemeldet.","info");
+}
+
+function userMenuAction(){
+ if(currentUser){
+  if(confirm("Möchtest du dich abmelden?")) logout();
+ }else{
+  openAuth();
  }
 }
 
-(function(){
- if(localStorage.getItem("echeck_guest")==="1"){
+async function setNewPasswordAfterRecovery(){
+ var p1=prompt("Neues Passwort eingeben (mindestens 6 Zeichen):");
+ if(!p1)return;
+ if(p1.length<6){alert("Das Passwort muss mindestens 6 Zeichen haben.");return}
+ const {error}=await sb.auth.updateUser({password:p1});
+ if(error){alert("Passwort konnte nicht geändert werden: "+friendlyAuthError(error.message));return}
+ alert("Passwort wurde geändert.");
+}
+
+sb.auth.onAuthStateChange(function(event,session){
+ currentUser=session&&session.user?session.user:null;
+ if(event==="PASSWORD_RECOVERY"){
+  setTimeout(setNewPasswordAfterRecovery,250);
+ }
+ if(currentUser){
+  localStorage.removeItem("echeck_guest");
+  document.getElementById("appShell").classList.remove("hidden");
+  document.getElementById("userButton").textContent=currentUser.email||"Mein Konto";
+  closeAuth();
+ }else if(event==="SIGNED_OUT"){
+  document.getElementById("userButton").textContent="Anmelden";
+ }
+});
+
+(async function initAuth(){
+ const {data}=await sb.auth.getSession();
+ if(data&&data.session&&data.session.user){
+  currentUser=data.session.user;
+  document.getElementById("appShell").classList.remove("hidden");
+  document.getElementById("userButton").textContent=currentUser.email||"Mein Konto";
+  document.getElementById("authScreen").classList.add("hidden");
+  document.body.classList.remove("auth-open");
+ }else if(localStorage.getItem("echeck_guest")==="1"){
   document.getElementById("appShell").classList.remove("hidden");
   document.getElementById("authScreen").classList.add("hidden");
   document.getElementById("userButton").textContent="Gast";
+  document.body.classList.remove("auth-open");
  }else{
   document.body.classList.add("auth-open");
  }
