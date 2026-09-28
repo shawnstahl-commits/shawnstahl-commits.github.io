@@ -103,6 +103,7 @@ body.scanner-fullscreen{overflow:hidden;background:#020504}body.scanner-fullscre
 @media(max-width:430px){.quick-grid-v4{grid-template-columns:1fr 1fr}.quick-card-v4 small{display:none}.quick-card-v4 b{font-size:13px}.home-copy-v4 h1{font-size:46px}.scan-cta-v4{grid-template-columns:48px 1fr 22px}.scan-icon-v4{width:48px;height:48px}.scan-cta-v4 strong{font-size:18px}}
 @media(prefers-reduced-motion:reduce){.scan-line-v4{animation:none}}
 
+body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barcode,body.scan-result-mode #panel-photo,body.scan-result-mode #panel-text{display:none!important}body.scan-result-mode #result{display:block!important;max-width:760px;margin:0 auto 20px}body.scan-result-mode #page-scan{padding-top:0}
 </style>
 </head>
 <body>
@@ -426,6 +427,7 @@ function error(t){var e=document.getElementById("scanError");e.textContent=t;e.c
 function clearError(){var e=document.getElementById("scanError");e.textContent="";e.classList.add("hidden")}
 
 function openFullscreenScanner(){
+ document.body.classList.remove("scan-result-mode");
  goPage("scan");
  openPanel("barcode");
  document.getElementById("result").innerHTML="";
@@ -440,6 +442,7 @@ async function closeFullscreenScanner(){
 }
 function revealScanResults(){
  document.body.classList.remove("scanner-fullscreen","scan-processing");
+ document.body.classList.add("scan-result-mode");
  window.scrollTo({top:0,behavior:"smooth"});
 }
 
@@ -548,7 +551,7 @@ async function lookupBarcode(forced){
     await updateCurrentFavoriteButton();
   }
   document.getElementById("result").scrollIntoView({behavior:"smooth"});
- }catch(e){revealScanResults();setStatus("Produktabfrage fehlgeschlagen.");error("Internetverbindung prüfen und erneut versuchen.")}
+ }catch(e){revealScanResults();setStatus("Produktabfrage fehlgeschlagen.");document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Abfrage fehlgeschlagen</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="error" style="display:block"><b>Produkt konnte nicht geladen werden.</b><br>Internetverbindung prüfen und erneut versuchen.</div></div>'}
 }
 
 function detectE(text,tags){
@@ -672,6 +675,7 @@ async function readIngredientsPhoto(){
 var deferredInstallPrompt=null;
 
 function goPage(name){
+ document.body.classList.remove("scan-result-mode");
  if(name!=="scan")document.body.classList.remove("scanner-fullscreen","scan-processing");
  stopScanner();
  document.querySelectorAll(".app-page").forEach(function(x){x.classList.remove("active")});
