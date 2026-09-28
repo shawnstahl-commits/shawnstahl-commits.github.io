@@ -105,6 +105,11 @@ body.scanner-fullscreen{overflow:hidden;background:#020504}body.scanner-fullscre
 
 body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barcode,body.scan-result-mode #panel-photo,body.scan-result-mode #panel-text{display:none!important}body.scan-result-mode #result{display:block!important;max-width:760px;margin:0 auto 20px}body.scan-result-mode #page-scan{padding-top:0}
 .use-box-v42{margin:14px 0 12px;padding:13px 14px;border-radius:15px;background:#fff;border:1px solid #f0c9c5}.use-box-v42 span{display:block;font-size:9px;font-weight:950;letter-spacing:.11em;color:#b42318;margin-bottom:4px}.use-box-v42 b{display:block;font-size:15px;color:#33211f}.use-box-v42 p{margin:5px 0 0;color:#6f6664;font-size:14px;line-height:1.45}
+
+/* Plus preview 5.0 */
+.plus-hero-v5{display:grid;grid-template-columns:64px 1fr;gap:16px;align-items:start;background:linear-gradient(135deg,#0b756b,#11998a);color:#fff;border-radius:28px;padding:23px;margin:14px 0;box-shadow:0 17px 40px rgba(8,125,114,.18)}.plus-crown-v5{width:64px;height:64px;border-radius:20px;background:rgba(255,255,255,.16);display:grid;place-items:center;font-size:38px;font-weight:300}.plus-eyebrow-v5{font-size:10px;letter-spacing:.12em;font-weight:950;color:#c8fff4}.plus-hero-v5 h2{font-size:28px;line-height:1.05;margin:5px 0 8px}.plus-hero-v5 p{margin:0;color:rgba(255,255,255,.82);font-size:14px}.plus-status-v5{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:19px;padding:15px 17px;margin-bottom:13px}.plus-status-v5>span{font-size:11px;font-weight:900;color:var(--muted);letter-spacing:.06em}.plus-status-v5>strong{grid-column:2;grid-row:1/3;color:var(--brand);font-size:17px}.plus-status-v5>small{color:var(--muted)}.plus-feature-grid-v5{display:grid;grid-template-columns:1fr 1fr;gap:10px}.plus-feature-v5{display:grid;grid-template-columns:30px 1fr;gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px}.plus-feature-v5>span{width:30px;height:30px;border-radius:10px;background:#e8f6f2;color:var(--brand);display:grid;place-items:center;font-weight:950}.plus-feature-v5 b{display:block;font-size:14px}.plus-feature-v5 small{display:block;margin-top:3px;color:var(--muted);font-size:12px;line-height:1.35}.plus-pricing-v5{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.price-card-v5{position:relative;background:#fff;border:1px solid var(--line);border-radius:20px;padding:17px}.price-card-v5.featured{border:2px solid #18a08f;background:#f5fffc}.price-card-v5>span{display:block;font-size:10px;font-weight:950;letter-spacing:.1em;color:var(--muted)}.price-card-v5>strong{display:block;font-size:27px;margin-top:4px}.price-card-v5>small{color:var(--muted)}.price-badge-v5{position:absolute;right:10px;top:10px;background:#dff6ef;color:#087d72;font-size:9px;font-weight:950;padding:5px 7px;border-radius:999px}.plus-payment-note-v5 .btn:disabled{opacity:.55;cursor:not-allowed}.plan-line-v5{display:flex;align-items:center;gap:8px;margin-top:6px}.plan-badge-v5{display:inline-flex;padding:5px 8px;border-radius:999px;background:#edf3f2;color:#60716d;font-size:10px;font-weight:950;letter-spacing:.07em}.plan-badge-v5.plus{background:#dff6ef;color:#087d72}
+@media(max-width:650px){.plus-feature-grid-v5{grid-template-columns:1fr}.plus-hero-v5{grid-template-columns:52px 1fr;padding:19px}.plus-crown-v5{width:52px;height:52px;border-radius:17px;font-size:31px}.plus-hero-v5 h2{font-size:24px}.plus-pricing-v5{grid-template-columns:1fr 1fr}.price-card-v5>strong{font-size:23px}}
+
 </style>
 </head>
 <body>
@@ -313,11 +318,41 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
 </section>
 <section id="page-history" class="app-page"><div class="section-head"><h2>🕘 Scan-Verlauf</h2><button class="danger-btn" onclick="clearHistory()">Verlauf löschen</button></div><div id="historyFull" class="wide-list"></div></section>
 <section id="page-favorites" class="app-page"><div class="section-head"><h2>⭐ Favoriten</h2></div><div id="favoritesFull" class="wide-list"></div></section>
+<section id="page-plus" class="app-page">
+ <div class="section-head"><h2>E-Check Kids Plus</h2><button class="btn soft" onclick="goPage('profile')">← Zurück</button></div>
+ <div class="plus-hero-v5">
+   <div class="plus-crown-v5">+</div>
+   <div><span class="plus-eyebrow-v5">PLUS-VORSCHAU</span><h2>Mehr verstehen. Einfach entscheiden.</h2><p>Der Basis-Scan und wichtige Kinderwarnhinweise bleiben kostenlos. Plus soll zusätzliche Erklärungen und Komfort bieten.</p></div>
+ </div>
+ <div id="plusStatusBox" class="plus-status-v5"><span>Dein Tarif</span><strong id="plusPlanName">Free</strong><small id="plusPlanText">Basisfunktionen sind aktiv.</small></div>
+
+ <div class="plus-feature-grid-v5">
+   <div class="plus-feature-v5"><span>✓</span><div><b>Ausführliche E-Nummern-Erklärungen</b><small>Mehr Hintergrund, Verwendung und verständliche Einordnung.</small></div></div>
+   <div class="plus-feature-v5"><span>✓</span><div><b>ADS-/ADHS-Fokus mit Quellen</b><small>Belegte Informationen klar von unsicheren Zusammenhängen getrennt.</small></div></div>
+   <div class="plus-feature-v5"><span>✓</span><div><b>Erweiterte Alternativen</b><small>Mehr Vergleichshilfen zu gescannten Produkten.</small></div></div>
+   <div class="plus-feature-v5"><span>✓</span><div><b>Familienprofile</b><small>Später mehrere Kinder bzw. Familienmitglieder verwalten.</small></div></div>
+   <div class="plus-feature-v5"><span>✓</span><div><b>Erweiterter Verlauf & Favoriten</b><small>Mehr Organisation für regelmäßig gekaufte Produkte.</small></div></div>
+   <div class="plus-feature-v5"><span>✓</span><div><b>Produktvergleich</b><small>Später zwei Produkte direkt nebeneinander vergleichen.</small></div></div>
+ </div>
+
+ <div class="plus-pricing-v5">
+   <div class="price-card-v5"><span>MONATLICH</span><strong>3,99 €</strong><small>pro Monat · geplant</small></div>
+   <div class="price-card-v5 featured"><div class="price-badge-v5">GEPLANT</div><span>JÄHRLICH</span><strong>29,99 €</strong><small>pro Jahr · geplant</small></div>
+ </div>
+
+ <div class="card plus-payment-note-v5">
+   <h3>Zahlung noch nicht aktiviert</h3>
+   <p class="muted">Die technische Plus-Struktur ist vorbereitet. Es wird aktuell nichts berechnet und kein Kauf ausgelöst. Erst wenn der Zahlungsanbieter sicher angebunden ist, wird hier ein echter Kaufbutton aktiviert.</p>
+   <button class="btn primary" style="width:100%" disabled>Noch nicht verfügbar</button>
+ </div>
+ <div class="notice" style="margin-bottom:16px"><b>Bleibt kostenlos:</b> Barcode-Scan, erkannte E-Nummern, grundlegende Erklärungen und wichtige EU-Kinderhinweise.</div>
+</section>
 <section id="page-profile" class="app-page">
  <div class="section-head"><h2>👤 Profil & Einstellungen</h2></div>
  <div class="card">
   <div class="profile-row"><b>Angemeldet als</b><span id="profileEmail" class="muted">Gast</span></div>
   <div class="profile-row"><b>Anzeigename</b><input id="profileName" placeholder="Dein Name"><button class="btn soft" style="margin-top:8px" onclick="saveProfile()">Speichern</button></div>
+  <div class="profile-row plus-profile-row-v5"><b>E-Check Kids Plus</b><div class="plan-line-v5"><span id="profilePlanBadge" class="plan-badge-v5">FREE</span><span id="profilePlanText" class="muted">Basis-Tarif</span></div><button class="btn primary" style="margin-top:9px" onclick="goPage('plus')">Plus ansehen</button></div>
   <div class="profile-row"><b>Passwort</b><button class="btn soft" onclick="changePassword()">Passwort ändern</button></div>
   <div class="profile-row"><b>App installieren</b><button class="btn soft" onclick="installApp()">Zum Startbildschirm</button></div>
   <div class="profile-row"><b>Meine Daten</b><button class="btn soft" onclick="clearHistory()">Scan-Verlauf löschen</button></div>
@@ -361,7 +396,7 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 4.3 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.0 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -985,6 +1020,7 @@ function goPage(name){
  document.querySelectorAll(".nav-btn").forEach(function(x){x.classList.toggle("active",x.dataset.page===name)});
  if(name==="history"||name==="favorites"||name==="home")refreshDashboard();
  if(name==="profile")loadProfile();
+ if(name==="plus")loadSubscriptionStatus();
  window.scrollTo({top:0,behavior:"smooth"});
 }
 
@@ -1023,12 +1059,36 @@ function showAdditive(n){
  document.getElementById("result").innerHTML='<div class="card"><h2>'+esc(n)+' – '+esc((special[n]||["Zusatzstoff"])[0])+'</h2>'+renderE([n])+'<p class="muted" style="margin-top:14px">Quelle/Einordnung: EU-Zusatzstoffrecht, EFSA und Open Food Facts. Die App ersetzt keine medizinische Beratung.</p></div>';
  document.getElementById("result").scrollIntoView({behavior:"smooth"});
 }
+function readablePlan(plan,status){
+ if(status!=="active"&&status!=="trialing")return {name:"Free",badge:"FREE",plus:false,text:"Basisfunktionen sind aktiv."};
+ if(plan==="plus_monthly")return {name:"Plus Monat",badge:"PLUS",plus:true,text:"Plus-Monatsabo ist aktiv."};
+ if(plan==="plus_yearly")return {name:"Plus Jahr",badge:"PLUS",plus:true,text:"Plus-Jahresabo ist aktiv."};
+ if(plan==="plus_lifetime")return {name:"Plus Lifetime",badge:"PLUS",plus:true,text:"Plus ist dauerhaft aktiv."};
+ return {name:"Plus",badge:"PLUS",plus:true,text:"Plus ist aktiv."};
+}
+async function loadSubscriptionStatus(){
+ var plan={name:"Free",badge:"FREE",plus:false,text:"Basisfunktionen sind aktiv."};
+ if(currentUser){
+  try{
+   const r=await sb.from("subscriptions").select("plan,status,current_period_end").eq("user_id",currentUser.id).maybeSingle();
+   if(!r.error&&r.data)plan=readablePlan(r.data.plan,r.data.status);
+  }catch(e){}
+ }
+ var pn=document.getElementById("plusPlanName"),pt=document.getElementById("plusPlanText");
+ if(pn)pn.textContent=plan.name;if(pt)pt.textContent=plan.text;
+ var pb=document.getElementById("profilePlanBadge"),ppt=document.getElementById("profilePlanText");
+ if(pb){pb.textContent=plan.badge;pb.classList.toggle("plus",plan.plus)}
+ if(ppt)ppt.textContent=plan.plus?plan.name:"Basis-Tarif";
+ return plan;
+}
+
 async function loadProfile(){
  var email=document.getElementById("profileEmail"),name=document.getElementById("profileName");
- if(!currentUser){email.textContent="Gast – für Kontofunktionen bitte anmelden";name.value="";return}
+ if(!currentUser){email.textContent="Gast – für Kontofunktionen bitte anmelden";name.value="";loadSubscriptionStatus();return}
  email.textContent=currentUser.email||"";
  const r=await sb.from("profiles").select("display_name").eq("id",currentUser.id).maybeSingle();
  name.value=r.data&&r.data.display_name?r.data.display_name:"";
+ await loadSubscriptionStatus();
 }
 async function saveProfile(){
  if(!currentUser){alert("Bitte zuerst anmelden.");return}
@@ -1059,7 +1119,7 @@ async function installApp(){
  if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return}
  alert("Auf Android/Chrome: Browser-Menü öffnen und „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.");
 }
-if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=30",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){})})}
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js?v=31",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){})})}
 
 async function saveScan(product){
  if(!currentUser||!product)return;
