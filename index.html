@@ -100,7 +100,7 @@ body.auth-open{overflow:hidden}
     <p>Scanne Produkte, speichere Favoriten und finde deine letzten Prüfungen schnell wieder.</p>
     <div class="dash-actions">
       <button class="btn" onclick="openPanel('barcode');document.getElementById('panel-barcode').scrollIntoView({behavior:'smooth'});startScanner()">📷 Jetzt scannen</button>
-      <button class="btn" onclick="openPanel('text');document.getElementById('panel-text').scrollIntoView({behavior:'smooth'})">⌨️ Zutaten prüfen</button>
+      <button class="btn" onclick="openPanel('text');document.getElementById('panel-text').scrollIntoView({behavior:'smooth'})">🔎 E-Nummer prüfen</button>
     </div>
   </div>
   <div class="dash-grid">
@@ -121,7 +121,7 @@ body.auth-open{overflow:hidden}
 <p class="muted">Scanne einen Produktbarcode mit der Handykamera oder prüfe eine Zutatenliste. E‑Nummern werden verständlich eingeordnet.</p>
 <div class="row">
 <button class="btn primary" onclick="openPanel('barcode');startScanner()">📷 Live-Barcode scannen</button>
-<button class="btn soft" onclick="openPanel('text')">⌨️ Zutaten prüfen</button>
+<button class="btn soft" onclick="openPanel('text')">🔎 E-Nummer prüfen</button>
 </div>
 </div>
 </section>
@@ -169,9 +169,9 @@ body.auth-open{overflow:hidden}
 
 <div id="panel-text" class="panel">
 <div class="card">
-<h2>Zutatenliste prüfen</h2>
-<textarea id="ingredientsText" placeholder="Zutaten hier einfügen, z. B. Wasser, Zucker, Farbstoff E129 ..."></textarea>
-<button class="btn primary" style="margin-top:10px;width:100%" onclick="analyzeIngredients()">E-Nummern prüfen</button>
+<h2>E-Nummer prüfen</h2>
+<textarea id="ingredientsText" placeholder="E-Nummer oder Zutatenliste eingeben, z. B. E129 oder Wasser, Zucker, Farbstoff E129 ..."></textarea>
+<button class="btn primary" style="margin-top:10px;width:100%" onclick="analyzeIngredients()">E-Nummer prüfen</button>
 </div>
 </div>
 
@@ -206,7 +206,7 @@ body.auth-open{overflow:hidden}
 </section>
 </main>
 
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.8</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.9</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
