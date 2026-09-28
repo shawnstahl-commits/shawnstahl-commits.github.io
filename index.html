@@ -48,6 +48,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:13px}
 .top-user{margin-left:auto;display:flex;align-items:center;gap:8px}.user-pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:850;color:var(--brand);cursor:pointer}
 body.auth-open{overflow:hidden}
 @media(max-width:520px){.auth-card{padding:22px;border-radius:24px}.auth-title{font-size:30px}.auth-links{align-items:flex-start;flex-direction:column}}
+.dash{margin:18px 0}.dash-hero{background:linear-gradient(135deg,#0f766e,#1ba798);color:#fff;border-radius:28px;padding:24px;box-shadow:0 18px 45px rgba(15,118,110,.20)}.dash-hero h2{font-size:32px;margin:0 0 8px}.dash-hero p{margin:0 0 16px;color:rgba(255,255,255,.88)}.dash-actions{display:flex;gap:10px;flex-wrap:wrap}.dash-actions .btn{background:#fff;color:#0f766e}.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.dash-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px}.dash-card h3{display:flex;align-items:center;justify-content:space-between}.list-empty{color:var(--muted);font-size:14px}.history-item{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #edf2f1}.history-item:first-of-type{border-top:0}.history-item img{width:52px;height:52px;border-radius:10px;object-fit:contain;background:#f4f6f5}.history-meta{min-width:0;flex:1}.history-name{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-sub{font-size:12px;color:var(--muted)}.fav-btn{border:0;background:#fff4cc;border-radius:12px;padding:8px 10px;cursor:pointer;font-size:18px}.fav-btn.active{background:#ffe28a}.danger-btn{border:0;background:#fff1ef;color:#9c2d24;border-radius:10px;padding:7px 9px;font-weight:800;cursor:pointer}@media(max-width:700px){.dash-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -93,6 +94,26 @@ body.auth-open{overflow:hidden}
 <header id="siteHeader"><div class="wrap top"><div class="logo">E</div>E-Check Kids<div class="top-user"><button id="userButton" class="user-pill" onclick="userMenuAction()">Anmelden</button></div></div></header>
 
 <main id="appShell" class="wrap hidden">
+<section id="dashboard" class="dash">
+  <div class="dash-hero">
+    <h2>Dein E-Check 👋</h2>
+    <p>Scanne Produkte, speichere Favoriten und finde deine letzten Prüfungen schnell wieder.</p>
+    <div class="dash-actions">
+      <button class="btn" onclick="openPanel('barcode');document.getElementById('panel-barcode').scrollIntoView({behavior:'smooth'});startScanner()">📷 Jetzt scannen</button>
+      <button class="btn" onclick="openPanel('text');document.getElementById('panel-text').scrollIntoView({behavior:'smooth'})">⌨️ Zutaten prüfen</button>
+    </div>
+  </div>
+  <div class="dash-grid">
+    <div class="dash-card">
+      <h3>🕘 Letzte Scans <button class="danger-btn" onclick="clearHistory()">Leeren</button></h3>
+      <div id="historyList" class="list-empty">Noch keine Scans gespeichert.</div>
+    </div>
+    <div class="dash-card">
+      <h3>⭐ Favoriten</h3>
+      <div id="favoritesList" class="list-empty">Noch keine Favoriten gespeichert.</div>
+    </div>
+  </div>
+</section>
 <section class="hero">
 <div class="card">
 <span class="eyebrow">Einfach • mobil • ohne App-Kauf</span>
@@ -185,13 +206,13 @@ body.auth-open{overflow:hidden}
 </section>
 </main>
 
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.7</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 1.8</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null;
+var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,currentProduct=null;
 
 var special={
 "E102":["Tartrazin","EU-Kinderhinweis"],
@@ -343,6 +364,14 @@ async function lookupBarcode(forced){
   if(!ing)head+='<div class="notice warn" style="margin-top:12px">Für dieses Produkt sind keine Zutaten gespeichert. Fotografiere die Zutatenliste, um sie trotzdem zu prüfen.</div>';
   head+='</div>';
   document.getElementById("result").innerHTML=head;
+  currentProduct={barcode:code,product_name:(p.product_name_de||p.product_name||"Produkt"),brand:(p.brands||""),image_url:(p.image_front_url||""),additives:nums};
+  if(currentUser){
+    var favBar='<div style="margin-top:14px"><button id="favoriteCurrentBtn" class="btn soft" onclick="toggleCurrentFavorite()">☆ Zu Favoriten</button></div>';
+    document.getElementById("result").querySelector(".card").insertAdjacentHTML("beforeend",favBar);
+    await saveScan(currentProduct);
+    await refreshDashboard();
+    await updateCurrentFavoriteButton();
+  }
   document.getElementById("result").scrollIntoView({behavior:"smooth"});
  }catch(e){setStatus("Produktabfrage fehlgeschlagen.");error("Internetverbindung prüfen und erneut versuchen.")}
 }
@@ -413,6 +442,87 @@ async function readIngredientsPhoto(){
 }
 
 
+
+async function saveScan(product){
+ if(!currentUser||!product)return;
+ try{
+  await sb.from("scan_history").insert({
+   user_id:currentUser.id,
+   barcode:product.barcode,
+   product_name:product.product_name||"",
+   brand:product.brand||"",
+   image_url:product.image_url||"",
+   additives:product.additives||[]
+  });
+ }catch(e){}
+}
+
+function renderSavedItem(item,type){
+ var img=item.image_url?'<img src="'+esc(item.image_url)+'" alt="">':'<div style="width:52px;height:52px;border-radius:10px;background:#f4f6f5;display:grid;place-items:center">🛒</div>';
+ var buttons=type==="favorite"
+  ?'<button class="danger-btn" onclick="removeFavorite('+item.id+')">Entfernen</button>'
+  :'';
+ return '<div class="history-item">'+img+'<div class="history-meta"><div class="history-name">'+esc(item.product_name||"Produkt")+'</div><div class="history-sub">'+esc(item.brand||"")+(item.additives&&item.additives.length?' • '+item.additives.length+' E-Nummern':'')+'</div></div>'+buttons+'</div>';
+}
+
+async function refreshDashboard(){
+ if(!currentUser){
+  document.getElementById("historyList").innerHTML='<div class="list-empty">Melde dich an, um Verlauf zu speichern.</div>';
+  document.getElementById("favoritesList").innerHTML='<div class="list-empty">Melde dich an, um Favoriten zu speichern.</div>';
+  return;
+ }
+ const [h,f]=await Promise.all([
+  sb.from("scan_history").select("id,barcode,product_name,brand,image_url,additives,created_at").order("created_at",{ascending:false}).limit(8),
+  sb.from("favorites").select("id,barcode,product_name,brand,image_url,additives,created_at").order("created_at",{ascending:false}).limit(8)
+ ]);
+ var hl=document.getElementById("historyList"),fl=document.getElementById("favoritesList");
+ if(h.error)hl.innerHTML='<div class="list-empty">Verlauf konnte nicht geladen werden.</div>';
+ else hl.innerHTML=h.data&&h.data.length?h.data.map(function(x){return renderSavedItem(x,"history")}).join(""):'<div class="list-empty">Noch keine Scans gespeichert.</div>';
+ if(f.error)fl.innerHTML='<div class="list-empty">Favoriten konnten nicht geladen werden.</div>';
+ else fl.innerHTML=f.data&&f.data.length?f.data.map(function(x){return renderSavedItem(x,"favorite")}).join(""):'<div class="list-empty">Noch keine Favoriten gespeichert.</div>';
+}
+
+async function toggleCurrentFavorite(){
+ if(!currentUser||!currentProduct)return;
+ const check=await sb.from("favorites").select("id").eq("barcode",currentProduct.barcode).maybeSingle();
+ if(check.data&&check.data.id){
+  await sb.from("favorites").delete().eq("id",check.data.id);
+ }else{
+  await sb.from("favorites").insert({
+   user_id:currentUser.id,
+   barcode:currentProduct.barcode,
+   product_name:currentProduct.product_name||"",
+   brand:currentProduct.brand||"",
+   image_url:currentProduct.image_url||"",
+   additives:currentProduct.additives||[]
+  });
+ }
+ await updateCurrentFavoriteButton();
+ await refreshDashboard();
+}
+
+async function updateCurrentFavoriteButton(){
+ var btn=document.getElementById("favoriteCurrentBtn");
+ if(!btn||!currentUser||!currentProduct)return;
+ const r=await sb.from("favorites").select("id").eq("barcode",currentProduct.barcode).maybeSingle();
+ if(r.data&&r.data.id){btn.textContent="★ Favorit gespeichert";btn.classList.add("primary");btn.classList.remove("soft")}
+ else{btn.textContent="☆ Zu Favoriten";btn.classList.add("soft");btn.classList.remove("primary")}
+}
+
+async function removeFavorite(id){
+ if(!currentUser)return;
+ await sb.from("favorites").delete().eq("id",id);
+ await refreshDashboard();
+ await updateCurrentFavoriteButton();
+}
+
+async function clearHistory(){
+ if(!currentUser)return;
+ if(!confirm("Möchtest du deinen gesamten Scan-Verlauf löschen?"))return;
+ await sb.from("scan_history").delete().eq("user_id",currentUser.id);
+ await refreshDashboard();
+}
+
 const SUPABASE_URL="https://jnnqpxpbtqavloltpaow.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_O5jzIaWkpkaHUf_r_Y_uDQ_XuAtawnw";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
@@ -480,6 +590,7 @@ async function authLogin(){
  currentUser=data.user||null;
  localStorage.removeItem("echeck_guest");
  enterApp(currentUser&&currentUser.email?currentUser.email:"Mein Konto");
+ refreshDashboard();
 }
 
 async function authSignup(){
@@ -551,6 +662,7 @@ sb.auth.onAuthStateChange(function(event,session){
   document.getElementById("appShell").classList.remove("hidden");
   document.getElementById("userButton").textContent=currentUser.email||"Mein Konto";
   closeAuth();
+  refreshDashboard();
  }else if(event==="SIGNED_OUT"){
   document.getElementById("userButton").textContent="Anmelden";
  }
@@ -563,12 +675,14 @@ sb.auth.onAuthStateChange(function(event,session){
   document.getElementById("appShell").classList.remove("hidden");
   document.getElementById("userButton").textContent=currentUser.email||"Mein Konto";
   document.getElementById("authScreen").classList.add("hidden");
+  refreshDashboard();
   document.body.classList.remove("auth-open");
  }else if(localStorage.getItem("echeck_guest")==="1"){
   document.getElementById("appShell").classList.remove("hidden");
   document.getElementById("authScreen").classList.add("hidden");
   document.getElementById("userButton").textContent="Gast";
   document.body.classList.remove("auth-open");
+  refreshDashboard();
  }else{
   document.body.classList.add("auth-open");
  }
