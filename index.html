@@ -25,7 +25,7 @@ input,textarea{width:100%;border:1px solid #cdd9d6;border-radius:14px;padding:14
 .product{display:flex;gap:14px;align-items:center}.product img{width:80px;height:80px;object-fit:contain;background:#f2f4f3;border-radius:12px}.name{font-size:20px;font-weight:900}
 .chip{display:inline-block;background:#edf3f2;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800;margin:4px 4px 0 0}
 .notice{border-radius:16px;padding:14px;background:#f7faff;border:1px solid #cfdaea}.warn{background:#fff9ed;border-color:#efd39b}.danger{background:#fff1ef;border-color:#efbbb5}
-.eitem{border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:10px;background:#fff}.etag{float:right;font-size:12px;font-weight:900;padding:6px 8px;border-radius:999px}.red{background:#feeceb;color:var(--red)}.amber{background:#fff1d8;color:var(--warn)}.blue{background:#edf4ff;color:var(--blue)}
+.eitem{border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:10px;background:#fff}.etag{float:right;font-size:12px;font-weight:900;padding:6px 8px;border-radius:999px}.red{background:#feeceb;color:var(--red)}.amber{background:#fff1d8;color:var(--warn)}.blue{background:#edf4ff;color:var(--blue)}.eu-kids{border:2px solid #d92d20;background:#fff5f4;box-shadow:0 0 0 3px rgba(217,45,32,.10),0 0 22px rgba(217,45,32,.28);animation:euGlow 1.8s ease-in-out infinite}.eu-kids .etag{background:#d92d20;color:#fff}.eu-warning{margin-top:10px;padding:11px 12px;border-radius:12px;background:#fee4e2;color:#912018;font-weight:850;line-height:1.4}@keyframes euGlow{0%,100%{box-shadow:0 0 0 3px rgba(217,45,32,.10),0 0 14px rgba(217,45,32,.20)}50%{box-shadow:0 0 0 4px rgba(217,45,32,.16),0 0 28px rgba(217,45,32,.42)}}@media(prefers-reduced-motion:reduce){.eu-kids{animation:none}}
 .foods{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.food{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}.food b{display:block;margin-top:6px}
 footer{padding:30px 0 50px;color:var(--muted);font-size:13px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.foods{grid-template-columns:repeat(2,1fr)}.hero{padding-top:18px}.card{padding:18px}.row .btn{width:100%;flex-basis:100%}}
@@ -267,13 +267,20 @@ function detectE(text,tags){
 
 function renderE(nums){
  if(!nums.length)return '<div class="notice" style="margin-top:12px"><b>Keine E-Nummer erkannt.</b><br>Das bedeutet nicht automatisch, dass das Produkt gesund oder ungesund ist.</div>';
- var hasKids=nums.some(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0});
- var out=hasKids?'<div class="notice danger" style="margin-top:12px"><b>⚠ Besonderer Kinderhinweis gefunden.</b></div>':'<div class="notice" style="margin-top:12px"><b>E-Nummern gefunden.</b></div>';
+ var euKids=["E102","E104","E110","E122","E124","E129"];
+ var hasKids=nums.some(function(n){return euKids.indexOf(n)>=0});
+ var out=hasKids
+  ?'<div class="notice danger" style="margin-top:12px"><b>⚠ EU-Kinderwarnhinweis erkannt</b><br>Mindestens einer der gefundenen Farbstoffe gehört zu den sechs E-Nummern mit zusätzlichem EU-Kennzeichnungshinweis.</div>'
+  :'<div class="notice" style="margin-top:12px"><b>E-Nummern gefunden.</b></div>';
+
  nums.forEach(function(n){
-  var d=special[n]||["Zusatzstoff","Gefunden"],kids=["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0;
+  var d=special[n]||["Zusatzstoff","Gefunden"];
+  var kids=euKids.indexOf(n)>=0;
   var cls=kids?"red":(n==="E211"||n.indexOf("E22")===0?"amber":"blue");
-  var detail=kids?"Für diesen Farbstoff ist in der EU ein zusätzlicher Hinweis zur möglichen Beeinträchtigung von Aktivität und Aufmerksamkeit bei Kindern vorgeschrieben.":"Diese E-Nummer wurde erkannt. Eine E-Nummer ist nicht automatisch gleichbedeutend mit gesundheitsschädlich.";
-  out+='<div class="eitem"><span class="etag '+cls+'">'+esc(d[1])+'</span><b>'+esc(n)+' – '+esc(d[0])+'</b><p class="muted">'+esc(detail)+'</p></div>';
+  var detail=kids
+   ?"Dieser Farbstoff gehört zu den sechs Stoffen, für die die EU einen zusätzlichen Kinderhinweis bei der Kennzeichnung verlangt."
+   :"Diese E-Nummer wurde erkannt. Eine E-Nummer ist nicht automatisch gleichbedeutend mit gesundheitsschädlich.";
+  out+='<div class="eitem '+(kids?'eu-kids':'')+'"><span class="etag '+cls+'">'+(kids?'⚠ EU-Kinderhinweis':esc(d[1]))+'</span><b>'+esc(n)+' – '+esc(d[0])+'</b><p class="muted">'+esc(detail)+'</p>'+(kids?'<div class="eu-warning">⚠ Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen.</div>':'')+'</div>';
  });
  return out;
 }
