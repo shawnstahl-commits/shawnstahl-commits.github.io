@@ -149,7 +149,34 @@ var special={
 "E224":["Kaliummetabisulfit","Empfindlichkeit möglich"],
 "E226":["Calciumsulfit","Empfindlichkeit möglich"],
 "E227":["Calciumhydrogensulfit","Empfindlichkeit möglich"],
-"E228":["Kaliumhydrogensulfit","Empfindlichkeit möglich"]
+"E228":["Kaliumhydrogensulfit","Empfindlichkeit möglich"],
+"E150D":["Ammoniumsulfit-Zuckerkulör","Farbstoff"],
+"E338":["Phosphorsäure","Säuerungsmittel / Säureregulator"],
+"E330":["Citronensäure","Säuerungsmittel / Säureregulator"],
+"E202":["Kaliumsorbat","Konservierungsstoff"],
+"E200":["Sorbinsäure","Konservierungsstoff"],
+"E250":["Natriumnitrit","Konservierungsstoff"],
+"E300":["Ascorbinsäure (Vitamin C)","Antioxidationsmittel"],
+"E322":["Lecithine","Emulgator"],
+"E415":["Xanthan","Verdickungs- / Stabilisiermittel"],
+"E471":["Mono- und Diglyceride von Speisefettsäuren","Emulgator"]
+};
+
+var eExplain={
+"E150D":"Ein dunkelbrauner Zuckerkulör. Er wird vor allem eingesetzt, um Getränken wie Cola ihre typische dunkle Farbe zu geben.",
+"E338":"Phosphorsäure. Sie wird eingesetzt, um den Säuregrad und den säuerlichen Geschmack eines Lebensmittels oder Getränks einzustellen.",
+"E330":"Citronensäure. Sie reguliert Säure und Geschmack und kommt auch natürlicherweise in vielen Früchten vor.",
+"E202":"Kaliumsorbat hemmt vor allem Hefen und Schimmel und hilft dadurch, Lebensmittel länger haltbar zu machen.",
+"E200":"Sorbinsäure wird als Konservierungsstoff eingesetzt, besonders gegen Hefen und Schimmel.",
+"E250":"Natriumnitrit wird vor allem bei gepökelten Fleischwaren eingesetzt und dient unter anderem der Haltbarkeit und Produktsicherheit.",
+"E300":"Ascorbinsäure ist Vitamin C und wird als Antioxidationsmittel eingesetzt, um Oxidation und Qualitätsveränderungen zu vermindern.",
+"E322":"Lecithine helfen dabei, Fett und Wasser miteinander zu mischen und Mischungen stabil zu halten.",
+"E415":"Xanthan bindet Wasser, verdickt Flüssigkeiten und stabilisiert Lebensmittel.",
+"E471":"Diese Emulgatoren helfen dabei, Fett und Wasser gleichmäßig miteinander zu mischen.",
+"E211":"Natriumbenzoat ist ein Konservierungsstoff, der besonders in sauren Lebensmitteln und Getränken eingesetzt wird.",
+"E220":"Schwefeldioxid schützt bestimmte Lebensmittel vor Oxidation und Verderb. Sulfite können für empfindliche Personen relevant sein.",
+"E221":"Natriumsulfit ist ein Sulfit und wird zum Schutz vor Oxidation und Verderb eingesetzt.",
+"E223":"Natriummetabisulfit ist ein Sulfit und wird als Konservierungs- und Antioxidationsmittel eingesetzt."
 };
 
 function openPanel(n){
@@ -279,7 +306,7 @@ function renderE(nums){
   var cls=kids?"red":(n==="E211"||n.indexOf("E22")===0?"amber":"blue");
   var detail=kids
    ?"Dieser Farbstoff gehört zu den sechs Stoffen, für die die EU einen zusätzlichen Kinderhinweis bei der Kennzeichnung verlangt."
-   :"Diese E-Nummer wurde erkannt. Eine E-Nummer ist nicht automatisch gleichbedeutend mit gesundheitsschädlich.";
+   :(eExplain[n]||"Diese E-Nummer wurde erkannt. Eine E-Nummer ist nicht automatisch gleichbedeutend mit gesundheitsschädlich.");
   out+='<div class="eitem '+(kids?'eu-kids':'')+'"><span class="etag '+cls+'">'+(kids?'⚠ EU-Kinderhinweis':esc(d[1]))+'</span><b>'+esc(n)+' – '+esc(d[0])+'</b><p class="muted">'+esc(detail)+'</p>'+(kids?'<div class="eu-warning">⚠ Kann Aktivität und Aufmerksamkeit bei Kindern beeinträchtigen.</div>':'')+'</div>';
  });
  return out;
