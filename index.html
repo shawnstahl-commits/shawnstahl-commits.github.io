@@ -223,6 +223,11 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 .btn,.danger-btn,.nav-btn,button{touch-action:manipulation}.bottom-nav{padding-bottom:max(8px,env(safe-area-inset-bottom))}.feedback-card-v70{padding-bottom:max(20px,env(safe-area-inset-bottom))}.scanner-fullscreen .barcode-card-v4{padding-bottom:max(18px,env(safe-area-inset-bottom))}
 @media(max-width:430px){.wrap{padding-left:12px;padding-right:12px}.product-v60{align-items:flex-start}.product-v60 .name{font-size:16px}.compare-product-v52{gap:8px}.pc-row-v52{font-size:10px}.saved-compare-item-v68>div:last-child{width:100%;display:flex;gap:6px;flex-wrap:wrap}.saved-compare-item-v68>div:last-child button{flex:1}.result-head-v4 strong{overflow-wrap:anywhere}}
 
+
+/* Scan confirmation + data quality 7.2 */
+.data-quality-v72{margin:14px 0;border:1px solid #dbe8e4;border-radius:18px;padding:13px;background:#f8fbfa}.data-quality-v72.good{background:#f2fbf7;border-color:#cfe9dc}.data-quality-v72.partial{background:#fffaf0;border-color:#eddcb5}.data-quality-v72.limited{background:#fff4f1;border-color:#efcdc4}.quality-head-v72{display:flex;gap:10px;align-items:flex-start}.quality-icon-v72{width:34px;height:34px;flex:0 0 34px;border-radius:11px;display:grid;place-items:center;background:#fff;border:1px solid rgba(0,0,0,.06);font-weight:950}.quality-head-v72 small{display:block;font-size:8px;letter-spacing:.1em;font-weight:950;color:var(--muted)}.quality-head-v72 b{display:block;font-size:15px;margin-top:2px}.quality-head-v72 p{margin:4px 0 0;font-size:10px;color:#61736e;line-height:1.45}.quality-grid-v72{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}.quality-row-v72{display:flex;gap:7px;align-items:flex-start;background:#fff;border-radius:11px;padding:9px;min-width:0}.quality-row-v72>span{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:950;flex:0 0 20px}.quality-row-v72.ok>span{background:#e5f6ed;color:#257052}.quality-row-v72.missing>span{background:#fff0dc;color:#9a5b0c}.quality-row-v72 b,.quality-row-v72 small{display:block}.quality-row-v72 b{font-size:10px;overflow-wrap:anywhere}.quality-row-v72 small{font-size:8px;color:var(--muted);margin-top:2px;line-height:1.35}.quality-note-v72{font-size:9px;color:#71817c;line-height:1.45;margin:9px 0 0}.scanner-fullscreen .status{transition:background .15s ease}
+@media(max-width:430px){.quality-grid-v72{grid-template-columns:1fr}.quality-row-v72{padding:8px 9px}}
+
 </style>
 </head>
 <body>
@@ -667,7 +672,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts (ODbL) • Produktbilder: Open Food Facts (CC BY-SA) • Version 7.1 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts (ODbL) • Produktbilder: Open Food Facts (CC BY-SA) • Version 7.2 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -676,7 +681,8 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,nativeFallbackTimer=null,scanHintTimer=null,scannerRetryTimer=null,scannerPassV63=0,scanNotFoundRetryV66=0,torchOn=false,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
 var familyMembersV68=[],personalAllergensV68=[],activeFamilyMemberV68=null,editingFamilyMemberV69=null,historyCacheV68=[];
 var productLookupBusyV71=false,familyProfilesErrorV71=false;
-var APP_VERSION_V70="7.1 Preview",feedbackKindV70="bug",diagnosticEventsV70=[];
+var scanCandidateV72="",scanCandidateCountV72=0,scanCandidateAtV72=0;
+var APP_VERSION_V70="7.2 Preview",feedbackKindV70="bug",diagnosticEventsV70=[];
 function diagV70(event,data){
  try{
   diagnosticEventsV70.push({t:new Date().toISOString(),event:String(event||""),data:data&&typeof data==="object"?data:{}});
@@ -1350,14 +1356,28 @@ function foundCode(raw){
   return;
  }
  var now=Date.now();
- if(code===lastScanCode&&now-lastScanAt<2500)return;
+ if(code!==scanCandidateV72||now-scanCandidateAtV72>1200){
+  scanCandidateV72=code;scanCandidateCountV72=1;scanCandidateAtV72=now;
+  setStatus("Barcode erkannt – bitte kurz ruhig halten zur Bestätigung …");
+  diagV70("barcode_confirmation",{step:1});
+  return;
+ }
+ scanCandidateCountV72++;
+ scanCandidateAtV72=now;
+ if(scanCandidateCountV72<2){
+  setStatus("Barcode wird bestätigt …");
+  return;
+ }
  lastScanCode=code;lastScanAt=now;
+ diagV70("barcode_confirmed",{confirmations:scanCandidateCountV72});
  locked=true;scanLookupBusy=true;
  var targetSlot=compareTargetSlot;
  document.getElementById("barcodeInput").value=code;
- setStatus("✓ Barcode erkannt: "+code);document.body.classList.add("scan-processing");
+ setStatus("✓ Barcode sicher erkannt: "+code);document.body.classList.add("scan-processing");
  try{if(navigator.vibrate)navigator.vibrate([80,40,80])}catch(e){}
- stopScanner().then(function(){return targetSlot?lookupCompareProduct(code,targetSlot):lookupBarcode(code,true)}).finally(function(){setTimeout(function(){locked=false;scanLookupBusy=false},700)});
+ stopScanner().then(function(){return targetSlot?lookupCompareProduct(code,targetSlot):lookupBarcode(code,true)}).finally(function(){
+  setTimeout(function(){locked=false;scanLookupBusy=false},700);
+ });
 }
 
 function scannerTrack(){
@@ -1472,6 +1492,7 @@ async function startScanner(session){
  session=session||scannerSessionId;
  await stopScanner();
  if(session!==scannerSessionId)return;
+ scanCandidateV72="";scanCandidateCountV72=0;scanCandidateAtV72=0;
  clearError();locked=false;torchOn=false;scannerPassV63=0;
  var torchBtn=document.getElementById("scanTorchBtn");
  if(torchBtn){torchBtn.classList.add("hidden");torchBtn.textContent="🔦 Licht an"}
@@ -1508,7 +1529,7 @@ async function startScanner(session){
     if(!nativeStream||session!==scannerSessionId||locked)return;
     try{
      var codes=await detector.detect(video);
-     if(codes&&codes[0]&&codes[0].rawValue){foundCode(codes[0].rawValue);return}
+     if(codes&&codes[0]&&codes[0].rawValue){foundCode(codes[0].rawValue)}
     }catch(e){}
     nativeTimer=setTimeout(loop,70);
    };
@@ -1607,7 +1628,8 @@ async function lookupCompareProduct(code,slot){
    sugar:(p.nutriments&&Number.isFinite(Number(p.nutriments.sugars_100g)))?Number(p.nutriments.sugars_100g):null,
    lactose:lactoseAssessment(p,ing),
    allergens_tags:Array.isArray(p.allergens_tags)?p.allergens_tags:[],
-   traces_tags:Array.isArray(p.traces_tags)?p.traces_tags:[]
+   traces_tags:Array.isArray(p.traces_tags)?p.traces_tags:[],
+   data_quality:dataQualityV72(p,ing,productImages)
   };
   document.body.classList.remove("scanner-fullscreen","scan-processing");
   compareTargetSlot=null;
@@ -1744,6 +1766,34 @@ function quickLactoseSummaryV60(p){
 function quickCardV60(icon,value,label,detail,cls){
  return '<div class="scan-quick-card-v60 '+(cls||"neutral")+'"><span class="scan-quick-icon-v60">'+icon+'</span><strong>'+esc(value)+'</strong><b>'+esc(label)+'</b><small>'+esc(detail||"")+'</small></div>';
 }
+
+function dataQualityV72(p,ing,images){
+ var ingredients=!!String(ing||"").trim();
+ var identity=!!String((p&&p.product_name_de)||(p&&p.product_name)||"").trim();
+ var picture=Array.isArray(images)&&images.length>0;
+ var allergenTags=Array.isArray(p&&p.allergens_tags)&&(p.allergens_tags.length>0||Array.isArray(p&&p.traces_tags)&&p.traces_tags.length>0);
+ var nutrition=!!(p&&p.nutriments&&Object.keys(p.nutriments).length);
+ var score=(identity?1:0)+(ingredients?2:0)+(picture?1:0)+(allergenTags?1:0)+(nutrition?1:0);
+ var level=score>=5?"good":(score>=3?"partial":"limited");
+ return {ingredients:ingredients,identity:identity,picture:picture,allergenTags:allergenTags,nutrition:nutrition,score:score,level:level};
+}
+function qualityRowV72(ok,label,detail){
+ return '<div class="quality-row-v72 '+(ok?"ok":"missing")+'"><span>'+(ok?"✓":"!")+'</span><div><b>'+esc(label)+'</b><small>'+esc(detail)+'</small></div></div>';
+}
+function renderDataQualityV72(p,ing,images){
+ var q=dataQualityV72(p,ing,images);
+ var title=q.level==="good"?"Datenlage gut":(q.level==="partial"?"Datenlage teilweise":"Datenlage eingeschränkt");
+ var intro=q.level==="good"
+  ?"Für die wichtigsten Prüfbereiche liegen mehrere Produktangaben vor."
+  :(q.level==="partial"?"Einige Angaben sind vorhanden, andere fehlen oder sind nicht separat hinterlegt.":"Für dieses Produkt fehlen mehrere wichtige Angaben in der Datenbank.");
+ return '<div class="data-quality-v72 '+q.level+'"><div class="quality-head-v72"><span class="quality-icon-v72">'+(q.level==="good"?"✓":"i")+'</span><div><small>DATENQUALITÄT</small><b>'+esc(title)+'</b><p>'+esc(intro)+'</p></div></div><div class="quality-grid-v72">'
+  +qualityRowV72(q.ingredients,"Zutatenliste",q.ingredients?"in den Produktdaten vorhanden":"fehlt – E-Nummern können dadurch unvollständig sein")
+  +qualityRowV72(q.allergenTags,"Allergen-/Spurenangaben",q.allergenTags?"separate Tags sind hinterlegt":"keine separaten Tags hinterlegt – Verpackung besonders beachten")
+  +qualityRowV72(q.nutrition,"Nährwertdaten",q.nutrition?"vorhanden":"nicht oder nur unvollständig hinterlegt")
+  +qualityRowV72(q.picture,"Produktbild",q.picture?"vorhanden":"nicht hinterlegt")
+  +'</div><p class="quality-note-v72">Die Anzeige bewertet nur, wie viele Daten in der Produktdatenbank vorhanden sind – nicht, ob das Lebensmittel gesund ist. Maßgeblich bleibt die aktuelle Verpackung.</p></div>';
+}
+
 function renderQuickScanSummaryV60(p,nums){
  var kids=(nums||[]).filter(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0});
  var a=quickAllergenSummaryV60(p),l=quickLactoseSummaryV60(p);
@@ -1797,7 +1847,7 @@ function renderCompareCtaV60(){
 
 async function retryScannerAfterNotFoundV66(code){
  scanNotFoundRetryV66++;
- lastScanCode="";lastScanAt=0;
+ lastScanCode="";lastScanAt=0;scanCandidateV72="";scanCandidateCountV72=0;scanCandidateAtV72=0;
  locked=false;scanLookupBusy=false;
  document.body.classList.remove("scan-processing");
  setStatus("Barcode erkannt, Produkt aber nicht gefunden – bitte kurz weiter auf den Barcode halten. Wir prüfen ihn automatisch noch einmal …");
@@ -1845,6 +1895,7 @@ async function lookupBarcode(forced,fromScanner){
   var pic=robustProductImage(productImages,"scan-product-img-v53",p.product_name_de||p.product_name||"Produkt");
   var kidsCount=nums.filter(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0}).length;
   var head='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Produkt geprüft</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card result-card-v4 result-card-v60"><div class="product product-v60">'+pic+'<div><div class="name">'+esc(p.product_name_de||p.product_name||"Produkt")+'</div><div class="muted">'+esc(p.brands||"")+'</div><span class="chip">Barcode '+esc(code)+'</span></div></div>';
+  head+=renderDataQualityV72(p,ing,productImages);
   head+=renderQuickScanSummaryV60(p,nums);
   head+=renderAllergenAlert(p);
   head+=renderScanDetailsV60(p,nums);
@@ -2543,12 +2594,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v52"))return;
-  sessionStorage.setItem("echeck-sw-reload-v52","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v53"))return;
+  sessionStorage.setItem("echeck-sw-reload-v53","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=52",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=53",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
