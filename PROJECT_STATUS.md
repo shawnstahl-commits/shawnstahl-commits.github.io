@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **5.8 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=39
-- Aktueller Frontend-Checkpoint: `038b94500361c008dea841ecc93a27481b54a314`
-- Aktueller Cache-Checkpoint: `2c9b27da82eb914e06bfa38ae197f7eacbc0674d`
+- Version: **5.9 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=40
+- Aktueller Frontend-Checkpoint: `875e6153b291af573cce04affef31b4e3a0f522c`
+- Aktueller Cache-Checkpoint: `a25122e446f5d7ceaea1c341900f96c0f2dbe86b`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -27,6 +27,8 @@ Stand: 29.09.2026
 - Allergen-Funktionen wurden begonnen und sind bereits teilweise integriert
 - Laktoseintoleranz im Profil auswählbar
 - Laktose-Check bei Barcode-Scan, Zutaten-Text/OCR und Produktvergleich
+- Zutatenfoto wird nach OCR automatisch ausgewertet: E-Nummern, ausgewählte Allergene, Laktose und ADS/ADHS-Hinweise
+- OCR-Allergenprüfung unterscheidet erkannte Zutaten von einfachen Spurenhinweisen
 
 ## Stabilitätsverbesserungen
 - Scanner-Start/Stop-Rennen reduziert
@@ -42,6 +44,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 5.9 – automatische Zutatenfoto-Auswertung: `875e6153b291af573cce04affef31b4e3a0f522c`
 - Version 5.8 – Scanner-Licht + automatischer Erkennungswechsel: `038b94500361c008dea841ecc93a27481b54a314`
 - Version 5.7 – Laktoseintoleranz-Check: `40979eb247cb8399b9a6fe2747333159a9ff7501`
 - Version 5.6 – manuelle Barcode-Eingabe wieder sichtbar: `8aa7dc13bb59daa69c3b702f77e5ed06be9d2761`
@@ -58,7 +61,7 @@ Stand: 29.09.2026
 3. API-/Offline-Fälle weiter absichern
 4. Verlauf/Favoriten auf mehreren Geräten testen
 5. Allergene und weitere Unverträglichkeiten fertigstellen
-6. Zutaten-OCR direkt automatisch auswerten
+6. Zutaten-OCR mit echten Verpackungen testen und weiter verbessern
 7. E-Nummern-Datenbank und Quellen weiter ausbauen
 8. Plus-Funktionen erst danach weiter ausbauen
 9. Zahlung erst ganz zum Schluss aktivieren
