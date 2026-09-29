@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **6.2 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=43
-- Aktueller Frontend-Checkpoint: `80a2eb173c71be291c5f044ee208fbac6455f09d`
-- Aktueller Cache-Checkpoint: `b28ae57927111aebb8879391f47abc25b9e3d986`
+- Version: **6.3 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=44
+- Aktueller Frontend-Checkpoint: `7aa8e8e7ad5f7a78e8cbacedac82480a0b6f73f3`
+- Aktueller Cache-Checkpoint: `3569d0349a1918e863094ef77737ef142d486a96`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -44,6 +44,9 @@ Stand: 29.09.2026
 - Taschenlampen-Schalter bei unterstützten Handys
 - Automatischer Wechsel auf zweiten Barcode-Erkennungsmodus bei ausbleibendem Treffer
 - Schnellere Barcode-Erkennungsintervalle und bessere Scan-Hinweise
+- Scanner wechselt nach kurzer Zeit automatisch früher zum zweiten Erkennungsweg
+- Zweiter Scanner führt bei Bedarf selbst einen erweiterten zweiten Durchlauf mit größerem Scanbereich durch
+- Unterstützte Kameras erhalten kontinuierlichen Fokus/Belichtung und einen sehr leichten Zoom
 - Schutz vor doppelten Barcode-Scans
 - Open-Food-Facts-Abfragen mit Timeout und Wiederholungsversuch
 - Bessere Fehlermeldungen bei Offline/Timeout
@@ -53,6 +56,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 6.3 – adaptiver Scanner mit automatischen Erkennungsdurchläufen: `7aa8e8e7ad5f7a78e8cbacedac82480a0b6f73f3`
 - Version 6.2 – echte Alternativensuche nach Produktkategorie: `80a2eb173c71be291c5f044ee208fbac6455f09d`
 - Version 6.1 – Hilfe & Einführung für neue Nutzer: `b0d2f271650b865eb2d648f2fa624a20aa2126bb`
 - Version 6.0 – neues Scan-Ergebnis mit Schnellübersicht: `27dcbafd8f194d2456e1f4a83a5faf50dbf9b94f`
