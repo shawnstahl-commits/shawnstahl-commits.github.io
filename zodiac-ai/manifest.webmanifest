@@ -1,0 +1,17 @@
+{
+  "name": "Zodiac AI",
+  "short_name": "Zodiac AI",
+  "start_url": "/zodiac-ai/",
+  "scope": "/zodiac-ai/",
+  "display": "standalone",
+  "background_color": "#090716",
+  "theme_color": "#090716",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
