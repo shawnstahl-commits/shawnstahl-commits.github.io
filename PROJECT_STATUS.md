@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **7.1 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=52
-- Aktueller Frontend-Checkpoint: `1ab68d00ebf59212f44fdba2ff8f6214ce4ce664`
-- Aktueller Cache-Checkpoint: `19bc363c45588dbaaa93c09b4523295d8af7ee32`
+- Version: **7.2 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=53
+- Aktueller Frontend-Checkpoint: `6c5ea592cee68a694f86174574a7edd9aad444f3`
+- Aktueller Cache-Checkpoint: `03591c5668ba72c605f4620de87ca0eda958f267`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -76,6 +76,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 7.2 – Scan-Sicherheit & Datenqualität: `6c5ea592cee68a694f86174574a7edd9aad444f3`
 - Version 7.1 – Stabilität & Feinschliff: `1ab68d00ebf59212f44fdba2ff8f6214ce4ce664`
 - Version 7.0 – Tester-/Feedbackmodus, Diagnose und Rechtstransparenz: `48028dd3b1a986b6a6f5ac4de16b592c9d4e441d`
 - Version 6.9 – Plus-Ausbau abgeschlossen: Quellen, Familienprofile, erweiterter Verlauf & gespeicherte Vergleiche: `98fb31ad2feb8348fdc3f483cca25710955dcc37`
@@ -120,6 +121,11 @@ Stand: 29.09.2026
 - 7.1: Familienprofile zeigen bei Ladefehlern einen Wiederholen-Button statt fälschlich „keine Profile“
 - 7.1: Gast-/Logout-Zustand leert lokale Verlauf-, Vergleichs- und Familienzustände sauber
 - 7.1: Mobile Umbrüche, Touch-Verhalten und Safe-Area-Abstände verbessert
+
+- 7.2: Kamera-Barcodes werden erst nach zweiter identischer Erkennung innerhalb eines kurzen Zeitfensters übernommen
+- 7.2: Native Android-Barcodedetektion läuft nach dem ersten Kandidaten weiter, bis die Bestätigung erfolgt
+- 7.2: Scan-Ergebnis zeigt Datenqualität für Zutatenliste, Allergen-/Spurentags, Nährwerte und Produktbild
+- 7.2: Datenqualität bewertet nur Datenverfügbarkeit, nicht die gesundheitliche Qualität eines Produkts
 
 ## Als Nächstes
 1. Produktvergleich weiter testen und stabilisieren
