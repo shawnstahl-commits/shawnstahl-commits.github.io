@@ -435,13 +435,54 @@ function loadGermanVoice() {
     null;
 }
 
-function speakReply(text) {
-  if (!voiceEnabled || !text || !('speechSynthesis' in window)) return;
+async function speakReply(text) {
+  if (!voiceEnabled || !text) return;
+
+  if (session?.access_token && selectedSign?.name) {
+    try {
+      const res = await fetch(SUPABASE_URL + '/functions/v1/zodiac-voice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token,
+          'apikey': SUPABASE_KEY
+        },
+        body: JSON.stringify({ sign: selectedSign.name, text })
+      });
+
+      if (res.ok && (res.headers.get('content-type') || '').includes('audio')) {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.onended = () => URL.revokeObjectURL(url);
+        await audio.play();
+        return;
+      }
+    } catch (_) {}
+  }
+
+  if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'de-DE';
-  utterance.rate = 0.95;
-  utterance.pitch = selectedSign?.name === 'Löwe' ? 0.9 : 1;
+  const fallbackProfiles = {
+    'Widder': { rate: 1.08, pitch: 1.08 },
+    'Stier': { rate: .90, pitch: .88 },
+    'Zwillinge': { rate: 1.12, pitch: 1.12 },
+    'Krebs': { rate: .94, pitch: 1.04 },
+    'Löwe': { rate: .94, pitch: .88 },
+    'Jungfrau': { rate: .98, pitch: .98 },
+    'Waage': { rate: .97, pitch: 1.05 },
+    'Skorpion': { rate: .90, pitch: .82 },
+    'Schütze': { rate: 1.08, pitch: 1.04 },
+    'Steinbock': { rate: .91, pitch: .84 },
+    'Wassermann': { rate: 1.02, pitch: .96 },
+    'Fische': { rate: .90, pitch: 1.10 }
+  };
+  const p = fallbackProfiles[selectedSign?.name] || { rate: .95, pitch: 1 };
+  utterance.rate = p.rate;
+  utterance.pitch = p.pitch;
   if (preferredVoice) utterance.voice = preferredVoice;
   window.speechSynthesis.speak(utterance);
 }
