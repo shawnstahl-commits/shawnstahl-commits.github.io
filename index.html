@@ -185,6 +185,11 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 /* Product lookup reliability 6.4 */
 .retry-product-v64{width:100%;margin-top:12px}
 
+
+/* Complete product comparison 6.5 */
+.compare-glance-v65{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:14px}.compare-glance-card-v65{border:1px solid #dfe9e6;background:#f8fbfa;border-radius:18px;padding:11px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.compare-glance-card-v65>span{grid-column:1/-1;font-size:9px;font-weight:950;letter-spacing:.08em;color:var(--muted)}.compare-glance-card-v65>div{min-width:0}.compare-glance-card-v65 b{display:block;font-size:14px;line-height:1.2;overflow-wrap:anywhere}.compare-glance-card-v65 small{display:block;font-size:9px;color:var(--muted);margin-top:3px}.pc-ok-v65{color:#236148!important;background:#eefaf5!important}.pc-trace-v65{color:#854d0e!important;background:#fff8e8!important}.pc-allergen-row-v65 .pc-value-v52{font-size:11px;line-height:1.35;overflow-wrap:anywhere}.compare-safety-v65{margin-top:12px;border-radius:14px;background:#fff8e8;border:1px solid #f3dfaa;padding:11px 12px;font-size:11px;line-height:1.45;color:#72510f}.compare-safety-v65 b{display:block;margin-bottom:3px}
+@media(max-width:560px){.compare-glance-v65{grid-template-columns:1fr}.compare-glance-card-v65{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -558,7 +563,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.4 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.5 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1469,7 +1474,9 @@ async function lookupCompareProduct(code,slot){
    image:(productImageCandidates(p)[0]||""),
    additives:nums,
    sugar:(p.nutriments&&Number.isFinite(Number(p.nutriments.sugars_100g)))?Number(p.nutriments.sugars_100g):null,
-   lactose:lactoseAssessment(p,ing)
+   lactose:lactoseAssessment(p,ing),
+   allergens_tags:Array.isArray(p.allergens_tags)?p.allergens_tags:[],
+   traces_tags:Array.isArray(p.traces_tags)?p.traces_tags:[]
   };
   document.body.classList.remove("scanner-fullscreen","scan-processing");
   compareTargetSlot=null;
@@ -1483,6 +1490,34 @@ async function lookupCompareProduct(code,slot){
   var box=document.getElementById("compareResult");
   if(box)box.innerHTML='<div class="error" style="display:block;margin-top:12px">'+esc(productLoadErrorText(e))+'</div>';
  }
+}
+
+
+function compareSelectedAllergensV65(p){
+ var regular=selectedAllergens.filter(function(id){return id!=="lactose"});
+ if(!regular.length)return {contains:[],traces:[],configured:false};
+ var hit=detectSelectedAllergens({
+  allergens_tags:(p&&p.allergens_tags)||[],
+  traces_tags:(p&&p.traces_tags)||[]
+ });
+ return {contains:hit.contains||[],traces:hit.traces||[],configured:true};
+}
+function compareAllergenTextV65(ids,emptyText){
+ return ids&&ids.length?ids.map(allergenLabel).join(", "):(emptyText||"keine erkannt");
+}
+function compareAllergenClassV65(ids,type){
+ if(!ids||!ids.length)return "pc-ok-v65";
+ return type==="trace"?"pc-trace-v65":"pc-warn-v52";
+}
+function lactoseClassV65(a){
+ if(!a)return "";
+ if(a.status==="explicit")return "pc-warn-v52";
+ if(a.status==="milk")return "pc-trace-v65";
+ if(a.status==="free")return "pc-ok-v65";
+ return "";
+}
+function compareSummaryCardV65(label,a,b,clsA,clsB){
+ return '<div class="compare-glance-card-v65"><span>'+esc(label)+'</span><div><b class="'+(clsA||"")+'">'+esc(a)+'</b><small>Produkt A</small></div><div><b class="'+(clsB||"")+'">'+esc(b)+'</b><small>Produkt B</small></div></div>';
 }
 
 function compareCounts(p){
@@ -1502,23 +1537,58 @@ function renderComparison(){
  if(sa)sa.innerHTML=compareProductCard("A",a);
  if(sb)sb.innerHTML=compareProductCard("B",b);
  if(!out)return;
- if(!a||!b){out.innerHTML='<div class="notice" style="margin-top:14px"><b>So geht’s:</b> Scanne Produkt A und anschließend Produkt B. Der Vergleich erscheint automatisch, sobald beide Produkte vorhanden sind.</div>';return}
+ if(!a||!b){
+  out.innerHTML='<div class="notice" style="margin-top:14px"><b>So geht’s:</b> Scanne Produkt A und anschließend Produkt B. Der Vergleich erscheint automatisch, sobald beide Produkte vorhanden sind.</div>';
+  return;
+ }
  var ca=compareCounts(a),cb=compareCounts(b);
+ var aa=compareSelectedAllergensV65(a),ab=compareSelectedAllergensV65(b);
  function v(x,cls){return '<div class="pc-value-v52 '+(cls||"")+'">'+x+'</div>'}
+ var glance='<div class="compare-glance-v65">'
+  +compareSummaryCardV65("E-Nummern",String(a.additives.length),String(b.additives.length),"","")
+  +compareSummaryCardV65("EU-Kinderhinweise",String(ca.kids),String(cb.kids),ca.kids?"pc-warn-v52":"pc-ok-v65",cb.kids?"pc-warn-v52":"pc-ok-v65");
+ if(aa.configured){
+  glance+=compareSummaryCardV65("Ausgewählte Allergene",aa.contains.length?String(aa.contains.length):"0",ab.contains.length?String(ab.contains.length):"0",compareAllergenClassV65(aa.contains,"contains"),compareAllergenClassV65(ab.contains,"contains"));
+ }
+ if(selectedAllergens.indexOf("lactose")>=0){
+  glance+=compareSummaryCardV65("Laktose",lactoseShort(a.lactose),lactoseShort(b.lactose),lactoseClassV65(a.lactose),lactoseClassV65(b.lactose));
+ }
+ glance+='</div>';
+
  var rows='';
  rows+='<div class="pc-row-v52 pc-head-v52"><div>Merkmal</div><div>Produkt A</div><div>Produkt B</div></div>';
  rows+='<div class="pc-row-v52"><div class="pc-label-v52">E-Nummern erkannt</div>'+v(a.additives.length)+v(b.additives.length)+'</div>';
- rows+='<div class="pc-row-v52"><div class="pc-label-v52">EU-Kinderhinweise</div>'+v(ca.kids,ca.kids?"pc-warn-v52":"")+v(cb.kids,cb.kids?"pc-warn-v52":"")+'</div>';
+ rows+='<div class="pc-row-v52"><div class="pc-label-v52">EU-Kinderhinweise</div>'+v(ca.kids,ca.kids?"pc-warn-v52":"pc-ok-v65")+v(cb.kids,cb.kids?"pc-warn-v52":"pc-ok-v65")+'</div>';
  rows+='<div class="pc-row-v52"><div class="pc-label-v52">Süßstoffe erkannt</div>'+v(ca.sweet)+v(cb.sweet)+'</div>';
  rows+='<div class="pc-row-v52"><div class="pc-label-v52">Konservierungsstoffe</div>'+v(ca.cons)+v(cb.cons)+'</div>';
  rows+='<div class="pc-row-v52"><div class="pc-label-v52">Zucker pro 100 g/ml*</div>'+v(fmtSugar(a.sugar))+v(fmtSugar(b.sugar))+'</div>';
- if(selectedAllergens.indexOf("lactose")>=0)rows+='<div class="pc-row-v52"><div class="pc-label-v52">Laktose-Hinweis</div>'+v(esc(lactoseShort(a.lactose)),a.lactose&&a.lactose.status==="explicit"?"pc-warn-v52":"")+v(esc(lactoseShort(b.lactose)),b.lactose&&b.lactose.status==="explicit"?"pc-warn-v52":"")+'</div>';
+
+ if(aa.configured){
+  rows+='<div class="pc-row-v52 pc-allergen-row-v65"><div class="pc-label-v52">Enthält – ausgewählte Allergene</div>'+v(esc(compareAllergenTextV65(aa.contains)),compareAllergenClassV65(aa.contains,"contains"))+v(esc(compareAllergenTextV65(ab.contains)),compareAllergenClassV65(ab.contains,"contains"))+'</div>';
+  rows+='<div class="pc-row-v52 pc-allergen-row-v65"><div class="pc-label-v52">Spurenhinweis – ausgewählte Allergene</div>'+v(esc(compareAllergenTextV65(aa.traces)),compareAllergenClassV65(aa.traces,"trace"))+v(esc(compareAllergenTextV65(ab.traces)),compareAllergenClassV65(ab.traces,"trace"))+'</div>';
+ }else{
+  rows+='<div class="pc-row-v52 pc-allergen-row-v65"><div class="pc-label-v52">Allergie-Check</div>'+v("im Profil nicht eingerichtet","")+v("im Profil nicht eingerichtet","")+'</div>';
+ }
+
+ if(selectedAllergens.indexOf("lactose")>=0){
+  rows+='<div class="pc-row-v52"><div class="pc-label-v52">Laktose-Hinweis</div>'+v(esc(lactoseShort(a.lactose)),lactoseClassV65(a.lactose))+v(esc(lactoseShort(b.lactose)),lactoseClassV65(b.lactose))+'</div>';
+ }
+
  rows+='<div class="pc-row-v52"><div class="pc-label-v52">E-Nummern</div><div class="pc-enums-v52">'+esc(a.additives.join(", ")||"keine erkannt")+'</div><div class="pc-enums-v52">'+esc(b.additives.join(", ")||"keine erkannt")+'</div></div>';
+
  var notes=[];
  notes.push('Produkt A: '+a.additives.length+' erkannte E-Nummer'+(a.additives.length===1?'':'n')+' · Produkt B: '+b.additives.length+'.');
  if(ca.kids||cb.kids)notes.push('EU-Kinderhinweise: A '+ca.kids+' · B '+cb.kids+'.');
+ if(aa.configured&&(aa.contains.length||aa.traces.length||ab.contains.length||ab.traces.length)){
+  notes.push('Allergie-Hinweise beziehen sich nur auf deine im Profil ausgewählten Allergene.');
+ }
  if(a.sugar!=null&&b.sugar!=null)notes.push('Hinterlegter Zuckergehalt: A '+fmtSugar(a.sugar)+' · B '+fmtSugar(b.sugar)+' pro 100 g/ml.');
- out.innerHTML='<div class="product-compare-table-v52">'+rows+'</div><div class="compare-summary-v52"><h3>Unterschiede zusammengefasst</h3>'+notes.map(function(x){return '<p>'+esc(x)+'</p>'}).join('')+'<p><small>* Die Bezugsgröße stammt aus den Produktdaten. Bei Getränken ist sie häufig 100 ml, bei festen Lebensmitteln 100 g.</small></p></div>';
+
+ out.innerHTML=glance
+  +'<div class="product-compare-table-v52">'+rows+'</div>'
+  +'<div class="compare-summary-v52"><h3>Unterschiede zusammengefasst</h3>'+notes.map(function(x){return '<p>'+esc(x)+'</p>'}).join('')
+  +'<div class="compare-safety-v65"><b>Wichtig bei Allergien und Unverträglichkeiten:</b> Fehlende oder leere Produktdaten sind keine Garantie auf Allergen- oder Laktosefreiheit. Prüfe immer die aktuelle Verpackung.</div>'
+  +'<p><small>* Die Bezugsgröße stammt aus den Produktdaten. Bei Getränken ist sie häufig 100 ml, bei festen Lebensmitteln 100 g.</small></p></div>';
 }
 
 
@@ -1613,7 +1683,9 @@ async function lookupBarcode(forced){
    additives:nums,
    sugar:(p.nutriments&&Number.isFinite(Number(p.nutriments.sugars_100g)))?Number(p.nutriments.sugars_100g):null,
    lactose:lactoseAssessment(p),
-   category_tag:bestCategoryTagV62(p)
+   category_tag:bestCategoryTagV62(p),
+   allergens_tags:Array.isArray(p.allergens_tags)?p.allergens_tags:[],
+   traces_tags:Array.isArray(p.traces_tags)?p.traces_tags:[]
   };
   if(currentUser){
     var favBar='<div style="margin-top:14px"><button id="favoriteCurrentBtn" class="btn soft" onclick="toggleCurrentFavorite()">☆ Zu Favoriten</button></div>';
@@ -1700,7 +1772,9 @@ function productToCompareV62(p){
   image:images[0]||"",
   additives:nums,
   sugar:(p&&p.nutriments&&Number.isFinite(Number(p.nutriments.sugars_100g)))?Number(p.nutriments.sugars_100g):null,
-  lactose:lactoseAssessment(p,ing)
+  lactose:lactoseAssessment(p,ing),
+  allergens_tags:(p&&Array.isArray(p.allergens_tags))?p.allergens_tags:[],
+  traces_tags:(p&&Array.isArray(p.traces_tags))?p.traces_tags:[]
  };
 }
 function selectedAllergenRiskV62(p){
@@ -1743,7 +1817,9 @@ function useAlternativeAsCompareV62(index){
    image:currentProduct.image_url||"",
    additives:currentProduct.additives||[],
    sugar:currentProduct.sugar,
-   lactose:currentProduct.lactose
+   lactose:currentProduct.lactose,
+   allergens_tags:currentProduct.allergens_tags||[],
+   traces_tags:currentProduct.traces_tags||[]
   };
  }
  compareProducts.B=p;
@@ -1773,7 +1849,9 @@ async function findAlternativesV62(){
   var base={
    additives:currentProduct.additives||[],
    sugar:currentProduct.sugar,
-   lactose:currentProduct.lactose
+   lactose:currentProduct.lactose,
+   allergens_tags:currentProduct.allergens_tags||[],
+   traces_tags:currentProduct.traces_tags||[]
   };
   var ranked=[];
   products.forEach(function(raw){
@@ -2014,12 +2092,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v45"))return;
-  sessionStorage.setItem("echeck-sw-reload-v45","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v46"))return;
+  sessionStorage.setItem("echeck-sw-reload-v46","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=45",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=46",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
