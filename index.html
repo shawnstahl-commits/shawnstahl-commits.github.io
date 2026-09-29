@@ -901,7 +901,7 @@ function lactoseAssessment(p,textOverride){
  var freeText=/(^|[^a-z])(laktosefrei|lactose[- ]?free|ohne laktose|sans lactose|sin lactosa)([^a-z]|$)/i.test(t);
  if(freeLabel||freeText)return {status:"free",short:"laktosefrei",title:"Als laktosefrei gekennzeichnet",detail:"In den verfügbaren Produktdaten bzw. Zutaten wurde ein Laktosefrei-Hinweis erkannt."};
  if(/(^|[^a-z])(laktose|lactose|milchzucker)([^a-z]|$)/i.test(t))return {status:"explicit",short:"Laktose erkannt",title:"⚠ Laktose / Milchzucker erkannt",detail:"Die Zutatenangaben enthalten ausdrücklich Laktose beziehungsweise Milchzucker."};
- var milkTerms=/(milchpulver|magermilchpulver|vollmilchpulver|molkenpulver|sussmolkenpulver|molkenerzeugnis|whey powder|milk powder|milk solids|kondensmilch|condensed milk|vollmilch|magermilch|joghurt|yoghurt|quark|frischkase|frischkaese|sahne|rahm)/i.test(t);
+ var milkTerms=/(^|[^a-z])(milch|milk|buttermilch|milchpulver|magermilchpulver|vollmilchpulver|molkenpulver|sußmolkenpulver|sussmolkenpulver|molkenerzeugnis|whey powder|milk powder|milk solids|kondensmilch|condensed milk|vollmilch|magermilch|joghurt|yoghurt|quark|frischkase|frischkaese|sahne|rahm)([^a-z]|$)/i.test(t);
  var milkTag=allergenTags.indexOf("en:milk")>=0;
  if(milkTerms||milkTag)return {status:"milk",short:"Milchbestandteile",title:"Milchbestandteile erkannt",detail:"Das kann für Laktoseintoleranz relevant sein. Aus den Produktdaten lässt sich der tatsächliche Laktosegehalt aber nicht sicher bestimmen."};
  return {status:"none",short:"kein Hinweis",title:"Kein eindeutiger Laktose-Hinweis erkannt",detail:"Das ist keine Garantie auf Laktosefreiheit. Produktdaten und Zutaten können unvollständig sein."};
