@@ -181,6 +181,10 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 .alt-product-v62{display:grid;grid-template-columns:82px 1fr;gap:12px;align-items:start;margin-top:10px;border:1px solid #dce8e5;background:#fff;border-radius:18px;padding:12px}.alt-product-img-v62{width:82px;height:96px;object-fit:contain;background:#f7faf9;border-radius:13px}.alt-product-v62>.product-image-fallback-v53{width:82px;height:96px;border-radius:13px}.alt-product-copy-v62>b{display:block;font-size:14px}.alt-product-copy-v62>small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.alt-product-tags-v62{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}.alt-product-tags-v62 span{font-size:9px;font-weight:850;color:#28675c;background:#e9f6f2;border-radius:999px;padding:5px 7px}.alt-product-meta-v62{font-size:10px;color:var(--muted);margin-bottom:8px}.alt-product-copy-v62 .btn{width:100%;min-height:38px;padding:8px 10px;font-size:11px}.affiliate-prep-v62{margin-top:12px;border:1px dashed #ccd9d6;border-radius:15px;padding:11px;background:#fafcfc}.affiliate-prep-v62 span{display:block;font-size:8px;font-weight:950;letter-spacing:.11em;color:#7b8c88}.affiliate-prep-v62 b{display:block;font-size:12px;margin-top:3px}.affiliate-prep-v62 p{font-size:10px;line-height:1.4;color:var(--muted);margin:4px 0 0}
 @media(max-width:430px){.alt-product-v62{grid-template-columns:70px 1fr}.alt-product-img-v62,.alt-product-v62>.product-image-fallback-v53{width:70px;height:84px}}
 
+
+/* Product lookup reliability 6.4 */
+.retry-product-v64{width:100%;margin-top:12px}
+
 </style>
 </head>
 <body>
@@ -554,7 +558,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.3 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.4 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1098,10 +1102,46 @@ async function fetchJsonReliable(url,timeoutMs,retries){
  }
  throw lastError||new Error("Netzwerkfehler");
 }
+async function fetchOpenFoodFactsProductV64(code,fields){
+ var encoded=encodeURIComponent(code),q="?fields="+encodeURIComponent(fields),lastError=null;
+ var urls=[
+  "https://world.openfoodfacts.org/api/v2/product/"+encoded+".json"+q,
+  "https://world.openfoodfacts.org/api/v0/product/"+encoded+".json"+q
+ ];
+ for(var i=0;i<urls.length;i++){
+  if(i>0){
+   setStatus("Produktdaten werden erneut geladen …");
+   await new Promise(function(resolve){setTimeout(resolve,350)});
+  }
+  try{
+   var d=await fetchJsonReliable(urls[i],10000,i===0?1:0);
+   if(d&&d.product)return d.product;
+   lastError=new Error("NOT_FOUND");
+   lastError.productNotFound=true;
+  }catch(e){
+   lastError=e;
+  }
+ }
+ throw lastError||new Error("Produkt konnte nicht geladen werden");
+}
+function validGtinChecksumV64(code){
+ code=String(code||"").replace(/\D/g,"");
+ if([8,12,13,14].indexOf(code.length)<0)return true;
+ var sum=0,posFromRight=0;
+ for(var i=code.length-2;i>=0;i--){
+  posFromRight++;
+  var n=Number(code.charAt(i));
+  sum+=n*(posFromRight%2===1?3:1);
+ }
+ var check=(10-(sum%10))%10;
+ return check===Number(code.charAt(code.length-1));
+}
+
 function productLoadErrorText(e){
  if(!navigator.onLine)return "Keine Internetverbindung. Bitte Verbindung prüfen und erneut versuchen.";
- if(e&&e.message==="TIMEOUT")return "Die Produktdatenbank antwortet gerade zu langsam. Bitte erneut versuchen.";
- return "Produkt konnte nicht geladen werden. Bitte erneut versuchen.";
+ if(e&&e.productNotFound)return "Für diesen Barcode wurde kein Produkt in der Produktdatenbank gefunden.";
+ if(e&&e.message==="TIMEOUT")return "Die Produktdatenbank antwortet gerade zu langsam. E-Check Kids hat die Abfrage bereits automatisch wiederholt.";
+ return "Die Produktdatenbank war gerade nicht erreichbar. E-Check Kids hat die Abfrage bereits automatisch wiederholt.";
 }
 
 async function openFullscreenScanner(target){
@@ -1179,6 +1219,10 @@ function foundCode(raw){
  if(locked||scanLookupBusy)return;
  var code=String(raw||"").replace(/\D/g,"");
  if(code.length<8||code.length>14)return;
+ if(!validGtinChecksumV64(code)){
+  setStatus("Barcode noch nicht eindeutig erkannt – bitte kurz ruhig halten …");
+  return;
+ }
  var now=Date.now();
  if(code===lastScanCode&&now-lastScanAt<2500)return;
  lastScanCode=code;lastScanAt=now;
@@ -1414,9 +1458,7 @@ async function lookupCompareProduct(code,slot){
  setStatus("Produkt "+slot+" wird geladen …");
  try{
   var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,labels_tags,categories,categories_tags,nutriments";
-  var u="https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields="+encodeURIComponent(fields);
-  var d=await fetchJsonReliable(u,9000,1),p=d.product;
-  if(!p)throw new Error("Produkt nicht gefunden");
+  var p=await fetchOpenFoodFactsProductV64(code,fields);
   var ing=p.ingredients_text_de||p.ingredients_text||p.ingredients_text_en||"";
   var nums=detectE(ing,p.additives_tags||[]);
   compareProducts[slot]={
@@ -1538,9 +1580,15 @@ async function lookupBarcode(forced){
  setStatus("🔎 Produkt wird gesucht …");clearError();
  try{
   var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,labels_tags,nutriscore_grade,categories,categories_tags,nutriments";
-  var u="https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields="+encodeURIComponent(fields);
-  var d=await fetchJsonReliable(u,9000,1),p=d.product;
-  if(!p){setStatus("Produkt nicht gefunden.");revealScanResults();document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Nicht gefunden</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="notice warn"><b>Produkt nicht gefunden.</b><br>Du kannst die Zutatenliste fotografieren oder eintippen.</div></div>';return}
+  var p;
+  try{
+   p=await fetchOpenFoodFactsProductV64(code,fields);
+  }catch(fetchErr){
+   if(fetchErr&&fetchErr.productNotFound){
+    setStatus("Produkt nicht gefunden.");revealScanResults();document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Nicht gefunden</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="notice warn"><b>Produkt nicht gefunden.</b><br>Der Barcode wurde erkannt, aber das Produkt ist nicht in der Datenbank hinterlegt. Du kannst die Zutatenliste fotografieren oder eintippen.</div></div>';return
+   }
+   throw fetchErr;
+  }
   setStatus("✓ Produkt gefunden");revealScanResults();
   var ing=p.ingredients_text_de||p.ingredients_text||p.ingredients_text_en||"";
   var nums=detectE(ing,p.additives_tags||[]);
@@ -1575,7 +1623,7 @@ async function lookupBarcode(forced){
     await updateCurrentFavoriteButton();
   }
   document.getElementById("result").scrollIntoView({behavior:"smooth"});
- }catch(e){revealScanResults();setStatus("Produktabfrage fehlgeschlagen.");document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Abfrage fehlgeschlagen</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="error" style="display:block"><b>Produkt konnte nicht geladen werden.</b><br>'+esc(productLoadErrorText(e))+'</div></div>'}
+ }catch(e){revealScanResults();setStatus("Produktabfrage fehlgeschlagen.");document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Abfrage fehlgeschlagen</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="error" style="display:block"><b>Produktdaten konnten nicht geladen werden.</b><br>'+esc(productLoadErrorText(e))+'</div><button class="btn primary retry-product-v64" type="button" onclick="lookupBarcode(&quot;'+esc(code)+'&quot;)">Produkt erneut laden</button><div class="muted" style="font-size:11px;margin-top:8px">Du musst den Barcode dafür nicht noch einmal scannen.</div></div>'}
 }
 
 function detectE(text,tags){
@@ -1966,12 +2014,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v44"))return;
-  sessionStorage.setItem("echeck-sw-reload-v44","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v45"))return;
+  sessionStorage.setItem("echeck-sw-reload-v45","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=44",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=45",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
