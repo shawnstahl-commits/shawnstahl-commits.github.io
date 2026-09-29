@@ -554,13 +554,13 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.2 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.3 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
 <script>
-var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,nativeFallbackTimer=null,scanHintTimer=null,torchOn=false,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
+var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,nativeFallbackTimer=null,scanHintTimer=null,scannerRetryTimer=null,scannerPassV63=0,torchOn=false,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
 
 var special={
 "E102":["Tartrazin","EU-Kinderhinweis"],
@@ -1201,6 +1201,10 @@ async function setupScannerTrack(track){
   if(Array.isArray(caps.focusMode)&&caps.focusMode.indexOf("continuous")>=0)adv.focusMode="continuous";
   if(Array.isArray(caps.exposureMode)&&caps.exposureMode.indexOf("continuous")>=0)adv.exposureMode="continuous";
   if(Array.isArray(caps.whiteBalanceMode)&&caps.whiteBalanceMode.indexOf("continuous")>=0)adv.whiteBalanceMode="continuous";
+  if(caps.zoom&&Number.isFinite(Number(caps.zoom.min))&&Number.isFinite(Number(caps.zoom.max))){
+   var z=Math.min(Number(caps.zoom.max),Math.max(Number(caps.zoom.min),1.15));
+   if(z>Number(caps.zoom.min))adv.zoom=z;
+  }
   if(Object.keys(adv).length)await track.applyConstraints({advanced:[adv]});
   var torch=document.getElementById("scanTorchBtn");
   if(torch){
@@ -1225,9 +1229,28 @@ async function toggleScannerTorch(){
   if(btn)btn.classList.add("hidden");
  }
 }
-async function startHtml5Scanner(session,switched){
+async function clearHtml5ScannerV63(){
+ if(scannerRetryTimer){clearTimeout(scannerRetryTimer);scannerRetryTimer=null}
+ if(html5Scanner){
+  try{await html5Scanner.stop()}catch(e){}
+  try{html5Scanner.clear()}catch(e){}
+  html5Scanner=null;
+ }
+ document.getElementById("reader").classList.add("hidden");
+}
+async function restartHtml5ScannerPassV63(session){
+ if(session!==scannerSessionId||locked||scanLookupBusy||!html5Scanner)return;
+ setStatus("Barcode noch nicht erkannt – Kamera wird automatisch neu fokussiert …");
+ await clearHtml5ScannerV63();
+ if(session!==scannerSessionId||locked||scanLookupBusy)return;
+ scannerPassV63=2;
+ await startHtml5Scanner(session,true,2);
+}
+async function startHtml5Scanner(session,switched,pass){
  if(session!==scannerSessionId||locked||scanLookupBusy)return;
  if(!window.Html5Qrcode){error("Scanner konnte nicht geladen werden. Seite bitte neu laden.");return}
+ pass=pass||1;
+ scannerPassV63=pass;
  try{
   document.getElementById("reader").classList.remove("hidden");
   var f=window.Html5QrcodeSupportedFormats;
@@ -1235,11 +1258,31 @@ async function startHtml5Scanner(session,switched){
   html5Scanner=new Html5Qrcode("reader",formats?{formatsToSupport:formats,verbose:false}:{verbose:false});
   await html5Scanner.start(
    {facingMode:"environment"},
-   {fps:24,qrbox:function(w,h){return {width:Math.floor(Math.min(w*.97,620)),height:Math.floor(Math.max(120,Math.min(h*.30,205))) }},disableFlip:true},
+   {
+    fps:pass===1?26:30,
+    qrbox:function(w,h){
+     var qw=Math.floor(Math.min(w*.98,660));
+     var qh=pass===1?Math.floor(Math.max(125,Math.min(h*.36,230))):Math.floor(Math.max(180,Math.min(h*.55,360)));
+     return {width:qw,height:qh};
+    },
+    disableFlip:true
+   },
    function(decoded){if(session===scannerSessionId)foundCode(decoded)},
    function(){}
   );
-  setStatus(switched?"Erkennung optimiert – Barcode ruhig in den Rahmen halten.":"Kamera läuft – Barcode groß und ruhig in den Rahmen halten.");
+  if(session!==scannerSessionId)return;
+  setStatus(pass===2?"Erkennung erweitert – Barcode einfach weiter im Rahmen halten.":(switched?"Erkennung optimiert – Barcode ruhig in den Rahmen halten.":"Kamera läuft – Barcode groß und ruhig in den Rahmen halten."));
+  if(pass===1){
+   scannerRetryTimer=setTimeout(function(){
+    if(session===scannerSessionId&&!locked&&!scanLookupBusy)restartHtml5ScannerPassV63(session);
+   },4800);
+  }else{
+   scannerRetryTimer=setTimeout(function(){
+    if(session!==scannerSessionId||locked||scanLookupBusy)return;
+    setStatus("Scanner läuft weiter – bei dunkler Umgebung Licht einschalten oder Barcode 10–20 cm entfernt halten.");
+    document.getElementById("photoFallback").classList.remove("hidden");
+   },6500);
+  }
  }catch(e){
   if(session!==scannerSessionId)return;
   await stopScanner();
@@ -1258,7 +1301,7 @@ async function startScanner(session){
  session=session||scannerSessionId;
  await stopScanner();
  if(session!==scannerSessionId)return;
- clearError();locked=false;torchOn=false;
+ clearError();locked=false;torchOn=false;scannerPassV63=0;
  var torchBtn=document.getElementById("scanTorchBtn");
  if(torchBtn){torchBtn.classList.add("hidden");torchBtn.textContent="🔦 Licht an"}
  if(!window.isSecureContext && location.hostname!=="localhost"){
@@ -1273,15 +1316,15 @@ async function startScanner(session){
  scanHintTimer=setTimeout(function(){
   if(session!==scannerSessionId||locked)return;
   var hint=document.querySelector(".scan-instruction-v4 small");
-  if(hint)hint.textContent="Noch nichts? Mehr Licht, 10–20 cm Abstand und Barcode möglichst gerade halten.";
- },3200);
+  if(hint)hint.textContent="Noch nichts? Einfach draufhalten – die Erkennung optimiert sich automatisch. Mehr Licht und 10–20 cm Abstand helfen.";
+ },2500);
 
  if("BarcodeDetector" in window){
   try{
    var supported=BarcodeDetector.getSupportedFormats?await BarcodeDetector.getSupportedFormats():[];
    var wanted=["ean_13","ean_8","upc_a","upc_e","code_128"].filter(function(x){return !supported.length||supported.indexOf(x)>=0});
    var detector=new BarcodeDetector({formats:wanted.length?wanted:["ean_13","ean_8","upc_a","upc_e"]});
-   nativeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080}},audio:false});
+   nativeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30,max:30}},audio:false});
    if(session!==scannerSessionId){await stopNative();return}
    var video=document.getElementById("nativeVideo");
    video.srcObject=nativeStream;document.getElementById("nativeWrap").classList.remove("hidden");
@@ -1289,14 +1332,14 @@ async function startScanner(session){
    var track=scannerTrack();
    await setupScannerTrack(track);
    setStatus("Kamera läuft – Barcode groß und ruhig in den Rahmen halten.");
-   nativeFallbackTimer=setTimeout(function(){switchScannerEngine(session)},5600);
+   nativeFallbackTimer=setTimeout(function(){switchScannerEngine(session)},3200);
    var loop=async function(){
     if(!nativeStream||session!==scannerSessionId||locked)return;
     try{
      var codes=await detector.detect(video);
      if(codes&&codes[0]&&codes[0].rawValue){foundCode(codes[0].rawValue);return}
     }catch(e){}
-    nativeTimer=setTimeout(loop,90);
+    nativeTimer=setTimeout(loop,70);
    };
    setTimeout(function(){if(session===scannerSessionId)loop()},180);
    return;
@@ -1323,6 +1366,8 @@ async function stopNative(){
 async function stopScanner(){
  if(fallbackTimer){clearTimeout(fallbackTimer);fallbackTimer=null}
  if(scanHintTimer){clearTimeout(scanHintTimer);scanHintTimer=null}
+ if(scannerRetryTimer){clearTimeout(scannerRetryTimer);scannerRetryTimer=null}
+ scannerPassV63=0;
  var hint=document.querySelector(".scan-instruction-v4 small");
  if(hint)hint.textContent="Die Erkennung startet automatisch";
  await stopNative();
@@ -1921,12 +1966,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v43"))return;
-  sessionStorage.setItem("echeck-sw-reload-v43","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v44"))return;
+  sessionStorage.setItem("echeck-sw-reload-v44","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=43",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=44",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
