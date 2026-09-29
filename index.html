@@ -194,6 +194,10 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 /* Barcode confirmation after not-found 6.6 */
 .barcode-debug-v66{margin-top:12px;border:1px solid #e3e9e7;background:#f8faf9;border-radius:15px;padding:11px 13px}.barcode-debug-v66 span{display:block;font-size:8px;font-weight:950;letter-spacing:.1em;color:var(--muted)}.barcode-debug-v66 b{display:block;margin-top:4px;font-size:18px;letter-spacing:.04em;color:var(--ink)}.notfound-actions-v66{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.notfound-actions-v66 .btn{width:100%;font-size:12px}@media(max-width:480px){.notfound-actions-v66{grid-template-columns:1fr}}
 
+
+/* FREE / PLUS test mode 6.7 */
+.plan-test-v67{margin:14px 0 18px;border:1px solid #cfe4de;border-radius:22px;background:linear-gradient(145deg,#f0faf7,#fff);padding:15px}.plan-test-head-v67{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.plan-test-head-v67 span:first-child{display:block;font-size:9px;font-weight:950;letter-spacing:.12em;color:var(--brand)}.plan-test-head-v67 h3{margin:4px 0 3px;font-size:18px}.plan-test-head-v67 p{margin:0;color:var(--muted);font-size:11px;line-height:1.4}.plan-test-badge-v67{flex:0 0 auto;border-radius:999px;background:#e5f6f1;color:var(--brand);font-weight:950;font-size:12px;padding:7px 10px}.plan-test-switch-v67{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.plan-test-switch-v67 button{border:1px solid #dbe6e3;background:#fff;border-radius:16px;padding:12px;cursor:pointer;text-align:left;color:var(--ink)}.plan-test-switch-v67 button b,.plan-test-switch-v67 button small{display:block}.plan-test-switch-v67 button small{font-size:10px;color:var(--muted);margin-top:3px}.plan-test-switch-v67 button.active{border-color:var(--brand);background:#eaf8f4;box-shadow:0 0 0 2px rgba(8,125,114,.08)}.plan-test-switch-v67 button.active b{color:var(--brand)}.plus-gate-message-v67{margin-top:12px;border-radius:14px;background:#fff8e8;border:1px solid #f0d99a;color:#73500b;padding:11px 12px;font-size:12px;line-height:1.45}.premium-locked-v67{border-style:dashed!important;opacity:.92}.premium-locked-btn-v67{border:1px dashed #b9c9c5!important}.plan-badge-v5.plus{background:#e8f7f3!important;color:var(--brand)!important}
+
 </style>
 </head>
 <body>
@@ -443,6 +447,18 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  </div>
  <div id="plusStatusBox" class="plus-status-v5"><span>Dein Tarif</span><strong id="plusPlanName">Free</strong><small id="plusPlanText">Basisfunktionen sind aktiv.</small></div>
 
+ <div class="plan-test-v67">
+   <div class="plan-test-head-v67">
+     <div><span>TESTMODUS</span><h3>FREE und PLUS ausprobieren</h3><p>Nur für die Entwicklung. Es wird nichts gekauft oder berechnet.</p></div>
+     <span class="plan-test-badge-v67">0,00 €</span>
+   </div>
+   <div class="plan-test-switch-v67">
+     <button id="testPlanFreeV67" type="button" onclick="setTestPlanV67('free')"><b>FREE</b><small>Basisfunktionen</small></button>
+     <button id="testPlanPlusV67" type="button" onclick="setTestPlanV67('plus')"><b>PLUS TEST</b><small>Premiumfunktionen freischalten</small></button>
+   </div>
+   <div id="plusGateMessageV67" class="plus-gate-message-v67 hidden"></div>
+ </div>
+
  <div class="plus-value-head-v51">
    <span>DEIN MEHRWERT MIT PLUS</span>
    <h2>Mehr als nur „E-Nummer gefunden“</h2>
@@ -461,18 +477,20 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <div class="compare-card-v51">
    <div class="compare-head-v51"><div><span>FUNKTION</span></div><div><b>FREE</b></div><div class="plus-col-v51"><b>PLUS</b></div></div>
    <div class="compare-row-v51"><div>Barcode scannen</div><div class="yes-v51">✓</div><div class="yes-v51 plus-col-v51">✓</div></div>
-   <div class="compare-row-v51"><div>E-Nummern erkennen</div><div class="yes-v51">✓</div><div class="yes-v51 plus-col-v51">✓</div></div>
+   <div class="compare-row-v51"><div>Zutaten fotografieren / OCR</div><div class="yes-v51">✓</div><div class="yes-v51 plus-col-v51">✓</div></div>
+   <div class="compare-row-v51"><div>E-Nummern + Basis-Erklärung</div><div class="yes-v51">✓</div><div class="yes-v51 plus-col-v51">✓</div></div>
    <div class="compare-row-v51"><div>EU-Kinderhinweise</div><div class="yes-v51">✓</div><div class="yes-v51 plus-col-v51">✓</div></div>
-   <div class="compare-row-v51"><div>Grundlegende Erklärung</div><div class="yes-v51">✓</div><div class="yes-v51 plus-col-v51">✓</div></div>
-   <div class="compare-row-v51"><div>Ausführliche Hintergründe & Quellen</div><div class="dash-v51">–</div><div class="yes-v51 plus-col-v51">✓</div></div>
-   <div class="compare-row-v51"><div>Vertiefter ADS-/ADHS-Fokus</div><div class="dash-v51">–</div><div class="yes-v51 plus-col-v51">✓</div></div>
-   <div class="compare-row-v51"><div>Erweiterte Alternativen</div><div class="dash-v51">–</div><div class="yes-v51 plus-col-v51">✓</div></div>
-   <div class="compare-row-v51"><div>Produktvergleich</div><div class="dash-v51">–</div><div class="planned-v51 plus-col-v51">Beta</div></div>
+   <div class="compare-row-v51"><div>Allergie- & Laktose-Grundcheck</div><div class="yes-v51">✓</div><div class="yes-v51 plus-col-v51">✓</div></div>
+   <div class="compare-row-v51"><div>Basis-Verlauf & Favoriten</div><div class="yes-v51">✓</div><div class="yes-v51 plus-col-v51">✓</div></div>
+   <div class="compare-row-v51"><div>Echte ähnliche Produkte suchen</div><div class="dash-v51">🔒</div><div class="yes-v51 plus-col-v51">✓</div></div>
+   <div class="compare-row-v51"><div>Produktvergleich A/B</div><div class="dash-v51">🔒</div><div class="yes-v51 plus-col-v51">✓</div></div>
+   <div class="compare-row-v51"><div>Vertiefte Hintergründe & Quellen</div><div class="dash-v51">–</div><div class="planned-v51 plus-col-v51">geplant</div></div>
    <div class="compare-row-v51"><div>Familienprofile</div><div class="dash-v51">–</div><div class="planned-v51 plus-col-v51">geplant</div></div>
+   <div class="compare-row-v51"><div>Erweiterter Verlauf & gespeicherte Vergleiche</div><div class="dash-v51">–</div><div class="planned-v51 plus-col-v51">geplant</div></div>
  </div>
- <button class="compare-beta-cta-v52" onclick="goPage('compare');renderComparison()">
+ <button class="compare-beta-cta-v52" onclick="openComparisonFromPlusV67()">
    <span class="compare-beta-icon-v52">A:B</span>
-   <span><b>Produktvergleich jetzt testen</b><small>Beta-Vorschau – aktuell kostenlos testbar</small></span>
+   <span><b>Produktvergleich öffnen</b><small>Im PLUS TEST-Modus freigeschaltet – ohne Zahlung</small></span>
    <span>›</span>
  </button>
 
@@ -492,11 +510,11 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  </div>
 
  <div class="card plus-payment-note-v5">
-   <h3>Zahlung noch nicht aktiviert</h3>
-   <p class="muted">Die technische Plus-Struktur ist vorbereitet. Es wird aktuell nichts berechnet und kein Kauf ausgelöst. Erst wenn der Zahlungsanbieter sicher angebunden ist, wird hier ein echter Kaufbutton aktiviert.</p>
-   <button class="btn primary" style="width:100%" disabled>Noch nicht verfügbar</button>
+   <h3>Bezahlung bleibt ausgeschaltet</h3>
+   <p class="muted">Aktuell testest du nur die Tariflogik. FREE und PLUS TEST können oben jederzeit gewechselt werden. Es gibt keinen Zahlungsanbieter, keine Zahlungsabfrage und keine Abbuchung.</p>
+   <button class="btn soft" style="width:100%" onclick="setTestPlanV67('plus')">PLUS TEST aktivieren</button>
  </div>
- <div class="notice" style="margin-bottom:16px"><b>Bleibt kostenlos:</b> Barcode-Scan, erkannte E-Nummern, grundlegende Erklärungen und wichtige EU-Kinderhinweise.</div>
+ <div class="notice" style="margin-bottom:16px"><b>Bleibt kostenlos:</b> Barcode-Scan, Zutatenfoto/OCR, erkannte E-Nummern, Basis-Erklärungen, wichtige EU-Kinderhinweise sowie grundlegende Allergie- und Laktose-Hinweise.</div>
 </section>
 <section id="page-compare" class="app-page">
  <div class="section-head"><div><span class="beta-label-v52">PLUS BETA</span><h2 style="margin-top:3px">Produktvergleich</h2></div><button class="btn soft" onclick="goPage('plus')">← Zurück</button></div>
@@ -509,14 +527,14 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
    <div id="compareSlotB" class="compare-slot-v52"><div class="compare-letter-v52">B</div><div class="compare-placeholder-v52"><b>Produkt B</b><small>Noch nicht gescannt</small></div><button class="btn primary" onclick="openCompareScanner('B')">B scannen</button><div class="compare-manual-v54"><input id="compareBarcodeB" inputmode="numeric" placeholder="Barcode B"><button class="btn soft" onclick="lookupCompareManual('B')">Suchen</button></div></div>
  </div>
  <div id="compareResult" class="compare-result-v52"></div>
- <div class="notice" style="margin-top:14px"><b>Beta-Test:</b> Der Produktvergleich ist während der Entwicklung frei testbar. Produktdaten können unvollständig sein; maßgeblich bleibt die Verpackung.</div>
+ <div class="notice" style="margin-top:14px"><b>PLUS TEST:</b> Der Produktvergleich ist eine Premiumfunktion, die du im Testmodus ohne Zahlung freischalten kannst. Produktdaten können unvollständig sein; maßgeblich bleibt die Verpackung.</div>
 </section>
 <section id="page-profile" class="app-page">
  <div class="section-head"><h2>👤 Profil & Einstellungen</h2></div>
  <div class="card">
   <div class="profile-row"><b>Angemeldet als</b><span id="profileEmail" class="muted">Gast</span></div>
   <div class="profile-row"><b>Anzeigename</b><input id="profileName" placeholder="Dein Name"><button class="btn soft" style="margin-top:8px" onclick="saveProfile()">Speichern</button></div>
-  <div class="profile-row plus-profile-row-v5"><b>E-Check Kids Plus</b><div class="plan-line-v5"><span id="profilePlanBadge" class="plan-badge-v5">FREE</span><span id="profilePlanText" class="muted">Basis-Tarif</span></div><button class="btn primary" style="margin-top:9px" onclick="goPage('plus')">Plus ansehen</button></div>
+  <div class="profile-row plus-profile-row-v5"><b>E-Check Kids Plus</b><div class="plan-line-v5"><span id="profilePlanBadge" class="plan-badge-v5">FREE</span><span id="profilePlanText" class="muted">Basis-Tarif</span></div><button class="btn primary" style="margin-top:9px" onclick="goPage('plus')">Tarif & Plus testen</button></div>
   <div class="profile-row">
    <b>Allergien & Unverträglichkeiten</b>
    <p class="muted" style="margin:5px 0 10px">Wähle relevante EU-Hauptallergene und – falls nötig – Laktoseintoleranz. Treffer und Hinweise werden beim Scan besonders hervorgehoben.</p>
@@ -567,7 +585,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.6 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.7 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1630,6 +1648,7 @@ function renderScanDetailsV60(p,nums){
  return '<details class="scan-details-v60" '+(kids?"open":"")+'><summary><span><b>Details & Erklärungen</b><small>E-Nummern und ADS/ADHS-Kontext</small></span><span class="scan-details-arrow-v60">⌄</span></summary><div class="scan-details-body-v60">'+renderAdhdFocus(nums)+renderE(nums)+'</div></details>';
 }
 function startComparisonWithCurrent(){
+ if(!hasPlusAccessV67()){showPlusGateV67("Der Produktvergleich");return}
  if(!currentProduct)return;
  compareProducts.A={
   barcode:currentProduct.barcode,
@@ -1645,7 +1664,8 @@ function startComparisonWithCurrent(){
  goPage("compare");
 }
 function renderCompareCtaV60(){
- return '<div class="compare-cta-v60"><div><span>PRODUKTVERGLEICH</span><b>Mit einem anderen Produkt vergleichen</b><p>Produkt A ist schon übernommen. Scanne danach nur noch Produkt B.</p></div><button class="btn primary" onclick="startComparisonWithCurrent()">Vergleich starten</button></div>';
+ var plus=hasPlusAccessV67();
+ return '<div class="compare-cta-v60 '+(plus?"":"premium-locked-v67")+'"><div><span>'+(plus?"PLUS":"🔒 PLUS")+' · PRODUKTVERGLEICH</span><b>Mit einem anderen Produkt vergleichen</b><p>'+(plus?"Produkt A ist schon übernommen. Scanne danach nur noch Produkt B.":"Im FREE-Tarif gesperrt. Im PLUS TEST kannst du zwei Produkte direkt nebeneinander vergleichen.")+'</p></div><button class="btn '+(plus?"primary":"soft")+'" onclick="'+(plus?"startComparisonWithCurrent()":"showPlusGateV67(&quot;Der Produktvergleich&quot;)")+'">'+(plus?"Vergleich starten":"PLUS ansehen")+'</button></div>';
 }
 
 async function retryScannerAfterNotFoundV66(code){
@@ -1829,6 +1849,7 @@ function alternativeScoreV62(candidate,base){
  return score;
 }
 function useAlternativeAsCompareV62(index){
+ if(!hasPlusAccessV67()){showPlusGateV67("Der Produktvergleich");return}
  if(!window.alternativeProductsV62||!alternativeProductsV62[index])return;
  var p=alternativeProductsV62[index];
  if(currentProduct){
@@ -1855,6 +1876,7 @@ function renderAlternativeProductV62(p,index,reasons){
  return '<div class="alt-product-v62">'+img+'<div class="alt-product-copy-v62"><b>'+esc(p.name)+'</b><small>'+esc(p.brand||"")+'</small><div class="alt-product-tags-v62">'+tags+'</div><div class="alt-product-meta-v62">'+p.additives.length+' E-Nummer'+(p.additives.length===1?"":"n")+' · '+esc(sugar)+'</div><button class="btn soft" onclick="useAlternativeAsCompareV62('+index+')">Mit gescanntem Produkt vergleichen</button></div></div>';
 }
 async function findAlternativesV62(){
+ if(!hasPlusAccessV67()){showPlusGateV67("Die echte Alternativensuche");return}
  var box=document.getElementById("alternativeResultsV62"),btn=document.getElementById("alternativeSearchBtnV62");
  if(!box||!currentProduct)return;
  var tag=currentProduct.category_tag||"";
@@ -1938,7 +1960,7 @@ function renderBetterAlternatives(p,nums){
  var out='<div class="alt-section"><div class="alt-title"><span style="font-size:25px">🥕</span><h3>Alternativen zum Vergleichen</h3></div>'
   +'<p class="muted" style="margin:0">Keine pauschale Bewertung: Diese Vorschläge helfen dir, ähnliche Produkte anhand einfacher Kriterien zu vergleichen.</p><div class="alt-grid">';
  unique.forEach(function(x){out+='<div class="alt-card"><strong>'+x.icon+' '+esc(x.title)+'</strong><p>'+x.text+'</p></div>'});
- out+='</div><div class="alt-check"><b>Beim Einkauf vergleichen:</b> Zutatenliste • Zucker • erkannte Zusatzstoffe • passende Vollkorn-/Naturvariante</div><button id="alternativeSearchBtnV62" class="btn primary alt-find-btn-v62" type="button" onclick="findAlternativesV62()">Ähnliche Produkte finden</button><div id="alternativeResultsV62"></div></div>';
+ out+='</div><div class="alt-check"><b>Beim Einkauf vergleichen:</b> Zutatenliste • Zucker • erkannte Zusatzstoffe • passende Vollkorn-/Naturvariante</div>'+(hasPlusAccessV67()?'<button id="alternativeSearchBtnV62" class="btn primary alt-find-btn-v62" type="button" onclick="findAlternativesV62()">Ähnliche Produkte finden</button>':'<button id="alternativeSearchBtnV62" class="btn soft alt-find-btn-v62 premium-locked-btn-v67" type="button" onclick="showPlusGateV67(&quot;Die echte Alternativensuche&quot;)">🔒 Ähnliche Produkte · PLUS</button>')+'<div id="alternativeResultsV62"></div></div>';
  return out;
 }
 
@@ -1999,6 +2021,7 @@ async function readIngredientsPhoto(){
 var deferredInstallPrompt=null;
 
 function goPage(name){
+ if(name==="compare"&&!hasPlusAccessV67()){showPlusGateV67("Der Produktvergleich");return}
  document.body.classList.remove("scan-result-mode");
  if(name!=="scan"){
   scannerSessionId++;
@@ -2051,6 +2074,58 @@ function showAdditive(n){
  document.getElementById("result").innerHTML='<div class="card"><h2>'+esc(n)+' – '+esc((special[n]||["Zusatzstoff"])[0])+'</h2>'+renderE([n])+'<p class="muted" style="margin-top:14px">Quelle/Einordnung: EU-Zusatzstoffrecht, EFSA und Open Food Facts. Die App ersetzt keine medizinische Beratung.</p></div>';
  document.getElementById("result").scrollIntoView({behavior:"smooth"});
 }
+
+var currentSubscriptionPlusV67=false;
+var TEST_PLAN_KEY_V67="echeck_test_plan_v67";
+function testPlanV67(){
+ try{return localStorage.getItem(TEST_PLAN_KEY_V67)==="plus"?"plus":"free"}catch(e){return "free"}
+}
+function hasPlusAccessV67(){
+ return currentSubscriptionPlusV67||testPlanV67()==="plus";
+}
+function updateTestPlanUiV67(){
+ var plus=hasPlusAccessV67(),freeBtn=document.getElementById("testPlanFreeV67"),plusBtn=document.getElementById("testPlanPlusV67");
+ if(freeBtn)freeBtn.classList.toggle("active",!plus);
+ if(plusBtn)plusBtn.classList.toggle("active",plus);
+ var pn=document.getElementById("plusPlanName"),pt=document.getElementById("plusPlanText");
+ if(testPlanV67()==="plus"&&!currentSubscriptionPlusV67){
+  if(pn)pn.textContent="PLUS TEST";
+  if(pt)pt.textContent="Premiumfunktionen sind lokal zum Testen freigeschaltet. Keine Zahlung.";
+ }
+ var pb=document.getElementById("profilePlanBadge"),ppt=document.getElementById("profilePlanText");
+ if(pb){pb.textContent=plus?"PLUS TEST":"FREE";pb.classList.toggle("plus",plus)}
+ if(ppt)ppt.textContent=plus?"Testmodus – keine Zahlung":"Basis-Tarif";
+ document.body.classList.toggle("plus-test-active-v67",plus);
+}
+function setTestPlanV67(plan){
+ var next=plan==="plus"?"plus":"free";
+ try{localStorage.setItem(TEST_PLAN_KEY_V67,next)}catch(e){}
+ var msg=document.getElementById("plusGateMessageV67");
+ if(msg){
+  msg.classList.remove("hidden");
+  msg.innerHTML=next==="plus"
+   ?'<b>PLUS TEST ist aktiv.</b><br>Produktvergleich und echte Alternativensuche sind jetzt freigeschaltet. Es wird nichts berechnet.'
+   :'<b>FREE ist aktiv.</b><br>Premiumfunktionen sind wieder gesperrt. Scanner und alle wichtigen Basis-/Sicherheitshinweise bleiben verfügbar.';
+ }
+ updateTestPlanUiV67();
+ if(next==="free"&&document.getElementById("page-compare")&&document.getElementById("page-compare").classList.contains("active"))goPage("plus");
+}
+function showPlusGateV67(feature){
+ goPage("plus");
+ setTimeout(function(){
+  var msg=document.getElementById("plusGateMessageV67");
+  if(msg){
+   msg.classList.remove("hidden");
+   msg.innerHTML='<b>'+esc(feature||"Diese Funktion")+' gehört zu PLUS.</b><br>Für unseren Test kannst du oben kostenlos auf „PLUS TEST“ umschalten.';
+   msg.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+ },50);
+}
+function openComparisonFromPlusV67(){
+ if(!hasPlusAccessV67()){showPlusGateV67("Der Produktvergleich");return}
+ goPage("compare");renderComparison();
+}
+
 function readablePlan(plan,status){
  if(status!=="active"&&status!=="trialing")return {name:"Free",badge:"FREE",plus:false,text:"Basisfunktionen sind aktiv."};
  if(plan==="plus_monthly")return {name:"Plus Monat",badge:"PLUS",plus:true,text:"Plus-Monatsabo ist aktiv."};
@@ -2060,17 +2135,17 @@ function readablePlan(plan,status){
 }
 async function loadSubscriptionStatus(){
  var plan={name:"Free",badge:"FREE",plus:false,text:"Basisfunktionen sind aktiv."};
+ currentSubscriptionPlusV67=false;
  if(currentUser){
   try{
    const r=await sb.from("subscriptions").select("plan,status,current_period_end").eq("user_id",currentUser.id).maybeSingle();
    if(!r.error&&r.data)plan=readablePlan(r.data.plan,r.data.status);
   }catch(e){}
  }
+ currentSubscriptionPlusV67=!!plan.plus;
  var pn=document.getElementById("plusPlanName"),pt=document.getElementById("plusPlanText");
  if(pn)pn.textContent=plan.name;if(pt)pt.textContent=plan.text;
- var pb=document.getElementById("profilePlanBadge"),ppt=document.getElementById("profilePlanText");
- if(pb){pb.textContent=plan.badge;pb.classList.toggle("plus",plan.plus)}
- if(ppt)ppt.textContent=plan.plus?plan.name:"Basis-Tarif";
+ updateTestPlanUiV67();
  return plan;
 }
 
@@ -2115,12 +2190,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v47"))return;
-  sessionStorage.setItem("echeck-sw-reload-v47","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v48"))return;
+  sessionStorage.setItem("echeck-sw-reload-v48","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=47",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=48",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
@@ -2380,7 +2455,7 @@ function maybeShowHelpIntroV61(){
 }
 
 function enterApp(label){
- showAppChrome();
+ showAppChrome();updateTestPlanUiV67();
  document.getElementById("appShell").classList.remove("hidden");
  document.getElementById("userButton").textContent=label||"Konto";
  closeAuth();
