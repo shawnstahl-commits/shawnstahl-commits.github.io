@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **6.1 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=42
-- Aktueller Frontend-Checkpoint: `b0d2f271650b865eb2d648f2fa624a20aa2126bb`
-- Aktueller Cache-Checkpoint: `13446456118c66a657bbec985e1e0c5997db3011`
+- Version: **6.2 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=43
+- Aktueller Frontend-Checkpoint: `80a2eb173c71be291c5f044ee208fbac6455f09d`
+- Aktueller Cache-Checkpoint: `b28ae57927111aebb8879391f47abc25b9e3d986`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -33,6 +33,10 @@ Stand: 29.09.2026
 - Gescanntes Produkt kann direkt als Produkt A in den Vergleich übernommen werden
 - Erste Nutzung zeigt eine kurze 5-Schritte-Einführung
 - Dauerhafter Hilfe-Button im Kopfbereich erklärt Scanner, Zutatenfoto, Profil, Ergebnis, Vergleich, Verlauf und Favoriten
+- Scan-Ergebnis kann ähnliche reale Produkte derselben Open-Food-Facts-Kategorie suchen
+- Alternativen werden nach transparenten Kriterien wie Kinderhinweisen, erkannten E-Nummern und hinterlegtem Zucker sortiert
+- Vorschläge mit erkannten ausgewählten Allergenen werden nicht als Alternative angezeigt; fehlende Daten bleiben ausdrücklich keine Garantie
+- Gefundene Alternative kann direkt als Produkt B in den bestehenden Produktvergleich übernommen werden
 - OCR-Allergenprüfung unterscheidet erkannte Zutaten von einfachen Spurenhinweisen
 
 ## Stabilitätsverbesserungen
@@ -49,6 +53,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 6.2 – echte Alternativensuche nach Produktkategorie: `80a2eb173c71be291c5f044ee208fbac6455f09d`
 - Version 6.1 – Hilfe & Einführung für neue Nutzer: `b0d2f271650b865eb2d648f2fa624a20aa2126bb`
 - Version 6.0 – neues Scan-Ergebnis mit Schnellübersicht: `27dcbafd8f194d2456e1f4a83a5faf50dbf9b94f`
 - Version 5.9 – automatische Zutatenfoto-Auswertung: `875e6153b291af573cce04affef31b4e3a0f522c`
