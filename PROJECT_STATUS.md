@@ -134,3 +134,10 @@ E-Check Kids soll keine pauschale "gut/schlecht"-Ampel sein, sondern Eltern schn
 
 ## Grundsatz
 Neue Funktionen erst dann weiter ausbauen, wenn Scanner, Produktdaten, Vergleich, Verlauf/Favoriten und Allergene stabil genug sind.
+
+## Vollbackup vor Version 7.1
+- Sicherungs-Branch: `backup-v7.0-before-7.1-2026-09-29`
+- Gesicherter Git-Stand: `8a92a9e1259bf11ac1094edd7278d04793f6b540`
+- Stand beim Erstellen: Version 7.0 Preview, identisch zu `main` (0 Commits Unterschied)
+- Zweck: vollständiger Rücksprungpunkt vor dem Stabilitäts-/Feinschliff-Block 7.1
+- Supabase bleibt das aktive Backend; Datenbanktabellen/RLS wurden zuletzt für Familienprofile, gespeicherte Vergleiche und Tester-Feedback geprüft.
