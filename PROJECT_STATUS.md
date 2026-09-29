@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **7.0 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=51
-- Aktueller Frontend-Checkpoint: `48028dd3b1a986b6a6f5ac4de16b592c9d4e441d`
-- Aktueller Cache-Checkpoint: `26d66c242fb8aee20f2293ccad475c33504bd16d`
+- Version: **7.1 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=52
+- Aktueller Frontend-Checkpoint: `1ab68d00ebf59212f44fdba2ff8f6214ce4ce664`
+- Aktueller Cache-Checkpoint: `19bc363c45588dbaaa93c09b4523295d8af7ee32`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -76,6 +76,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 7.1 – Stabilität & Feinschliff: `1ab68d00ebf59212f44fdba2ff8f6214ce4ce664`
 - Version 7.0 – Tester-/Feedbackmodus, Diagnose und Rechtstransparenz: `48028dd3b1a986b6a6f5ac4de16b592c9d4e441d`
 - Version 6.9 – Plus-Ausbau abgeschlossen: Quellen, Familienprofile, erweiterter Verlauf & gespeicherte Vergleiche: `98fb31ad2feb8348fdc3f483cca25710955dcc37`
 - Version 6.8 – Plus-Ausbau: Quellen, Familienprofile, erweiterter Verlauf: `4cfbdfb5117c338f441a93f1025e8b948e671dca`
@@ -110,6 +111,15 @@ Stand: 29.09.2026
 - Rechtliches/Datenquellen als transparente Testfassung: Datenschutz, Impressum-Platzhalter, Open-Food-Facts-Lizenzen, Monetarisierung noch deaktiviert
 - Open-Food-Facts-Attribution im Footer um ODbL/CC-BY-SA ergänzt
 - Kein externes Analytics-, Werbe- oder Affiliate-Tracking aktiviert; Diagnose-Ereignisse bleiben lokal bis freiwilliges Feedback gesendet wird
+
+- 7.1: Doppelabfragen bei Produkt-Lookups werden blockiert
+- 7.1: Offline-Banner und verständliche Offline-Zustände für Produkt- und Vergleichsabfragen
+- 7.1: Manuelle Barcodes werden auf 8–14 Ziffern geprüft
+- 7.1: Allergen-/Spuren-Tags werden beim Start eines Vergleichs korrekt in Produkt A übernommen
+- 7.1: OCR prüft Bildtyp/Dateigröße und meldet Fehler verständlicher
+- 7.1: Familienprofile zeigen bei Ladefehlern einen Wiederholen-Button statt fälschlich „keine Profile“
+- 7.1: Gast-/Logout-Zustand leert lokale Verlauf-, Vergleichs- und Familienzustände sauber
+- 7.1: Mobile Umbrüche, Touch-Verhalten und Safe-Area-Abstände verbessert
 
 ## Als Nächstes
 1. Produktvergleich weiter testen und stabilisieren
