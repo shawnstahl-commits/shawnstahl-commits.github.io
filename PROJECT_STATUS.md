@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **5.7 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=38
-- Aktueller Frontend-Checkpoint: `40979eb247cb8399b9a6fe2747333159a9ff7501`
-- Aktueller Cache-Checkpoint: `f4c75c690e36a39d0d360546eb9ac666b61e7845`
+- Version: **5.8 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=39
+- Aktueller Frontend-Checkpoint: `038b94500361c008dea841ecc93a27481b54a314`
+- Aktueller Cache-Checkpoint: `2c9b27da82eb914e06bfa38ae197f7eacbc0674d`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -30,6 +30,9 @@ Stand: 29.09.2026
 
 ## Stabilitätsverbesserungen
 - Scanner-Start/Stop-Rennen reduziert
+- Taschenlampen-Schalter bei unterstützten Handys
+- Automatischer Wechsel auf zweiten Barcode-Erkennungsmodus bei ausbleibendem Treffer
+- Schnellere Barcode-Erkennungsintervalle und bessere Scan-Hinweise
 - Schutz vor doppelten Barcode-Scans
 - Open-Food-Facts-Abfragen mit Timeout und Wiederholungsversuch
 - Bessere Fehlermeldungen bei Offline/Timeout
@@ -39,6 +42,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 5.8 – Scanner-Licht + automatischer Erkennungswechsel: `038b94500361c008dea841ecc93a27481b54a314`
 - Version 5.7 – Laktoseintoleranz-Check: `40979eb247cb8399b9a6fe2747333159a9ff7501`
 - Version 5.6 – manuelle Barcode-Eingabe wieder sichtbar: `8aa7dc13bb59daa69c3b702f77e5ed06be9d2761`
 - Version 5.5 – Stabilitäts-Sprint: `71b7d72e752a813631eff9cd9fd1c7c5ea59d449`
