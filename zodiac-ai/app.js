@@ -369,7 +369,7 @@ async function ensureChatSession() {
   }
 
   const signName = selectedSign?.name || profile?.zodiac_sign;
-  const effectiveSign = profile?.zodiac_sign || signName || 'Löwe';
+  const effectiveSign = signName || 'Löwe';
   const z = zodiac.find(x => x.name === effectiveSign) || zodiac[4];
   selectedSign = z;
 
@@ -501,7 +501,14 @@ $('#replayVoiceBtn').addEventListener('click', () => {
 $('#bottomChatBtn').addEventListener('click', openChat);
 $('#openChatFromHome').addEventListener('click', openChat);
 $('#readingChatBtn').addEventListener('click', openChat);
-$('#profileChatBtn').addEventListener('click', openChat);
+$('#profileChatBtn').addEventListener('click', async () => {
+  if (profile?.zodiac_sign) {
+    selectedSign = zodiac.find(z => z.name === profile.zodiac_sign) || selectedSign;
+    chatSessionId = null;
+    currentChatSign = null;
+  }
+  await openChat();
+});
 
 sb.auth.onAuthStateChange(async () => {
   setTimeout(refreshAuthUI, 0);
