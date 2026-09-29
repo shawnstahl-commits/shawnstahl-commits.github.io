@@ -18,20 +18,21 @@ const zodiac = [
   {name:'Fische',symbol:'♓',dates:'19. Februar – 20. März',element:'Wasser'}
 ];
 
-const zodiacAvatars = {
-  'Widder':'🐏',
-  'Stier':'🐂',
-  'Zwillinge':'👯',
-  'Krebs':'🦀',
-  'Löwe':'🦁',
-  'Jungfrau':'👩',
-  'Waage':'⚖️',
-  'Skorpion':'🦂',
-  'Schütze':'🏹',
-  'Steinbock':'🐐',
-  'Wassermann':'🏺',
-  'Fische':'🐟'
-};
+function zodiacIndex(name) {
+  const i = zodiac.findIndex(z => z.name === name);
+  return i < 0 ? 4 : i;
+}
+
+function zodiacPosition(name) {
+  return (zodiacIndex(name) * 100 / 11).toFixed(4) + '%';
+}
+
+function setZodiacArt(el, name) {
+  if (!el) return;
+  el.textContent = '';
+  el.classList.add('zodiac-art');
+  el.style.setProperty('--z-pos', zodiacPosition(name));
+}
 
 const horoscopeBank = {
   today: {
@@ -218,9 +219,9 @@ function route(name) {
 $$('[data-route]').forEach(btn => btn.addEventListener('click', () => route(btn.dataset.route)));
 
 function renderGrid() {
-  $('#zodiacGrid').innerHTML = zodiac.map(z => `
+  $('#zodiacGrid').innerHTML = zodiac.map((z, i) => `
     <button class="zodiac-card" data-zodiac="${z.name}">
-      <div class="symbol">${z.symbol}</div>
+      <div class="symbol zodiac-card-art zodiac-art" style="--z-pos:${(i * 100 / 11).toFixed(4)}%"></div>
       <h3>${z.name}</h3>
       <p>${z.dates}</p>
     </button>`).join('');
@@ -242,7 +243,7 @@ function openReading(name) {
 
 function renderReading() {
   const c = getHoroscope(selectedPeriod, selectedSign);
-  $('#readingSymbol').textContent = selectedSign.symbol;
+  setZodiacArt($('#readingSymbol'), selectedSign.name);
   $('#readingDates').textContent = selectedSign.dates + ' · ' + selectedSign.element;
   $('#readingTitle').textContent = selectedSign.name;
   $('#readingHeadline').textContent = c.headline;
@@ -387,10 +388,9 @@ async function ensureChatSession() {
   }
 
   $('#chatTitle').textContent = `Dein ${z.name}-Reading`;
-  const avatar = zodiacAvatars[z.name] || z.symbol;
-  $('#chatAvatar').textContent = avatar;
+  setZodiacArt($('#chatAvatar'), z.name);
   $('#chatAvatarLabel').textContent = z.name;
-  $('#premiumPreviewAvatar').textContent = avatar;
+  setZodiacArt($('#premiumPreviewAvatar'), z.name);
   currentChatSign = z.name;
   return true;
 }
