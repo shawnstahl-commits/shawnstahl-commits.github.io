@@ -157,6 +157,10 @@ body.scanner-fullscreen.manual-entry-v56 .scan-manual-open-v56,body.scanner-full
 body.scanner-fullscreen .scan-torch-v58:not(.hidden){display:block;position:absolute;z-index:47;right:16px;top:max(78px,calc(env(safe-area-inset-top) + 64px));border:1px solid rgba(255,255,255,.30);background:rgba(0,0,0,.46);color:#fff;border-radius:999px;padding:10px 13px;font-weight:850;backdrop-filter:blur(10px)}
 body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.manual-entry-v56 .scan-torch-v58{display:none!important}
 
+
+/* Automatic ingredient photo evaluation 5.9 */
+.ingredient-auto-v59{border-radius:18px;background:linear-gradient(145deg,#edf9f6,#f8fcfb);border:1px solid #cfe8e2;padding:14px 15px;margin-bottom:12px}.ingredient-auto-v59>span{display:block;font-size:9px;font-weight:950;letter-spacing:.11em;color:var(--brand)}.ingredient-auto-v59>b{display:block;font-size:20px;margin-top:4px;color:var(--ink)}.ingredient-auto-v59>p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.45}.ingredient-result-v59{padding-top:16px}.ocr-details-v59{margin-top:14px;border:1px solid var(--line);border-radius:15px;background:#fafcfb;padding:11px 13px}.ocr-details-v59 summary{cursor:pointer;font-weight:850;color:var(--ink)}.ocr-details-v59>div{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5;max-height:220px;overflow:auto}
+
 </style>
 </head>
 <body>
@@ -313,7 +317,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 <h2>Zutatenliste fotografieren</h2>
 <p class="muted">Foto möglichst gerade, nah und gut beleuchtet aufnehmen.</p>
 <input id="ingredientsPhoto" type="file" accept="image/*" capture="environment">
-<button class="btn primary" style="margin-top:10px;width:100%" onclick="readIngredientsPhoto()">Text erkennen & prüfen</button>
+<button class="btn primary" style="margin-top:10px;width:100%" onclick="readIngredientsPhoto()">Foto automatisch auswerten</button>
 <div id="ocrStatus" class="status"></div>
 </div>
 </div>
@@ -508,7 +512,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.8 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.9 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -937,6 +941,68 @@ function detectSelectedAllergens(p){
  });
  return {contains:contains,traces:traceHits};
 }
+
+var INGREDIENT_ALLERGEN_PATTERNS_V59={
+ "gluten":[/\bgluten\b/i,/\bweizen\b/i,/\broggen\b/i,/\bgerste\b/i,/\bdinkel\b/i,/\bkamut\b/i,/\bhafer\b/i],
+ "crustaceans":[/\bkrebstier/i,/\bgarnele/i,/\bshrimp/i,/\bkrabbe/i],
+ "eggs":[/\bei(?:er|pulver|weiß|weiss|gelb)?\b/i,/\balbumin\b/i],
+ "fish":[/\bfisch/i],
+ "peanuts":[/\berdnuss/i,/\berdnüsse/i,/\berdnuesse/i,/\bpeanut/i],
+ "soybeans":[/\bsoja/i,/\bsoy/i],
+ "milk":[/\bmilch/i,/\blaktose\b/i,/\blactose\b/i,/\bmolke/i,/\bsahne\b/i,/\brahm\b/i,/\bbutter\b/i,/\bkäse\b/i,/\bkaese\b/i,/\bjoghurt\b/i,/\byoghurt\b/i,/\bquark\b/i],
+ "nuts":[/\bmandel/i,/\bhaselnuss/i,/\bwalnuss/i,/\bcashew/i,/\bpistaz/i,/\bpekannuss/i,/\bpecan/i,/\bparanuss/i,/\bmacadamia/i,/\bschalenfr/i,/\bnüsse\b/i,/\bnuesse\b/i],
+ "celery":[/\bsellerie/i],
+ "mustard":[/\bsenf/i,/\bmustard/i],
+ "sesame-seeds":[/\bsesam/i],
+ "sulphur-dioxide-and-sulphites":[/\bsulfit/i,/\bschwefeldioxid/i,/\bsulphite/i],
+ "lupin":[/\blupin/i],
+ "molluscs":[/\bweichtier/i,/\bmollusc/i,/\bmuschel/i,/\bauster/i,/\btintenfisch/i]
+};
+function textHasAnyPattern(text,patterns){
+ return (patterns||[]).some(function(re){return re.test(text||"")});
+}
+function detectSelectedAllergensFromText(text){
+ var raw=String(text||"");
+ var norm=normalizeSearch(raw);
+ var markers=["spuren von","kann spuren","kann enthalten","may contain","traces of"];
+ var splitAt=-1;
+ markers.forEach(function(m){
+  var i=norm.indexOf(m);
+  if(i>=0&&(splitAt<0||i<splitAt))splitAt=i;
+ });
+ var main=splitAt>=0?norm.slice(0,splitAt):norm;
+ var trace=splitAt>=0?norm.slice(splitAt):"";
+ var contains=[],traces=[];
+ selectedAllergens.filter(function(id){return id!=="lactose"}).forEach(function(id){
+  var patterns=INGREDIENT_ALLERGEN_PATTERNS_V59[id]||[];
+  if(textHasAnyPattern(main,patterns))contains.push(id);
+  else if(trace&&textHasAnyPattern(trace,patterns))traces.push(id);
+ });
+ return {contains:contains,traces:traces};
+}
+function renderIngredientAllergenAlert(text){
+ var regular=selectedAllergens.filter(function(id){return id!=="lactose"});
+ if(!regular.length){
+  return '<div class="allergy-info-v54"><b>Allergie-Check nicht eingerichtet.</b><span>Im Profil kannst du relevante Allergene auswählen.</span></div>';
+ }
+ var hit=detectSelectedAllergensFromText(text),out='';
+ if(hit.contains.length){
+  out+='<div class="allergy-alert-v54 danger"><b>⚠ Im Zutatenfoto erkannt:</b><span>'+esc(hit.contains.map(allergenLabel).join(", "))+'</span></div>';
+ }
+ if(hit.traces.length){
+  out+='<div class="allergy-alert-v54 trace"><b>Spurenhinweis im erkannten Text:</b><span>'+esc(hit.traces.map(allergenLabel).join(", "))+'</span></div>';
+ }
+ if(!hit.contains.length&&!hit.traces.length){
+  out+='<div class="allergy-alert-v54 ok"><b>Kein ausgewähltes Allergen im erkannten Text gefunden.</b><span>Das ist keine Garantie auf Allergenfreiheit.</span></div>';
+ }
+ out+='<div class="allergy-disclaimer-v54 compact"><b>OCR-Hinweis:</b> Texterkennung kann Wörter falsch lesen oder übersehen. Bei Allergien immer die Originalverpackung prüfen.</div>';
+ return out;
+}
+function looksLikeIngredientText(text){
+ var t=String(text||"").trim();
+ return t.length>45||t.indexOf(",")>=0||/\bzutaten\b/i.test(t)||/\bingredients\b/i.test(t);
+}
+
 function renderAllergenAlert(p){
  if(!selectedAllergens.length)return '<div class="allergy-info-v54"><b>Allergie-/Unverträglichkeits-Check nicht eingerichtet.</b><span>Im Profil kannst du Allergene und Laktoseintoleranz auswählen.</span></div>';
  var regular=selectedAllergens.filter(function(id){return id!=="lactose"});
@@ -1455,11 +1521,20 @@ function renderBetterAlternatives(p,nums){
  return out;
 }
 
-function analyzeIngredients(){
- var t=document.getElementById("ingredientsText").value;
+function analyzeIngredients(source){
+ var box=document.getElementById("ingredientsText");
+ var t=box?box.value.trim():"";
+ if(!t){
+  document.getElementById("result").innerHTML='<div class="card"><div class="notice warn"><b>Kein Zutaten-Text vorhanden.</b><br>Bitte fotografiere die Zutatenliste erneut oder gib sie manuell ein.</div></div>';
+  return;
+ }
  var nums=detectE(t,[]);
- document.getElementById("result").innerHTML='<div class="card"><h2>Ergebnis</h2>'+renderLactoseAlert(null,t)+renderE(nums)+'</div>';
- document.getElementById("result").scrollIntoView({behavior:"smooth"});
+ var title=source==="photo"?"Zutatenfoto ausgewertet":"Zutaten ausgewertet";
+ var intro=source==="photo"
+  ?'<div class="ingredient-auto-v59"><span>📷 AUTOMATISCHE AUSWERTUNG</span><b>'+esc(title)+'</b><p>E-Nummern, deine ausgewählten Allergene und Laktose-Hinweise wurden direkt geprüft.</p></div>'
+  :'<div class="ingredient-auto-v59"><span>⌨️ ZUTATEN-CHECK</span><b>'+esc(title)+'</b><p>Der eingegebene Text wurde automatisch geprüft.</p></div>';
+ document.getElementById("result").innerHTML='<div class="card ingredient-result-v59">'+intro+renderIngredientAllergenAlert(t)+renderLactoseAlert(null,t)+renderAdhdFocus(nums)+renderE(nums)+'<details class="ocr-details-v59"><summary>Erkannten Zutaten-Text anzeigen</summary><div>'+esc(t).replace(/\n/g,"<br>")+'</div></details><div class="notice" style="margin-top:12px"><b>Etwas falsch erkannt?</b><br>Du kannst den Text oben korrigieren und anschließend erneut auf „Suchen & prüfen“ tippen.</div></div>';
+ document.getElementById("result").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 async function scanBarcodePhoto(file){
@@ -1474,16 +1549,27 @@ document.getElementById("barcodePhoto").addEventListener("change",function(){if(
 document.getElementById("barcodeInput").addEventListener("keydown",function(e){if(e.key==="Enter")lookupBarcode()});
 
 async function readIngredientsPhoto(){
- var f=document.getElementById("ingredientsPhoto").files[0],st=document.getElementById("ocrStatus");
+ var input=document.getElementById("ingredientsPhoto"),f=input&&input.files?input.files[0]:null,st=document.getElementById("ocrStatus");
  if(!f){st.textContent="Bitte zuerst ein Foto auswählen.";return}
  if(!window.Tesseract){st.textContent="Texterkennung konnte nicht geladen werden.";return}
- st.textContent="Texterkennung läuft …";
+ st.textContent="Foto wird gelesen …";
  try{
-  var r=await Tesseract.recognize(f,"deu",{logger:function(m){if(m.status==="recognizing text")st.textContent="Texterkennung: "+Math.round((m.progress||0)*100)+" %"}});
-  document.getElementById("ingredientsText").value=r.data.text||"";
-  st.textContent="Text erkannt. Prüfe oder korrigiere ihn bei Bedarf.";
-  openPanel("text");document.getElementById("ingredientsText").focus();
- }catch(e){st.textContent="Texterkennung fehlgeschlagen. Zutaten können auch manuell eingefügt werden."}
+  var r=await Tesseract.recognize(f,"deu",{logger:function(m){
+   if(m.status==="recognizing text")st.textContent="Texterkennung: "+Math.round((m.progress||0)*100)+" %";
+  }});
+  var detected=String(r&&r.data&&r.data.text||"").trim();
+  if(!detected){
+   st.textContent="Auf dem Foto konnte kein Text erkannt werden. Bitte näher und schärfer fotografieren.";
+   return;
+  }
+  document.getElementById("ingredientsText").value=detected;
+  st.textContent="Text erkannt – wird automatisch ausgewertet …";
+  openPanel("text");
+  analyzeIngredients("photo");
+  st.textContent="Fertig: Zutaten automatisch ausgewertet.";
+ }catch(e){
+  st.textContent="Texterkennung fehlgeschlagen. Zutaten können auch manuell eingefügt werden.";
+ }
 }
 
 
@@ -1525,7 +1611,7 @@ function localAdditiveMatches(q){
 async function smartSearch(){
  var t=document.getElementById("ingredientsText").value.trim();
  var direct=detectE(t,[]);
- if(direct.length||selectedAllergens.indexOf("lactose")>=0&&/(laktose|lactose|milchzucker|milchpulver|molkenpulver|sahne|joghurt|yoghurt|quark)/i.test(t)){analyzeIngredients();return}
+ if(direct.length||looksLikeIngredientText(t)||selectedAllergens.indexOf("lactose")>=0&&/(laktose|lactose|milchzucker|milchpulver|molkenpulver|sahne|joghurt|yoghurt|quark)/i.test(t)){analyzeIngredients("text");return}
  var hits=localAdditiveMatches(t);
  var box=document.getElementById("additiveSearchResults");
  if(hits.length){
@@ -1607,12 +1693,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v39"))return;
-  sessionStorage.setItem("echeck-sw-reload-v39","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v40"))return;
+  sessionStorage.setItem("echeck-sw-reload-v40","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=39",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=40",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
