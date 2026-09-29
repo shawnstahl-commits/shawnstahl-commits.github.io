@@ -134,6 +134,18 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
 .allergen-grid-v54{display:grid;grid-template-columns:1fr 1fr;gap:8px}.allergen-choice-v54{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;padding:10px;background:#fff;font-size:12px}.allergen-choice-v54 input{margin-top:2px;accent-color:var(--brand)}.allergy-disclaimer-v54{margin-top:11px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;padding:11px;color:#7c3f10;font-size:12px;line-height:1.45}.allergy-disclaimer-v54.compact{margin-top:7px}.allergy-alert-v54,.allergy-info-v54{margin-top:12px;border-radius:17px;padding:13px 14px;display:flex;flex-direction:column;gap:4px}.allergy-alert-v54.danger{background:#fff1f1;border:1px solid #fecaca;color:#991b1b}.allergy-alert-v54.trace{background:#fff8e8;border:1px solid #fde68a;color:#854d0e}.allergy-alert-v54.ok,.allergy-info-v54{background:#f3faf8;border:1px solid #cfe8e2;color:#285f56}.allergy-alert-v54 span,.allergy-info-v54 span{font-size:13px;line-height:1.4}.compare-manual-v54{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:2px}.compare-manual-v54 input{min-width:0;padding:9px 8px;font-size:11px}.compare-manual-v54 .btn{padding:9px 8px;font-size:11px}
 @media(max-width:520px){.allergen-grid-v54{grid-template-columns:1fr}.compare-manual-v54{grid-template-columns:1fr}.compare-manual-v54 .btn{width:100%}}
 
+
+/* Fullscreen manual barcode entry 5.6 */
+.scan-manual-open-v56,.scan-manual-box-v56{display:none}
+body.scanner-fullscreen .scan-manual-open-v56{display:block;position:absolute;z-index:46;left:50%;bottom:78px;transform:translateX(-50%);border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.48);color:#fff;border-radius:999px;padding:11px 16px;font-weight:850;backdrop-filter:blur(10px);white-space:nowrap}
+body.scanner-fullscreen.manual-entry-v56 .scan-manual-box-v56{display:flex;position:absolute;z-index:80;inset:0;background:rgba(2,7,6,.82);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:22px}
+body.scanner-fullscreen.manual-entry-v56 .scan-manual-open-v56,body.scanner-fullscreen.manual-entry-v56 .scan-instruction-v4,body.scanner-fullscreen.manual-entry-v56 .fullscreen-guide-v4,body.scanner-fullscreen.manual-entry-v56 #photoFallback{display:none!important}
+.scan-manual-card-v56{position:relative;width:min(100%,390px);background:#fff;color:#15211e;border-radius:22px;padding:24px;box-shadow:0 18px 60px rgba(0,0,0,.35)}
+.scan-manual-card-v56>strong{display:block;font-size:19px;margin-bottom:3px}.scan-manual-card-v56>small{display:block;color:#73807c;margin-bottom:14px}
+.scan-manual-card-v56 input{width:100%;font-size:17px;padding:14px 15px;border:1px solid #d6e0dd;border-radius:14px;margin-bottom:12px;background:#fff;color:#15211e}
+.scan-manual-card-v56 .btn{width:100%}.scan-manual-close-v56{position:absolute;right:13px;top:12px;width:36px;height:36px;border:0;border-radius:50%;background:#eef4f2;color:#38514a;font-size:23px;line-height:1}
+@media(max-height:640px){body.scanner-fullscreen .scan-manual-open-v56{bottom:58px}}
+
 </style>
 </head>
 <body>
@@ -263,6 +275,16 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
 <div id="reader" class="hidden"></div>
 <div class="fullscreen-guide-v4" aria-hidden="true"><div class="scan-corner-v4 tl"></div><div class="scan-corner-v4 tr"></div><div class="scan-corner-v4 bl"></div><div class="scan-corner-v4 br"></div><div class="scan-line-v4"></div></div>
 <div class="scan-instruction-v4"><strong>Barcode in den Rahmen halten</strong><small>Die Erkennung startet automatisch</small></div>
+<button class="scan-manual-open-v56" type="button" onclick="toggleManualBarcodeEntry(true)">⌨️ Barcode eingeben</button>
+<div class="scan-manual-box-v56">
+  <div class="scan-manual-card-v56">
+    <button class="scan-manual-close-v56" type="button" onclick="toggleManualBarcodeEntry(false)" aria-label="Manuelle Eingabe schließen">×</button>
+    <strong>Barcode manuell eingeben</strong>
+    <small>8 bis 14 Ziffern</small>
+    <input id="barcodeManualFullscreen" inputmode="numeric" autocomplete="off" placeholder="z. B. 3017624010701">
+    <button class="btn primary" type="button" onclick="lookupManualFullscreen()">Produkt suchen</button>
+  </div>
+</div>
 <div class="scan-processing-v4"><div class="processing-check-v4">✓</div><strong>Barcode erkannt</strong><small>Produkt wird geprüft …</small></div>
 <div id="scanStatus" class="status"></div>
 <div id="scanError" class="error hidden"></div>
@@ -474,7 +496,7 @@ body.scan-result-mode #page-scan>section>.grid,body.scan-result-mode #panel-barc
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.5 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.6 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -952,14 +974,53 @@ async function closeFullscreenScanner(){
  scannerSessionId++;
  compareTargetSlot=null;scanLookupBusy=false;locked=false;
  await stopScanner();
- document.body.classList.remove("scanner-fullscreen","scan-processing");
+ document.body.classList.remove("scanner-fullscreen","scan-processing","manual-entry-v56");
  goPage(backToCompare?"compare":"home");
  if(backToCompare)renderComparison();
 }
 function revealScanResults(){
- document.body.classList.remove("scanner-fullscreen","scan-processing");
+ document.body.classList.remove("scanner-fullscreen","scan-processing","manual-entry-v56");
  document.body.classList.add("scan-result-mode");
  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+async function toggleManualBarcodeEntry(open){
+ var on=open!==false;
+ document.body.classList.toggle("manual-entry-v56",on);
+ if(on){
+  locked=true;
+  await stopScanner();
+  var input=document.getElementById("barcodeManualFullscreen");
+  if(input){input.value=document.getElementById("barcodeInput").value||"";setTimeout(function(){input.focus()},60)}
+ }else{
+  locked=false;
+  var input=document.getElementById("barcodeManualFullscreen");
+  if(input)input.value="";
+  if(document.body.classList.contains("scanner-fullscreen"))startScanner(scannerSessionId);
+ }
+}
+async function lookupManualFullscreen(){
+ if(scanLookupBusy)return;
+ var input=document.getElementById("barcodeManualFullscreen");
+ var code=String(input&&input.value||"").replace(/\D/g,"");
+ if(code.length<8||code.length>14){
+  setStatus("Bitte einen gültigen Barcode mit 8 bis 14 Ziffern eingeben.");
+  if(input)input.focus();
+  return;
+ }
+ var targetSlot=compareTargetSlot;
+ document.getElementById("barcodeInput").value=code;
+ scanLookupBusy=true;locked=true;
+ document.body.classList.remove("manual-entry-v56");
+ document.body.classList.add("scan-processing");
+ setStatus("🔎 Produkt wird gesucht …");
+ await stopScanner();
+ try{
+  if(targetSlot)await lookupCompareProduct(code,targetSlot);
+  else await lookupBarcode(code);
+ }finally{
+  scanLookupBusy=false;locked=false;
+ }
 }
 
 function foundCode(raw){
@@ -1425,12 +1486,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v36"))return;
-  sessionStorage.setItem("echeck-sw-reload-v36","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v37"))return;
+  sessionStorage.setItem("echeck-sw-reload-v37","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=36",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=37",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
