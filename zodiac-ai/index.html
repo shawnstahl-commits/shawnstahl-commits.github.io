@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2" />
   <link rel="shortcut icon" href="favicon.svg?v=2" />
   <link rel="manifest" href="manifest.webmanifest?v=2" />
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <div class="stars" aria-hidden="true"></div>
@@ -66,6 +66,8 @@
               <li>✓ neues Wochenhoroskop jede Woche</li>
               <li>✓ neues Monatshoroskop jeden Monat</li>
               <li>✓ alle 12 Sternzeichen</li>
+              <li>✓ eigener Sternzeichen-Avatar</li>
+              <li>✓ kostenloses Vorlesen der Antworten</li>
             </ul>
             <button class="secondary-btn" disabled>Immer kostenlos</button>
           </article>
@@ -75,9 +77,10 @@
             <div class="plan-price">Preis folgt</div>
             <ul>
               <li>✦ persönlicher KI-Chat</li>
+              <li>✦ animierter sprechender Sternzeichen-Avatar</li>
+              <li>✦ hochwertigere Premium-Stimme</li>
               <li>✦ individuelle Readings</li>
               <li>✦ Sterne-Guthaben & Käufe</li>
-              <li>✦ weitere Premium-Funktionen</li>
             </ul>
             <button class="primary-btn" disabled>Noch nicht buchbar</button>
           </article>
@@ -197,13 +200,33 @@
     <section id="chatView" class="view">
       <button class="back-btn" data-route="profile">← Zurück</button>
       <div class="chat-head card">
-        <div id="chatSymbol" class="reading-symbol small">✦</div>
+        <div class="avatar-stage">
+          <div id="chatAvatar" class="zodiac-avatar" aria-label="Sternzeichen-Avatar">🦁</div>
+          <span id="chatAvatarLabel" class="avatar-label">Löwe</span>
+        </div>
         <div>
           <span class="kicker">STERNZEICHEN-CHAT</span>
           <h2 id="chatTitle">Dein Reading</h2>
-          <p>Jede Nachricht kostet <strong>1 ⭐</strong>. Testversion mit astrologisch formulierten Antworten.</p>
+          <p>Free: eigener Sternzeichen-Avatar + kostenlose Stimme. Jede Test-Nachricht kostet <strong>1 ⭐</strong>.</p>
+          <div class="voice-controls">
+            <button id="voiceToggleBtn" class="secondary-btn voice-btn" type="button">🔊 Stimme an</button>
+            <button id="replayVoiceBtn" class="secondary-btn voice-btn" type="button" disabled>↻ Antwort anhören</button>
+          </div>
         </div>
         <div class="chat-balance">⭐ <span id="chatBalance">0</span></div>
+      </div>
+
+      <div class="premium-avatar-preview card">
+        <div class="premium-avatar-demo">
+          <div id="premiumPreviewAvatar" class="zodiac-avatar premium-preview-avatar">🦁</div>
+          <div class="premium-wave"><span></span><span></span><span></span><span></span></div>
+        </div>
+        <div>
+          <span class="plan-badge premium">PREMIUM · SPÄTER</span>
+          <h3>Dein Sternzeichen spricht sichtbar mit dir</h3>
+          <p>In Premium wird der Avatar später animiert: Mundbewegung, Gesichtsausdruck und hochwertigere Stimme.</p>
+        </div>
+        <button class="primary-btn" disabled>Noch nicht verfügbar</button>
       </div>
 
       <div id="chatMessages" class="chat-messages card">
@@ -225,6 +248,6 @@
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
