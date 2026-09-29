@@ -157,8 +157,8 @@ linear-gradient(145deg,#2d2051,#130e2b);border:1px solid rgba(210,188,255,.2);bo
 
 /* High-quality generated Zodiac artwork */
 .zodiac-art{
-  background-image:url('zodiac-sprite.webp?v=1')!important;
-  background-size:1200% 100%!important;
+  background-image:url('zodiac-premium-sprite.webp?v=1')!important;
+  background-size:1200% auto!important;
   background-position:var(--z-pos,36.3636%) center!important;
   background-repeat:no-repeat!important;
   background-color:#130e2b!important;
