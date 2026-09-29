@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg?v=2" />
   <link rel="shortcut icon" href="favicon.svg?v=2" />
   <link rel="manifest" href="manifest.webmanifest?v=2" />
-  <link rel="stylesheet" href="styles.css?v=2" />
+  <link rel="stylesheet" href="styles.css?v=3" />
 </head>
 <body>
   <div class="stars" aria-hidden="true"></div>
@@ -51,6 +51,38 @@
         </div>
         <button id="openChatFromHome" class="primary-btn">Chat öffnen</button>
       </div>
+
+      <section class="plans-section">
+        <div class="section-head">
+          <div><span class="kicker">MITGLIEDSCHAFT</span><h2>Free oder später Premium</h2></div>
+        </div>
+        <div class="plans-grid">
+          <article class="plan-card card">
+            <span class="plan-badge">FREE</span>
+            <h3>Kostenlos</h3>
+            <div class="plan-price">0 €</div>
+            <ul>
+              <li>✓ täglich wechselndes Tageshoroskop</li>
+              <li>✓ neues Wochenhoroskop jede Woche</li>
+              <li>✓ neues Monatshoroskop jeden Monat</li>
+              <li>✓ alle 12 Sternzeichen</li>
+            </ul>
+            <button class="secondary-btn" disabled>Immer kostenlos</button>
+          </article>
+          <article class="plan-card card premium-plan">
+            <span class="plan-badge premium">PREMIUM · VORBEREITET</span>
+            <h3>Zodiac AI Premium</h3>
+            <div class="plan-price">Preis folgt</div>
+            <ul>
+              <li>✦ persönlicher KI-Chat</li>
+              <li>✦ individuelle Readings</li>
+              <li>✦ Sterne-Guthaben & Käufe</li>
+              <li>✦ weitere Premium-Funktionen</li>
+            </ul>
+            <button class="primary-btn" disabled>Noch nicht buchbar</button>
+          </article>
+        </div>
+      </section>
 
       <p class="disclaimer">Astrologische Inhalte dienen der Unterhaltung und persönlichen Reflexion. Keine garantierten Vorhersagen und keine medizinische, rechtliche oder finanzielle Beratung.</p>
     </section>
@@ -125,6 +157,7 @@
             <div>
               <span class="kicker">ANGEMELDET</span>
               <h3 id="profileName">Dein Profil</h3>
+              <span id="planStatus" class="plan-status">Free</span>
               <p id="profileEmail" class="muted"></p>
             </div>
           </div>
@@ -192,6 +225,6 @@
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
