@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **6.9 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=50
-- Aktueller Frontend-Checkpoint: `98fb31ad2feb8348fdc3f483cca25710955dcc37`
-- Aktueller Cache-Checkpoint: `cfb49e5eb46f0916ce41b211a3306083746e6909`
+- Version: **7.0 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=51
+- Aktueller Frontend-Checkpoint: `48028dd3b1a986b6a6f5ac4de16b592c9d4e441d`
+- Aktueller Cache-Checkpoint: `26d66c242fb8aee20f2293ccad475c33504bd16d`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -76,6 +76,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 7.0 – Tester-/Feedbackmodus, Diagnose und Rechtstransparenz: `48028dd3b1a986b6a6f5ac4de16b592c9d4e441d`
 - Version 6.9 – Plus-Ausbau abgeschlossen: Quellen, Familienprofile, erweiterter Verlauf & gespeicherte Vergleiche: `98fb31ad2feb8348fdc3f483cca25710955dcc37`
 - Version 6.8 – Plus-Ausbau: Quellen, Familienprofile, erweiterter Verlauf: `4cfbdfb5117c338f441a93f1025e8b948e671dca`
 - Version 6.7 – FREE/PLUS-Testmodus ohne Zahlung: `c4dfa6a48a36d8c957654603c12e160b24e65fc9`
@@ -102,6 +103,13 @@ Stand: 29.09.2026
 - Erweiterter Plus-Verlauf mit Suche
 - A/B-Produktvergleiche können im Konto gespeichert, wieder geöffnet und gelöscht werden
 - Beim Wechsel zurück auf FREE wird ein aktives Familienprofil deaktiviert und das persönliche Profil verwendet
+
+- Tester können Fehler und Ideen direkt in der App melden
+- Optionaler Diagnoseanhang enthält nur technische App-/Geräteinfos, keine Fotos oder OCR-Zutaten-Texte
+- Lokaler Tester-Modus zeigt Version, aktuellen Bereich, Netzstatus, Tarif und letzte technische Ereignisse
+- Rechtliches/Datenquellen als transparente Testfassung: Datenschutz, Impressum-Platzhalter, Open-Food-Facts-Lizenzen, Monetarisierung noch deaktiviert
+- Open-Food-Facts-Attribution im Footer um ODbL/CC-BY-SA ergänzt
+- Kein externes Analytics-, Werbe- oder Affiliate-Tracking aktiviert; Diagnose-Ereignisse bleiben lokal bis freiwilliges Feedback gesendet wird
 
 ## Als Nächstes
 1. Produktvergleich weiter testen und stabilisieren
