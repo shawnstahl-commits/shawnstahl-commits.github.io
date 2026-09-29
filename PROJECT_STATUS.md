@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **6.6 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=47
-- Aktueller Frontend-Checkpoint: `ad994b883a953e4d57236cba246eb623e9e8fb1f`
-- Aktueller Cache-Checkpoint: `038794c1372dcd92bfad85952ca26632cbe9bc5f`
+- Version: **6.7 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=48
+- Aktueller Frontend-Checkpoint: `c4dfa6a48a36d8c957654603c12e160b24e65fc9`
+- Aktueller Cache-Checkpoint: `c7bde5c6e2e0ee070665a9f82f3ea36f0d005828`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -57,6 +57,10 @@ Stand: 29.09.2026
 - Wenn ein gescannter Barcode nicht gefunden wird, startet automatisch eine zweite Erkennung in derselben Scan-Sitzung
 - Erst nach der zweiten erfolglosen Erkennung erscheint „nicht gefunden“
 - Der endgültig erkannte Barcode wird auf der Fehlerseite sichtbar angezeigt, um Fehlablesungen diagnostizieren zu können
+- Lokaler Tarif-Testschalter FREE ↔ PLUS TEST ohne Zahlungsanbieter oder Abbuchung
+- FREE enthält Scanner, Zutatenfoto/OCR, E-Nummern, EU-Kinderhinweise, Allergie-/Laktose-Grundcheck und Basis-Verlauf/Favoriten
+- PLUS TEST schaltet echte Alternativensuche und Produktvergleich frei
+- Geplante Plus-Funktionen bleiben als Vorschau sichtbar, ohne vorzutäuschen dass sie schon fertig sind
 - Schutz vor doppelten Barcode-Scans
 - Open-Food-Facts-Abfragen mit Timeout und Wiederholungsversuch
 - Bessere Fehlermeldungen bei Offline/Timeout
@@ -66,6 +70,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 6.7 – FREE/PLUS-Testmodus ohne Zahlung: `c4dfa6a48a36d8c957654603c12e160b24e65fc9`
 - Version 6.6 – automatische Barcode-Bestätigung bei „nicht gefunden“: `ad994b883a953e4d57236cba246eb623e9e8fb1f`
 - Version 6.5 – vollständiger Produktvergleich mit Allergenen und Spuren: `09c0c19fede3b722b3e4f8ab75718fb72bd640e6`
 - Version 6.4 – robuste Produktabfrage nach Barcode-Scan: `cdc117157ef8a90ceeff71afb515144f313908cf`
