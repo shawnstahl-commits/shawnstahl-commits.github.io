@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **6.8 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=49
-- Aktueller Frontend-Checkpoint: `4cfbdfb5117c338f441a93f1025e8b948e671dca`
-- Aktueller Cache-Checkpoint: `09c1e5454fb54b0c53a601c38b88fbbd332c5f26`
+- Version: **6.9 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=50
+- Aktueller Frontend-Checkpoint: `98fb31ad2feb8348fdc3f483cca25710955dcc37`
+- Aktueller Cache-Checkpoint: `cfb49e5eb46f0916ce41b211a3306083746e6909`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -76,6 +76,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 6.9 – Plus-Ausbau abgeschlossen: Quellen, Familienprofile, erweiterter Verlauf & gespeicherte Vergleiche: `98fb31ad2feb8348fdc3f483cca25710955dcc37`
 - Version 6.8 – Plus-Ausbau: Quellen, Familienprofile, erweiterter Verlauf: `4cfbdfb5117c338f441a93f1025e8b948e671dca`
 - Version 6.7 – FREE/PLUS-Testmodus ohne Zahlung: `c4dfa6a48a36d8c957654603c12e160b24e65fc9`
 - Version 6.6 – automatische Barcode-Bestätigung bei „nicht gefunden“: `ad994b883a953e4d57236cba246eb623e9e8fb1f`
@@ -95,6 +96,12 @@ Stand: 29.09.2026
 - Version 5.1 – Plus-Mehrwert: `99b9cb07d4eaefae54a02c4afa4d30aa2776dadb`
 - Version 4.3 – E-Nummern-Datenbank erweitert: `af10171c4edf57fe4077574ab9b650a31c969eab`
 - Version 4.0 – großes Redesign: `3bcd3e3a991f953c6aa25be1c0687a31c7e70179`
+
+- Vertiefte Plus-Einordnung mit offiziellen EU-/EFSA-Quellen
+- Familienprofile in Supabase mit eigenem Allergie-/Laktose-Filter, aktivierbar für Scans und bearbeitbar
+- Erweiterter Plus-Verlauf mit Suche
+- A/B-Produktvergleiche können im Konto gespeichert, wieder geöffnet und gelöscht werden
+- Beim Wechsel zurück auf FREE wird ein aktives Familienprofil deaktiviert und das persönliche Profil verwendet
 
 ## Als Nächstes
 1. Produktvergleich weiter testen und stabilisieren
