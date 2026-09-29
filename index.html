@@ -1744,7 +1744,7 @@ function renderBetterAlternatives(p,nums){
  var out='<div class="alt-section"><div class="alt-title"><span style="font-size:25px">🥕</span><h3>Alternativen zum Vergleichen</h3></div>'
   +'<p class="muted" style="margin:0">Keine pauschale Bewertung: Diese Vorschläge helfen dir, ähnliche Produkte anhand einfacher Kriterien zu vergleichen.</p><div class="alt-grid">';
  unique.forEach(function(x){out+='<div class="alt-card"><strong>'+x.icon+' '+esc(x.title)+'</strong><p>'+x.text+'</p></div>'});
- out+='</div><div class="alt-check"><b>Beim Einkauf vergleichen:</b> Zutatenliste • Zucker • erkannte Zusatzstoffe • passende Vollkorn-/Naturvariante</div><button id="alternativeSearchBtnV62" class="btn primary alt-find-btn-v62" type="button" onclick="findAlternativesV62()">Ähnliche Produkte finden</button><div id="alternativeResultsV62"></div><div class="affiliate-prep-v62"><span>SPÄTER MÖGLICH</span><b>Werbelinks nur klar getrennt</b><p>Eine spätere Kauf-Verlinkung kann hier ergänzt werden. Die Auswahl der Vergleichsvorschläge bleibt davon unabhängig.</p></div></div>';
+ out+='</div><div class="alt-check"><b>Beim Einkauf vergleichen:</b> Zutatenliste • Zucker • erkannte Zusatzstoffe • passende Vollkorn-/Naturvariante</div><button id="alternativeSearchBtnV62" class="btn primary alt-find-btn-v62" type="button" onclick="findAlternativesV62()">Ähnliche Produkte finden</button><div id="alternativeResultsV62"></div></div>';
  return out;
 }
 
@@ -2126,8 +2126,8 @@ var HELP_TOUR_STEPS_V61=[
   icon:"✓",
   mini1:"4 Schnellkarten",
   mini2:"Vergleich A/B",
-  text:"Nach dem Scan zeigen vier Karten sofort <b>E-Nummern, Kinderhinweise, Allergene und Laktose</b>. Details kannst du aufklappen. Du kannst ein Produkt direkt mit einem zweiten vergleichen und – angemeldet – Verlauf und Favoriten speichern.",
-  where:"Im Scan-Ergebnis findest du <b>„Details & Erklärungen“</b> und <b>„Vergleich starten“</b>. Verlauf und Favoriten liegen unten in der Navigation."
+  text:"Nach dem Scan zeigen vier Karten sofort <b>E-Nummern, Kinderhinweise, Allergene und Laktose</b>. Details kannst du aufklappen. Du kannst ähnliche Produkte suchen, ein Produkt direkt vergleichen und – angemeldet – Verlauf und Favoriten speichern.",
+  where:"Im Scan-Ergebnis findest du <b>„Ähnliche Produkte finden“</b>, <b>„Details & Erklärungen“</b> und <b>„Vergleich starten“</b>. Verlauf und Favoriten liegen unten in der Navigation."
  }
 ];
 function renderHelpTourV61(){
