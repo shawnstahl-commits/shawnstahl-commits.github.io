@@ -146,6 +146,11 @@ body.scanner-fullscreen.manual-entry-v56 .scan-manual-open-v56,body.scanner-full
 .scan-manual-card-v56 .btn{width:100%}.scan-manual-close-v56{position:absolute;right:13px;top:12px;width:36px;height:36px;border:0;border-radius:50%;background:#eef4f2;color:#38514a;font-size:23px;line-height:1}
 @media(max-height:640px){body.scanner-fullscreen .scan-manual-open-v56{bottom:58px}}
 
+
+/* Lactose intolerance support 5.7 */
+.allergen-choice-v54.intolerance-v57{border-color:#c9ddd7;background:#f5fbf9}.allergen-choice-v54.intolerance-v57 span{display:flex;flex-direction:column;gap:2px}.allergen-choice-v54.intolerance-v57 small{font-size:10px;color:#71807b;line-height:1.3}
+.lactose-alert-v57{margin-top:12px;border-radius:17px;padding:13px 14px;display:flex;flex-direction:column;gap:4px;border:1px solid #d8e6e2;background:#f6faf9;color:#31554d}.lactose-alert-v57 .lactose-kicker-v57{font-size:9px;font-weight:950;letter-spacing:.1em}.lactose-alert-v57>span:last-child{font-size:13px;line-height:1.4}.lactose-alert-v57.danger{background:#fff1f1;border-color:#fecaca;color:#991b1b}.lactose-alert-v57.warn{background:#fff8e8;border-color:#fde68a;color:#854d0e}.lactose-alert-v57.ok{background:#eefaf5;border-color:#bfe5d3;color:#236148}.lactose-alert-v57.neutral{background:#f5f8f7;border-color:#d9e3e0;color:#52635f}
+
 </style>
 </head>
 <body>
@@ -448,10 +453,10 @@ body.scanner-fullscreen.manual-entry-v56 .scan-manual-open-v56,body.scanner-full
   <div class="profile-row plus-profile-row-v5"><b>E-Check Kids Plus</b><div class="plan-line-v5"><span id="profilePlanBadge" class="plan-badge-v5">FREE</span><span id="profilePlanText" class="muted">Basis-Tarif</span></div><button class="btn primary" style="margin-top:9px" onclick="goPage('plus')">Plus ansehen</button></div>
   <div class="profile-row">
    <b>Allergien & Unverträglichkeiten</b>
-   <p class="muted" style="margin:5px 0 10px">Wähle relevante EU-Hauptallergene. Treffer werden beim Scan besonders hervorgehoben.</p>
+   <p class="muted" style="margin:5px 0 10px">Wähle relevante EU-Hauptallergene und – falls nötig – Laktoseintoleranz. Treffer und Hinweise werden beim Scan besonders hervorgehoben.</p>
    <div id="allergenChoices" class="allergen-grid-v54"></div>
-   <button class="btn soft" style="margin-top:10px" onclick="saveAllergenPreferences()">Allergene speichern</button>
-   <div class="allergy-disclaimer-v54"><b>Wichtig:</b> E-Check Kids kann Allergene nur anhand der verfügbaren Produktdaten erkennen. Angaben können fehlen, veraltet oder falsch sein. Maßgeblich ist immer die aktuelle Verpackung. Die App gibt keine Garantie auf Allergenfreiheit und darf bei Allergien nicht als alleinige Entscheidungsgrundlage verwendet werden.</div>
+   <button class="btn soft" style="margin-top:10px" onclick="saveAllergenPreferences()">Auswahl speichern</button>
+   <div class="allergy-disclaimer-v54"><b>Wichtig:</b> E-Check Kids kann Allergene und Hinweise auf Laktose nur anhand der verfügbaren Produktdaten und Zutaten erkennen. Angaben können fehlen, veraltet oder falsch sein. Maßgeblich ist immer die aktuelle Verpackung. Die App gibt keine Garantie auf Allergen- oder Laktosefreiheit.</div>
   </div>
   <div class="profile-row"><b>Passwort</b><button class="btn soft" onclick="changePassword()">Passwort ändern</button></div>
   <div class="profile-row"><b>App installieren</b><button class="btn soft" onclick="installApp()">Zum Startbildschirm</button></div>
@@ -496,7 +501,7 @@ body.scanner-fullscreen.manual-entry-v56 .scan-manual-open-v56,body.scanner-full
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.6 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.7 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -872,18 +877,46 @@ var ALLERGENS_V54=[
 ];
 function renderAllergenChoices(){
  var box=document.getElementById("allergenChoices");if(!box)return;
- box.innerHTML=ALLERGENS_V54.map(function(a){
+ var html=ALLERGENS_V54.map(function(a){
   var checked=selectedAllergens.indexOf(a.id)>=0?"checked":"";
   return '<label class="allergen-choice-v54"><input type="checkbox" value="'+esc(a.id)+'" '+checked+'><span>'+esc(a.label)+'</span></label>';
  }).join("");
+ var lactoseChecked=selectedAllergens.indexOf("lactose")>=0?"checked":"";
+ html+='<label class="allergen-choice-v54 intolerance-v57"><input type="checkbox" value="lactose" '+lactoseChecked+'><span><b>Laktoseintoleranz</b><small>Unverträglichkeit – getrennt von Milcheiweiß-Allergie</small></span></label>';
+ box.innerHTML=html;
 }
 async function saveAllergenPreferences(){
  if(!currentUser){alert("Bitte zuerst anmelden.");return}
  var ids=[...document.querySelectorAll("#allergenChoices input:checked")].map(function(x){return x.value});
  const r=await sb.from("profiles").update({allergens:ids,updated_at:new Date().toISOString()}).eq("id",currentUser.id);
- if(r.error){alert("Allergene konnten nicht gespeichert werden.");return}
- selectedAllergens=ids;alert("Allergene gespeichert.");
+ if(r.error){alert("Auswahl konnte nicht gespeichert werden.");return}
+ selectedAllergens=ids;alert("Auswahl gespeichert.");
 }
+function lactoseAssessment(p,textOverride){
+ var raw=String(textOverride!=null?textOverride:((p&&p.ingredients_text_de)||(p&&p.ingredients_text)||(p&&p.ingredients_text_en)||""));
+ var t=normalizeSearch(raw);
+ var labels=(p&&Array.isArray(p.labels_tags)?p.labels_tags:[]).map(function(x){return String(x).toLowerCase()});
+ var allergenTags=(p&&Array.isArray(p.allergens_tags)?p.allergens_tags:[]);
+ var freeLabel=labels.some(function(x){return x==="en:lactose-free"||x.indexOf("lactose-free")>=0||x.indexOf("laktosefrei")>=0});
+ var freeText=/(^|[^a-z])(laktosefrei|lactose[- ]?free|ohne laktose|sans lactose|sin lactosa)([^a-z]|$)/i.test(t);
+ if(freeLabel||freeText)return {status:"free",short:"laktosefrei",title:"Als laktosefrei gekennzeichnet",detail:"In den verfügbaren Produktdaten bzw. Zutaten wurde ein Laktosefrei-Hinweis erkannt."};
+ if(/(^|[^a-z])(laktose|lactose|milchzucker)([^a-z]|$)/i.test(t))return {status:"explicit",short:"Laktose erkannt",title:"⚠ Laktose / Milchzucker erkannt",detail:"Die Zutatenangaben enthalten ausdrücklich Laktose beziehungsweise Milchzucker."};
+ var milkTerms=/(milchpulver|magermilchpulver|vollmilchpulver|molkenpulver|sussmolkenpulver|molkenerzeugnis|whey powder|milk powder|milk solids|kondensmilch|condensed milk|vollmilch|magermilch|joghurt|yoghurt|quark|frischkase|frischkaese|sahne|rahm)/i.test(t);
+ var milkTag=allergenTags.indexOf("en:milk")>=0;
+ if(milkTerms||milkTag)return {status:"milk",short:"Milchbestandteile",title:"Milchbestandteile erkannt",detail:"Das kann für Laktoseintoleranz relevant sein. Aus den Produktdaten lässt sich der tatsächliche Laktosegehalt aber nicht sicher bestimmen."};
+ return {status:"none",short:"kein Hinweis",title:"Kein eindeutiger Laktose-Hinweis erkannt",detail:"Das ist keine Garantie auf Laktosefreiheit. Produktdaten und Zutaten können unvollständig sein."};
+}
+function renderLactoseAlert(p,textOverride){
+ if(selectedAllergens.indexOf("lactose")<0)return "";
+ var a=lactoseAssessment(p,textOverride);
+ var cls=a.status==="explicit"?"danger":(a.status==="milk"?"warn":(a.status==="free"?"ok":"neutral"));
+ return '<div class="lactose-alert-v57 '+cls+'"><span class="lactose-kicker-v57">LAKTOSE-CHECK</span><b>'+esc(a.title)+'</b><span>'+esc(a.detail)+'</span></div>';
+}
+function lactoseShort(a){
+ if(!a)return "keine Daten";
+ return a.short||"keine Daten";
+}
+
 function allergenLabel(id){
  var a=ALLERGENS_V54.find(function(x){return x.id===id});return a?a.label:id;
 }
@@ -898,18 +931,22 @@ function detectSelectedAllergens(p){
  return {contains:contains,traces:traceHits};
 }
 function renderAllergenAlert(p){
- if(!selectedAllergens.length)return '<div class="allergy-info-v54"><b>Allergie-Check nicht eingerichtet.</b><span>Im Profil kannst du relevante Allergene auswählen.</span></div>';
+ if(!selectedAllergens.length)return '<div class="allergy-info-v54"><b>Allergie-/Unverträglichkeits-Check nicht eingerichtet.</b><span>Im Profil kannst du Allergene und Laktoseintoleranz auswählen.</span></div>';
+ var regular=selectedAllergens.filter(function(id){return id!=="lactose"});
  var hit=detectSelectedAllergens(p),out='';
- if(hit.contains.length){
-  out+='<div class="allergy-alert-v54 danger"><b>⚠ Enthält laut Produktdaten:</b><span>'+esc(hit.contains.map(allergenLabel).join(", "))+'</span></div>';
+ if(regular.length){
+  if(hit.contains.length){
+   out+='<div class="allergy-alert-v54 danger"><b>⚠ Enthält laut Produktdaten:</b><span>'+esc(hit.contains.map(allergenLabel).join(", "))+'</span></div>';
+  }
+  if(hit.traces.length){
+   out+='<div class="allergy-alert-v54 trace"><b>Spurenhinweis laut Produktdaten:</b><span>'+esc(hit.traces.map(allergenLabel).join(", "))+'</span></div>';
+  }
+  if(!hit.contains.length&&!hit.traces.length){
+   out+='<div class="allergy-alert-v54 ok"><b>Kein ausgewähltes Allergen erkannt.</b><span>Das ist keine Garantie auf Allergenfreiheit.</span></div>';
+  }
  }
- if(hit.traces.length){
-  out+='<div class="allergy-alert-v54 trace"><b>Spurenhinweis laut Produktdaten:</b><span>'+esc(hit.traces.map(allergenLabel).join(", "))+'</span></div>';
- }
- if(!hit.contains.length&&!hit.traces.length){
-  out+='<div class="allergy-alert-v54 ok"><b>Kein ausgewähltes Allergen erkannt.</b><span>Das ist keine Garantie auf Allergenfreiheit.</span></div>';
- }
- out+='<div class="allergy-disclaimer-v54 compact"><b>Keine Garantie:</b> Produktdaten können unvollständig, veraltet oder falsch sein. Prüfe bei Allergien immer die aktuelle Verpackung und Spurenhinweise.</div>';
+ out+=renderLactoseAlert(p);
+ out+='<div class="allergy-disclaimer-v54 compact"><b>Keine Garantie:</b> Produktdaten können unvollständig, veraltet oder falsch sein. Prüfe bei Allergien und Unverträglichkeiten immer die aktuelle Verpackung.</div>';
  return out;
 }
 async function lookupCompareManual(slot){
@@ -1141,7 +1178,7 @@ function robustProductImage(urls,cls,alt){
 async function lookupCompareProduct(code,slot){
  setStatus("Produkt "+slot+" wird geladen …");
  try{
-  var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,categories,categories_tags,nutriments";
+  var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,labels_tags,categories,categories_tags,nutriments";
   var u="https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields="+encodeURIComponent(fields);
   var d=await fetchJsonReliable(u,9000,1),p=d.product;
   if(!p)throw new Error("Produkt nicht gefunden");
@@ -1154,7 +1191,8 @@ async function lookupCompareProduct(code,slot){
    image_urls:productImageCandidates(p),
    image:(productImageCandidates(p)[0]||""),
    additives:nums,
-   sugar:(p.nutriments&&Number.isFinite(Number(p.nutriments.sugars_100g)))?Number(p.nutriments.sugars_100g):null
+   sugar:(p.nutriments&&Number.isFinite(Number(p.nutriments.sugars_100g)))?Number(p.nutriments.sugars_100g):null,
+   lactose:lactoseAssessment(p,ing)
   };
   document.body.classList.remove("scanner-fullscreen","scan-processing");
   compareTargetSlot=null;
@@ -1197,6 +1235,7 @@ function renderComparison(){
  rows+='<div class="pc-row-v52"><div class="pc-label-v52">Süßstoffe erkannt</div>'+v(ca.sweet)+v(cb.sweet)+'</div>';
  rows+='<div class="pc-row-v52"><div class="pc-label-v52">Konservierungsstoffe</div>'+v(ca.cons)+v(cb.cons)+'</div>';
  rows+='<div class="pc-row-v52"><div class="pc-label-v52">Zucker pro 100 g/ml*</div>'+v(fmtSugar(a.sugar))+v(fmtSugar(b.sugar))+'</div>';
+ if(selectedAllergens.indexOf("lactose")>=0)rows+='<div class="pc-row-v52"><div class="pc-label-v52">Laktose-Hinweis</div>'+v(esc(lactoseShort(a.lactose)),a.lactose&&a.lactose.status==="explicit"?"pc-warn-v52":"")+v(esc(lactoseShort(b.lactose)),b.lactose&&b.lactose.status==="explicit"?"pc-warn-v52":"")+'</div>';
  rows+='<div class="pc-row-v52"><div class="pc-label-v52">E-Nummern</div><div class="pc-enums-v52">'+esc(a.additives.join(", ")||"keine erkannt")+'</div><div class="pc-enums-v52">'+esc(b.additives.join(", ")||"keine erkannt")+'</div></div>';
  var notes=[];
  notes.push('Produkt A: '+a.additives.length+' erkannte E-Nummer'+(a.additives.length===1?'':'n')+' · Produkt B: '+b.additives.length+'.');
@@ -1210,7 +1249,7 @@ async function lookupBarcode(forced){
  if(!code){setStatus("Bitte Barcode eingeben oder scannen.");return}
  setStatus("🔎 Produkt wird gesucht …");clearError();
  try{
-  var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,nutriscore_grade,categories,categories_tags,nutriments";
+  var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,labels_tags,nutriscore_grade,categories,categories_tags,nutriments";
   var u="https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(code)+".json?fields="+encodeURIComponent(fields);
   var d=await fetchJsonReliable(u,9000,1),p=d.product;
   if(!p){setStatus("Produkt nicht gefunden.");revealScanResults();document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Nicht gefunden</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="notice warn"><b>Produkt nicht gefunden.</b><br>Du kannst die Zutatenliste fotografieren oder eintippen.</div></div>';return}
@@ -1337,7 +1376,7 @@ function renderBetterAlternatives(p,nums){
 function analyzeIngredients(){
  var t=document.getElementById("ingredientsText").value;
  var nums=detectE(t,[]);
- document.getElementById("result").innerHTML='<div class="card"><h2>Ergebnis</h2>'+renderE(nums)+'</div>';
+ document.getElementById("result").innerHTML='<div class="card"><h2>Ergebnis</h2>'+renderLactoseAlert(null,t)+renderE(nums)+'</div>';
  document.getElementById("result").scrollIntoView({behavior:"smooth"});
 }
 
@@ -1404,7 +1443,7 @@ function localAdditiveMatches(q){
 async function smartSearch(){
  var t=document.getElementById("ingredientsText").value.trim();
  var direct=detectE(t,[]);
- if(direct.length){analyzeIngredients();return}
+ if(direct.length||selectedAllergens.indexOf("lactose")>=0&&/(laktose|lactose|milchzucker|milchpulver|molkenpulver|sahne|joghurt|yoghurt|quark)/i.test(t)){analyzeIngredients();return}
  var hits=localAdditiveMatches(t);
  var box=document.getElementById("additiveSearchResults");
  if(hits.length){
@@ -1486,12 +1525,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v37"))return;
-  sessionStorage.setItem("echeck-sw-reload-v37","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v38"))return;
+  sessionStorage.setItem("echeck-sw-reload-v38","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=37",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=38",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
