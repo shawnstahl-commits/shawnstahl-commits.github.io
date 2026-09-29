@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **5.9 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=40
-- Aktueller Frontend-Checkpoint: `875e6153b291af573cce04affef31b4e3a0f522c`
-- Aktueller Cache-Checkpoint: `a25122e446f5d7ceaea1c341900f96c0f2dbe86b`
+- Version: **6.0 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=41
+- Aktueller Frontend-Checkpoint: `27dcbafd8f194d2456e1f4a83a5faf50dbf9b94f`
+- Aktueller Cache-Checkpoint: `ea5effd9af11f9226486486d1a4a2fb64b9bbe67`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -28,6 +28,9 @@ Stand: 29.09.2026
 - Laktoseintoleranz im Profil auswählbar
 - Laktose-Check bei Barcode-Scan, Zutaten-Text/OCR und Produktvergleich
 - Zutatenfoto wird nach OCR automatisch ausgewertet: E-Nummern, ausgewählte Allergene, Laktose und ADS/ADHS-Hinweise
+- Scan-Ergebnis zeigt vier Schnellkarten für E-Nummern, Kinderhinweise, Allergene und Laktose
+- Ausführliche E-Nummern-/ADS-ADHS-Erklärungen sind einklappbar
+- Gescanntes Produkt kann direkt als Produkt A in den Vergleich übernommen werden
 - OCR-Allergenprüfung unterscheidet erkannte Zutaten von einfachen Spurenhinweisen
 
 ## Stabilitätsverbesserungen
@@ -44,6 +47,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 6.0 – neues Scan-Ergebnis mit Schnellübersicht: `27dcbafd8f194d2456e1f4a83a5faf50dbf9b94f`
 - Version 5.9 – automatische Zutatenfoto-Auswertung: `875e6153b291af573cce04affef31b4e3a0f522c`
 - Version 5.8 – Scanner-Licht + automatischer Erkennungswechsel: `038b94500361c008dea841ecc93a27481b54a314`
 - Version 5.7 – Laktoseintoleranz-Check: `40979eb247cb8399b9a6fe2747333159a9ff7501`
