@@ -2504,7 +2504,7 @@ async function directPasswordLogin(email,pw){
   localStorage.removeItem("echeck_guest");
   currentUser=j.user||null;
   showAuthMessage("Anmeldung erfolgreich – E-Check Kids wird geöffnet …","info");
-  setTimeout(function(){location.replace(location.pathname+"?v=36&login=ok")},250);
+  setTimeout(function(){location.replace(location.pathname+"?v=49&login=ok")},250);
   return true;
  }finally{clearTimeout(timer)}
 }
