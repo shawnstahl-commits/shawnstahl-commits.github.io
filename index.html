@@ -963,7 +963,7 @@ function textHasAnyPattern(text,patterns){
 }
 function detectSelectedAllergensFromText(text){
  var raw=String(text||"");
- var norm=normalizeSearch(raw);
+ var norm=raw.toLowerCase();
  var markers=["spuren von","kann spuren","kann enthalten","may contain","traces of"];
  var splitAt=-1;
  markers.forEach(function(m){
