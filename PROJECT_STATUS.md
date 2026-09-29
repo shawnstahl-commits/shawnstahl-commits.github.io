@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **5.6 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=37
-- Aktueller Frontend-Checkpoint: `8aa7dc13bb59daa69c3b702f77e5ed06be9d2761`
-- Aktueller Cache-Checkpoint: `6254de159bcea128e3fd2c001070265fc7a5a4b7`
+- Version: **5.7 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=38
+- Aktueller Frontend-Checkpoint: `40979eb247cb8399b9a6fe2747333159a9ff7501`
+- Aktueller Cache-Checkpoint: `f4c75c690e36a39d0d360546eb9ac666b61e7845`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -25,6 +25,8 @@ Stand: 29.09.2026
 - Plus-Bereich als Vorbereitung, noch ohne echte Zahlung
 - PWA / Service Worker / Installierbarkeit
 - Allergen-Funktionen wurden begonnen und sind bereits teilweise integriert
+- Laktoseintoleranz im Profil auswählbar
+- Laktose-Check bei Barcode-Scan, Zutaten-Text/OCR und Produktvergleich
 
 ## Stabilitätsverbesserungen
 - Scanner-Start/Stop-Rennen reduziert
@@ -37,6 +39,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 5.7 – Laktoseintoleranz-Check: `40979eb247cb8399b9a6fe2747333159a9ff7501`
 - Version 5.6 – manuelle Barcode-Eingabe wieder sichtbar: `8aa7dc13bb59daa69c3b702f77e5ed06be9d2761`
 - Version 5.5 – Stabilitäts-Sprint: `71b7d72e752a813631eff9cd9fd1c7c5ea59d449`
 - Version 5.3 – bessere Produktbilder: `1703e99d987690a2644afd5b6f17f5fdf413d7d0`
@@ -50,7 +53,7 @@ Stand: 29.09.2026
 2. Scanner mit vielen echten Produkten testen
 3. API-/Offline-Fälle weiter absichern
 4. Verlauf/Favoriten auf mehreren Geräten testen
-5. Allergene und Unverträglichkeiten fertigstellen
+5. Allergene und weitere Unverträglichkeiten fertigstellen
 6. Zutaten-OCR direkt automatisch auswerten
 7. E-Nummern-Datenbank und Quellen weiter ausbauen
 8. Plus-Funktionen erst danach weiter ausbauen
