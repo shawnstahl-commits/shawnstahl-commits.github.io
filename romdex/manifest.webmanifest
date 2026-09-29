@@ -1,0 +1,18 @@
+{
+  "name": "ROMDex – Save Collection",
+  "short_name": "ROMDex",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#090b10",
+  "theme_color": "#10131c",
+  "description": "Read-only Sammlung aus Emulator-Save-Dateien.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
