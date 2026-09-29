@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#090716" />
+  <title>Zodiac AI</title>
+  <meta name="description" content="Moderne Horoskope, persönliche Sternzeichen und Sternzeichen-Chat." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <button class="brand ghost-btn" data-route="home" aria-label="Startseite">
+      <span class="brand-orb">✦</span>
+      <span>Zodiac AI</span>
+    </button>
+    <div class="top-actions">
+      <button id="walletBtn" class="wallet hidden" data-route="profile">⭐ <span id="walletBalance">0</span></button>
+      <button id="profileBtn" class="icon-btn" data-route="profile" aria-label="Profil">☾</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section id="homeView" class="view active">
+      <div class="hero">
+        <div class="eyebrow">DEIN HIMMEL · DEIN MOMENT</div>
+        <h1>Was sagen die Sterne<br><span>heute über dich?</span></h1>
+        <p>Wähle dein Sternzeichen und entdecke dein Tages-, Wochen- und Monatshoroskop.</p>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <span class="kicker">12 ZEICHEN</span>
+          <h2>Wähle dein Sternzeichen</h2>
+        </div>
+      </div>
+
+      <div id="zodiacGrid" class="zodiac-grid"></div>
+
+      <div class="premium-teaser card">
+        <div class="premium-icon">✦</div>
+        <div class="premium-copy">
+          <span class="kicker">PREMIUM</span>
+          <h3>Sprich mit deinem Sternzeichen</h3>
+          <p>Stelle persönliche Fragen und erhalte ein individuelles Reading. Testzugang mit ⭐ Sternen.</p>
+        </div>
+        <button id="openChatFromHome" class="primary-btn">Chat öffnen</button>
+      </div>
+
+      <p class="disclaimer">Astrologische Inhalte dienen der Unterhaltung und persönlichen Reflexion. Keine garantierten Vorhersagen und keine medizinische, rechtliche oder finanzielle Beratung.</p>
+    </section>
+
+    <section id="readingView" class="view">
+      <button class="back-btn" data-route="home">← Zurück</button>
+
+      <div class="reading-hero card">
+        <div id="readingSymbol" class="reading-symbol">♌</div>
+        <div>
+          <span id="readingDates" class="kicker"></span>
+          <h1 id="readingTitle">Löwe</h1>
+          <div class="tabs">
+            <button class="tab active" data-period="today">Heute</button>
+            <button class="tab" data-period="week">Woche</button>
+            <button class="tab" data-period="month">Monat</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="reading-main card">
+        <span class="kicker">DEIN READING</span>
+        <h2 id="readingHeadline"></h2>
+        <p id="readingText" class="reading-text"></p>
+      </div>
+
+      <div class="insight-grid">
+        <article class="insight card"><span>♡</span><small>Liebe</small><p id="loveText"></p></article>
+        <article class="insight card"><span>✦</span><small>Beruf</small><p id="workText"></p></article>
+        <article class="insight card"><span>◈</span><small>Finanzen</small><p id="moneyText"></p></article>
+        <article class="insight card"><span>☼</span><small>Energie</small><p id="energyText"></p></article>
+      </div>
+
+      <div class="focus card">
+        <span class="kicker">TAGESFOKUS</span>
+        <p id="focusText"></p>
+      </div>
+
+      <button id="readingChatBtn" class="primary-btn wide">✦ Mit diesem Sternzeichen sprechen · 1 ⭐</button>
+    </section>
+
+    <section id="profileView" class="view">
+      <button class="back-btn" data-route="home">← Zurück</button>
+      <div class="section-head">
+        <div><span class="kicker">MEIN BEREICH</span><h1>Dein kosmisches Profil</h1></div>
+      </div>
+
+      <div id="loggedOutPanel" class="auth-grid">
+        <form id="loginForm" class="card form-card">
+          <span class="kicker">ANMELDEN</span>
+          <h3>Willkommen zurück</h3>
+          <label>E-Mail<input id="loginEmail" type="email" required autocomplete="email"></label>
+          <label>Passwort<input id="loginPassword" type="password" required autocomplete="current-password" minlength="6"></label>
+          <button class="primary-btn" type="submit">Anmelden</button>
+        </form>
+
+        <form id="signupForm" class="card form-card">
+          <span class="kicker">NEU HIER?</span>
+          <h3>Konto erstellen</h3>
+          <label>Name<input id="signupName" type="text" autocomplete="name"></label>
+          <label>E-Mail<input id="signupEmail" type="email" required autocomplete="email"></label>
+          <label>Passwort<input id="signupPassword" type="password" required autocomplete="new-password" minlength="6"></label>
+          <button class="secondary-btn" type="submit">Kostenlos registrieren</button>
+          <small>Neue Konten erhalten 20 ⭐ Test-Sterne.</small>
+        </form>
+      </div>
+
+      <div id="loggedInPanel" class="hidden">
+        <div class="profile-grid">
+          <div class="card profile-card">
+            <div class="avatar">✦</div>
+            <div>
+              <span class="kicker">ANGEMELDET</span>
+              <h3 id="profileName">Dein Profil</h3>
+              <p id="profileEmail" class="muted"></p>
+            </div>
+          </div>
+
+          <div class="card wallet-card">
+            <span class="kicker">DEIN GUTHABEN</span>
+            <div class="big-wallet">⭐ <strong id="profileBalance">0</strong></div>
+            <p>1 Chat-Nachricht kostet in dieser Testversion 1 ⭐.</p>
+            <button class="secondary-btn" disabled>Sterne kaufen · kommt später</button>
+          </div>
+        </div>
+
+        <form id="profileForm" class="card form-card full">
+          <span class="kicker">PERSÖNLICHES STERNZEICHEN</span>
+          <h3>Profil vervollständigen</h3>
+          <div class="two-col">
+            <label>Dein Name<input id="displayName" type="text"></label>
+            <label>Geburtsdatum<input id="birthDate" type="date"></label>
+          </div>
+          <label>Sternzeichen
+            <select id="profileZodiac">
+              <option value="">Bitte wählen</option>
+            </select>
+          </label>
+          <button class="primary-btn" type="submit">Profil speichern</button>
+        </form>
+
+        <div class="actions-row">
+          <button id="profileChatBtn" class="primary-btn">✦ Persönlichen Chat öffnen</button>
+          <button id="logoutBtn" class="danger-btn">Abmelden</button>
+        </div>
+      </div>
+
+      <div id="statusMessage" class="status hidden"></div>
+    </section>
+
+    <section id="chatView" class="view">
+      <button class="back-btn" data-route="profile">← Zurück</button>
+      <div class="chat-head card">
+        <div id="chatSymbol" class="reading-symbol small">✦</div>
+        <div>
+          <span class="kicker">STERNZEICHEN-CHAT</span>
+          <h2 id="chatTitle">Dein Reading</h2>
+          <p>Jede Nachricht kostet <strong>1 ⭐</strong>. Testversion mit astrologisch formulierten Antworten.</p>
+        </div>
+        <div class="chat-balance">⭐ <span id="chatBalance">0</span></div>
+      </div>
+
+      <div id="chatMessages" class="chat-messages card">
+        <div class="message assistant">Frag mich etwas zu Liebe, Beruf, Finanzen oder deinem Tag.</div>
+      </div>
+
+      <form id="chatForm" class="chat-compose">
+        <input id="chatInput" maxlength="1000" placeholder="Was möchtest du wissen?" autocomplete="off">
+        <button class="primary-btn" type="submit">Senden · 1 ⭐</button>
+      </form>
+      <p class="disclaimer">Diese Antworten sind astrologische Unterhaltung und keine fachliche Beratung.</p>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button data-route="home" class="nav-item active"><span>✦</span><small>Horoskop</small></button>
+    <button id="bottomChatBtn" class="nav-item"><span>☄</span><small>Chat</small></button>
+    <button data-route="profile" class="nav-item"><span>☾</span><small>Profil</small></button>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
