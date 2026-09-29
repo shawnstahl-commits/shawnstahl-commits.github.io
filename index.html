@@ -205,6 +205,9 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 .history-plus-tools-v68{margin-bottom:12px}.history-search-v68{display:flex;gap:8px;align-items:center}.history-search-v68 input{flex:1}.history-search-v68 span{font-size:10px;color:var(--muted);white-space:nowrap}.history-lock-v68{width:100%}.saved-comparisons-v68{margin-top:18px}.saved-compare-head-v68 span{font-size:9px;font-weight:950;letter-spacing:.1em;color:var(--brand)}.saved-compare-head-v68 h3{margin:3px 0 9px}.saved-compare-item-v68{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #dfe9e6;background:#fff;border-radius:16px;padding:11px;margin-top:8px}.saved-compare-item-v68 b,.saved-compare-item-v68 small{display:block}.saved-compare-item-v68 small{font-size:10px;color:var(--muted);margin-top:3px}.saved-compare-item-v68>div:last-child{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.saved-compare-lock-v68{border:1px dashed #cad8d4;border-radius:16px;padding:12px;background:#fafcfc}.saved-compare-lock-v68 p{font-size:11px;color:var(--muted)}.save-comparison-v68{margin-top:12px;border-radius:16px;background:#eef9f6;border:1px solid #d0e8e1;padding:12px}.save-comparison-v68 .btn{width:100%}.save-comparison-v68 small{display:block;text-align:center;margin-top:6px;color:var(--muted)}
 @media(max-width:520px){.saved-compare-item-v68{align-items:flex-start;flex-direction:column}.saved-compare-item-v68>div:last-child{width:100%}.saved-compare-item-v68 .btn,.saved-compare-item-v68 .danger-btn{flex:1}.history-search-v68{align-items:stretch;flex-direction:column}}
 
+
+.family-edit-actions-v69{display:flex;gap:8px;flex-wrap:wrap}
+.family-edit-actions-v69 .btn{flex:1}
 </style>
 </head>
 <body>
@@ -603,14 +606,14 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.8 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.9 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
 <script>
 var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,nativeFallbackTimer=null,scanHintTimer=null,scannerRetryTimer=null,scannerPassV63=0,scanNotFoundRetryV66=0,torchOn=false,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
-var familyMembersV68=[],personalAllergensV68=[],activeFamilyMemberV68=null,historyCacheV68=[];
+var familyMembersV68=[],personalAllergensV68=[],activeFamilyMemberV68=null,editingFamilyMemberV69=null,historyCacheV68=[];
 
 var special={
 "E102":["Tartrazin","EU-Kinderhinweis"],
@@ -980,11 +983,12 @@ var ALLERGENS_V54=[
 ];
 function renderAllergenChoices(){
  var box=document.getElementById("allergenChoices");if(!box)return;
+ var own=(currentUser?personalAllergensV68:selectedAllergens)||[];
  var html=ALLERGENS_V54.map(function(a){
-  var checked=selectedAllergens.indexOf(a.id)>=0?"checked":"";
+  var checked=own.indexOf(a.id)>=0?"checked":"";
   return '<label class="allergen-choice-v54"><input type="checkbox" value="'+esc(a.id)+'" '+checked+'><span>'+esc(a.label)+'</span></label>';
  }).join("");
- var lactoseChecked=selectedAllergens.indexOf("lactose")>=0?"checked":"";
+ var lactoseChecked=own.indexOf("lactose")>=0?"checked":"";
  html+='<label class="allergen-choice-v54 intolerance-v57"><input type="checkbox" value="lactose" '+lactoseChecked+'><span><b>Laktoseintoleranz</b><small>Unverträglichkeit – getrennt von Milcheiweiß-Allergie</small></span></label>';
  box.innerHTML=html;
 }
@@ -1674,7 +1678,7 @@ function renderPlusDeepDiveV68(nums){
   return '<div class="deep-e-v68"><span>'+esc(n)+'</span><div><b>'+esc(d[0])+'</b><small>'+esc(d[1])+'</small><p>'+esc(detail)+'</p></div></div>';
  }).join("");
  if(!items)items='<div class="notice">Keine E-Nummer erkannt – deshalb gibt es hier aktuell keine vertiefte Stoff-Einordnung.</div>';
- return '<div class="plus-deep-v68"><div class="deep-head-v68"><span>PLUS · QUELLEN</span><b>Vertiefte Einordnung</b><p>Zusätzliche Hintergrundinformationen ersetzen keine individuelle medizinische Beratung.</p></div>'+items+'<div class="deep-sources-v68"><b>Offizielle Quellen</b><a href="https://food.ec.europa.eu/food-safety/food-improvement-agents/additives/database_en" target="_blank" rel="noopener">EU-Kommission: Datenbank Lebensmittelzusatzstoffe ↗</a><a href="https://www.efsa.europa.eu/de/topics/topic/food-additives" target="_blank" rel="noopener">EFSA: Lebensmittelzusatzstoffe ↗</a></div></div>';
+ return '<div class="plus-deep-v68"><div class="deep-head-v68"><span>PLUS · QUELLEN</span><b>Vertiefte Einordnung</b><p>Zusätzliche Hintergrundinformationen ersetzen keine individuelle medizinische Beratung.</p></div>'+items+'<div class="deep-sources-v68"><b>Offizielle Quellen</b><a href="https://food.ec.europa.eu/food-safety/food-improvement-agents/additives/database_en" target="_blank" rel="noopener">EU-Kommission: Datenbank Lebensmittelzusatzstoffe ↗</a><a href="https://food.ec.europa.eu/food-safety/food-improvement-agents/additives/eu-rules_en" target="_blank" rel="noopener">EU-Kommission: Regeln für Zusatzstoffe ↗</a><a href="https://www.efsa.europa.eu/de/topics/topic/food-additives" target="_blank" rel="noopener">EFSA: Lebensmittelzusatzstoffe ↗</a><a href="https://www.efsa.europa.eu/de/topics/topic/food-colours" target="_blank" rel="noopener">EFSA: Lebensmittelfarbstoffe ↗</a></div></div>';
 }
 
 function renderScanDetailsV60(p,nums){
@@ -2139,11 +2143,16 @@ function updateTestPlanUiV67(){
 function setTestPlanV67(plan){
  var next=plan==="plus"?"plus":"free";
  try{localStorage.setItem(TEST_PLAN_KEY_V67,next)}catch(e){}
+ if(next==="free"&&activeFamilyMemberV68){
+  activeFamilyMemberV68=null;selectedAllergens=personalAllergensV68.slice();
+  try{localStorage.removeItem("echeck_active_family_v68")}catch(e){}
+  renderAllergenChoices();
+ }
  var msg=document.getElementById("plusGateMessageV67");
  if(msg){
   msg.classList.remove("hidden");
   msg.innerHTML=next==="plus"
-   ?'<b>PLUS TEST ist aktiv.</b><br>Produktvergleich und echte Alternativensuche sind jetzt freigeschaltet. Es wird nichts berechnet.'
+   ?'<b>PLUS TEST ist aktiv.</b><br>Produktvergleich, Alternativensuche, Tiefeninfos, Familienprofile und erweiterter Verlauf sind freigeschaltet. Es wird nichts berechnet.'
    :'<b>FREE ist aktiv.</b><br>Premiumfunktionen sind wieder gesperrt. Scanner und alle wichtigen Basis-/Sicherheitshinweise bleiben verfügbar.';
  }
  updateTestPlanUiV67();
@@ -2195,10 +2204,22 @@ function renderFamilyFormV68(){
   box.innerHTML='<div class="premium-family-lock-v68"><b>🔒 Familienprofile gehören zu PLUS.</b><p>Im PLUS TEST kannst du mehrere Personen anlegen und ihre Allergie-/Laktose-Einstellungen getrennt verwenden.</p><button class="btn soft" onclick="showPlusGateV67(&quot;Familienprofile&quot;)">PLUS testen</button></div>';
   return;
  }
- var choices=ALLERGENS_V54.map(function(a){return '<label class="allergen-choice-v54"><input type="checkbox" value="'+esc(a.id)+'"><span>'+esc(a.label)+'</span></label>'}).join("");
- choices+='<label class="allergen-choice-v54 intolerance-v57"><input type="checkbox" value="lactose"><span><b>Laktoseintoleranz</b><small>Unverträglichkeit</small></span></label>';
- box.innerHTML='<details class="family-add-v68"><summary>+ Familienmitglied hinzufügen</summary><div class="family-add-body-v68"><input id="familyNameV68" placeholder="Name, z. B. Mia"><input id="familyRelationV68" placeholder="Beziehung, z. B. Kind"><div class="allergen-grid-v54 family-allergens-v68">'+choices+'</div><button class="btn primary" onclick="saveFamilyMemberV68()">Profil speichern</button></div></details>';
+ var edit=editingFamilyMemberV69;
+ var selected=edit&&Array.isArray(edit.allergens)?edit.allergens:[];
+ var choices=ALLERGENS_V54.map(function(a){
+  var checked=selected.indexOf(a.id)>=0?"checked":"";
+  return '<label class="allergen-choice-v54"><input type="checkbox" value="'+esc(a.id)+'" '+checked+'><span>'+esc(a.label)+'</span></label>';
+ }).join("");
+ choices+='<label class="allergen-choice-v54 intolerance-v57"><input type="checkbox" value="lactose" '+(edit&&edit.lactose?"checked":"")+'><span><b>Laktoseintoleranz</b><small>Unverträglichkeit</small></span></label>';
+ box.innerHTML='<details class="family-add-v68" open><summary>'+(edit?"Familienprofil bearbeiten":"+ Familienmitglied hinzufügen")+'</summary><div class="family-add-body-v68"><input id="familyNameV68" value="'+esc(edit?edit.name:"")+'" placeholder="Name, z. B. Mia"><input id="familyRelationV68" value="'+esc(edit?edit.relation||"":"")+'" placeholder="Beziehung, z. B. Kind"><div class="allergen-grid-v54 family-allergens-v68">'+choices+'</div><div class="family-edit-actions-v69"><button class="btn primary" onclick="saveFamilyMemberV68()">'+(edit?"Änderungen speichern":"Profil speichern")+'</button>'+(edit?'<button class="btn soft" onclick="cancelFamilyEditV69()">Abbrechen</button>':'')+'</div></div></details>';
 }
+function editFamilyMemberV69(id){
+ editingFamilyMemberV69=familyMembersV68.find(function(x){return x.id===id})||null;
+ renderFamilyFormV68();
+ var el=document.getElementById("familyFormV68");if(el)el.scrollIntoView({behavior:"smooth",block:"center"});
+}
+function cancelFamilyEditV69(){editingFamilyMemberV69=null;renderFamilyFormV68();}
+
 function renderFamilyListV68(){
  var list=document.getElementById("familyListV68"),active=document.getElementById("activeFamilyV68");
  if(!list||!active)return;
@@ -2216,12 +2237,12 @@ function renderFamilyListV68(){
  list.innerHTML=familyMembersV68.map(function(m){
   var prefs=(m.allergens||[]).map(allergenLabel);if(m.lactose)prefs.push("Laktoseintoleranz");
   var activeClass=activeFamilyMemberV68&&activeFamilyMemberV68.id===m.id?" active":"";
-  return '<div class="family-member-v68'+activeClass+'"><div><b>'+esc(m.name)+'</b><small>'+esc(m.relation||"Familienmitglied")+'</small><p>'+esc(prefs.join(", ")||"Keine besonderen Einstellungen")+'</p></div><div class="family-actions-v68"><button class="btn soft" onclick="useFamilyMemberV68(&quot;'+esc(m.id)+'&quot;)">Für Scan verwenden</button><button class="danger-btn" onclick="deleteFamilyMemberV68(&quot;'+esc(m.id)+'&quot;)">Löschen</button></div></div>';
+  return '<div class="family-member-v68'+activeClass+'"><div><b>'+esc(m.name)+'</b><small>'+esc(m.relation||"Familienmitglied")+'</small><p>'+esc(prefs.join(", ")||"Keine besonderen Einstellungen")+'</p></div><div class="family-actions-v68"><button class="btn soft" onclick="useFamilyMemberV68(&quot;'+esc(m.id)+'&quot;)">Für Scan verwenden</button><button class="btn soft" onclick="editFamilyMemberV69(&quot;'+esc(m.id)+'&quot;)">Bearbeiten</button><button class="danger-btn" onclick="deleteFamilyMemberV68(&quot;'+esc(m.id)+'&quot;)">Löschen</button></div></div>';
  }).join("");
  renderFamilyFormV68();
 }
 async function loadFamilyProfilesV68(){
- if(!currentUser||!hasPlusAccessV67()){familyMembersV68=[];activeFamilyMemberV68=null;renderFamilyListV68();return}
+ if(!currentUser||!hasPlusAccessV67()){familyMembersV68=[];activeFamilyMemberV68=null;selectedAllergens=personalAllergensV68.slice();try{localStorage.removeItem("echeck_active_family_v68")}catch(e){}renderAllergenChoices();renderFamilyListV68();return}
  const r=await sb.from("family_members").select("id,name,relation,allergens,lactose,created_at").eq("user_id",currentUser.id).order("created_at",{ascending:true});
  if(r.error){familyMembersV68=[];renderFamilyListV68();return}
  familyMembersV68=r.data||[];
@@ -2245,8 +2266,12 @@ async function saveFamilyMemberV68(){
  var checked=[...document.querySelectorAll(".family-allergens-v68 input:checked")].map(function(x){return x.value});
  var lactose=checked.indexOf("lactose")>=0;
  var allergens=checked.filter(function(x){return x!=="lactose"});
- const r=await sb.from("family_members").insert({user_id:currentUser.id,name:name,relation:relation,allergens:allergens,lactose:lactose});
+ var payload={user_id:currentUser.id,name:name,relation:relation,allergens:allergens,lactose:lactose,updated_at:new Date().toISOString()};
+ var r;
+ if(editingFamilyMemberV69)r=await sb.from("family_members").update(payload).eq("user_id",currentUser.id).eq("id",editingFamilyMemberV69.id);
+ else r=await sb.from("family_members").insert(payload);
  if(r.error){alert("Familienprofil konnte nicht gespeichert werden.");return}
+ editingFamilyMemberV69=null;
  await loadFamilyProfilesV68();
 }
 async function deleteFamilyMemberV68(id){
@@ -2314,12 +2339,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v49"))return;
-  sessionStorage.setItem("echeck-sw-reload-v49","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v50"))return;
+  sessionStorage.setItem("echeck-sw-reload-v50","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=49",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=50",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
@@ -2355,7 +2380,9 @@ async function saveCurrentComparisonV68(){
  if(!hasPlusAccessV67()){showPlusGateV67("Gespeicherte Vergleiche");return}
  if(!currentUser){alert("Bitte zuerst anmelden, um Vergleiche zu speichern.");return}
  if(!compareProducts.A||!compareProducts.B){alert("Bitte zuerst zwei Produkte vergleichen.");return}
- var title=(compareProducts.A.name||"Produkt A")+" vs. "+(compareProducts.B.name||"Produkt B");
+ var def=(compareProducts.A.name||"Produkt A")+" vs. "+(compareProducts.B.name||"Produkt B");
+ var title=prompt("Name für den Vergleich:",def);if(title===null)return;
+ title=title.trim()||def;
  const r=await sb.from("saved_comparisons").insert({user_id:currentUser.id,title:title,product_a:compareProducts.A,product_b:compareProducts.B});
  if(r.error){alert("Vergleich konnte nicht gespeichert werden.");return}
  alert("Vergleich gespeichert.");
@@ -2382,7 +2409,7 @@ async function loadSavedComparisonsV68(){
  window.savedComparisonsCacheV68=r.data||[];
  var rows=(r.data||[]).map(function(x){
   var date=x.created_at?new Date(x.created_at).toLocaleDateString("de-DE"):"";
-  return '<div class="saved-compare-item-v68"><div><b>'+esc(x.title||"Gespeicherter Vergleich")+'</b><small>'+esc(date)+'</small></div><div><button class="btn soft" onclick="openSavedComparisonV68(&quot;'+esc(x.id)+'&quot;)">Öffnen</button><button class="danger-btn" onclick="deleteSavedComparisonV68(&quot;'+esc(x.id)+'&quot;)">Löschen</button></div></div>';
+  var a=x.product_a||{},b=x.product_b||{};return '<div class="saved-compare-item-v68"><div><b>'+esc(x.title||"Gespeicherter Vergleich")+'</b><small>'+esc((a.name||"Produkt A")+" ↔ "+(b.name||"Produkt B"))+(date?" · "+esc(date):"")+'</small></div><div><button class="btn soft" onclick="openSavedComparisonV68(&quot;'+esc(x.id)+'&quot;)">Öffnen</button><button class="danger-btn" onclick="deleteSavedComparisonV68(&quot;'+esc(x.id)+'&quot;)">Löschen</button></div></div>';
  }).join("");
  box.innerHTML='<div class="saved-compare-head-v68"><span>PLUS</span><h3>Gespeicherte Vergleiche</h3></div>'+(rows||'<div class="list-empty">Noch keine Vergleiche gespeichert.</div>');
 }
