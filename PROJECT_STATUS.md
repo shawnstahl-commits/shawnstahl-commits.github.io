@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **6.7 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=48
-- Aktueller Frontend-Checkpoint: `c4dfa6a48a36d8c957654603c12e160b24e65fc9`
-- Aktueller Cache-Checkpoint: `c7bde5c6e2e0ee070665a9f82f3ea36f0d005828`
+- Version: **6.8 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=49
+- Aktueller Frontend-Checkpoint: `4cfbdfb5117c338f441a93f1025e8b948e671dca`
+- Aktueller Cache-Checkpoint: `09c1e5454fb54b0c53a601c38b88fbbd332c5f26`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -61,6 +61,12 @@ Stand: 29.09.2026
 - FREE enthält Scanner, Zutatenfoto/OCR, E-Nummern, EU-Kinderhinweise, Allergie-/Laktose-Grundcheck und Basis-Verlauf/Favoriten
 - PLUS TEST schaltet echte Alternativensuche und Produktvergleich frei
 - Geplante Plus-Funktionen bleiben als Vorschau sichtbar, ohne vorzutäuschen dass sie schon fertig sind
+- Vertiefte E-Nummern-Hintergründe mit offiziellen EU-/EFSA-Quellen im Plus-Test
+- Familienprofile in Supabase mit eigenen Allergie-/Laktose-Einstellungen und RLS
+- Familienprofil kann für Scans aktiviert werden, ohne die persönlichen Einstellungen zu überschreiben
+- Erweiterter Verlauf mit Produktsuche im Plus-Test
+- A/B-Produktvergleiche können im Konto gespeichert, geöffnet und gelöscht werden
+- Neue Tabellen `family_members` und `saved_comparisons` sind per RLS auf den jeweiligen Nutzer begrenzt
 - Schutz vor doppelten Barcode-Scans
 - Open-Food-Facts-Abfragen mit Timeout und Wiederholungsversuch
 - Bessere Fehlermeldungen bei Offline/Timeout
@@ -70,6 +76,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 6.8 – Plus-Ausbau: Quellen, Familienprofile, erweiterter Verlauf: `4cfbdfb5117c338f441a93f1025e8b948e671dca`
 - Version 6.7 – FREE/PLUS-Testmodus ohne Zahlung: `c4dfa6a48a36d8c957654603c12e160b24e65fc9`
 - Version 6.6 – automatische Barcode-Bestätigung bei „nicht gefunden“: `ad994b883a953e4d57236cba246eb623e9e8fb1f`
 - Version 6.5 – vollständiger Produktvergleich mit Allergenen und Spuren: `09c0c19fede3b722b3e4f8ab75718fb72bd640e6`
