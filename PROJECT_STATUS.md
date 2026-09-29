@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **6.3 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=44
-- Aktueller Frontend-Checkpoint: `7aa8e8e7ad5f7a78e8cbacedac82480a0b6f73f3`
-- Aktueller Cache-Checkpoint: `3569d0349a1918e863094ef77737ef142d486a96`
+- Version: **6.4 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=45
+- Aktueller Frontend-Checkpoint: `cdc117157ef8a90ceeff71afb515144f313908cf`
+- Aktueller Cache-Checkpoint: `779a53591cb55d8c1ad702e0a25a9a3f590e032a`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -47,6 +47,9 @@ Stand: 29.09.2026
 - Scanner wechselt nach kurzer Zeit automatisch früher zum zweiten Erkennungsweg
 - Zweiter Scanner führt bei Bedarf selbst einen erweiterten zweiten Durchlauf mit größerem Scanbereich durch
 - Unterstützte Kameras erhalten kontinuierlichen Fokus/Belichtung und einen sehr leichten Zoom
+- Produktabfrage nutzt automatischen Retry und einen zweiten Open-Food-Facts-Endpunkt
+- Gängige GTIN/EAN-Barcodes werden nach dem Kamera-Scan über die Prüfziffer plausibilisiert
+- Bei Datenbankfehlern kann dasselbe Produkt erneut geladen werden, ohne den Barcode neu zu scannen
 - Schutz vor doppelten Barcode-Scans
 - Open-Food-Facts-Abfragen mit Timeout und Wiederholungsversuch
 - Bessere Fehlermeldungen bei Offline/Timeout
@@ -56,6 +59,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 6.4 – robuste Produktabfrage nach Barcode-Scan: `cdc117157ef8a90ceeff71afb515144f313908cf`
 - Version 6.3 – adaptiver Scanner mit automatischen Erkennungsdurchläufen: `7aa8e8e7ad5f7a78e8cbacedac82480a0b6f73f3`
 - Version 6.2 – echte Alternativensuche nach Produktkategorie: `80a2eb173c71be291c5f044ee208fbac6455f09d`
 - Version 6.1 – Hilfe & Einführung für neue Nutzer: `b0d2f271650b865eb2d648f2fa624a20aa2126bb`
