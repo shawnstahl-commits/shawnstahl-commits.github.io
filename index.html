@@ -208,6 +208,14 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 
 .family-edit-actions-v69{display:flex;gap:8px;flex-wrap:wrap}
 .family-edit-actions-v69 .btn{flex:1}
+
+/* Tester / feedback / legal center 7.0 */
+.tester-pill-v70{width:38px;height:38px;border-radius:13px;border:1px solid #d8e5e2;background:#fff;color:var(--brand);font-size:17px;cursor:pointer;box-shadow:0 5px 14px rgba(20,50,45,.05)}
+.feedback-modal-v70{position:fixed;z-index:5000;inset:0;background:rgba(8,20,17,.64);backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:18px}.feedback-modal-v70.hidden{display:none}.feedback-card-v70{width:min(540px,100%);max-height:calc(100dvh - 36px);overflow:auto;background:#fff;border-radius:28px;padding:20px;box-shadow:0 28px 80px rgba(0,0,0,.30)}.feedback-head-v70{display:flex;justify-content:space-between;gap:12px}.feedback-head-v70 span{font-size:9px;font-weight:950;letter-spacing:.11em;color:var(--brand)}.feedback-head-v70 h2{margin:3px 0;font-size:23px}.feedback-head-v70 p{margin:0;color:var(--muted);font-size:11px}.feedback-head-v70>button{width:38px;height:38px;border:0;border-radius:50%;background:#eff5f3;font-size:25px;color:#48625c}.feedback-kind-v70{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:16px}.feedback-kind-v70 button{border:1px solid #dbe6e3;background:#fff;border-radius:13px;padding:10px 6px;font-weight:850;color:#48625c}.feedback-kind-v70 button.active{border-color:var(--brand);background:#eaf8f4;color:var(--brand)}#feedbackTextV70{width:100%;min-height:145px;resize:vertical;margin-top:10px;border:1px solid #dce6e3;border-radius:15px;padding:12px;font:inherit}.feedback-check-v70{display:flex;gap:9px;align-items:flex-start;margin:11px 0}.feedback-check-v70 input{margin-top:3px}.feedback-check-v70 span{font-size:12px;font-weight:800}.feedback-check-v70 small{display:block;margin-top:3px;color:var(--muted);font-weight:400;line-height:1.4}.feedback-context-v70{background:#f5f9f8;border-radius:12px;padding:9px 10px;color:#667a74;font-size:10px;margin-bottom:10px}.feedback-status-v70{padding:10px;border-radius:12px;margin-bottom:9px;font-size:12px}.feedback-status-v70.ok{display:block;background:#edf9f4;color:#236148}.feedback-status-v70.warn{display:block;background:#fff4ed;color:#9a4c0b}body.feedback-open-v70{overflow:hidden}
+.tester-row-head-v70{display:flex;justify-content:space-between;gap:10px}.tester-row-head-v70 p{margin:4px 0}.tester-chip-v70{background:#eaf8f4;color:var(--brand);border-radius:999px;padding:5px 8px;font-size:9px;font-weight:950}.tester-toggle-v70{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12px}.tester-info-v70{margin-top:10px;border:1px solid #dce8e5;border-radius:15px;background:#f8fbfa;padding:11px}.tester-grid-v70{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.tester-grid-v70>div{background:#fff;border-radius:10px;padding:8px}.tester-grid-v70 span{display:block;font-size:8px;font-weight:950;color:var(--muted)}.tester-grid-v70 b{display:block;margin-top:2px;font-size:11px}.tester-info-v70 details{margin:10px 0}.tester-events-v70{display:grid;gap:4px;margin-top:7px}.tester-events-v70>div{display:flex;justify-content:space-between;background:#fff;border-radius:8px;padding:6px 8px;font-size:10px}.tester-events-v70 small{color:var(--muted)}
+.legal-center-v70 details{border-top:1px solid var(--line);padding:10px 0}.legal-center-v70 details:first-of-type{margin-top:8px}.legal-center-v70 summary{cursor:pointer;font-size:12px;font-weight:850;color:var(--ink)}.legal-detail-v70{padding:7px 1px 0;color:#536862;font-size:11px;line-height:1.5}.legal-detail-v70 p{margin:7px 0}
+@media(max-width:520px){.feedback-kind-v70{grid-template-columns:1fr}.feedback-card-v70{padding:16px;border-radius:23px}.tester-grid-v70{grid-template-columns:1fr 1fr}.top-user{gap:5px}.tester-pill-v70,.help-pill-v61{width:35px;height:35px}}
+
 </style>
 </head>
 <body>
@@ -272,7 +280,23 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
   </div>
 </div>
 
-<header id="siteHeader"><div class="wrap top"><div class="logo">E</div>E-Check Kids<div class="top-user"><button class="help-pill-v61" type="button" onclick="openHelpTour(false)" aria-label="Hilfe öffnen">?</button><button id="userButton" class="user-pill" onclick="userMenuAction()">Anmelden</button></div></div></header>
+
+<div id="feedbackModalV70" class="feedback-modal-v70 hidden" role="dialog" aria-modal="true" aria-labelledby="feedbackTitleV70">
+ <div class="feedback-card-v70">
+  <div class="feedback-head-v70"><div><span>TESTER-FEEDBACK</span><h2 id="feedbackTitleV70">Problem oder Idee melden</h2><p>Direkt an den E-Check-Kids-Testbereich – ohne E-Mail.</p></div><button type="button" onclick="closeFeedbackV70()" aria-label="Schließen">×</button></div>
+  <div class="feedback-kind-v70">
+   <button id="feedbackBugV70" class="active" onclick="setFeedbackKindV70('bug')" type="button">🐞 Problem</button>
+   <button id="feedbackIdeaV70" onclick="setFeedbackKindV70('idea')" type="button">💡 Idee</button>
+   <button id="feedbackOtherV70" onclick="setFeedbackKindV70('other')" type="button">💬 Sonstiges</button>
+  </div>
+  <textarea id="feedbackTextV70" maxlength="4000" placeholder="Was ist passiert? Was sollte anders sein?"></textarea>
+  <label class="feedback-check-v70"><input id="feedbackDiagV70" type="checkbox" checked><span>Technische Diagnose mitsenden <small>Version, Bereich, Browser/Android, Bildschirmgröße und letzte technische App-Ereignisse. Keine Fotos oder Zutaten-Texte.</small></span></label>
+  <div id="feedbackContextV70" class="feedback-context-v70"></div>
+  <div id="feedbackStatusV70" class="feedback-status-v70 hidden"></div>
+  <button id="feedbackSendV70" class="btn primary" style="width:100%" onclick="submitFeedbackV70()">Feedback senden</button>
+ </div>
+</div>
+<header id="siteHeader"><div class="wrap top"><div class="logo">E</div>E-Check Kids<div class="top-user"><button class="tester-pill-v70" type="button" onclick="openFeedbackV70()" aria-label="Feedback senden">🐞</button><button class="help-pill-v61" type="button" onclick="openHelpTour(false)" aria-label="Hilfe öffnen">?</button><button id="userButton" class="user-pill" onclick="userMenuAction()">Anmelden</button></div></div></header>
 
 <main id="appShell" class="wrap hidden">
 <section id="page-home" class="app-page active">
@@ -563,6 +587,35 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
    <div id="familyListV68"></div>
    <div id="familyFormV68" class="family-form-v68"></div>
   </div>
+
+  <div class="profile-row tester-row-v70">
+   <div class="tester-row-head-v70"><div><b>Tester-Modus</b><p class="muted">Hilft beim Finden von Fehlern, ohne externes Analytics-Tracking.</p></div><span class="tester-chip-v70">V7.0</span></div>
+   <label class="tester-toggle-v70"><input id="testerModeV70" type="checkbox" onchange="toggleTesterModeV70(this.checked)"><span>Technische Testinfos anzeigen</span></label>
+   <div id="testerInfoV70" class="tester-info-v70 hidden"></div>
+   <button class="btn soft" style="margin-top:8px" onclick="openFeedbackV70()">🐞 Problem / Idee melden</button>
+  </div>
+  <div class="profile-row legal-center-v70">
+   <b>Rechtliches & Datenquellen</b>
+   <p class="muted" style="margin:5px 0 10px">Testfassung für die Entwicklung – vor öffentlicher/gewerblicher Veröffentlichung müssen Betreiberangaben und Rechtstexte final geprüft und ergänzt werden.</p>
+   <details><summary>Datenschutz – Testfassung</summary><div class="legal-detail-v70">
+    <p><b>Aktuell verarbeitete Bereiche:</b> Kontodaten für Anmeldung, Scan-Verlauf, Favoriten, Familienprofile, gespeicherte Vergleiche und freiwilliges Tester-Feedback.</p>
+    <p><b>Technische Dienste:</b> GitHub Pages liefert die Website aus; Supabase wird für Anmeldung und gespeicherte Kontodaten genutzt; Open Food Facts liefert Produktdaten. Die Zutaten-Fotoerkennung läuft im Browser über Tesseract.js.</p>
+    <p><b>Tester-Feedback:</b> Wenn „Technische Diagnose mitsenden“ aktiviert ist, werden App-Version, aktueller Bereich, Browser-/Geräteangaben, Online-Status, Bildschirmgröße und eine kurze Liste technischer App-Ereignisse gespeichert. Fotos und erkannter Zutaten-Text werden nicht Teil dieses Diagnoseprotokolls.</p>
+    <p><b>Analytics/Werbung:</b> In dieser Testversion ist kein externes Werbe- oder Analytics-Tracking aktiviert. Eine spätere Einführung muss separat datenschutzrechtlich geprüft und transparent gemacht werden.</p>
+   </div></details>
+   <details><summary>Impressum – vor Veröffentlichung vervollständigen</summary><div class="legal-detail-v70">
+    <p>Für eine geschäftsmäßige Veröffentlichung müssen insbesondere <b>Name/Betreiber, ladungsfähige Anschrift und eine E-Mail-Kontaktmöglichkeit</b> ergänzt werden. Je nach Situation können weitere Angaben erforderlich sein.</p>
+    <p><b>Status:</b> Diese Testversion enthält bewusst keine erfundenen Betreiberangaben.</p>
+   </div></details>
+   <details><summary>Open Food Facts & Lizenzen</summary><div class="legal-detail-v70">
+    <p>Produktdaten stammen aus Open Food Facts. Die Datenbank wird unter der <b>Open Database License (ODbL)</b> bereitgestellt. Produktbilder sind grundsätzlich unter <b>CC BY-SA</b> verfügbar; auf Bildern können zusätzlich Marken- oder andere Rechte bestehen.</p>
+    <p><a class="source-link" href="https://openfoodfacts.github.io/openfoodfacts-server/api/tutorials/license-be-on-the-legal-side/" target="_blank" rel="noopener">Open Food Facts – Lizenzhinweise ↗</a></p>
+   </div></details>
+   <details><summary>Werbung, Affiliate & Plus – noch deaktiviert</summary><div class="legal-detail-v70">
+    <p>Aktuell gibt es <b>keine echte Zahlung, keine Werbeanzeigen und keine Affiliate-Links</b>. FREE ↔ PLUS TEST ist nur ein Entwicklungsmodus.</p>
+    <p>Spätere Werbe-/Affiliate-Elemente sollen klar vom neutralen Scan-Ergebnis getrennt und ausdrücklich als Werbung/Werbelink gekennzeichnet werden. Vor Aktivierung werden Verbraucher-, Preis-, Datenschutz- und Kündigungsinformationen separat umgesetzt.</p>
+   </div></details>
+  </div>
   <div class="profile-row"><b>Passwort</b><button class="btn soft" onclick="changePassword()">Passwort ändern</button></div>
   <div class="profile-row"><b>App installieren</b><button class="btn soft" onclick="installApp()">Zum Startbildschirm</button></div>
   <div class="profile-row"><b>Meine Daten</b><button class="btn soft" onclick="clearHistory()">Scan-Verlauf löschen</button></div>
@@ -606,7 +659,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.9 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 7.0 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -614,6 +667,19 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 <script>
 var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,nativeFallbackTimer=null,scanHintTimer=null,scannerRetryTimer=null,scannerPassV63=0,scanNotFoundRetryV66=0,torchOn=false,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
 var familyMembersV68=[],personalAllergensV68=[],activeFamilyMemberV68=null,editingFamilyMemberV69=null,historyCacheV68=[];
+var APP_VERSION_V70="7.0 Preview",feedbackKindV70="bug",diagnosticEventsV70=[];
+function diagV70(event,data){
+ try{
+  diagnosticEventsV70.push({t:new Date().toISOString(),event:String(event||""),data:data&&typeof data==="object"?data:{}});
+  if(diagnosticEventsV70.length>30)diagnosticEventsV70.splice(0,diagnosticEventsV70.length-30);
+  if(testerModeEnabledV70())renderTesterInfoV70();
+ }catch(e){}
+}
+function currentPageV70(){
+ var p=document.querySelector(".app-page.active");return p?p.id.replace("page-",""):"unknown";
+}
+function testerModeEnabledV70(){try{return localStorage.getItem("echeck_tester_mode_v70")==="1"}catch(e){return false}}
+
 
 var special={
 "E102":["Tartrazin","EU-Kinderhinweis"],
@@ -1266,6 +1332,7 @@ async function lookupManualFullscreen(){
 }
 
 function foundCode(raw){
+ diagV70("barcode_candidate",{length:String(raw||"").replace(/\D/g,"").length});
  if(locked||scanLookupBusy)return;
  var code=String(raw||"").replace(/\D/g,"");
  if(code.length<8||code.length>14)return;
@@ -1392,6 +1459,7 @@ async function switchScannerEngine(session){
 }
 
 async function startScanner(session){
+ diagV70("scanner_start",{page:currentPageV70()});
  session=session||scannerSessionId;
  await stopScanner();
  if(session!==scannerSessionId)return;
@@ -1740,7 +1808,7 @@ async function lookupBarcode(forced,fromScanner){
    }
    throw fetchErr;
   }
-  scanNotFoundRetryV66=0;setStatus("✓ Produkt gefunden");revealScanResults();
+  scanNotFoundRetryV66=0;diagV70("product_lookup_ok",{});setStatus("✓ Produkt gefunden");revealScanResults();
   var ing=p.ingredients_text_de||p.ingredients_text||p.ingredients_text_en||"";
   var nums=detectE(ing,p.additives_tags||[]);
   var productImages=productImageCandidates(p);
@@ -1776,7 +1844,7 @@ async function lookupBarcode(forced,fromScanner){
     await updateCurrentFavoriteButton();
   }
   document.getElementById("result").scrollIntoView({behavior:"smooth"});
- }catch(e){revealScanResults();setStatus("Produktabfrage fehlgeschlagen.");document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Abfrage fehlgeschlagen</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="error" style="display:block"><b>Produktdaten konnten nicht geladen werden.</b><br>'+esc(productLoadErrorText(e))+'</div><button class="btn primary retry-product-v64" type="button" onclick="lookupBarcode(&quot;'+esc(code)+'&quot;)">Produkt erneut laden</button><div class="muted" style="font-size:11px;margin-top:8px">Du musst den Barcode dafür nicht noch einmal scannen.</div></div>'}
+ }catch(e){diagV70("product_lookup_error",{type:e&&e.productNotFound?"not_found":(e&&e.message==="TIMEOUT"?"timeout":"network_or_api")});revealScanResults();setStatus("Produktabfrage fehlgeschlagen.");document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Abfrage fehlgeschlagen</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="error" style="display:block"><b>Produktdaten konnten nicht geladen werden.</b><br>'+esc(productLoadErrorText(e))+'</div><button class="btn primary retry-product-v64" type="button" onclick="lookupBarcode(&quot;'+esc(code)+'&quot;)">Produkt erneut laden</button><div class="muted" style="font-size:11px;margin-top:8px">Du musst den Barcode dafür nicht noch einmal scannen.</div></div>'}
 }
 
 function detectE(text,tags){
@@ -2030,6 +2098,7 @@ document.getElementById("barcodePhoto").addEventListener("change",function(){if(
 document.getElementById("barcodeInput").addEventListener("keydown",function(e){if(e.key==="Enter")lookupBarcode()});
 
 async function readIngredientsPhoto(){
+ diagV70("ocr_start",{});
  var input=document.getElementById("ingredientsPhoto"),f=input&&input.files?input.files[0]:null,st=document.getElementById("ocrStatus");
  if(!f){st.textContent="Bitte zuerst ein Foto auswählen.";return}
  if(!window.Tesseract){st.textContent="Texterkennung konnte nicht geladen werden.";return}
@@ -2047,6 +2116,7 @@ async function readIngredientsPhoto(){
   st.textContent="Text erkannt – wird automatisch ausgewertet …";
   openPanel("text");
   analyzeIngredients("photo");
+  diagV70("ocr_done",{hasText:!!detected});
   st.textContent="Fertig: Zutaten automatisch ausgewertet.";
  }catch(e){
   st.textContent="Texterkennung fehlgeschlagen. Zutaten können auch manuell eingefügt werden.";
@@ -2056,9 +2126,92 @@ async function readIngredientsPhoto(){
 
 
 
+
+function setFeedbackKindV70(kind){
+ feedbackKindV70=["bug","idea","other"].indexOf(kind)>=0?kind:"other";
+ ["bug","idea","other"].forEach(function(k){
+  var id=k==="bug"?"feedbackBugV70":(k==="idea"?"feedbackIdeaV70":"feedbackOtherV70");
+  var b=document.getElementById(id);if(b)b.classList.toggle("active",k===feedbackKindV70);
+ });
+}
+function feedbackDeviceV70(){
+ return {
+  userAgent:navigator.userAgent||"",
+  platform:navigator.platform||"",
+  language:navigator.language||"",
+  online:navigator.onLine,
+  viewport:{w:window.innerWidth,h:window.innerHeight},
+  screen:{w:screen.width,h:screen.height,dpr:window.devicePixelRatio||1},
+  touch:("ontouchstart" in window)||navigator.maxTouchPoints>0,
+  standalone:window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches
+ };
+}
+function feedbackDiagnosticsV70(){
+ return diagnosticEventsV70.slice(-15).map(function(x){return {t:x.t,event:x.event,data:x.data}});
+}
+function openFeedbackV70(){
+ var m=document.getElementById("feedbackModalV70");if(!m)return;
+ m.classList.remove("hidden");document.body.classList.add("feedback-open-v70");
+ var ctx=document.getElementById("feedbackContextV70");
+ if(ctx)ctx.innerHTML='<b>Wird automatisch ergänzt:</b> '+esc(APP_VERSION_V70)+' · Bereich '+esc(currentPageV70())+' · '+(navigator.onLine?"online":"offline");
+ var st=document.getElementById("feedbackStatusV70");if(st){st.classList.add("hidden");st.textContent=""}
+}
+function closeFeedbackV70(){
+ var m=document.getElementById("feedbackModalV70");if(m)m.classList.add("hidden");
+ document.body.classList.remove("feedback-open-v70");
+}
+async function submitFeedbackV70(){
+ var txt=document.getElementById("feedbackTextV70"),btn=document.getElementById("feedbackSendV70"),st=document.getElementById("feedbackStatusV70");
+ var message=txt?txt.value.trim():"";
+ if(message.length<3){if(st){st.textContent="Bitte kurz beschreiben, was passiert ist oder was du dir wünschst.";st.className="feedback-status-v70 warn"}return}
+ if(btn){btn.disabled=true;btn.textContent="Wird gesendet …"}
+ if(st){st.classList.add("hidden")}
+ try{
+  var includeDiag=document.getElementById("feedbackDiagV70")&&document.getElementById("feedbackDiagV70").checked;
+  var payload={
+   user_id:currentUser?currentUser.id:null,
+   kind:feedbackKindV70,
+   message:message,
+   page:currentPageV70(),
+   app_version:APP_VERSION_V70,
+   device_info:includeDiag?feedbackDeviceV70():{},
+   diagnostics:includeDiag?feedbackDiagnosticsV70():[]
+  };
+  const r=await sb.from("feedback_reports").insert(payload);
+  if(r.error)throw r.error;
+  diagV70("feedback_sent",{kind:feedbackKindV70});
+  if(txt)txt.value="";
+  if(st){st.textContent="Danke! Feedback wurde im Testbereich gespeichert.";st.className="feedback-status-v70 ok"}
+  setTimeout(closeFeedbackV70,1100);
+ }catch(e){
+  if(st){st.textContent="Feedback konnte gerade nicht gesendet werden. Bitte erneut versuchen.";st.className="feedback-status-v70 warn"}
+ }finally{
+  if(btn){btn.disabled=false;btn.textContent="Feedback senden"}
+ }
+}
+function toggleTesterModeV70(on){
+ try{localStorage.setItem("echeck_tester_mode_v70",on?"1":"0")}catch(e){}
+ renderTesterInfoV70();
+}
+function renderTesterInfoV70(){
+ var box=document.getElementById("testerInfoV70"),toggle=document.getElementById("testerModeV70");if(!box)return;
+ var on=testerModeEnabledV70();if(toggle)toggle.checked=on;
+ box.classList.toggle("hidden",!on);
+ if(!on)return;
+ var d=feedbackDeviceV70(),events=feedbackDiagnosticsV70().slice(-6).reverse();
+ box.innerHTML='<div class="tester-grid-v70"><div><span>VERSION</span><b>'+esc(APP_VERSION_V70)+'</b></div><div><span>BEREICH</span><b>'+esc(currentPageV70())+'</b></div><div><span>NETZ</span><b>'+(d.online?"online":"offline")+'</b></div><div><span>TARIF</span><b>'+(hasPlusAccessV67()?"PLUS TEST":"FREE")+'</b></div></div><details><summary>Letzte technische Ereignisse</summary><div class="tester-events-v70">'+(events.length?events.map(function(x){return '<div><b>'+esc(x.event)+'</b><small>'+esc(x.t.slice(11,19))+'</small></div>'}).join(""):'<small>Noch keine Ereignisse.</small>')+'</div></details><button class="btn soft" onclick="diagnosticEventsV70=[];renderTesterInfoV70()">Diagnose leeren</button>';
+}
+function initTesterV70(){
+ var t=document.getElementById("testerModeV70");if(t)t.checked=testerModeEnabledV70();
+ renderTesterInfoV70();
+ diagV70("app_ready",{version:APP_VERSION_V70});
+}
+document.getElementById("feedbackModalV70").addEventListener("click",function(e){if(e.target===this)closeFeedbackV70()});
+
 var deferredInstallPrompt=null;
 
 function goPage(name){
+ diagV70("navigate",{to:name});
  if(name==="compare"&&!hasPlusAccessV67()){showPlusGateV67("Der Produktvergleich");return}
  document.body.classList.remove("scan-result-mode");
  if(name!=="scan"){
@@ -2142,6 +2295,7 @@ function updateTestPlanUiV67(){
 }
 function setTestPlanV67(plan){
  var next=plan==="plus"?"plus":"free";
+ diagV70("test_plan_switch",{plan:next});
  try{localStorage.setItem(TEST_PLAN_KEY_V67,next)}catch(e){}
  if(next==="free"&&activeFamilyMemberV68){
   activeFamilyMemberV68=null;selectedAllergens=personalAllergensV68.slice();
@@ -2297,6 +2451,7 @@ function usePersonalProfileV68(){
 }
 
 async function loadProfile(){
+ initTesterV70();
  var email=document.getElementById("profileEmail"),name=document.getElementById("profileName");
  if(!currentUser){email.textContent="Gast – für Kontofunktionen bitte anmelden";name.value="";selectedAllergens=[];personalAllergensV68=[];renderAllergenChoices();loadSubscriptionStatus();familyMembersV68=[];renderFamilyListV68();return}
  email.textContent=currentUser.email||"";
@@ -2339,12 +2494,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v50"))return;
-  sessionStorage.setItem("echeck-sw-reload-v50","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v51"))return;
+  sessionStorage.setItem("echeck-sw-reload-v51","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=50",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=51",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
@@ -2600,7 +2755,7 @@ var HELP_TOUR_STEPS_V61=[
   mini1:"4 Schnellkarten",
   mini2:"Vergleich A/B",
   text:"Nach dem Scan zeigen vier Karten sofort <b>E-Nummern, Kinderhinweise, Allergene und Laktose</b>. Details kannst du aufklappen. Du kannst ähnliche Produkte suchen, ein Produkt direkt vergleichen und – angemeldet – Verlauf und Favoriten speichern.",
-  where:"Im Scan-Ergebnis findest du <b>„Ähnliche Produkte finden“</b>, <b>„Details & Erklärungen“</b> und <b>„Vergleich starten“</b>. Verlauf und Favoriten liegen unten in der Navigation."
+  where:"Im Scan-Ergebnis findest du <b>„Ähnliche Produkte finden“</b>, <b>„Details & Erklärungen“</b> und <b>„Vergleich starten“</b>. Über <b>🐞 oben</b> kannst du in der Testphase jederzeit ein Problem oder eine Idee senden."
  }
 ];
 function renderHelpTourV61(){
