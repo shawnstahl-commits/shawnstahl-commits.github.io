@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **6.4 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=45
-- Aktueller Frontend-Checkpoint: `cdc117157ef8a90ceeff71afb515144f313908cf`
-- Aktueller Cache-Checkpoint: `779a53591cb55d8c1ad702e0a25a9a3f590e032a`
+- Version: **6.5 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=46
+- Aktueller Frontend-Checkpoint: `09c0c19fede3b722b3e4f8ab75718fb72bd640e6`
+- Aktueller Cache-Checkpoint: `a55974c621b687a5f30aacf379932d068dcba22f`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -50,6 +50,10 @@ Stand: 29.09.2026
 - Produktabfrage nutzt automatischen Retry und einen zweiten Open-Food-Facts-Endpunkt
 - Gängige GTIN/EAN-Barcodes werden nach dem Kamera-Scan über die Prüfziffer plausibilisiert
 - Bei Datenbankfehlern kann dasselbe Produkt erneut geladen werden, ohne den Barcode neu zu scannen
+- Produktvergleich zeigt ausgewählte Allergene getrennt nach „enthält“ und „Spurenhinweis“
+- Laktose-Hinweise werden im Vergleich farblich unterschieden
+- Vergleich übernimmt Allergie-Daten auch aus normalem Scan und Alternativensuche
+- Sicherheits-Hinweis im Vergleich: fehlende Produktdaten sind keine Garantie auf Allergen- oder Laktosefreiheit
 - Schutz vor doppelten Barcode-Scans
 - Open-Food-Facts-Abfragen mit Timeout und Wiederholungsversuch
 - Bessere Fehlermeldungen bei Offline/Timeout
@@ -59,6 +63,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 6.5 – vollständiger Produktvergleich mit Allergenen und Spuren: `09c0c19fede3b722b3e4f8ab75718fb72bd640e6`
 - Version 6.4 – robuste Produktabfrage nach Barcode-Scan: `cdc117157ef8a90ceeff71afb515144f313908cf`
 - Version 6.3 – adaptiver Scanner mit automatischen Erkennungsdurchläufen: `7aa8e8e7ad5f7a78e8cbacedac82480a0b6f73f3`
 - Version 6.2 – echte Alternativensuche nach Produktkategorie: `80a2eb173c71be291c5f044ee208fbac6455f09d`
