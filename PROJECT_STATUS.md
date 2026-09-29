@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **6.5 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=46
-- Aktueller Frontend-Checkpoint: `09c0c19fede3b722b3e4f8ab75718fb72bd640e6`
-- Aktueller Cache-Checkpoint: `a55974c621b687a5f30aacf379932d068dcba22f`
+- Version: **6.6 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=47
+- Aktueller Frontend-Checkpoint: `ad994b883a953e4d57236cba246eb623e9e8fb1f`
+- Aktueller Cache-Checkpoint: `038794c1372dcd92bfad85952ca26632cbe9bc5f`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -54,6 +54,9 @@ Stand: 29.09.2026
 - Laktose-Hinweise werden im Vergleich farblich unterschieden
 - Vergleich übernimmt Allergie-Daten auch aus normalem Scan und Alternativensuche
 - Sicherheits-Hinweis im Vergleich: fehlende Produktdaten sind keine Garantie auf Allergen- oder Laktosefreiheit
+- Wenn ein gescannter Barcode nicht gefunden wird, startet automatisch eine zweite Erkennung in derselben Scan-Sitzung
+- Erst nach der zweiten erfolglosen Erkennung erscheint „nicht gefunden“
+- Der endgültig erkannte Barcode wird auf der Fehlerseite sichtbar angezeigt, um Fehlablesungen diagnostizieren zu können
 - Schutz vor doppelten Barcode-Scans
 - Open-Food-Facts-Abfragen mit Timeout und Wiederholungsversuch
 - Bessere Fehlermeldungen bei Offline/Timeout
@@ -63,6 +66,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 6.6 – automatische Barcode-Bestätigung bei „nicht gefunden“: `ad994b883a953e4d57236cba246eb623e9e8fb1f`
 - Version 6.5 – vollständiger Produktvergleich mit Allergenen und Spuren: `09c0c19fede3b722b3e4f8ab75718fb72bd640e6`
 - Version 6.4 – robuste Produktabfrage nach Barcode-Scan: `cdc117157ef8a90ceeff71afb515144f313908cf`
 - Version 6.3 – adaptiver Scanner mit automatischen Erkennungsdurchläufen: `7aa8e8e7ad5f7a78e8cbacedac82480a0b6f73f3`
