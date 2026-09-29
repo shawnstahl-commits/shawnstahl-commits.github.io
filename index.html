@@ -216,6 +216,13 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 .legal-center-v70 details{border-top:1px solid var(--line);padding:10px 0}.legal-center-v70 details:first-of-type{margin-top:8px}.legal-center-v70 summary{cursor:pointer;font-size:12px;font-weight:850;color:var(--ink)}.legal-detail-v70{padding:7px 1px 0;color:#536862;font-size:11px;line-height:1.5}.legal-detail-v70 p{margin:7px 0}
 @media(max-width:520px){.feedback-kind-v70{grid-template-columns:1fr}.feedback-card-v70{padding:16px;border-radius:23px}.tester-grid-v70{grid-template-columns:1fr 1fr}.top-user{gap:5px}.tester-pill-v70,.help-pill-v61{width:35px;height:35px}}
 
+
+/* Stability & mobile polish 7.1 */
+.network-banner-v71{position:sticky;top:0;z-index:1100;margin:0 auto;width:min(760px,calc(100% - 20px));display:flex;gap:9px;align-items:center;background:#fff4df;border:1px solid #efd28e;color:#725018;padding:9px 12px;border-radius:0 0 14px 14px;box-shadow:0 5px 14px rgba(55,40,10,.08)}.network-banner-v71.hidden{display:none}.network-banner-v71>span{font-weight:950}.network-banner-v71 b,.network-banner-v71 small{display:block}.network-banner-v71 b{font-size:11px}.network-banner-v71 small{font-size:9px;margin-top:1px}
+.product .name,.history-name,.compare-product-v52 b,.saved-compare-item-v68 b,.family-member-v68 b{overflow-wrap:anywhere;word-break:break-word}.history-item,.compare-product-v52,.saved-compare-item-v68{min-width:0}.history-meta,.compare-product-v52>div{min-width:0}
+.btn,.danger-btn,.nav-btn,button{touch-action:manipulation}.bottom-nav{padding-bottom:max(8px,env(safe-area-inset-bottom))}.feedback-card-v70{padding-bottom:max(20px,env(safe-area-inset-bottom))}.scanner-fullscreen .barcode-card-v4{padding-bottom:max(18px,env(safe-area-inset-bottom))}
+@media(max-width:430px){.wrap{padding-left:12px;padding-right:12px}.product-v60{align-items:flex-start}.product-v60 .name{font-size:16px}.compare-product-v52{gap:8px}.pc-row-v52{font-size:10px}.saved-compare-item-v68>div:last-child{width:100%;display:flex;gap:6px;flex-wrap:wrap}.saved-compare-item-v68>div:last-child button{flex:1}.result-head-v4 strong{overflow-wrap:anywhere}}
+
 </style>
 </head>
 <body>
@@ -297,6 +304,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  </div>
 </div>
 <header id="siteHeader"><div class="wrap top"><div class="logo">E</div>E-Check Kids<div class="top-user"><button class="tester-pill-v70" type="button" onclick="openFeedbackV70()" aria-label="Feedback senden">🐞</button><button class="help-pill-v61" type="button" onclick="openHelpTour(false)" aria-label="Hilfe öffnen">?</button><button id="userButton" class="user-pill" onclick="userMenuAction()">Anmelden</button></div></div></header>
+<div id="networkBannerV71" class="network-banner-v71 hidden"><span>⚠</span><div><b>Keine Internetverbindung</b><small>Produktdaten, Anmeldung und Speichern können eingeschränkt sein.</small></div></div>
 
 <main id="appShell" class="wrap hidden">
 <section id="page-home" class="app-page active">
@@ -659,7 +667,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 7.0 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts (ODbL) • Produktbilder: Open Food Facts (CC BY-SA) • Version 7.1 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -667,7 +675,8 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 <script>
 var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,nativeFallbackTimer=null,scanHintTimer=null,scannerRetryTimer=null,scannerPassV63=0,scanNotFoundRetryV66=0,torchOn=false,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
 var familyMembersV68=[],personalAllergensV68=[],activeFamilyMemberV68=null,editingFamilyMemberV69=null,historyCacheV68=[];
-var APP_VERSION_V70="7.0 Preview",feedbackKindV70="bug",diagnosticEventsV70=[];
+var productLookupBusyV71=false,familyProfilesErrorV71=false;
+var APP_VERSION_V70="7.1 Preview",feedbackKindV70="bug",diagnosticEventsV70=[];
 function diagV70(event,data){
  try{
   diagnosticEventsV70.push({t:new Date().toISOString(),event:String(event||""),data:data&&typeof data==="object"?data:{}});
@@ -1573,12 +1582,21 @@ function robustProductImage(urls,cls,alt){
 }
 
 async function lookupCompareProduct(code,slot){
+ if(!navigator.onLine){
+  diagV70("compare_lookup_offline",{slot:slot});
+  document.body.classList.remove("scanner-fullscreen","scan-processing");
+  compareTargetSlot=null;goPage("compare");renderComparison();
+  var offlineBox=document.getElementById("compareResult");
+  if(offlineBox)offlineBox.innerHTML='<div class="notice warn" style="margin-top:12px"><b>Keine Internetverbindung.</b><br>Produkt '+esc(slot)+' kann gerade nicht geladen werden. Bitte Verbindung prüfen und erneut versuchen.</div>';
+  return;
+ }
  setStatus("Produkt "+slot+" wird geladen …");
  try{
   var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,labels_tags,categories,categories_tags,nutriments";
   var p=await fetchOpenFoodFactsProductV64(code,fields);
   var ing=p.ingredients_text_de||p.ingredients_text||p.ingredients_text_en||"";
   var nums=detectE(ing,p.additives_tags||[]);
+  diagV70("compare_lookup_ok",{slot:slot});
   compareProducts[slot]={
    barcode:String(code),
    name:p.product_name_de||p.product_name||"Produkt",
@@ -1596,6 +1614,7 @@ async function lookupCompareProduct(code,slot){
   goPage("compare");
   renderComparison();
  }catch(e){
+  diagV70("compare_lookup_error",{slot:slot,type:e&&e.productNotFound?"not_found":"network_or_api"});
   document.body.classList.remove("scanner-fullscreen","scan-processing");
   compareTargetSlot=null;
   goPage("compare");
@@ -1764,7 +1783,9 @@ function startComparisonWithCurrent(){
   image:currentProduct.image_url||"",
   additives:currentProduct.additives||[],
   sugar:currentProduct.sugar,
-  lactose:currentProduct.lactose
+  lactose:currentProduct.lactose,
+  allergens_tags:currentProduct.allergens_tags||[],
+  traces_tags:currentProduct.traces_tags||[]
  };
  compareProducts.B=null;
  goPage("compare");
@@ -1790,6 +1811,15 @@ async function retryScannerAfterNotFoundV66(code){
 async function lookupBarcode(forced,fromScanner){
  var code=String(forced||document.getElementById("barcodeInput").value||"").replace(/\D/g,"");
  if(!code){setStatus("Bitte Barcode eingeben oder scannen.");return}
+ if(code.length<8||code.length>14){setStatus("Bitte einen Barcode mit 8 bis 14 Ziffern eingeben.");return}
+ if(productLookupBusyV71){setStatus("Produkt wird bereits geladen …");return}
+ if(!navigator.onLine){
+  diagV70("product_lookup_offline",{});
+  revealScanResults();setStatus("Keine Internetverbindung.");
+  document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Offline</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="notice warn"><b>Keine Internetverbindung.</b><br>Der Barcode ist vorhanden, aber die Produktdaten können gerade nicht geladen werden.</div><button class="btn primary" onclick="lookupBarcode(&quot;'+esc(code)+'&quot;)">Erneut versuchen</button><button class="btn soft" style="margin-top:8px" onclick="goPage(&quot;scan&quot;);openPanel(&quot;photo&quot;)">Zutatenliste fotografieren</button></div>';
+  return;
+ }
+ productLookupBusyV71=true;
  setStatus("🔎 Produkt wird gesucht …");clearError();
  try{
   var fields="code,product_name,product_name_de,brands,image_front_url,image_front_small_url,image_url,image_small_url,selected_images,ingredients_text,ingredients_text_de,ingredients_text_en,additives_tags,allergens_tags,traces_tags,labels_tags,nutriscore_grade,categories,categories_tags,nutriments";
@@ -1802,7 +1832,7 @@ async function lookupBarcode(forced,fromScanner){
      await retryScannerAfterNotFoundV66(code);
      return;
     }
-    setStatus("Produkt nicht gefunden.");revealScanResults();
+    diagV70("product_not_found",{barcodeLength:code.length});setStatus("Produkt nicht gefunden.");revealScanResults();
     document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Nicht gefunden</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="notice warn"><b>Produkt nicht gefunden.</b><br>Der Barcode wurde erkannt, aber auch nach der automatischen Prüfung konnte kein Produkt gefunden werden.</div><div class="barcode-debug-v66"><span>ERKANNTER BARCODE</span><b>'+esc(code)+'</b></div><div class="notfound-actions-v66"><button class="btn primary" onclick="openFullscreenScanner()">Barcode erneut scannen</button><button class="btn soft" onclick="goPage(&quot;scan&quot;);openPanel(&quot;photo&quot;)">Zutaten fotografieren</button></div></div>';
     return;
    }
@@ -1845,6 +1875,7 @@ async function lookupBarcode(forced,fromScanner){
   }
   document.getElementById("result").scrollIntoView({behavior:"smooth"});
  }catch(e){diagV70("product_lookup_error",{type:e&&e.productNotFound?"not_found":(e&&e.message==="TIMEOUT"?"timeout":"network_or_api")});revealScanResults();setStatus("Produktabfrage fehlgeschlagen.");document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Abfrage fehlgeschlagen</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="error" style="display:block"><b>Produktdaten konnten nicht geladen werden.</b><br>'+esc(productLoadErrorText(e))+'</div><button class="btn primary retry-product-v64" type="button" onclick="lookupBarcode(&quot;'+esc(code)+'&quot;)">Produkt erneut laden</button><div class="muted" style="font-size:11px;margin-top:8px">Du musst den Barcode dafür nicht noch einmal scannen.</div></div>'}
+ finally{productLookupBusyV71=false}
 }
 
 function detectE(text,tags){
@@ -2101,7 +2132,9 @@ async function readIngredientsPhoto(){
  diagV70("ocr_start",{});
  var input=document.getElementById("ingredientsPhoto"),f=input&&input.files?input.files[0]:null,st=document.getElementById("ocrStatus");
  if(!f){st.textContent="Bitte zuerst ein Foto auswählen.";return}
- if(!window.Tesseract){st.textContent="Texterkennung konnte nicht geladen werden.";return}
+ if(f.type&&f.type.indexOf("image/")!==0){st.textContent="Bitte eine Bilddatei auswählen.";return}
+ if(f.size>20*1024*1024){st.textContent="Das Foto ist sehr groß. Bitte ein Bild unter 20 MB verwenden.";return}
+ if(!window.Tesseract){diagV70("ocr_library_missing",{});st.textContent="Texterkennung konnte nicht geladen werden. Bitte Seite mit Internetverbindung neu laden.";return}
  st.textContent="Foto wird gelesen …";
  try{
   var r=await Tesseract.recognize(f,"deu",{logger:function(m){
@@ -2119,7 +2152,8 @@ async function readIngredientsPhoto(){
   diagV70("ocr_done",{hasText:!!detected});
   st.textContent="Fertig: Zutaten automatisch ausgewertet.";
  }catch(e){
-  st.textContent="Texterkennung fehlgeschlagen. Zutaten können auch manuell eingefügt werden.";
+  diagV70("ocr_error",{type:e&&e.message?String(e.message).slice(0,80):"unknown"});
+  st.textContent="Texterkennung fehlgeschlagen. Bitte ein schärferes Foto versuchen oder die Zutaten manuell einfügen.";
  }
 }
 
@@ -2127,6 +2161,16 @@ async function readIngredientsPhoto(){
 
 
 
+
+function updateNetworkStateV71(){
+ var b=document.getElementById("networkBannerV71");if(!b)return;
+ var offline=!navigator.onLine;
+ b.classList.toggle("hidden",!offline);
+ document.body.classList.toggle("app-offline-v71",offline);
+ if(testerModeEnabledV70())renderTesterInfoV70();
+}
+window.addEventListener("online",function(){diagV70("network_online",{});updateNetworkStateV71()});
+window.addEventListener("offline",function(){diagV70("network_offline",{});updateNetworkStateV71()});
 function setFeedbackKindV70(kind){
  feedbackKindV70=["bug","idea","other"].indexOf(kind)>=0?kind:"other";
  ["bug","idea","other"].forEach(function(k){
@@ -2233,6 +2277,7 @@ function goPage(name){
 
 function showAppChrome(){
  var n=document.getElementById("bottomNav");if(n)n.classList.remove("hidden");
+ updateNetworkStateV71();
  maybeShowHelpIntroV61();
 }
 
@@ -2385,6 +2430,9 @@ function renderFamilyListV68(){
  }else{
   active.innerHTML='<div class="active-family-card-v68 personal"><span>AKTIV FÜR SCANS</span><b>Meine Einstellungen</b><small>Deine persönlichen Allergie-/Laktose-Einstellungen werden verwendet.</small></div>';
  }
+ if(familyProfilesErrorV71){
+  list.innerHTML='<div class="notice warn"><b>Familienprofile konnten nicht geladen werden.</b><br>Bitte Internetverbindung prüfen und erneut versuchen.<br><button class="btn soft" style="margin-top:8px" onclick="loadFamilyProfilesV68()">Erneut laden</button></div>';renderFamilyFormV68();return;
+ }
  if(!familyMembersV68.length){
   list.innerHTML='<div class="list-empty">Noch keine Familienprofile angelegt.</div>';renderFamilyFormV68();return;
  }
@@ -2396,9 +2444,10 @@ function renderFamilyListV68(){
  renderFamilyFormV68();
 }
 async function loadFamilyProfilesV68(){
+ familyProfilesErrorV71=false;
  if(!currentUser||!hasPlusAccessV67()){familyMembersV68=[];activeFamilyMemberV68=null;selectedAllergens=personalAllergensV68.slice();try{localStorage.removeItem("echeck_active_family_v68")}catch(e){}renderAllergenChoices();renderFamilyListV68();return}
  const r=await sb.from("family_members").select("id,name,relation,allergens,lactose,created_at").eq("user_id",currentUser.id).order("created_at",{ascending:true});
- if(r.error){familyMembersV68=[];renderFamilyListV68();return}
+ if(r.error){familyProfilesErrorV71=true;familyMembersV68=[];diagV70("family_profiles_load_error",{});renderFamilyListV68();return}
  familyMembersV68=r.data||[];
  try{
   var id=localStorage.getItem("echeck_active_family_v68");
@@ -2494,12 +2543,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v51"))return;
-  sessionStorage.setItem("echeck-sw-reload-v51","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v52"))return;
+  sessionStorage.setItem("echeck-sw-reload-v52","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=51",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=52",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
@@ -2584,8 +2633,13 @@ function filterHistoryV68(q){
 
 async function refreshDashboard(){
  if(!currentUser){
-  document.getElementById("historyList").innerHTML='<div class="list-empty">Melde dich an, um Verlauf zu speichern.</div>';
-  document.getElementById("favoritesList").innerHTML='<div class="list-empty">Melde dich an, um Favoriten zu speichern.</div>';
+  historyCacheV68=[];
+  var h1=document.getElementById("historyList"),f1=document.getElementById("favoritesList"),hf0=document.getElementById("historyFull"),ff0=document.getElementById("favoritesFull");
+  if(h1)h1.innerHTML='<div class="list-empty">Melde dich an, um Verlauf zu speichern.</div>';
+  if(f1)f1.innerHTML='<div class="list-empty">Melde dich an, um Favoriten zu speichern.</div>';
+  if(hf0)hf0.innerHTML='<div class="list-empty">Melde dich an, um Verlauf zu speichern.</div>';
+  if(ff0)ff0.innerHTML='<div class="list-empty">Melde dich an, um Favoriten zu speichern.</div>';
+  renderHistoryPlusToolsV68();await loadSavedComparisonsV68();
   return;
  }
  const [h,f]=await Promise.all([
@@ -2893,6 +2947,8 @@ async function authReset(){
 async function logout(){
  await sb.auth.signOut();
  currentUser=null;
+ currentProduct=null;compareProducts={A:null,B:null};familyMembersV68=[];activeFamilyMemberV68=null;historyCacheV68=[];personalAllergensV68=[];selectedAllergens=[];
+ try{localStorage.removeItem("echeck_active_family_v68")}catch(e){}
  localStorage.removeItem("echeck_guest");
  document.getElementById("appShell").classList.add("hidden");
  document.getElementById("userButton").textContent="Anmelden";
