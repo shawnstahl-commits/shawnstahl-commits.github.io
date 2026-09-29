@@ -151,6 +151,12 @@ body.scanner-fullscreen.manual-entry-v56 .scan-manual-open-v56,body.scanner-full
 .allergen-choice-v54.intolerance-v57{border-color:#c9ddd7;background:#f5fbf9}.allergen-choice-v54.intolerance-v57 span{display:flex;flex-direction:column;gap:2px}.allergen-choice-v54.intolerance-v57 small{font-size:10px;color:#71807b;line-height:1.3}
 .lactose-alert-v57{margin-top:12px;border-radius:17px;padding:13px 14px;display:flex;flex-direction:column;gap:4px;border:1px solid #d8e6e2;background:#f6faf9;color:#31554d}.lactose-alert-v57 .lactose-kicker-v57{font-size:9px;font-weight:950;letter-spacing:.1em}.lactose-alert-v57>span:last-child{font-size:13px;line-height:1.4}.lactose-alert-v57.danger{background:#fff1f1;border-color:#fecaca;color:#991b1b}.lactose-alert-v57.warn{background:#fff8e8;border-color:#fde68a;color:#854d0e}.lactose-alert-v57.ok{background:#eefaf5;border-color:#bfe5d3;color:#236148}.lactose-alert-v57.neutral{background:#f5f8f7;border-color:#d9e3e0;color:#52635f}
 
+
+/* Scanner reliability 5.8 */
+.scan-torch-v58{display:none}
+body.scanner-fullscreen .scan-torch-v58:not(.hidden){display:block;position:absolute;z-index:47;right:16px;top:max(78px,calc(env(safe-area-inset-top) + 64px));border:1px solid rgba(255,255,255,.30);background:rgba(0,0,0,.46);color:#fff;border-radius:999px;padding:10px 13px;font-weight:850;backdrop-filter:blur(10px)}
+body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.manual-entry-v56 .scan-torch-v58{display:none!important}
+
 </style>
 </head>
 <body>
@@ -279,6 +285,7 @@ body.scanner-fullscreen.manual-entry-v56 .scan-manual-open-v56,body.scanner-full
 </div>
 <div id="reader" class="hidden"></div>
 <div class="fullscreen-guide-v4" aria-hidden="true"><div class="scan-corner-v4 tl"></div><div class="scan-corner-v4 tr"></div><div class="scan-corner-v4 bl"></div><div class="scan-corner-v4 br"></div><div class="scan-line-v4"></div></div>
+<button id="scanTorchBtn" class="scan-torch-v58 hidden" type="button" onclick="toggleScannerTorch()">🔦 Licht an</button>
 <div class="scan-instruction-v4"><strong>Barcode in den Rahmen halten</strong><small>Die Erkennung startet automatisch</small></div>
 <button class="scan-manual-open-v56" type="button" onclick="toggleManualBarcodeEntry(true)">⌨️ Barcode eingeben</button>
 <div class="scan-manual-box-v56">
@@ -501,13 +508,13 @@ body.scanner-fullscreen.manual-entry-v56 .scan-manual-open-v56,body.scanner-full
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.7 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.8 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
 <script>
-var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
+var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,nativeFallbackTimer=null,scanHintTimer=null,torchOn=false,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
 
 var special={
 "E102":["Tartrazin","EU-Kinderhinweis"],
@@ -1075,39 +1082,43 @@ function foundCode(raw){
  stopScanner().then(function(){return targetSlot?lookupCompareProduct(code,targetSlot):lookupBarcode(code)}).finally(function(){setTimeout(function(){locked=false;scanLookupBusy=false},700)});
 }
 
-async function startScanner(session){
- session=session||scannerSessionId;
- await stopScanner();
- if(session!==scannerSessionId)return;
- clearError();locked=false;
- if(!window.isSecureContext && location.hostname!=="localhost"){
-  error("Live-Scan braucht eine HTTPS-Verbindung.");return;
+function scannerTrack(){
+ return nativeStream&&nativeStream.getVideoTracks?nativeStream.getVideoTracks()[0]:null;
+}
+async function setupScannerTrack(track){
+ if(!track)return;
+ try{
+  var caps=track.getCapabilities?track.getCapabilities():{};
+  var adv={};
+  if(Array.isArray(caps.focusMode)&&caps.focusMode.indexOf("continuous")>=0)adv.focusMode="continuous";
+  if(Array.isArray(caps.exposureMode)&&caps.exposureMode.indexOf("continuous")>=0)adv.exposureMode="continuous";
+  if(Array.isArray(caps.whiteBalanceMode)&&caps.whiteBalanceMode.indexOf("continuous")>=0)adv.whiteBalanceMode="continuous";
+  if(Object.keys(adv).length)await track.applyConstraints({advanced:[adv]});
+  var torch=document.getElementById("scanTorchBtn");
+  if(torch){
+   var supported=!!caps.torch;
+   torch.classList.toggle("hidden",!supported);
+   torch.textContent=torchOn?"🔦 Licht aus":"🔦 Licht an";
+  }
+ }catch(e){}
+}
+async function toggleScannerTorch(){
+ var track=scannerTrack(),btn=document.getElementById("scanTorchBtn");
+ if(!track||!track.getCapabilities)return;
+ try{
+  var caps=track.getCapabilities();
+  if(!caps.torch)return;
+  torchOn=!torchOn;
+  await track.applyConstraints({advanced:[{torch:torchOn}]});
+  if(btn)btn.textContent=torchOn?"🔦 Licht aus":"🔦 Licht an";
+  setStatus(torchOn?"Licht ist an – Barcode ruhig in den Rahmen halten.":"Licht ist aus – Barcode ruhig in den Rahmen halten.");
+ }catch(e){
+  torchOn=false;
+  if(btn)btn.classList.add("hidden");
  }
- setStatus("Kamera wird gestartet …");
- document.getElementById("photoFallback").classList.add("hidden");
- fallbackTimer=setTimeout(function(){document.getElementById("photoFallback").classList.remove("hidden")},7000);
-
- if("BarcodeDetector" in window){
-  try{
-   var supported=BarcodeDetector.getSupportedFormats?await BarcodeDetector.getSupportedFormats():[];
-   var wanted=["ean_13","ean_8","upc_a","upc_e","code_128"].filter(function(x){return !supported.length||supported.indexOf(x)>=0});
-   var detector=new BarcodeDetector({formats:wanted.length?wanted:["ean_13","ean_8","upc_a","upc_e"]});
-   nativeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080}},audio:false});
-   var video=document.getElementById("nativeVideo");
-   video.srcObject=nativeStream;document.getElementById("nativeWrap").classList.remove("hidden");
-   await video.play();
-   var track=nativeStream.getVideoTracks()[0];
-   try{await track.applyConstraints({advanced:[{focusMode:"continuous"}]})}catch(e){}
-   setStatus("Kamera läuft – Barcode groß und ruhig in den Rahmen halten.");
-   var loop=async function(){
-    if(!nativeStream||session!==scannerSessionId)return;
-    try{var codes=await detector.detect(video);if(codes&&codes[0]&&codes[0].rawValue){foundCode(codes[0].rawValue);return}}catch(e){}
-    nativeTimer=setTimeout(loop,120);
-   };loop();return;
-  }catch(e){await stopNative();if(session!==scannerSessionId)return}
- }
-
- if(session!==scannerSessionId)return;
+}
+async function startHtml5Scanner(session,switched){
+ if(session!==scannerSessionId||locked||scanLookupBusy)return;
  if(!window.Html5Qrcode){error("Scanner konnte nicht geladen werden. Seite bitte neu laden.");return}
  try{
   document.getElementById("reader").classList.remove("hidden");
@@ -1116,25 +1127,96 @@ async function startScanner(session){
   html5Scanner=new Html5Qrcode("reader",formats?{formatsToSupport:formats,verbose:false}:{verbose:false});
   await html5Scanner.start(
    {facingMode:"environment"},
-   {fps:20,qrbox:function(w,h){return {width:Math.floor(Math.min(w*.96,560)),height:Math.floor(Math.max(100,Math.min(h*.32,190))) }},aspectRatio:1.7778,disableFlip:false},
+   {fps:24,qrbox:function(w,h){return {width:Math.floor(Math.min(w*.97,620)),height:Math.floor(Math.max(120,Math.min(h*.30,205))) }},disableFlip:true},
    function(decoded){if(session===scannerSessionId)foundCode(decoded)},
    function(){}
   );
-  setStatus("Kamera läuft – Barcode groß und ruhig in den Rahmen halten.");
+  setStatus(switched?"Erkennung optimiert – Barcode ruhig in den Rahmen halten.":"Kamera läuft – Barcode groß und ruhig in den Rahmen halten.");
  }catch(e){
+  if(session!==scannerSessionId)return;
   await stopScanner();
   error("Kamera konnte nicht gestartet werden. Prüfe die Kamera-Berechtigung für diese Webseite.");
  }
 }
+async function switchScannerEngine(session){
+ if(session!==scannerSessionId||locked||scanLookupBusy||!nativeStream)return;
+ setStatus("Noch kein Treffer – Erkennung wird automatisch optimiert …");
+ await stopNative();
+ if(session!==scannerSessionId)return;
+ await startHtml5Scanner(session,true);
+}
+
+async function startScanner(session){
+ session=session||scannerSessionId;
+ await stopScanner();
+ if(session!==scannerSessionId)return;
+ clearError();locked=false;torchOn=false;
+ var torchBtn=document.getElementById("scanTorchBtn");
+ if(torchBtn){torchBtn.classList.add("hidden");torchBtn.textContent="🔦 Licht an"}
+ if(!window.isSecureContext && location.hostname!=="localhost"){
+  error("Live-Scan braucht eine HTTPS-Verbindung.");return;
+ }
+ setStatus("Kamera wird gestartet …");
+ document.getElementById("photoFallback").classList.add("hidden");
+ fallbackTimer=setTimeout(function(){
+  if(session!==scannerSessionId||locked)return;
+  document.getElementById("photoFallback").classList.remove("hidden");
+ },8500);
+ scanHintTimer=setTimeout(function(){
+  if(session!==scannerSessionId||locked)return;
+  var hint=document.querySelector(".scan-instruction-v4 small");
+  if(hint)hint.textContent="Noch nichts? Mehr Licht, 10–20 cm Abstand und Barcode möglichst gerade halten.";
+ },3200);
+
+ if("BarcodeDetector" in window){
+  try{
+   var supported=BarcodeDetector.getSupportedFormats?await BarcodeDetector.getSupportedFormats():[];
+   var wanted=["ean_13","ean_8","upc_a","upc_e","code_128"].filter(function(x){return !supported.length||supported.indexOf(x)>=0});
+   var detector=new BarcodeDetector({formats:wanted.length?wanted:["ean_13","ean_8","upc_a","upc_e"]});
+   nativeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080}},audio:false});
+   if(session!==scannerSessionId){await stopNative();return}
+   var video=document.getElementById("nativeVideo");
+   video.srcObject=nativeStream;document.getElementById("nativeWrap").classList.remove("hidden");
+   await video.play();
+   var track=scannerTrack();
+   await setupScannerTrack(track);
+   setStatus("Kamera läuft – Barcode groß und ruhig in den Rahmen halten.");
+   nativeFallbackTimer=setTimeout(function(){switchScannerEngine(session)},5600);
+   var loop=async function(){
+    if(!nativeStream||session!==scannerSessionId||locked)return;
+    try{
+     var codes=await detector.detect(video);
+     if(codes&&codes[0]&&codes[0].rawValue){foundCode(codes[0].rawValue);return}
+    }catch(e){}
+    nativeTimer=setTimeout(loop,90);
+   };
+   setTimeout(function(){if(session===scannerSessionId)loop()},180);
+   return;
+  }catch(e){
+   await stopNative();
+   if(session!==scannerSessionId)return;
+  }
+ }
+
+ if(session!==scannerSessionId)return;
+ await startHtml5Scanner(session,false);
+}
 
 async function stopNative(){
  if(nativeTimer){clearTimeout(nativeTimer);nativeTimer=null}
+ if(nativeFallbackTimer){clearTimeout(nativeFallbackTimer);nativeFallbackTimer=null}
+ torchOn=false;
+ var torch=document.getElementById("scanTorchBtn");
+ if(torch){torch.classList.add("hidden");torch.textContent="🔦 Licht an"}
  if(nativeStream){nativeStream.getTracks().forEach(function(t){t.stop()});nativeStream=null}
  var v=document.getElementById("nativeVideo");try{v.pause();v.srcObject=null}catch(e){}
  document.getElementById("nativeWrap").classList.add("hidden");
 }
 async function stopScanner(){
  if(fallbackTimer){clearTimeout(fallbackTimer);fallbackTimer=null}
+ if(scanHintTimer){clearTimeout(scanHintTimer);scanHintTimer=null}
+ var hint=document.querySelector(".scan-instruction-v4 small");
+ if(hint)hint.textContent="Die Erkennung startet automatisch";
  await stopNative();
  if(html5Scanner){try{await html5Scanner.stop()}catch(e){}try{html5Scanner.clear()}catch(e){}html5Scanner=null}
  document.getElementById("reader").classList.add("hidden");
@@ -1525,12 +1607,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v38"))return;
-  sessionStorage.setItem("echeck-sw-reload-v38","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v39"))return;
+  sessionStorage.setItem("echeck-sw-reload-v39","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=38",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=39",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
