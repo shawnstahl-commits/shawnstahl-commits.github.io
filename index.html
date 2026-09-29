@@ -161,6 +161,14 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 /* Automatic ingredient photo evaluation 5.9 */
 .ingredient-auto-v59{border-radius:18px;background:linear-gradient(145deg,#edf9f6,#f8fcfb);border:1px solid #cfe8e2;padding:14px 15px;margin-bottom:12px}.ingredient-auto-v59>span{display:block;font-size:9px;font-weight:950;letter-spacing:.11em;color:var(--brand)}.ingredient-auto-v59>b{display:block;font-size:20px;margin-top:4px;color:var(--ink)}.ingredient-auto-v59>p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.45}.ingredient-result-v59{padding-top:16px}.ocr-details-v59{margin-top:14px;border:1px solid var(--line);border-radius:15px;background:#fafcfb;padding:11px 13px}.ocr-details-v59 summary{cursor:pointer;font-weight:850;color:var(--ink)}.ocr-details-v59>div{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.5;max-height:220px;overflow:auto}
 
+
+/* Scan result 6.0 */
+.result-card-v60{padding-top:14px}.product-v60{align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.scan-quick-v60{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 10px}.scan-quick-card-v60{min-width:0;border:1px solid #e2ebe8;background:#f7faf9;border-radius:18px;padding:11px 9px;text-align:left}.scan-quick-icon-v60{width:28px;height:28px;border-radius:9px;background:#eaf4f2;color:var(--brand);display:grid;place-items:center;font-size:13px;font-weight:950;margin-bottom:8px}.scan-quick-card-v60>strong{display:block;font-size:20px;line-height:1}.scan-quick-card-v60>b{display:block;font-size:11px;margin-top:5px;line-height:1.15}.scan-quick-card-v60>small{display:block;font-size:9px;color:var(--muted);margin-top:5px;line-height:1.25;overflow-wrap:anywhere}.scan-quick-card-v60.warn{background:#fff4f2;border-color:#f3c9c4}.scan-quick-card-v60.warn .scan-quick-icon-v60{background:#fee4e2;color:#b42318}.scan-quick-card-v60.trace{background:#fff9eb;border-color:#f3dfaa}.scan-quick-card-v60.trace .scan-quick-icon-v60{background:#fff0c7;color:#95610d}.scan-quick-card-v60.ok{background:#f1faf6;border-color:#cde7da}.scan-quick-card-v60.ok .scan-quick-icon-v60{background:#daf1e7;color:#24644f}.scan-quick-card-v60.info .scan-quick-icon-v60{background:#e7f0fb;color:#315f97}
+.scan-details-v60{margin-top:14px;border:1px solid var(--line);border-radius:19px;background:#fff;overflow:hidden}.scan-details-v60>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 15px}.scan-details-v60>summary::-webkit-details-marker{display:none}.scan-details-v60>summary span:first-child{display:flex;flex-direction:column;gap:2px}.scan-details-v60>summary b{font-size:15px}.scan-details-v60>summary small{font-size:11px;color:var(--muted)}.scan-details-arrow-v60{font-size:22px;color:var(--brand);transition:transform .2s}.scan-details-v60[open] .scan-details-arrow-v60{transform:rotate(180deg)}.scan-details-body-v60{padding:0 14px 14px;border-top:1px solid #edf2f1}
+.compare-cta-v60{margin-top:16px;border-radius:20px;background:linear-gradient(135deg,#eef9f6,#fbfefd);border:1px solid #c9e5de;padding:15px}.compare-cta-v60 span{display:block;font-size:9px;font-weight:950;letter-spacing:.11em;color:var(--brand)}.compare-cta-v60 b{display:block;font-size:17px;margin-top:4px}.compare-cta-v60 p{font-size:12px;color:var(--muted);line-height:1.4;margin:5px 0 11px}.compare-cta-v60 .btn{width:100%}
+@media(max-width:620px){.scan-quick-v60{grid-template-columns:repeat(2,1fr)}.scan-quick-card-v60{min-height:116px}}
+
 </style>
 </head>
 <body>
@@ -512,7 +520,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 5.9 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.0 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -1392,6 +1400,59 @@ function renderComparison(){
  out.innerHTML='<div class="product-compare-table-v52">'+rows+'</div><div class="compare-summary-v52"><h3>Unterschiede zusammengefasst</h3>'+notes.map(function(x){return '<p>'+esc(x)+'</p>'}).join('')+'<p><small>* Die Bezugsgröße stammt aus den Produktdaten. Bei Getränken ist sie häufig 100 ml, bei festen Lebensmitteln 100 g.</small></p></div>';
 }
 
+
+function quickAllergenSummaryV60(p){
+ var regular=selectedAllergens.filter(function(id){return id!=="lactose"});
+ if(!regular.length)return {value:"–",label:"nicht gewählt",cls:"neutral",detail:"Im Profil auswählbar"};
+ var hit=detectSelectedAllergens(p);
+ if(hit.contains.length)return {value:"⚠ "+hit.contains.length,label:"Allergen"+(hit.contains.length===1?"":"e")+" erkannt",cls:"warn",detail:hit.contains.map(allergenLabel).join(", ")};
+ if(hit.traces.length)return {value:"~ "+hit.traces.length,label:"Spurenhinweis",cls:"trace",detail:hit.traces.map(allergenLabel).join(", ")};
+ return {value:"✓",label:"kein Treffer",cls:"ok",detail:"Keine ausgewählte Allergie erkannt"};
+}
+function quickLactoseSummaryV60(p){
+ if(selectedAllergens.indexOf("lactose")<0)return {value:"–",label:"nicht aktiv",cls:"neutral",detail:"Im Profil aktivierbar"};
+ var a=lactoseAssessment(p);
+ if(a.status==="free")return {value:"✓",label:"laktosefrei",cls:"ok",detail:"Laktosefrei-Hinweis erkannt"};
+ if(a.status==="explicit")return {value:"⚠",label:"Laktose erkannt",cls:"warn",detail:"Laktose/Milchzucker ausdrücklich erkannt"};
+ if(a.status==="milk")return {value:"~",label:"Milch erkannt",cls:"trace",detail:"Laktosegehalt unklar"};
+ return {value:"?",label:"kein Hinweis",cls:"neutral",detail:"Keine Garantie auf Laktosefreiheit"};
+}
+function quickCardV60(icon,value,label,detail,cls){
+ return '<div class="scan-quick-card-v60 '+(cls||"neutral")+'"><span class="scan-quick-icon-v60">'+icon+'</span><strong>'+esc(value)+'</strong><b>'+esc(label)+'</b><small>'+esc(detail||"")+'</small></div>';
+}
+function renderQuickScanSummaryV60(p,nums){
+ var kids=(nums||[]).filter(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0});
+ var a=quickAllergenSummaryV60(p),l=quickLactoseSummaryV60(p);
+ return '<div class="scan-quick-v60">'
+  +quickCardV60("E",String((nums||[]).length),"E-Nummern",nums&&nums.length?nums.join(", "):"keine erkannt",nums&&nums.length?"info":"ok")
+  +quickCardV60(kids.length?"!":"✓",String(kids.length),kids.length?"Kinderhinweis":"kein Kinderhinweis",kids.length?kids.join(", "):"keiner der 6 EU-Farbstoffe erkannt",kids.length?"warn":"ok")
+  +quickCardV60("A",a.value,a.label,a.detail,a.cls)
+  +quickCardV60("L",l.value,l.label,l.detail,l.cls)
+  +'</div>';
+}
+function renderScanDetailsV60(p,nums){
+ var kids=(nums||[]).some(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0});
+ return '<details class="scan-details-v60" '+(kids?"open":"")+'><summary><span><b>Details & Erklärungen</b><small>E-Nummern und ADS/ADHS-Kontext</small></span><span class="scan-details-arrow-v60">⌄</span></summary><div class="scan-details-body-v60">'+renderAdhdFocus(nums)+renderE(nums)+'</div></details>';
+}
+function startComparisonWithCurrent(){
+ if(!currentProduct)return;
+ compareProducts.A={
+  barcode:currentProduct.barcode,
+  name:currentProduct.product_name||"Produkt",
+  brand:currentProduct.brand||"",
+  image_urls:currentProduct.image_urls||[],
+  image:currentProduct.image_url||"",
+  additives:currentProduct.additives||[],
+  sugar:currentProduct.sugar,
+  lactose:currentProduct.lactose
+ };
+ compareProducts.B=null;
+ goPage("compare");
+}
+function renderCompareCtaV60(){
+ return '<div class="compare-cta-v60"><div><span>PRODUKTVERGLEICH</span><b>Mit einem anderen Produkt vergleichen</b><p>Produkt A ist schon übernommen. Scanne danach nur noch Produkt B.</p></div><button class="btn primary" onclick="startComparisonWithCurrent()">Vergleich starten</button></div>';
+}
+
 async function lookupBarcode(forced){
  var code=String(forced||document.getElementById("barcodeInput").value||"").replace(/\D/g,"");
  if(!code){setStatus("Bitte Barcode eingeben oder scannen.");return}
@@ -1407,16 +1468,25 @@ async function lookupBarcode(forced){
   var productImages=productImageCandidates(p);
   var pic=robustProductImage(productImages,"scan-product-img-v53",p.product_name_de||p.product_name||"Produkt");
   var kidsCount=nums.filter(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0}).length;
-  var head='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Produkt geprüft</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card result-card-v4"><div class="product">'+pic+'<div><div class="name">'+esc(p.product_name_de||p.product_name||"Produkt")+'</div><div class="muted">'+esc(p.brands||"")+'</div><span class="chip">Barcode '+esc(code)+'</span></div></div>'
-   +'<div class="result-summary"><div class="metric"><strong>'+nums.length+'</strong><small>E-Nummern</small></div><div class="metric"><strong>'+kidsCount+'</strong><small>Kinderhinweise</small></div><div class="metric"><strong>'+(kidsCount?'⚠':'✓')+'</strong><small>Status</small></div></div>';
+  var head='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Produkt geprüft</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card result-card-v4 result-card-v60"><div class="product product-v60">'+pic+'<div><div class="name">'+esc(p.product_name_de||p.product_name||"Produkt")+'</div><div class="muted">'+esc(p.brands||"")+'</div><span class="chip">Barcode '+esc(code)+'</span></div></div>';
+  head+=renderQuickScanSummaryV60(p,nums);
   head+=renderAllergenAlert(p);
-  head+=renderAdhdFocus(nums);
-  head+=renderE(nums);
+  head+=renderScanDetailsV60(p,nums);
   head+=renderBetterAlternatives(p,nums);
+  head+=renderCompareCtaV60();
   if(!ing)head+='<div class="notice warn" style="margin-top:12px">Für dieses Produkt sind keine Zutaten gespeichert. Fotografiere die Zutatenliste, um sie trotzdem zu prüfen.</div>';
   head+='</div>';
   document.getElementById("result").innerHTML=head;
-  currentProduct={barcode:code,product_name:(p.product_name_de||p.product_name||"Produkt"),brand:(p.brands||""),image_url:(productImages[0]||""),additives:nums};
+  currentProduct={
+   barcode:code,
+   product_name:(p.product_name_de||p.product_name||"Produkt"),
+   brand:(p.brands||""),
+   image_url:(productImages[0]||""),
+   image_urls:productImages,
+   additives:nums,
+   sugar:(p.nutriments&&Number.isFinite(Number(p.nutriments.sugars_100g)))?Number(p.nutriments.sugars_100g):null,
+   lactose:lactoseAssessment(p)
+  };
   if(currentUser){
     var favBar='<div style="margin-top:14px"><button id="favoriteCurrentBtn" class="btn soft" onclick="toggleCurrentFavorite()">☆ Zu Favoriten</button></div>';
     document.getElementById("result").querySelector(".card").insertAdjacentHTML("beforeend",favBar);
@@ -1514,7 +1584,7 @@ function renderBetterAlternatives(p,nums){
  }
 
  var seen={},unique=ideas.filter(function(x){var k=x.title; if(seen[k])return false;seen[k]=1;return true}).slice(0,4);
- var out='<div class="alt-section"><div class="alt-title"><span style="font-size:25px">🥕</span><h3>Bessere Alternativen</h3></div>'
+ var out='<div class="alt-section"><div class="alt-title"><span style="font-size:25px">🥕</span><h3>Alternativen zum Vergleichen</h3></div>'
   +'<p class="muted" style="margin:0">Keine pauschale Bewertung: Diese Vorschläge helfen dir, ähnliche Produkte anhand einfacher Kriterien zu vergleichen.</p><div class="alt-grid">';
  unique.forEach(function(x){out+='<div class="alt-card"><strong>'+x.icon+' '+esc(x.title)+'</strong><p>'+x.text+'</p></div>'});
  out+='</div><div class="alt-check"><b>Beim Einkauf vergleichen:</b> Zutatenliste • Zucker • erkannte Zusatzstoffe • passende Vollkorn-/Naturvariante</div></div>';
@@ -1693,12 +1763,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v40"))return;
-  sessionStorage.setItem("echeck-sw-reload-v40","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v41"))return;
+  sessionStorage.setItem("echeck-sw-reload-v41","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=40",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=41",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
