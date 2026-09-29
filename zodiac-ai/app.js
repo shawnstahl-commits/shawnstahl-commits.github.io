@@ -18,6 +18,21 @@ const zodiac = [
   {name:'Fische',symbol:'♓',dates:'19. Februar – 20. März',element:'Wasser'}
 ];
 
+const zodiacAvatars = {
+  'Widder':'🐏',
+  'Stier':'🐂',
+  'Zwillinge':'👯',
+  'Krebs':'🦀',
+  'Löwe':'🦁',
+  'Jungfrau':'👩',
+  'Waage':'⚖️',
+  'Skorpion':'🦂',
+  'Schütze':'🏹',
+  'Steinbock':'🐐',
+  'Wassermann':'🏺',
+  'Fische':'🐟'
+};
+
 const horoscopeBank = {
   today: {
     headline:[
@@ -179,6 +194,10 @@ let session = null;
 let profile = null;
 let balance = 0;
 let chatSessionId = null;
+let currentChatSign = null;
+let voiceEnabled = true;
+let lastAssistantReply = '';
+let preferredVoice = null;
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -209,7 +228,12 @@ function renderGrid() {
 }
 
 function openReading(name) {
-  selectedSign = zodiac.find(z => z.name === name) || zodiac[0];
+  const nextSign = zodiac.find(z => z.name === name) || zodiac[0];
+  if (selectedSign?.name !== nextSign.name) {
+    chatSessionId = null;
+    currentChatSign = null;
+  }
+  selectedSign = nextSign;
   selectedPeriod = 'today';
   $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.period === 'today'));
   renderReading();
@@ -316,7 +340,7 @@ $('#signupForm').addEventListener('submit', async e => {
 
 $('#logoutBtn').addEventListener('click', async () => {
   await sb.auth.signOut();
-  session = null; profile = null; balance = 0; chatSessionId = null;
+  session = null; profile = null; balance = 0; chatSessionId = null; currentChatSign = null;
   updateBalanceUI();
   await refreshAuthUI();
   setView('home');
@@ -349,7 +373,7 @@ async function ensureChatSession() {
   const z = zodiac.find(x => x.name === effectiveSign) || zodiac[4];
   selectedSign = z;
 
-  if (!chatSessionId) {
+  if (!chatSessionId || currentChatSign !== z.name) {
     const { data, error } = await sb.from('chat_sessions').insert({
       user_id: session.user.id,
       zodiac_sign: z.name
@@ -363,7 +387,11 @@ async function ensureChatSession() {
   }
 
   $('#chatTitle').textContent = `Dein ${z.name}-Reading`;
-  $('#chatSymbol').textContent = z.symbol;
+  const avatar = zodiacAvatars[z.name] || z.symbol;
+  $('#chatAvatar').textContent = avatar;
+  $('#chatAvatarLabel').textContent = z.name;
+  $('#premiumPreviewAvatar').textContent = avatar;
+  currentChatSign = z.name;
   return true;
 }
 
@@ -381,15 +409,46 @@ async function loadMessages() {
     .order('created_at', {ascending:true});
   const box = $('#chatMessages');
   if (!data?.length) {
-    box.innerHTML = '<div class="message assistant">Frag mich etwas zu Liebe, Beruf, Finanzen oder deinem Tag.</div>';
+    const welcome = `Ich bin dein ${selectedSign.name}-Guide. Frag mich etwas zu Liebe, Beruf, Finanzen oder deinem Tag.`;
+    lastAssistantReply = welcome;
+    box.innerHTML = `<div class="message assistant">${escapeHtml(welcome)}</div>`;
+    $('#replayVoiceBtn').disabled = false;
     return;
   }
   box.innerHTML = data.map(m => `<div class="message ${m.role}">${escapeHtml(m.content)}</div>`).join('');
+  const lastAssistant = [...data].reverse().find(m => m.role === 'assistant');
+  lastAssistantReply = lastAssistant?.content || '';
+  $('#replayVoiceBtn').disabled = !lastAssistantReply;
   box.scrollTop = box.scrollHeight;
 }
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+
+function loadGermanVoice() {
+  if (!('speechSynthesis' in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  preferredVoice =
+    voices.find(v => /^de[-_]/i.test(v.lang) && /google|microsoft|samsung|natural/i.test(v.name)) ||
+    voices.find(v => /^de[-_]/i.test(v.lang)) ||
+    null;
+}
+
+function speakReply(text) {
+  if (!voiceEnabled || !text || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'de-DE';
+  utterance.rate = 0.95;
+  utterance.pitch = selectedSign?.name === 'Löwe' ? 0.9 : 1;
+  if (preferredVoice) utterance.voice = preferredVoice;
+  window.speechSynthesis.speak(utterance);
+}
+
+if ('speechSynthesis' in window) {
+  loadGermanVoice();
+  window.speechSynthesis.onvoiceschanged = loadGermanVoice;
 }
 
 $('#chatForm').addEventListener('submit', async e => {
@@ -422,8 +481,21 @@ $('#chatForm').addEventListener('submit', async e => {
     balance = result.balance;
     updateBalanceUI();
     box.insertAdjacentHTML('beforeend', `<div class="message assistant">${escapeHtml(result.reply)}</div>`);
+    lastAssistantReply = result.reply;
+    $('#replayVoiceBtn').disabled = false;
     box.scrollTop = box.scrollHeight;
+    speakReply(result.reply);
   }
+});
+
+$('#voiceToggleBtn').addEventListener('click', () => {
+  voiceEnabled = !voiceEnabled;
+  if (!voiceEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+  $('#voiceToggleBtn').textContent = voiceEnabled ? '🔊 Stimme an' : '🔇 Stimme aus';
+});
+
+$('#replayVoiceBtn').addEventListener('click', () => {
+  if (lastAssistantReply) speakReply(lastAssistantReply);
 });
 
 $('#bottomChatBtn').addEventListener('click', openChat);
