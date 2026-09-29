@@ -190,6 +190,10 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 .compare-glance-v65{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:14px}.compare-glance-card-v65{border:1px solid #dfe9e6;background:#f8fbfa;border-radius:18px;padding:11px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.compare-glance-card-v65>span{grid-column:1/-1;font-size:9px;font-weight:950;letter-spacing:.08em;color:var(--muted)}.compare-glance-card-v65>div{min-width:0}.compare-glance-card-v65 b{display:block;font-size:14px;line-height:1.2;overflow-wrap:anywhere}.compare-glance-card-v65 small{display:block;font-size:9px;color:var(--muted);margin-top:3px}.pc-ok-v65{color:#236148!important;background:#eefaf5!important}.pc-trace-v65{color:#854d0e!important;background:#fff8e8!important}.pc-allergen-row-v65 .pc-value-v52{font-size:11px;line-height:1.35;overflow-wrap:anywhere}.compare-safety-v65{margin-top:12px;border-radius:14px;background:#fff8e8;border:1px solid #f3dfaa;padding:11px 12px;font-size:11px;line-height:1.45;color:#72510f}.compare-safety-v65 b{display:block;margin-bottom:3px}
 @media(max-width:560px){.compare-glance-v65{grid-template-columns:1fr}.compare-glance-card-v65{grid-template-columns:1fr 1fr}}
 
+
+/* Barcode confirmation after not-found 6.6 */
+.barcode-debug-v66{margin-top:12px;border:1px solid #e3e9e7;background:#f8faf9;border-radius:15px;padding:11px 13px}.barcode-debug-v66 span{display:block;font-size:8px;font-weight:950;letter-spacing:.1em;color:var(--muted)}.barcode-debug-v66 b{display:block;margin-top:4px;font-size:18px;letter-spacing:.04em;color:var(--ink)}.notfound-actions-v66{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.notfound-actions-v66 .btn{width:100%;font-size:12px}@media(max-width:480px){.notfound-actions-v66{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -563,13 +567,13 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.5 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts • Live-Web-App • Version 6.6 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js"></script>
 <script>
-var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,nativeFallbackTimer=null,scanHintTimer=null,scannerRetryTimer=null,scannerPassV63=0,torchOn=false,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
+var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTimer=null,nativeFallbackTimer=null,scanHintTimer=null,scannerRetryTimer=null,scannerPassV63=0,scanNotFoundRetryV66=0,torchOn=false,currentProduct=null,compareTargetSlot=null,compareProducts={A:null,B:null},selectedAllergens=[],scannerSessionId=0,scanLookupBusy=false,lastScanCode="",lastScanAt=0;
 
 var special={
 "E102":["Tartrazin","EU-Kinderhinweis"],
@@ -1152,7 +1156,7 @@ function productLoadErrorText(e){
 async function openFullscreenScanner(target){
  var session=++scannerSessionId;
  compareTargetSlot=target||null;
- scanLookupBusy=false;locked=false;
+ scanLookupBusy=false;locked=false;scanNotFoundRetryV66=0;
  document.body.classList.remove("scan-result-mode");
  await stopScanner();
  if(session!==scannerSessionId)return;
@@ -1236,7 +1240,7 @@ function foundCode(raw){
  document.getElementById("barcodeInput").value=code;
  setStatus("✓ Barcode erkannt: "+code);document.body.classList.add("scan-processing");
  try{if(navigator.vibrate)navigator.vibrate([80,40,80])}catch(e){}
- stopScanner().then(function(){return targetSlot?lookupCompareProduct(code,targetSlot):lookupBarcode(code)}).finally(function(){setTimeout(function(){locked=false;scanLookupBusy=false},700)});
+ stopScanner().then(function(){return targetSlot?lookupCompareProduct(code,targetSlot):lookupBarcode(code,true)}).finally(function(){setTimeout(function(){locked=false;scanLookupBusy=false},700)});
 }
 
 function scannerTrack(){
@@ -1644,7 +1648,20 @@ function renderCompareCtaV60(){
  return '<div class="compare-cta-v60"><div><span>PRODUKTVERGLEICH</span><b>Mit einem anderen Produkt vergleichen</b><p>Produkt A ist schon übernommen. Scanne danach nur noch Produkt B.</p></div><button class="btn primary" onclick="startComparisonWithCurrent()">Vergleich starten</button></div>';
 }
 
-async function lookupBarcode(forced){
+async function retryScannerAfterNotFoundV66(code){
+ scanNotFoundRetryV66++;
+ lastScanCode="";lastScanAt=0;
+ locked=false;scanLookupBusy=false;
+ document.body.classList.remove("scan-processing");
+ setStatus("Barcode erkannt, Produkt aber nicht gefunden – bitte kurz weiter auf den Barcode halten. Wir prüfen ihn automatisch noch einmal …");
+ var hint=document.querySelector(".scan-instruction-v4 small");
+ if(hint)hint.textContent="Barcode bitte kurz ruhig im Rahmen lassen – zweite Erkennung läuft automatisch.";
+ await new Promise(function(resolve){setTimeout(resolve,300)});
+ if(!document.body.classList.contains("scanner-fullscreen"))return;
+ await startScanner(scannerSessionId);
+}
+
+async function lookupBarcode(forced,fromScanner){
  var code=String(forced||document.getElementById("barcodeInput").value||"").replace(/\D/g,"");
  if(!code){setStatus("Bitte Barcode eingeben oder scannen.");return}
  setStatus("🔎 Produkt wird gesucht …");clearError();
@@ -1655,11 +1672,17 @@ async function lookupBarcode(forced){
    p=await fetchOpenFoodFactsProductV64(code,fields);
   }catch(fetchErr){
    if(fetchErr&&fetchErr.productNotFound){
-    setStatus("Produkt nicht gefunden.");revealScanResults();document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Nicht gefunden</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="notice warn"><b>Produkt nicht gefunden.</b><br>Der Barcode wurde erkannt, aber das Produkt ist nicht in der Datenbank hinterlegt. Du kannst die Zutatenliste fotografieren oder eintippen.</div></div>';return
+    if(fromScanner&&scanNotFoundRetryV66<1){
+     await retryScannerAfterNotFoundV66(code);
+     return;
+    }
+    setStatus("Produkt nicht gefunden.");revealScanResults();
+    document.getElementById("result").innerHTML='<div class="result-head-v4"><button class="result-back-v4" onclick="goPage(&quot;home&quot;)">‹</button><div><small>SCAN-ERGEBNIS</small><strong>Nicht gefunden</strong></div><button class="result-rescan-v4" onclick="openFullscreenScanner()">Neu scannen</button></div><div class="card"><div class="notice warn"><b>Produkt nicht gefunden.</b><br>Der Barcode wurde erkannt, aber auch nach der automatischen Prüfung konnte kein Produkt gefunden werden.</div><div class="barcode-debug-v66"><span>ERKANNTER BARCODE</span><b>'+esc(code)+'</b></div><div class="notfound-actions-v66"><button class="btn primary" onclick="openFullscreenScanner()">Barcode erneut scannen</button><button class="btn soft" onclick="goPage(&quot;scan&quot;);openPanel(&quot;photo&quot;)">Zutaten fotografieren</button></div></div>';
+    return;
    }
    throw fetchErr;
   }
-  setStatus("✓ Produkt gefunden");revealScanResults();
+  scanNotFoundRetryV66=0;setStatus("✓ Produkt gefunden");revealScanResults();
   var ing=p.ingredients_text_de||p.ingredients_text||p.ingredients_text_en||"";
   var nums=detectE(ing,p.additives_tags||[]);
   var productImages=productImageCandidates(p);
@@ -2092,12 +2115,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v46"))return;
-  sessionStorage.setItem("echeck-sw-reload-v46","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v47"))return;
+  sessionStorage.setItem("echeck-sw-reload-v47","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=46",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=47",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
