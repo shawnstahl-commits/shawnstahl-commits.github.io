@@ -32,6 +32,11 @@
     @media(max-width:520px){.syncSteps{grid-template-columns:1fr}}
   </style>
 
+
+  <style>
+    .shortcutSetup{margin-top:12px;padding:14px;border-radius:18px;background:#0d131d;border:1px solid #293447}.shortcutSetup h4{margin:0 0 7px;font-size:13px}.shortcutSetup p{margin:0;color:var(--muted);font-size:10px;line-height:1.5}.shortcutField{margin-top:10px}.shortcutField label{display:block;color:#8f9aae;font-size:8px;font-weight:900;letter-spacing:.08em;margin-bottom:5px}.shortcutValue{display:flex;gap:7px}.shortcutValue input{min-width:0;flex:1;background:#090e16;color:#dbe3f1;border:1px solid #293447;border-radius:12px;padding:10px;font:10px ui-monospace,SFMono-Regular,Menlo,monospace}.shortcutStatus{margin-top:9px;padding:9px 10px;border-radius:12px;background:#111925;border:1px solid #293447;font-size:9px;color:#aeb8ca;line-height:1.45}.shortcutStatus.good{border-color:#315a4a;color:#79dfaa}.shortcutGuide{margin-top:10px;display:grid;gap:6px}.shortcutGuide div{padding:9px 10px;border-radius:12px;background:#101722;border:1px solid #273143;font-size:9px;line-height:1.45;color:#b7c1d0}.secretWarn{color:#ffcb70!important}
+  </style>
+
 </head>
 <body>
   <input id="fileInput" type="file" hidden multiple accept=".sav,.dsv,.dat,.bin,application/octet-stream" />
@@ -221,6 +226,18 @@ QmCC
         <div class="syncHero">
           <div class="syncHeroTop"><div><div class="trainerEyebrow">MANIC EMU · AUTO-SYNC</div><h3>iPhone-Saves aus Manic EMU übernehmen</h3><p>Manic EMU unterstützt iCloud-Sync und Save-Export. ROMDex ist jetzt auf diesen Emulator vorbereitet und kann neue Save-Versionen später automatisch vergleichen.</p></div><span class="syncState ready" id="globalSyncState">Manic EMU erkannt</span></div>
           <div class="syncSteps"><div class="syncStep"><b>1 · Manic EMU ✓</b><small>Emulator erkannt und als Quelle vorgemerkt.</small></div><div class="syncStep"><b>2 · Save-Zugriff</b><small>Mit Manic-Mitgliedschaft: Dateien → iCloud Drive → Manic EMU. Ohne Mitgliedschaft: Auf meinem iPhone → Manic EMU → Datas.</small></div><div class="syncStep"><b>3 · Auto-Analyse</b><small>Neuen Save erkennen → Pokémon, Dex, Shinys und Entwicklungen automatisch vergleichen.</small></div></div><div class="privacy" style="margin-top:12px"><b style="color:#fff">📱 Manic-EMU-Verbindung</b><br><b>iCloud:</b> Dateien → iCloud Drive → Manic EMU<br><b>Lokal:</b> Dateien → Auf meinem iPhone → Manic EMU → Datas<br><span style="color:#8f9aae">Die Web-Version kann auf dem iPhone den Ordner aus Sicherheitsgründen noch nicht dauerhaft im Hintergrund beobachten. Für nahezu automatischen Sync bauen wir später die Kurzbefehle-/Cloud-Verbindung dazu.</span></div>
+        <div class="shortcutSetup">
+          <h4>⚙️ iPhone-Kurzbefehl verbinden</h4>
+          <p>Für jeden ROMDex-Account wird ein eigener geheimer Schlüssel verwendet. Damit kann der Kurzbefehl nur Saves in genau diesen Account hochladen.</p>
+          <div class="shortcutField"><label>UPLOAD-ADRESSE</label><div class="shortcutValue"><input id="shortcutEndpoint" readonly value="https://evaacicvduycgxjngejt.supabase.co/functions/v1/manic-sync-upload"><button class="miniBtn" id="copyEndpointBtn" type="button">Kopieren</button></div></div>
+          <div class="shortcutField"><label>PERSÖNLICHER SYNC-SCHLÜSSEL</label><div class="shortcutValue"><input id="shortcutToken" readonly placeholder="Erst anmelden und Schlüssel erzeugen"><button class="miniBtn" id="generateTokenBtn" type="button">Erzeugen</button><button class="miniBtn" id="copyTokenBtn" type="button">Kopieren</button></div></div>
+          <div id="shortcutTokenNote" class="shortcutStatus">Melde dich mit deinem ROMDex-Konto an. Danach erzeugst du hier einmalig den Schlüssel.</div>
+          <div class="shortcutGuide">
+            <div><b>Kurzbefehl:</b> Save-Datei aus Manic auswählen → „Inhalt von URL abrufen“ → Methode <b>POST</b> → Header <b>X-ROMDEX-TOKEN</b> = dein Schlüssel → Header <b>X-ROMDEX-FILENAME</b> = Dateiname → Request-Body = Save-Datei.</div>
+            <div><b>Automation:</b> Kurzbefehle → Automation → App → <b>Manic EMU</b> → „Wird geschlossen“ → diesen Kurzbefehl ausführen → „Sofort ausführen“.</div>
+          </div>
+          <div id="incomingStatus" class="shortcutStatus">Noch keine automatischen Saves geprüft.</div>
+        </div>
         </div>
         <div id="gamesList" class="gameStack"></div>
         <div class="sectionTitle"><h2>Save-Historie</h2><span id="historyCountText">Premium</span></div>
@@ -332,6 +349,8 @@ const GUEST_KEY='romdex-guest-mode';
 const TRAINER_AVATARS=[25,133,6,94,1,7];
 const TRAINER_AVATAR_KEY='romdex-trainer-avatar';
 const PLAN_KEY='romdex-test-plan';
+const MANIC_TOKEN_KEY='romdex-manic-sync-token';
+const MANIC_ENDPOINT='https://evaacicvduycgxjngejt.supabase.co/functions/v1/manic-sync-upload';
 const __memoryStorage={};
 function safeGet(key){try{return localStorage.getItem(key)}catch{return Object.prototype.hasOwnProperty.call(__memoryStorage,key)?__memoryStorage[key]:null}}
 function safeSet(key,value){__memoryStorage[key]=String(value);try{localStorage.setItem(key,String(value))}catch{}return true}
@@ -341,7 +360,7 @@ function setPlan(plan){safeSet(PLAN_KEY,plan==='premium'?'premium':'free');rende
 function isGuestMode(){return window.__romdexGuest===true||safeGet(GUEST_KEY)==='1'||document.getElementById('guestBypass')?.checked===true}
 function setGuestMode(v){window.__romdexGuest=!!v;const gate=document.getElementById('authGate'),bypass=document.getElementById('guestBypass');if(bypass)bypass.checked=!!v;if(gate){if(v){gate.classList.add('hidden');gate.style.display='none'}else{gate.style.display='';gate.classList.remove('hidden')}}if(v)safeSet(GUEST_KEY,'1');else safeRemove(GUEST_KEY);try{updateAuthUI()}catch(e){if(v&&gate){gate.classList.add('hidden');gate.style.display='none'}console.warn('Gastmodus UI-Fallback',e)}}
 function authConfigured(){return !!(SUPABASE_URL&&SUPABASE_ANON_KEY&&window.supabase)}
-function initAuth(){if(authConfigured()){supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);supabaseClient.auth.getSession().then(({data})=>{authSession=data.session||null;updateAuthUI();refreshCloudStatus()});supabaseClient.auth.onAuthStateChange((_event,session)=>{authSession=session||null;updateAuthUI();refreshCloudStatus()});}updateAuthUI();switchAuthMode('login')}
+function initAuth(){if(authConfigured()){supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);supabaseClient.auth.getSession().then(({data})=>{authSession=data.session||null;updateAuthUI();refreshCloudStatus();renderShortcutSetup();processIncomingSaves()});supabaseClient.auth.onAuthStateChange((_event,session)=>{authSession=session||null;updateAuthUI();refreshCloudStatus();renderShortcutSetup();if(session)processIncomingSaves()});}updateAuthUI();switchAuthMode('login')}
 function switchAuthMode(mode){authMode=mode;document.getElementById('authTabLogin').classList.toggle('active',mode==='login');document.getElementById('authTabSignup').classList.toggle('active',mode==='signup');document.getElementById('authNameField').classList.toggle('hiddenField',mode!=='signup');document.getElementById('authSubmit').textContent=mode==='login'?'Mit E-Mail anmelden':'Konto erstellen';document.getElementById('authHint').textContent=mode==='login'?'Melde dich an, um später Cloud-Sync für deine Sammlung zu nutzen.':'Lege dein Trainerkonto an. Danach können wir Cloud-Speicher und Geräte-Sync aktivieren.'}
 function currentTrainerAvatar(){const raw=Number(safeGet(TRAINER_AVATAR_KEY)||TRAINER_AVATARS[0]);return TRAINER_AVATARS.includes(raw)?raw:TRAINER_AVATARS[0]}
 function cycleTrainerAvatar(){const cur=currentTrainerAvatar(),idx=TRAINER_AVATARS.indexOf(cur),next=TRAINER_AVATARS[(idx+1)%TRAINER_AVATARS.length];safeSet(TRAINER_AVATAR_KEY,String(next));renderTrainerCard();toast('Trainer-Avatar gewechselt.')}
@@ -349,6 +368,83 @@ function trainerDisplayName(){const authName=authSession?.user?.user_metadata?.d
 function trainerRank(count){if(count>=500)return ['DEX-MEISTER',50];if(count>=250)return ['ELITE-SAMMLER',35];if(count>=100)return ['PROFI-SAMMLER',25];if(count>=30)return ['SAMMLER',15];if(count>=10)return ['SAMMLER',8];return ['STARTER',Math.max(1,count)]}
 function renderTrainerCard(){const img=document.getElementById('trainerAvatarImg');if(!img)return;const mons=allMons(),shinies=mons.filter(m=>m.shiny).length,dexCount=new Set(mons.map(m=>m.dex).filter(Boolean)).size,games=new Set(state.imports.map(x=>x.game)).size,name=trainerDisplayName(),rank=trainerRank(mons.length);const dex=currentTrainerAvatar();img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${dex}.png`;img.onerror=()=>{img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png`;img.onerror=null};document.getElementById('trainerCardName').textContent=name;document.getElementById('trainerCardSub').textContent=authSession?.user?.email||((state.imports.find(x=>x.game)?.game)||'Deine persönliche Save-Sammlung');document.getElementById('trainerCardLevel').textContent=`${rank[0]} · LV. ${rank[1]}`;document.getElementById('trainerPokemonCount').textContent=mons.length;document.getElementById('trainerShinyCount').textContent=shinies;document.getElementById('trainerGameCount').textContent=games;document.getElementById('trainerDexCount').textContent=dexCount;document.getElementById('trainerCloudLabel').textContent=authSession?'☁️ Supabase Cloud':isGuestMode()?'🔒 Lokal · Gastmodus':'🔐 Konto nicht verbunden';const basis=authSession?.user?.id||state.imports.find(x=>x.trainerId)?.trainerId||name;let h=0;for(const ch of String(basis))h=((h<<5)-h+ch.charCodeAt(0))>>>0;document.getElementById('trainerCardId').textContent=`ROM-${String(h%1000000).padStart(6,'0')}`}
 function updateAuthUI(){renderTrainerCard();const gate=document.getElementById('authGate');const pill=document.getElementById('privacyPill');const stateText=document.getElementById('authStateText');const profileTitle=document.getElementById('authProfileTitle');const profileBody=document.getElementById('authProfileBody');const status=document.getElementById('authStatus');const signOutBtn=document.getElementById('signOutBtn');const email=authSession?.user?.email||'';if(authSession){gate.classList.add('hidden');pill.textContent='☁️ cloud';stateText.textContent=email||'angemeldet';profileTitle.textContent='☁️ Mit Supabase verbunden';profileBody.textContent=`Angemeldet als ${email||'Trainer'}. Später können wir hier Cloud-Sync, Backups und gemeinsame Sammlungen anbinden.`;status.textContent=`Verbunden als ${email||'Trainer'}.`;signOutBtn.style.display='inline-flex';return}if(isGuestMode()){gate.classList.add('hidden');pill.textContent='🔒 lokal';stateText.textContent='Gastmodus';profileTitle.textContent='✨ Gastmodus aktiv';profileBody.textContent='Du nutzt ROMDex gerade ohne Login. Deine Daten bleiben lokal auf diesem Gerät. Du kannst die Anmeldung jederzeit wieder öffnen.';status.textContent=authConfigured()?'Gastmodus aktiv. Supabase ist verbunden, du kannst dich jederzeit anmelden.':'Gastmodus aktiv. Für echtes Login fehlen noch Supabase-URL und Anon-Key.';signOutBtn.style.display='none';return}gate.classList.remove('hidden');pill.textContent='🔐 login';stateText.textContent='nicht angemeldet';profileTitle.textContent='✨ Anmeldung empfohlen';profileBody.textContent='Mit Supabase können wir später Cloud-Sync, Backups und Geräte-Wechsel sauber lösen. Aktuell ist die Oberfläche fertig vorbereitet.';status.textContent=authConfigured()?'Bitte melde dich an oder registriere dich.':'Vorschau-Modus: Oberfläche ist fertig. Für echtes Login fehlen nur noch Supabase-URL und Anon-Key.';signOutBtn.style.display='none'}
+
+
+function base64Url(bytes){
+  let s="";for(const b of bytes)s+=String.fromCharCode(b);
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+async function sha256Text(text){
+  return sha256(new TextEncoder().encode(text).buffer);
+}
+function renderShortcutSetup(){
+  const tokenEl=document.getElementById("shortcutToken"),note=document.getElementById("shortcutTokenNote");
+  if(!tokenEl||!note)return;
+  const raw=safeGet(MANIC_TOKEN_KEY)||"";
+  tokenEl.value=raw;
+  if(!authSession){
+    note.className="shortcutStatus";
+    note.textContent="Melde dich mit deinem ROMDex-Konto an. Danach erzeugst du hier einmalig den persönlichen Sync-Schlüssel.";
+  }else if(raw){
+    note.className="shortcutStatus good";
+    note.textContent="✓ Persönlicher Manic-Sync-Schlüssel ist auf diesem Gerät gespeichert. Behandle ihn wie ein Passwort.";
+  }else{
+    note.className="shortcutStatus";
+    note.textContent="Angemeldet. Jetzt einmal auf „Erzeugen“ tippen und den Schlüssel anschließend in den iPhone-Kurzbefehl einfügen.";
+  }
+}
+async function generateManicToken(){
+  if(!supabaseClient||!authSession){toast("Bitte zuerst bei ROMDex anmelden.");return}
+  try{
+    const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);
+    const raw="rdx_"+base64Url(bytes);
+    const hash=await sha256Text(raw);
+    const del=await supabaseClient.from("sync_tokens").delete().eq("user_id",authSession.user.id).eq("label","Manic EMU iPhone");
+    if(del.error)throw del.error;
+    const ins=await supabaseClient.from("sync_tokens").insert({user_id:authSession.user.id,token_hash:hash,label:"Manic EMU iPhone"});
+    if(ins.error)throw ins.error;
+    safeSet(MANIC_TOKEN_KEY,raw);
+    renderShortcutSetup();
+    toast("Persönlicher Manic-Sync-Schlüssel erzeugt.");
+  }catch(e){toast("Schlüssel konnte nicht erzeugt werden: "+(e.message||e))}
+}
+async function copyShortcutValue(id){
+  const el=document.getElementById(id);if(!el)return;
+  if(!el.value){toast("Noch kein Wert vorhanden.");return}
+  try{await navigator.clipboard.writeText(el.value);toast("Kopiert.");}
+  catch{el.select();document.execCommand("copy");toast("Kopiert.");}
+}
+async function processIncomingSaves(){
+  const status=document.getElementById("incomingStatus");
+  if(!supabaseClient||!authSession){if(status)status.textContent="Für automatische Saves bitte anmelden.";return}
+  try{
+    if(status)status.textContent="Automatische Saves werden geprüft …";
+    const q=await supabaseClient.from("incoming_saves").select("*").eq("status","pending").order("created_at",{ascending:true}).limit(10);
+    if(q.error)throw q.error;
+    const rows=q.data||[];
+    if(!rows.length){if(status){status.className="shortcutStatus good";status.textContent="✓ Keine neuen Manic-Saves. Cloud ist aktuell."}return}
+    let done=0,failed=0;
+    for(const row of rows){
+      try{
+        const dl=await supabaseClient.storage.from("romdex-saves").download(row.object_path);
+        if(dl.error)throw dl.error;
+        const file=new File([dl.data],row.file_name||"manic-save.sav",{type:"application/octet-stream"});
+        await importFile(file);
+        const up=await supabaseClient.from("incoming_saves").update({status:"processed",processed_at:new Date().toISOString(),error_text:null}).eq("id",row.id);
+        if(up.error)throw up.error;
+        done++;
+      }catch(e){
+        failed++;
+        await supabaseClient.from("incoming_saves").update({status:"failed",error_text:String(e.message||e),processed_at:new Date().toISOString()}).eq("id",row.id);
+      }
+    }
+    if(status){
+      status.className=failed?"shortcutStatus":"shortcutStatus good";
+      status.textContent=failed?done+" Save(s) verarbeitet · "+failed+" Fehler":("✓ "+done+" neuer Manic-Save"+(done===1?"":"s")+" automatisch übernommen.");
+    }
+    renderAll();
+  }catch(e){if(status){status.className="shortcutStatus";status.textContent="Prüfung fehlgeschlagen: "+(e.message||e)}}
+}
 
 async function refreshCloudStatus(){
   if(!supabaseClient||!authSession){state.cloudCount=0;renderPremium();return}
@@ -579,9 +675,9 @@ function bindMonClicks(){document.querySelectorAll('.mon').forEach(el=>el.onclic
 function showDetail(fp){const m=dexEntries().find(x=>x.fingerprint===fp)||allMons().find(x=>x.fingerprint===fp);if(!m)return;const name=speciesLabel(m.dex),own=ownershipLabel({...m,dexOwned:m.dexOwned??ownedDexSet().has(m.dex)});document.getElementById('detailTitle').textContent=name;document.getElementById('detailDexBadge').textContent=`#${String(m.dex).padStart(3,'0')}`;document.getElementById('detailSubtitle').textContent=`${m.historical?'Pokédex-Historie':m.source}${m.level?` · Lv. ${m.level}`:''}${m.shiny?' · ★ Shiny':''}`;document.getElementById('detailSprite').innerHTML=spriteMarkup(m.dex,name,'large');const typeText=typesForDex(m.dex).length?typesForDex(m.dex).map(typeLabel).join(' / '):'werden geladen …';const fields=[['National Dex',`#${String(m.dex).padStart(3,'0')}`],['Status',own.text],['Typ',typeText],['Quelle',m.source],['Level',m.level??(m.historical?'—':'aus Box nicht berechnet')],['Shiny',m.shiny?'Ja ★':'Nein']];if(isPremium())fields.push(['Slot',m.slot],['Wesen',natureLabel(m.nature)],['Legendär / Mysteriös',isLegendaryDex(m.dex)?'Ja ✦':'Nein'],['Generation',m.generation||3],['Spielstand',m.game||m.importName||'—'],['Personality ID',m.pid??'—'],['OT-ID (intern)',m.otid??'—']);document.getElementById('detailBody').innerHTML=fields.map(([a,b])=>`<div class="detail"><small>${escapeHtml(a)}</small><b>${escapeHtml(b)}</b></div>`).join('')+(isPremium()?'':'<div class="proDetailLock">💎 Premium zeigt zusätzlich Wesen, genaue Herkunft, Slot, Generation sowie technische Trainer-/Pokémon-Daten.</div>');document.getElementById('modal').classList.add('show')}
 function switchPage(page){document.querySelectorAll('.tabPage').forEach(x=>x.classList.toggle('active',x.id===page));document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'})}
 
-document.getElementById('trainerAvatarBtn').onclick=cycleTrainerAvatar;document.getElementById('testFreeBtn').onclick=()=>setPlan('free');document.getElementById('testPremiumBtn').onclick=()=>setPlan('premium');document.getElementById('authTabLogin').onclick=()=>switchAuthMode('login');document.getElementById('authTabSignup').onclick=()=>switchAuthMode('signup');document.getElementById('authForm').onsubmit=handleAuthSubmit;document.getElementById('authGoogleBtn').onclick=signInWithGoogle;document.getElementById('guestBtn').onclick=()=>{window.__romdexGuest=true;const bypass=document.getElementById('guestBypass');if(bypass)bypass.checked=true;const gate=document.getElementById('authGate');if(gate){gate.classList.add('hidden');gate.style.display='none'};safeSet(GUEST_KEY,'1');try{updateAuthUI()}catch{};try{toast('Gastmodus aktiviert.')}catch{}};document.getElementById('openAuthBtn').onclick=openAuthGate;document.getElementById('signOutBtn').onclick=signOutAuth;document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();document.getElementById('fileInput').onchange=async e=>{const files=[...(e.target.files||[])];if(files.length){for(const f of files)await importFile(f);if(files.length>1)toast(files.length+' Save-Dateien verarbeitet.')}e.target.value=''};document.getElementById('demoBtn').onclick=demoImport;document.getElementById('showAllRecentBtn').onclick=()=>switchPage('boxesPage');document.getElementById('searchInput').oninput=e=>{searchTerm=e.target.value;renderDex();bindMonClicks()};document.getElementById('typeFilter').onchange=e=>{currentTypeFilter=e.target.value;renderDex();bindMonClicks()};document.getElementById('specialFilter').onchange=e=>{currentSpecialFilterDex=e.target.value;renderDex();bindMonClicks()};document.getElementById('sortSelect').onchange=e=>{currentSort=e.target.value;renderDex();bindMonClicks()};document.getElementById('ownershipFilter').onchange=e=>{currentOwnershipFilter=e.target.value;renderDex();bindMonClicks()};document.getElementById('specialShinyBtn').onclick=()=>{currentSpecialPage='shiny';renderSpecial(allMons());bindMonClicks()};document.getElementById('specialLegendaryBtn').onclick=()=>{currentSpecialPage='legendary';renderSpecial(allMons());bindMonClicks()};document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.remove('show');document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')e.currentTarget.classList.remove('show')};document.getElementById('clearDemoBtn').onclick=()=>{state.imports=state.imports.filter(x=>!x.demo);saveState();renderAll();toast('Demo entfernt.')};document.getElementById('clearAllBtn').onclick=()=>{if(confirm('Wirklich alle lokalen ROMDex-Daten löschen?')){state.imports=[];state.history=[];state.nameCache={};state.metaCache={};state.syncPrefs={};saveState();renderAll();toast('Alle lokalen Daten gelöscht.')}};document.getElementById('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),plan:isPremium()?'premium':'free',imports:state.imports,history:isPremium()?(state.history||[]):[]},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='romdex-collection.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js?v=11',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
-renderAll();initAuth();if(uniqueSpecies().length)enrichNames(uniqueSpecies());
+document.getElementById('generateTokenBtn').onclick=generateManicToken;document.getElementById('copyEndpointBtn').onclick=()=>copyShortcutValue('shortcutEndpoint');document.getElementById('copyTokenBtn').onclick=()=>copyShortcutValue('shortcutToken');document.getElementById('trainerAvatarBtn').onclick=cycleTrainerAvatar;document.getElementById('testFreeBtn').onclick=()=>setPlan('free');document.getElementById('testPremiumBtn').onclick=()=>setPlan('premium');document.getElementById('authTabLogin').onclick=()=>switchAuthMode('login');document.getElementById('authTabSignup').onclick=()=>switchAuthMode('signup');document.getElementById('authForm').onsubmit=handleAuthSubmit;document.getElementById('authGoogleBtn').onclick=signInWithGoogle;document.getElementById('guestBtn').onclick=()=>{window.__romdexGuest=true;const bypass=document.getElementById('guestBypass');if(bypass)bypass.checked=true;const gate=document.getElementById('authGate');if(gate){gate.classList.add('hidden');gate.style.display='none'};safeSet(GUEST_KEY,'1');try{updateAuthUI()}catch{};try{toast('Gastmodus aktiviert.')}catch{}};document.getElementById('openAuthBtn').onclick=openAuthGate;document.getElementById('signOutBtn').onclick=signOutAuth;document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();document.getElementById('fileInput').onchange=async e=>{const files=[...(e.target.files||[])];if(files.length){for(const f of files)await importFile(f);if(files.length>1)toast(files.length+' Save-Dateien verarbeitet.')}e.target.value=''};document.getElementById('demoBtn').onclick=demoImport;document.getElementById('showAllRecentBtn').onclick=()=>switchPage('boxesPage');document.getElementById('searchInput').oninput=e=>{searchTerm=e.target.value;renderDex();bindMonClicks()};document.getElementById('typeFilter').onchange=e=>{currentTypeFilter=e.target.value;renderDex();bindMonClicks()};document.getElementById('specialFilter').onchange=e=>{currentSpecialFilterDex=e.target.value;renderDex();bindMonClicks()};document.getElementById('sortSelect').onchange=e=>{currentSort=e.target.value;renderDex();bindMonClicks()};document.getElementById('ownershipFilter').onchange=e=>{currentOwnershipFilter=e.target.value;renderDex();bindMonClicks()};document.getElementById('specialShinyBtn').onclick=()=>{currentSpecialPage='shiny';renderSpecial(allMons());bindMonClicks()};document.getElementById('specialLegendaryBtn').onclick=()=>{currentSpecialPage='legendary';renderSpecial(allMons());bindMonClicks()};document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.remove('show');document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')e.currentTarget.classList.remove('show')};document.getElementById('clearDemoBtn').onclick=()=>{state.imports=state.imports.filter(x=>!x.demo);saveState();renderAll();toast('Demo entfernt.')};document.getElementById('clearAllBtn').onclick=()=>{if(confirm('Wirklich alle lokalen ROMDex-Daten löschen?')){state.imports=[];state.history=[];state.nameCache={};state.metaCache={};state.syncPrefs={};saveState();renderAll();toast('Alle lokalen Daten gelöscht.')}};document.getElementById('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),plan:isPremium()?'premium':'free',imports:state.imports,history:isPremium()?(state.history||[]):[]},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='romdex-collection.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js?v=12',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
+renderAll();renderShortcutSetup();initAuth();if(uniqueSpecies().length)enrichNames(uniqueSpecies());
 </script>
 </body>
 </html>
