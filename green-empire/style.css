@@ -3,3 +3,11 @@
 @media(max-width:1200px){.topbar{grid-template-columns:1.3fr .8fr repeat(2,.65fr);}.topbar .stat:nth-last-child(-n+2){display:none}.roomPlants{grid-template-columns:repeat(3,1fr);padding-top:80px}.dashboardRow{grid-template-columns:1fr 1fr}.dashboardRow>.panel:first-child{grid-column:1/-1}.plantOverview{grid-template-columns:repeat(5,1fr)}}
 @media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{position:static;display:flex;overflow:auto}.sidebar button{width:auto;white-space:nowrap;border-right:1px solid #31322d;border-bottom:0}.sidebar button.active{border-left:0;border-bottom:3px solid #e2b64d;padding-left:13px}.roomPlants{grid-template-columns:repeat(2,1fr)}.quickRow{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.shell{padding:4px}.topbar{grid-template-columns:1fr 1fr}.brand{grid-column:1/-1}.topbar .stat{display:none}.playerTop{grid-column:1/-1}.roomTop{display:block}.roomPills{justify-content:flex-start;margin-top:8px}.roomPlants{grid-template-columns:1fr;padding-top:55px}.roomPlantPhoto{height:300px}.dashboardRow{grid-template-columns:1fr}.plantOverview{grid-template-columns:1fr 1fr}.quickRow{grid-template-columns:1fr 1fr}.pageGrid{grid-template-columns:1fr}.growHero{min-height:620px}}
+.gamePlant{display:flex;align-items:flex-end;justify-content:center;background:
+ radial-gradient(circle at 50% 16%,rgba(219,110,255,.28),transparent 32%),
+ linear-gradient(180deg,#2b2a35 0,#1a1f20 55%,#101411 100%)!important;overflow:hidden}
+.gamePlant:before{content:"";position:absolute;left:10%;right:10%;top:9px;height:5px;border-radius:999px;background:linear-gradient(90deg,#7356ff,#eb80ff,#7356ff);box-shadow:0 0 14px rgba(220,102,255,.8),0 0 35px rgba(191,82,255,.28)}
+.gamePlant .plantAsset{width:96%;height:96%;position:relative;z-index:2;overflow:visible}
+.miniPlantPhoto.gamePlant{position:relative;height:132px}
+.miniPlantPhoto.gamePlant .plantAsset{width:100%;height:100%}
+.lockedMini{display:grid;place-items:center;height:132px;font-size:34px;background:#101210}
