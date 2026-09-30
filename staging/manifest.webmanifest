@@ -1,0 +1,24 @@
+{
+  "name": "E-Check Kids",
+  "short_name": "E-Check",
+  "description": "E-Nummern und Zutaten beim Einkauf prüfen",
+  "start_url": "/staging/?source=pwa",
+  "scope": "/staging/",
+  "display": "standalone",
+  "background_color": "#f5f8f7",
+  "theme_color": "#0f766e",
+  "lang": "de",
+  "categories": [
+    "food",
+    "health",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/staging/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
