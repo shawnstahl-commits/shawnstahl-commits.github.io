@@ -48,126 +48,22 @@
     .iosInstallActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.iosInstallActions button{flex:1 1 150px}.nativeAppPill{display:none;margin-top:8px;font-size:9px;color:#79dfaa}.nativeAppPill.show{display:block}
   </style>
 
+
+  <style>
+    .mon.missingMon{background:linear-gradient(145deg,#17191e,#101216);border-color:#30343c}
+    .mon.missingMon .sprite{filter:grayscale(1) saturate(0) brightness(.78) opacity(.72)}
+    .mon.missingMon .spriteWrap{background:linear-gradient(145deg,#2a2d33,#17191e);border-color:#3a3e46}
+    .mon.missingMon .name,.mon.missingMon .meta,.mon.missingMon .types{filter:grayscale(1);opacity:.58}
+    .mon.missingMon .tag{background:#25282e;color:#9ba0aa}
+    .mon.missingMon .statusLine{color:#8c929c}
+    .dexLegend{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-2px 2px 12px;font-size:9px;color:var(--muted)}
+    .dexLegend span{display:inline-flex;align-items:center;gap:5px}.dexLegend i{width:9px;height:9px;border-radius:50%;display:inline-block;border:1px solid #4a5160}
+    .dexLegend .have i{background:linear-gradient(135deg,#8c7bff,#44d4c2);border:none}.dexLegend .miss i{background:#777c84;filter:grayscale(1)}
+  </style>
+
 </head>
 <body>
   <input id="fileInput" type="file" hidden multiple accept=".sav,.dsv,.dat,.bin,application/octet-stream" />
-  <input id="guestBypass" type="checkbox" aria-hidden="true" />
-  <div id="authGate" class="authGate">
-    <div class="authShell">
-      <div class="authGlow one"></div><div class="authGlow two"></div>
-      <div class="authCard">
-        <div class="authBadge">⚡ ROMDex Trainer Login</div>
-        <div class="authHero">
-          <div class="authCopy">
-            <h2>Willkommen bei ROMDex.</h2>
-            <p>Deine Pokémon-Sammlung, deine Saves, dein Profil. Mit <b style="color:#fff">Supabase</b> können wir später alles sicher zwischen Android, iPhone und PC synchronisieren.</p>
-            <div class="sparkRow">
-              <span class="sparkChip">⚡ Pikachu</span>
-              <span class="sparkChip">🔥 Glutexo</span>
-              <span class="sparkChip">🪽 Taubsi</span>
-            </div>
-            <div class="featureTiles">
-              <div class="featureTile"><b>Cloud-Sync</b><small>Sammlung später auf mehreren Geräten nutzen.</small></div>
-              <div class="featureTile"><b>Trainer-Profil</b><small>Name, Avatar und Save-Historie verknüpfen.</small></div>
-              <div class="featureTile"><b>Shiny-Showcase</b><small>Seltene Funde schöner präsentieren.</small></div>
-            </div>
-          </div>
-          <div class="authMascot">
-            <div class="pokeStage">
-              <img class="pokeArt main" alt="Pikachu" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgBAMAAAAQtmoLAAAAKlBMVEUAAAAA
-AAApKSlBQUpiMQhzc4OcUgDFIBjelADmWkH2vSD25lL/9qT////Vai+KAAAA
-AXRSTlMAQObYZgAAAdlJREFUWMPtlsFqwkAQhjclhB6ztRRReqiHXnoSbz0p
-iLX2JcwliD6A0JsgEuoDlNJTQKzsnkJpSDN9A3PpG3U2ST12J4dCKftjNML/
-MTObndkwZmRkZPTX5Vb0Wxe/DrQq5nRSHehWBK4PQKtFAWpiU9wctTodygI0
-SsCZQqfTJgK+P3ZmgAClfltsJ9k+Qf8bKQACQZZlgHptqwC+lhh+ZNleAVz5
-HRjrAEwGUi4Tr/wX61JaSMzm8wrygo9BD5wjENVKYI3hNDnZbRiqlHJfAHrA
-uVQmeH9eqooJwB3AABN5egyL+rVF3MrldDtJ5/OwDKADbkSuHJAVgJf7kE1F
-Tmg2lCNKheoOCa7froU2OSo5owLSHeG33s+aJQCuTfKzJhQBsNjRlpEAJHZS
-rY4tKBNkHeNSqk3XZXUKYEFSApH18D1BfgYAmwZ7CKJhsOsRgHUB7CAMgj5l
-GM9AIfgJ6wtGA2Ko45UK7lPmUjPGmRThlQr3zCMAM/BxhXz1MLhPAKyiBwCk
-EH2PkJIlCn+apiKklGDlPQBCYoSQdKBMxUG0o6hx8O9oh53VEAHnqndIj42x
-/kotpjWYrGgB7Djp5c6R8GgR+Gn5G0cVXwl41bcUIyMjo/+qLw92FGczGN4X
-AAAAAElFTkSuQmCC
-" />
-              <img class="pokeArt fire" alt="Glutexo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgBAMAAAAQtmoLAAAAMFBMVEUAAAAA
-Wv8QEBBqamqUIBC0i1q0tLTNOTnNrHvmzaz/QQD/Ukr/g2r/pAD/3in///8H
-xnTZAAAAAXRSTlMAQObYZgAAAr5JREFUWMPtlr9r20AUx8VhKBicf6HimloJ
-DQiyZExqnBqsQCFEdHdLOxZUp29woVNp+x9EZPHQSeAMQXDDy9SlUHvI0ElQ
-09lgDS6kQwb33blN3NCTTtBueots8/3o/bp7z5ZVWmmllfYv7NZOQf2ruKB+
-GJirK03oobDN9XtI1jV3oPRgHlFliEPE2DwiD88w7qE50MI98cDDRgFgozG/
-xFPzHDDmty8LJNFDvO8U6AMVSRn8CXzTdyHGv/VhrK/qqdQ7N4FaRhtEg3MA
-45wZdEHaEtDPJrgj9QUOt8VkRDeBWjaznPO5VY36tfM8YDmHKIoGfSuLYQDd
-5u8v1T4BJP6alTYKD3au3x/lFXb9+PqO1kif9KtRVVtc5gTvQwLEwkUtidIo
-ywujCoUhxi3oLojkZJKlr7QA1sLwGANKXP0ySJNoMNECngC+rgAOKqhaOk0G
-adTXXjcMLAKO6OGg7N5KOknHegc0k2wWkgmwmbp1K+l0nCb6ip6NFgC1mg3l
-rEnTcTTVOlgF+Ggp4C0EbCRjStNpBlCHFzOZQnj0CIKNkSBgPJ60tSmw5z+2
-rwDY+AQ0zVZOvrQnuhqxueN2FPDGpysB0JFH40M70QIdp25fAe7W6wvKOmm2
-9YfvzmNuqTb4EvgezAmoxJ/1l7pOMVTWpAMC6rOA/FlenHG6GQHe7jvS+z0R
-dLY3bauJmevUplG5S3L/gIaf485IL3byFlYsAY8uBLirpM9Zdgx7CqBDJQKa
-muIwxwETCBTTwWhIAIUFB7mTkjomAemBPh/mzlg5KLm/T3tU0Ed/32AY09Tj
-nAC46/v7+UO8oqYe62GLAAO9dU+oSawi4wZ6LivT+JW8yaifufRmW/ZDmAF8
-vsVVsdBwqdA2UY9nL+Fpo8gWunj4ZG4XAWbuplsEsGyXs2J/KwvKSyuttP9j
-PwHziFbKYe4VBQAAAABJRU5ErkJggg==
-" />
-              <img class="pokeArt grass" alt="Taubsi" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgBAMAAAAQtmoLAAAALVBMVEUAAAAQ
-EBBBKRhzSjGDg4OkYlq9KSC9vb3Ng1rmvWLuYkH/rHP/7pz/9r3///9WNuoZ
-AAAAAXRSTlMAQObYZgAAAa5JREFUWMPt1LFKA0EQBuCLh9buaUAbSTZc1CBB
-PIQE4isIWRmIRZqgB2onvoAegQ3YeEHIQBqbFIe1jZWCkIPtbLSwEKx9BvcI
-1jdrYbV/vR+zs8Os49jY2NjY/CXutiFoGIJABiZi3pWRNAHdhpRGJTSIgo+Y
-fqNXGe19vHED0O++I2KJChaODxHLjF7h7OGYeR6Qm154TO7qa55PB0kyEXWP
-t8mA1yYpcjpwqr2aUjGHRSqohSca+NCmirnkXqUcQF5RJ8G3FPrQkVIQhYt4
-qwtI2RcGoJMBKFEBwoYGAkpuQNhWDcYvflbA5w3ZiHKFm47VM8h+H0QMQUde
-5oGWUhqALiDiA909FQCIzaddaLPcAbauf8E4LbZXIicfTFXqg9BAsSLkfyDN
-1nSsR61bUKoIkH8lt4mDYZy1oK6XGCNMbiUYNtEXehzTG9KoC3rUGJcRByMa
-cFYzgQxHeEkDhZkorw6oSzQTcZmRF7tQQRyS/75sT3ussmNwnFd7+vegg/X9
-sFcNQ/KV5i6+vPppcnROrsBY4es7ZMygaWf50+i4ftdFx8bGxsbm3/IDKBea
-6AbhhdgAAAAASUVORK5CYII=
-" />
-              <img class="pokeArt ghost" alt="Menki" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgBAMAAAAQtmoLAAAALVBMVEUAAAAQ
-EBBqSilzQQC0QTHFc0rVrJzepHPe3t7uc2LutIv23rT/xYP/9s3///9HRxNc
-AAAAAXRSTlMAQObYZgAAAoFJREFUWMPtlr2K20AQx7XrF9A6scyhKxwRbyMI
-DsF3TZork4OAMHsp7EYyN42qcBg1foYUwY3zBlfauVMzuAiHSaM3OFxcipR+
-huxKJzmE01cTCGgkXJj57cxfM7O7mtZYY4019p8ZYXo94Dj6Xi9AFG31esCP
-esDxfCvqAZOR49QBOsP6QMepVwYmqoqgiR8pByxL/fa4Tkmc1UUZYPhMo9Y6
-dLmpXA1wS4D2BbY5Ygg2VgPIyA8REVwcS4BAPtBigwQ4wfsdgv9NAWY+0Hob
-3SUf/wR3u52Pb8ZtjSGAntvJ0TYO0fE3EriXgMmkFJbfyZFQAEUVQAKX41hK
-noLufH4nRgrgMYCxhbkJad3JZDZUgL1G3GxSf/dQy79TGg5FR+ZE7ZUdoo9e
-XIs4gPV0e6jOFANq4+rXLY69z2aqgAohnKc3CDJey9VXP6eX8Gpvpgo6gvVz
-epz4iB6uH6ZT72hvqwg9BTgySI52A0Gm/vDy7MPR3leAp5bR8wHZOZ70e3+9
-AIi/Uu9xOPIBV6Z+8/V6ea78oRTQmC4LvVp8WZpJGbzk737B2FETV8ulAnzZ
-eI+NxIt2Ao4375aLc/TDrLNp0RBRCMMz9hxC+YAR9wTlUDTXbcjMBZCExUum
-1PgTAMsCKAwg5yH190OWwKwwgI1rLp24J0unE0m4xf4UbXDb8nW5j67aLEs2
-MuKFrq5xXXtBAKHCvkpiiTRWz6sAmuHpWbBKABHPBlkrVvC3+v300Hld5Wiw
-glk6wS3hlBM0CFjgZGeJGA1KBTASpMuyj0JclRFMO51leXRnLPhUquL0MCzd
-K61bDpCDUBIMSL2rhqh5+dFYc2NsrLHG/rH9Bu2p+mAO7hqiAAAAAElFTkSu
-QmCC
-" />
-              <span class="sparkle s1">✦</span><span class="sparkle s2">✦</span><span class="sparkle s3">✦</span>
-              <div class="pokeCaption">Deine Sammlung. Ein Konto.</div>
-            </div>
-          </div>
-        </div>
-        <div class="authFormWrap">
-          <div class="authTabs">
-            <button id="authTabLogin" class="active" type="button">Anmelden</button>
-            <button id="authTabSignup" type="button">Registrieren</button>
-          </div>
-          <form id="authForm">
-            <div class="authField hiddenField" id="authNameField"><label for="authName">Trainername</label><input id="authName" class="authInput" placeholder="z. B. Shawn" /></div>
-            <div class="authField"><label for="authEmail">E-Mail</label><input id="authEmail" class="authInput" type="email" placeholder="deinname@mail.de" required /></div>
-            <div class="authField"><label for="authPassword">Passwort</label><input id="authPassword" class="authInput" type="password" placeholder="Mindestens 6 Zeichen" required /></div>
-            <div class="authActions">
-              <button id="authSubmit" class="glitterBtn" type="submit">Mit E-Mail anmelden</button>
-              <button id="authGoogleBtn" class="softBtn" type="button">Mit Google weiter</button>
-              <label id="guestBtn" for="guestBypass" class="softBtn" role="button" tabindex="0">Ohne Konto testen</label>
-            </div>
-          </form>
-          <div class="authStatus" id="authStatus">Vorschau-Modus: Oberfläche ist fertig. Für echtes Login fehlen nur noch Supabase-URL und Anon-Key.</div>
-          <div class="authHint" id="authHint">Tipp: Wir können erst die Optik fertig machen und danach die echten Supabase-Zugangsdaten eintragen.</div>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="app">
     <header class="top">
       <div class="brand"><div class="logo">R</div><div><h1>ROMDex</h1><small>DEINE SAVE-SAMMLUNG</small></div></div>
@@ -216,7 +112,7 @@ QmCC
           <select id="sortSelect" class="select"><option value="dex">Dex-Nr. ↑</option><option value="name">Name A–Z</option><option value="nameDesc">Name Z–A</option><option value="shiny">Shinys zuerst</option><option value="legendary">Legendäre zuerst</option></select>
           <select id="ownershipFilter" class="select"><option value="all">Alles im Dex</option><option value="present">Aktuell vorhanden</option><option value="owned">Als gefangen registriert</option><option value="history">Nur Dex-Historie</option><option value="onlyPresent">Nur vorhanden, nicht registriert</option></select>
         </div>
-        <div class="ownershipNote">„Gefangen“ kommt aus dem Pokédex des Spielstands. „Aktuell vorhanden“ bedeutet: Das Pokémon liegt gerade in Team oder PC-Boxen.</div>
+        <div class="ownershipNote">„Gefangen“ kommt aus dem Pokédex des Spielstands. „Aktuell vorhanden“ bedeutet: Das Pokémon liegt gerade in Team oder PC-Boxen.</div><div class="dexLegend"><span class="have"><i></i>Gefangen = farbig</span><span class="miss"><i></i>Fehlt = grau</span></div>
         <div id="dexCards" class="cards"></div>
       </section>
 
@@ -322,8 +218,6 @@ QmCC
 
         <div class="sectionTitle"><h2>Premium-Werkzeuge</h2><span>teilen & exportieren</span></div>
         <div id="premiumToolsArea"></div>
-
-        <div class="authProfileCard"><div class="sectionTitle" style="margin-top:0"><h2>Konto & Cloud</h2><span id="authStateText">Gastmodus</span></div><div class="privacy" style="margin-top:0"><b style="color:#fff" id="authProfileTitle">✨ Supabase-Anmeldung vorbereitet</b><br><span id="authProfileBody">Die Oberfläche für Login und Registrierung ist fertig. Sobald wir Supabase-URL und Anon-Key eintragen, kann echtes Login per E-Mail/Passwort oder Google aktiviert werden.</span></div><div class="row"><button class="miniBtn" id="openAuthBtn">Anmeldung öffnen</button><button class="miniBtn" id="signOutBtn">Abmelden</button></div></div>
         <div class="sectionTitle"><h2>Werkzeuge</h2></div>
         <div class="row"><button class="miniBtn" id="exportBtn">Sammlung exportieren</button><button class="miniBtn" id="clearDemoBtn">Demo entfernen</button></div>
         <button class="danger" id="clearAllBtn">Alle lokalen ROMDex-Daten löschen</button>
@@ -377,196 +271,15 @@ function setPlan(plan){safeSet(PLAN_KEY,plan==='premium'?'premium':'free');rende
 function isGuestMode(){return window.__romdexGuest===true||safeGet(GUEST_KEY)==='1'||document.getElementById('guestBypass')?.checked===true}
 function setGuestMode(v){window.__romdexGuest=!!v;const gate=document.getElementById('authGate'),bypass=document.getElementById('guestBypass');if(bypass)bypass.checked=!!v;if(gate){if(v){gate.classList.add('hidden');gate.style.display='none'}else{gate.style.display='';gate.classList.remove('hidden')}}if(v)safeSet(GUEST_KEY,'1');else safeRemove(GUEST_KEY);try{updateAuthUI()}catch(e){if(v&&gate){gate.classList.add('hidden');gate.style.display='none'}console.warn('Gastmodus UI-Fallback',e)}}
 function authConfigured(){return !!(SUPABASE_URL&&SUPABASE_ANON_KEY&&window.supabase)}
-function initAuth(){if(authConfigured()){supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);supabaseClient.auth.getSession().then(({data})=>{authSession=data.session||null;updateAuthUI();refreshCloudStatus();renderShortcutSetup();processIncomingSaves()});supabaseClient.auth.onAuthStateChange((_event,session)=>{authSession=session||null;updateAuthUI();refreshCloudStatus();renderShortcutSetup();if(session)processIncomingSaves()});}updateAuthUI();switchAuthMode('login')}
+function initAuth(){if(authConfigured()){supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);supabaseClient.auth.getSession().then(({data})=>{authSession=data.session||null;updateAuthUI();refreshCloudStatus();renderShortcutSetup();if(authSession)processIncomingSaves()});supabaseClient.auth.onAuthStateChange((_event,session)=>{authSession=session||null;updateAuthUI();refreshCloudStatus();renderShortcutSetup();if(session)processIncomingSaves()});}updateAuthUI()}
 function switchAuthMode(mode){authMode=mode;document.getElementById('authTabLogin').classList.toggle('active',mode==='login');document.getElementById('authTabSignup').classList.toggle('active',mode==='signup');document.getElementById('authNameField').classList.toggle('hiddenField',mode!=='signup');document.getElementById('authSubmit').textContent=mode==='login'?'Mit E-Mail anmelden':'Konto erstellen';document.getElementById('authHint').textContent=mode==='login'?'Melde dich an, um später Cloud-Sync für deine Sammlung zu nutzen.':'Lege dein Trainerkonto an. Danach können wir Cloud-Speicher und Geräte-Sync aktivieren.'}
 function currentTrainerAvatar(){const raw=Number(safeGet(TRAINER_AVATAR_KEY)||TRAINER_AVATARS[0]);return TRAINER_AVATARS.includes(raw)?raw:TRAINER_AVATARS[0]}
 function cycleTrainerAvatar(){const cur=currentTrainerAvatar(),idx=TRAINER_AVATARS.indexOf(cur),next=TRAINER_AVATARS[(idx+1)%TRAINER_AVATARS.length];safeSet(TRAINER_AVATAR_KEY,String(next));renderTrainerCard();toast('Trainer-Avatar gewechselt.')}
 function trainerDisplayName(){const authName=authSession?.user?.user_metadata?.display_name||authSession?.user?.user_metadata?.full_name||'';if(authName)return authName;const save=state.imports.find(x=>x.trainerName);if(save?.trainerName)return save.trainerName;return isGuestMode()?'Gast-Trainer':'Trainer'}
 function trainerRank(count){if(count>=500)return ['DEX-MEISTER',50];if(count>=250)return ['ELITE-SAMMLER',35];if(count>=100)return ['PROFI-SAMMLER',25];if(count>=30)return ['SAMMLER',15];if(count>=10)return ['SAMMLER',8];return ['STARTER',Math.max(1,count)]}
 function renderTrainerCard(){const img=document.getElementById('trainerAvatarImg');if(!img)return;const mons=allMons(),shinies=mons.filter(m=>m.shiny).length,dexCount=new Set(mons.map(m=>m.dex).filter(Boolean)).size,games=new Set(state.imports.map(x=>x.game)).size,name=trainerDisplayName(),rank=trainerRank(mons.length);const dex=currentTrainerAvatar();img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${dex}.png`;img.onerror=()=>{img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dex}.png`;img.onerror=null};document.getElementById('trainerCardName').textContent=name;document.getElementById('trainerCardSub').textContent=authSession?.user?.email||((state.imports.find(x=>x.game)?.game)||'Deine persönliche Save-Sammlung');document.getElementById('trainerCardLevel').textContent=`${rank[0]} · LV. ${rank[1]}`;document.getElementById('trainerPokemonCount').textContent=mons.length;document.getElementById('trainerShinyCount').textContent=shinies;document.getElementById('trainerGameCount').textContent=games;document.getElementById('trainerDexCount').textContent=dexCount;document.getElementById('trainerCloudLabel').textContent=authSession?'☁️ Supabase Cloud':isGuestMode()?'🔒 Lokal · Gastmodus':'🔐 Konto nicht verbunden';const basis=authSession?.user?.id||state.imports.find(x=>x.trainerId)?.trainerId||name;let h=0;for(const ch of String(basis))h=((h<<5)-h+ch.charCodeAt(0))>>>0;document.getElementById('trainerCardId').textContent=`ROM-${String(h%1000000).padStart(6,'0')}`}
-function updateAuthUI(){renderTrainerCard();const gate=document.getElementById('authGate');const pill=document.getElementById('privacyPill');const stateText=document.getElementById('authStateText');const profileTitle=document.getElementById('authProfileTitle');const profileBody=document.getElementById('authProfileBody');const status=document.getElementById('authStatus');const signOutBtn=document.getElementById('signOutBtn');const email=authSession?.user?.email||'';if(authSession){gate.classList.add('hidden');pill.textContent='☁️ cloud';stateText.textContent=email||'angemeldet';profileTitle.textContent='☁️ Mit Supabase verbunden';profileBody.textContent=`Angemeldet als ${email||'Trainer'}. Später können wir hier Cloud-Sync, Backups und gemeinsame Sammlungen anbinden.`;status.textContent=`Verbunden als ${email||'Trainer'}.`;signOutBtn.style.display='inline-flex';return}if(isGuestMode()){gate.classList.add('hidden');pill.textContent='🔒 lokal';stateText.textContent='Gastmodus';profileTitle.textContent='✨ Gastmodus aktiv';profileBody.textContent='Du nutzt ROMDex gerade ohne Login. Deine Daten bleiben lokal auf diesem Gerät. Du kannst die Anmeldung jederzeit wieder öffnen.';status.textContent=authConfigured()?'Gastmodus aktiv. Supabase ist verbunden, du kannst dich jederzeit anmelden.':'Gastmodus aktiv. Für echtes Login fehlen noch Supabase-URL und Anon-Key.';signOutBtn.style.display='none';return}gate.classList.remove('hidden');pill.textContent='🔐 login';stateText.textContent='nicht angemeldet';profileTitle.textContent='✨ Anmeldung empfohlen';profileBody.textContent='Mit Supabase können wir später Cloud-Sync, Backups und Geräte-Wechsel sauber lösen. Aktuell ist die Oberfläche fertig vorbereitet.';status.textContent=authConfigured()?'Bitte melde dich an oder registriere dich.':'Vorschau-Modus: Oberfläche ist fertig. Für echtes Login fehlen nur noch Supabase-URL und Anon-Key.';signOutBtn.style.display='none'}
-
-
-function base64Url(bytes){
-  let s="";for(const b of bytes)s+=String.fromCharCode(b);
-  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-}
-async function sha256Text(text){
-  return sha256(new TextEncoder().encode(text).buffer);
-}
-function renderShortcutSetup(){
-  const tokenEl=document.getElementById("shortcutToken"),note=document.getElementById("shortcutTokenNote");
-  if(!tokenEl||!note)return;
-  const raw=safeGet(MANIC_TOKEN_KEY)||"";
-  tokenEl.value=raw;
-  if(!authSession){
-    note.className="shortcutStatus";
-    note.textContent="Melde dich mit deinem ROMDex-Konto an. Danach erzeugst du hier einmalig den persönlichen Sync-Schlüssel.";
-  }else if(raw){
-    note.className="shortcutStatus good";
-    note.textContent="✓ Persönlicher Manic-Sync-Schlüssel ist auf diesem Gerät gespeichert. Behandle ihn wie ein Passwort.";
-  }else{
-    note.className="shortcutStatus";
-    note.textContent="Angemeldet. Jetzt einmal auf „Erzeugen“ tippen und den Schlüssel anschließend in den iPhone-Kurzbefehl einfügen.";
-  }
-}
-async function generateManicToken(){
-  if(!supabaseClient||!authSession){toast("Bitte zuerst bei ROMDex anmelden.");return}
-  try{
-    const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);
-    const raw="rdx_"+base64Url(bytes);
-    const hash=await sha256Text(raw);
-    const del=await supabaseClient.from("sync_tokens").delete().eq("user_id",authSession.user.id).eq("label","Manic EMU iPhone");
-    if(del.error)throw del.error;
-    const ins=await supabaseClient.from("sync_tokens").insert({user_id:authSession.user.id,token_hash:hash,label:"Manic EMU iPhone"});
-    if(ins.error)throw ins.error;
-    safeSet(MANIC_TOKEN_KEY,raw);
-    renderShortcutSetup();
-    toast("Persönlicher Manic-Sync-Schlüssel erzeugt.");
-  }catch(e){toast("Schlüssel konnte nicht erzeugt werden: "+(e.message||e))}
-}
-async function copyShortcutValue(id){
-  const el=document.getElementById(id);if(!el)return;
-  if(!el.value){toast("Noch kein Wert vorhanden.");return}
-  try{await navigator.clipboard.writeText(el.value);toast("Kopiert.");}
-  catch{el.select();document.execCommand("copy");toast("Kopiert.");}
-}
-async function processIncomingSaves(){
-  const status=document.getElementById("incomingStatus");
-  if(!supabaseClient||!authSession){if(status)status.textContent="Für automatische Saves bitte anmelden.";return}
-  try{
-    if(status)status.textContent="Automatische Saves werden geprüft …";
-    const q=await supabaseClient.from("incoming_saves").select("*").eq("status","pending").order("created_at",{ascending:true}).limit(10);
-    if(q.error)throw q.error;
-    const rows=q.data||[];
-    if(!rows.length){if(status){status.className="shortcutStatus good";status.textContent="✓ Keine neuen Manic-Saves. Cloud ist aktuell."}return}
-    let done=0,failed=0;
-    for(const row of rows){
-      try{
-        const dl=await supabaseClient.storage.from("romdex-saves").download(row.object_path);
-        if(dl.error)throw dl.error;
-        const file=new File([dl.data],row.file_name||"manic-save.sav",{type:"application/octet-stream"});
-        await importFile(file);
-        const up=await supabaseClient.from("incoming_saves").update({status:"processed",processed_at:new Date().toISOString(),error_text:null}).eq("id",row.id);
-        if(up.error)throw up.error;
-        done++;
-      }catch(e){
-        failed++;
-        await supabaseClient.from("incoming_saves").update({status:"failed",error_text:String(e.message||e),processed_at:new Date().toISOString()}).eq("id",row.id);
-      }
-    }
-    if(status){
-      status.className=failed?"shortcutStatus":"shortcutStatus good";
-      status.textContent=failed?done+" Save(s) verarbeitet · "+failed+" Fehler":("✓ "+done+" neuer Manic-Save"+(done===1?"":"s")+" automatisch übernommen.");
-    }
-    renderAll();
-  }catch(e){if(status){status.className="shortcutStatus";status.textContent="Prüfung fehlgeschlagen: "+(e.message||e)}}
-}
-
-async function refreshCloudStatus(){
-  if(!supabaseClient||!authSession){state.cloudCount=0;renderPremium();return}
-  try{
-    const {count,error}=await supabaseClient.from('save_versions').select('id',{count:'exact',head:true});
-    if(error)throw error;
-    state.cloudCount=count||0;
-    renderPremium();
-  }catch(e){console.warn('Cloud-Status',e)}
-}
-async function ensureCloudSource(payload){
-  const userId=authSession?.user?.id;if(!userId)return null;
-  const key=payload.saveKey||payload.game||payload.fileName;
-  let {data,error}=await supabaseClient.from('save_sources').select('*').eq('user_id',userId).eq('game_key',key).limit(1);
-  if(error)throw error;
-  if(data&&data[0])return data[0];
-  const ins={
-    user_id:userId,
-    game_key:key,
-    display_name:payload.game||payload.fileName||'Spielstand',
-    emulator:'Manic EMU',
-    source_kind:'manual',
-    auto_sync_enabled:false
-  };
-  const res=await supabaseClient.from('save_sources').insert(ins).select().single();
-  if(res.error)throw res.error;
-  return res.data;
-}
-async function cloudSyncImportedSave(payload,buffer){
-  if(!supabaseClient||!authSession)return false;
-  try{
-    const userId=authSession.user.id;
-    const source=await ensureCloudSource(payload);
-    if(!source)return false;
-    const ext=(payload.fileName||'save.sav').includes('.')?'.'+(payload.fileName.split('.').pop()||'sav') : '.sav';
-    const objectPath=userId+'/'+source.id+'/'+payload.hash+ext;
-    const blob=new Blob([buffer],{type:'application/octet-stream'});
-    const up=await supabaseClient.storage.from('romdex-saves').upload(objectPath,blob,{upsert:true,contentType:'application/octet-stream'});
-    if(up.error)throw up.error;
-    const versionRow={
-      user_id:userId,
-      source_id:source.id,
-      file_name:payload.fileName||'save.sav',
-      sha256:payload.hash,
-      byte_size:buffer.byteLength,
-      game:payload.game||null,
-      trainer_name:payload.trainerName||null,
-      trainer_id:payload.trainerId==null?null:String(payload.trainerId),
-      object_path:objectPath,
-      metadata:{
-        saveKey:payload.saveKey||null,
-        caughtCount:payload.caughtCount??null,
-        seenCount:payload.seenCount??null,
-        regionName:payload.regionName||null,
-        regionMax:payload.regionMax||null,
-        playTime:payload.playTime||null,
-        importedAt:Date.now()
-      }
-    };
-    let vr=await supabaseClient.from('save_versions').upsert(versionRow,{onConflict:'user_id,sha256'}).select().single();
-    if(vr.error)throw vr.error;
-    const versionId=vr.data.id;
-    const rows=(payload.mons||[]).map(function(m){
-      return {
-        user_id:userId,
-        source_id:source.id,
-        save_version_id:versionId,
-        fingerprint:String(m.fingerprint||((m.dex||0)+'-'+(m.pid||0)+'-'+(m.otid||0))),
-        dex:Number(m.dex)||0,
-        level:m.level==null?null:Number(m.level),
-        shiny:!!m.shiny,
-        nature:m.nature||null,
-        source_slot:m.slot==null?null:String(m.slot),
-        data:{
-          source:m.source||null,
-          generation:m.generation||null,
-          pid:m.pid??null,
-          otid:m.otid??null
-        }
-      };
-    }).filter(function(x){return x.dex>0});
-    if(rows.length){
-      const pi=await supabaseClient.from('pokemon_instances').upsert(rows,{onConflict:'save_version_id,fingerprint'});
-      if(pi.error)throw pi.error;
-    }
-    await supabaseClient.from('sync_events').insert({
-      user_id:userId,
-      source_id:source.id,
-      event_type:'save_imported',
-      summary:{game:payload.game||null,fileName:payload.fileName||null,pokemon:(payload.mons||[]).length,sha256:payload.hash}
-    });
-    await refreshCloudStatus();
-    toast('☁ Save sicher in ROMDex Cloud gespeichert.');
-    return true;
-  }catch(e){
-    console.error('ROMDex Cloud-Sync',e);
-    toast('Cloud-Sync fehlgeschlagen: '+(e.message||'unbekannter Fehler'));
-    return false;
-  }
-}
-
-async function handleAuthSubmit(e){e.preventDefault();const email=document.getElementById('authEmail').value.trim();const password=document.getElementById('authPassword').value;const trainerName=document.getElementById('authName').value.trim();if(!authConfigured()){toast('Supabase ist noch nicht verbunden. Ich habe die Anmeldeoberfläche aber komplett vorbereitet.');return}if(!email||!password){toast('Bitte E-Mail und Passwort ausfüllen.');return}if(authMode==='signup'){const {error}=await supabaseClient.auth.signUp({email,password,options:{data:{display_name:trainerName||'Trainer'}}});if(error){toast(error.message);return}toast('Konto erstellt. Prüfe ggf. deine E-Mail.');}else{const {error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){toast(error.message);return}toast('Erfolgreich angemeldet.')}}
-async function signInWithGoogle(){if(!authConfigured()){toast('Google-Login ist vorbereitet. Für echtes Login fehlen noch Supabase-URL und Anon-Key.');return}const {error}=await supabaseClient.auth.signInWithOAuth({provider:'google'});if(error)toast(error.message)}
-async function signOutAuth(){if(supabaseClient&&authSession){const {error}=await supabaseClient.auth.signOut();if(error){toast(error.message);return}toast('Abgemeldet.');}setGuestMode(false)}
-function openAuthGate(){setGuestMode(false);const bypass=document.getElementById('guestBypass');if(bypass)bypass.checked=false;const gate=document.getElementById('authGate');gate.style.display='';gate.classList.remove('hidden');}
+function updateAuthUI(){renderTrainerCard();const pill=document.getElementById('privacyPill');if(pill)pill.textContent=authSession?'☁️ cloud':'🔒 lokal';renderShortcutSetup()}
+function openAuthGate(){toast('ROMDex startet jetzt ohne Anmeldebildschirm.')}
 function loadState(){try{const raw=JSON.parse(safeGet(STORAGE_KEY))||{};return {imports:Array.isArray(raw.imports)?raw.imports:[],history:Array.isArray(raw.history)?raw.history:[],nameCache:raw.nameCache||{},metaCache:raw.metaCache||{},syncPrefs:raw.syncPrefs||{}}}catch{return {imports:[],history:[],nameCache:{},metaCache:{},syncPrefs:{}}}}
 function saveState(){safeSet(STORAGE_KEY,JSON.stringify(state))}
 function allMons(){const map=new Map();for(const imp of state.imports){for(const m of imp.mons||[]){const key=m.fingerprint||`${m.dex}-${m.pid}-${m.otid}`;if(!map.has(key))map.set(key,{...m,importId:imp.id,game:imp.game,importName:imp.fileName});}}return [...map.values()]}
@@ -582,6 +295,8 @@ function decodeDexFlags(bytes,maxDex=386){const out=[];for(let dex=1;dex<=maxDex
 function formatPlayTime(p){if(!p)return '—';return `${p.hours}:${String(p.minutes).padStart(2,'0')}:${String(p.seconds).padStart(2,'0')}`}
 function ownedDexSet(){const out=new Set();for(const imp of state.imports)for(const d of imp.ownedDex||[])out.add(Number(d));return out}
 function dexEntries(){const current=allMons(),owned=ownedDexSet(),map=new Map();for(const m of current){const c={...m,dexOwned:owned.has(Number(m.dex)),historical:false};const old=map.get(c.dex);if(!old||c.shiny)map.set(c.dex,c)}for(const d of owned){if(!map.has(d)){const imp=state.imports.find(x=>(x.ownedDex||[]).includes(d));map.set(d,{dex:d,pid:null,otid:null,shiny:false,nature:'',source:'Pokédex-Historie',slot:'—',level:null,fingerprint:`history-${imp?.id||'dex'}-${d}`,historical:true,dexOwned:true,generation:3,game:imp?.game||'Pokédex'})}}return [...map.values()]}
+function visibleDexMax(){const latest=state.imports.find(x=>!x.demo&&(x.regionMax||x.maxDex))||state.imports.find(x=>x.regionMax||x.maxDex);return Math.max(1,Number(latest?.regionMax||latest?.maxDex||386))}
+function completeDexEntries(){const existing=new Map(dexEntries().map(m=>[Number(m.dex),m])),owned=ownedDexSet(),max=visibleDexMax(),out=[];for(let d=1;d<=max;d++){if(existing.has(d)){out.push({...existing.get(d),missing:false});continue}out.push({dex:d,pid:null,otid:null,shiny:false,nature:'',source:'Noch nicht gefangen',slot:'—',level:null,fingerprint:'missing-'+d,historical:false,dexOwned:owned.has(d),missing:true,generation:3,game:'Pokédex'})}return out}
 function ownershipLabel(m){if(m.historical)return {text:'✓ Gefangen · aktuell nicht vorhanden',cls:'history'};if(m.dexOwned)return {text:'● Aktuell vorhanden · im Pokédex gefangen',cls:'present'};return {text:'● Aktuell vorhanden · nicht als gefangen registriert',cls:'onlyPresent'}}
 function speciesLabel(dex){return state.nameCache[dex]||COMMON_NAMES[dex]||(dex?`Pokémon #${String(dex).padStart(3,'0')}`:'Unbekannt')}
 const TYPE_COLORS={normal:'#A8A77A',fire:'#EE8130',water:'#6390F0',electric:'#F7D02C',grass:'#7AC74C',ice:'#96D9D6',fighting:'#C22E28',poison:'#A33EA1',ground:'#E2BF65',flying:'#A98FF3',psychic:'#F95587',bug:'#A6B91A',rock:'#B6A136',ghost:'#735797',dragon:'#6F35FC',dark:'#705746',steel:'#B7B7CE',fairy:'#D685AD'};
@@ -630,7 +345,7 @@ async function shareTrainerCard(){const mons=allMons(),text=`${trainerDisplayNam
 function exportCsv(){if(!isPremium())return;const rows=[['Dex','Name','Level','Shiny','Quelle','Spiel']];for(const m of allMons())rows.push([m.dex,speciesLabel(m.dex),m.level??'',m.shiny?'Ja':'Nein',m.source||'',m.game||'']);const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='romdex-sammlung.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
 function printTrainerCard(){if(!isPremium())return;const mons=allMons(),badges=unlockedAchievements().filter(x=>x.ok).map(x=>`${x.ico} ${x.name}`).join(' · ');const w=window.open('','_blank');if(!w){toast('Popup wurde blockiert.');return}w.document.write(`<html><head><title>ROMDex Trainerkarte</title><style>body{font-family:system-ui;background:#0c1019;color:#fff;padding:32px}.card{max-width:700px;margin:auto;padding:28px;border-radius:28px;background:#171d2b;border:1px solid #514a88}h1{margin:0}.muted{color:#a8b1c2}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:20px}.s{padding:14px;background:#0d121b;border-radius:16px;text-align:center}.s b{display:block;font-size:24px}</style></head><body><div class="card"><div class="muted">ROMDex PREMIUM TRAINER</div><h1>${escapeHtml(trainerDisplayName())}</h1><div class="stats"><div class="s"><b>${mons.length}</b>Pokémon</div><div class="s"><b>${mons.filter(m=>m.shiny).length}</b>Shinys</div><div class="s"><b>${state.imports.length}</b>Saves</div><div class="s"><b>${new Set(mons.map(m=>m.dex)).size}</b>Arten</div></div><p>${escapeHtml(badges||'Noch keine Badges')}</p><p class="muted">Inoffizielle persönliche ROMDex-Sammlung</p></div><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close();}
 async function importFile(file){const info=document.getElementById('fileInfo');info.classList.add('show');info.textContent='Save wird lokal geprüft …';try{const buffer=await file.arrayBuffer();const hash=await sha256(buffer);let parsed;if(buffer.byteLength===131072)parsed=parseGen3(buffer,file.name);else if(buffer.byteLength>=524288&&buffer.byteLength<=530000)parsed=parseNDS(buffer,file.name);else throw new Error(`Dateigröße ${Math.round(buffer.byteLength/1024)} KiB wird noch nicht unterstützt. Aktuell: Gen III 128 KiB sowie Nintendo DS 512 KiB/.dsv.`);const payload={fileName:file.name,game:parsed.game,trainerId:parsed.trainerId,trainerName:parsed.trainerName||null,playTime:parsed.playTime||null,saveIndex:parsed.saveIndex,maxDex:parsed.maxDex||386,ownedDex:parsed.ownedDex||[],seenDex:parsed.seenDex||[],regionName:parsed.regionName||null,regionMax:parsed.regionMax||null,caughtCount:parsed.caughtCount??null,seenCount:parsed.seenCount??null,boxNames:parsed.boxNames||[],mons:parsed.mons,details:parsed.details,hash};payload.saveKey=saveIdentity(payload);const exactIdx=state.imports.findIndex(x=>x.hash===hash);if(exactIdx>=0){state.imports[exactIdx]={...state.imports[exactIdx],...payload};saveState();info.textContent=`✓ Bereits importierter Save aktualisiert: ${parsed.mons.length} Pokémon${parsed.caughtCount!=null?` · ${parsed.regionName}-Dex ${parsed.caughtCount}/${parsed.regionMax}`:''}.`;renderAll();toast('Save-Daten aktualisiert.');enrichNames(parsed.mons.map(x=>x.dex));await cloudSyncImportedSave(payload,buffer);return}const logicalIdx=state.imports.findIndex(x=>(x.saveKey||saveIdentity(x))===payload.saveKey&&!x.demo);if(logicalIdx>=0){const old=state.imports[logicalIdx],fresh={...old,...payload,importedAt:Date.now()};const snap=snapshotSave(old);snap.delta=compareSaves(old,fresh);state.history=state.history||[];state.history.unshift(snap);state.history=state.history.slice(0,100);state.imports[logicalIdx]=fresh;saveState();const d=snap.delta;info.textContent=`✓ Neuer Stand erkannt: ${parsed.mons.length} Pokémon${d.caught?` · ${d.caught>0?'+':''}${d.caught} neue Dex-Einträge`:''}${d.shiny>0?` · +${d.shiny} Shiny`:''}.`;renderAll();toast('Neue Save-Version erkannt und mit dem vorherigen Stand verglichen.');enrichNames(parsed.mons.map(x=>x.dex));await cloudSyncImportedSave(payload,buffer);return}const imp={id:id(),importedAt:Date.now(),...payload};state.imports.unshift(imp);saveState();info.textContent=`✓ ${parsed.game}: ${parsed.mons.length} Pokémon gefunden${parsed.caughtCount!=null?` · ${parsed.regionName}-Dex ${parsed.caughtCount}/${parsed.regionMax}`:''}. Save wurde nicht verändert.`;renderAll();toast(`${parsed.mons.length} Pokémon aus ${file.name} erkannt.`);enrichNames(parsed.mons.map(x=>x.dex));await cloudSyncImportedSave(payload,buffer);}catch(e){info.textContent=`⚠ ${e.message}`;toast(e.message)}}
-function monCard(m){const name=speciesLabel(m.dex),gen=m.generation||3,tag=m.shiny?'★ SHINY':(isLegendaryDex(m.dex)?'✦ LEGENDÄR':(m.historical?'✓ GEFANGEN':(gen==='DS'?'NDS':`GEN ${gen===4?'IV':gen===5?'V':'III'}`))),own=ownershipLabel({...m,dexOwned:m.dexOwned??ownedDexSet().has(Number(m.dex))});return `<article class="mon ${m.shiny?'shinyMon':''} ${m.historical?'historicalMon':''}" data-fp="${escapeHtml(m.fingerprint)}">${spriteMarkup(m.dex,name)}<span class="tag ${m.shiny?'shiny':''}">${tag}</span><div class="name">${escapeHtml(name)}</div>${typesMarkup(m.dex)}<div class="statusLine ${own.cls}">${escapeHtml(own.text)}</div><div class="meta">${escapeHtml(m.source)}${m.level?` · Lv. ${m.level}`:''}${m.nature?`<br>${escapeHtml(natureLabel(m.nature))}`:''}</div></article>`}
+function monCard(m){const name=speciesLabel(m.dex),gen=m.generation||3,missing=!!m.missing,tag=missing?'FEHLT':(m.shiny?'★ SHINY':(isLegendaryDex(m.dex)?'✦ LEGENDÄR':(m.historical?'✓ GEFANGEN':(gen==='DS'?'NDS':`GEN ${gen===4?'IV':gen===5?'V':'III'}`)))),own=missing?{cls:'missing',text:'Noch nicht gefangen'}:ownershipLabel({...m,dexOwned:m.dexOwned??ownedDexSet().has(Number(m.dex))});return `<article class="mon ${missing?'missingMon':''} ${m.shiny?'shinyMon':''} ${m.historical?'historicalMon':''}" data-fp="${escapeHtml(m.fingerprint)}">${spriteMarkup(m.dex,name)}<span class="tag ${m.shiny?'shiny':''}">${tag}</span><div class="name">${escapeHtml(name)}</div>${typesMarkup(m.dex)}<div class="statusLine ${own.cls}">${escapeHtml(own.text)}</div><div class="meta">${missing?'#'+String(m.dex).padStart(3,'0'):escapeHtml(m.source)+(m.level?` · Lv. ${m.level}`:'')+(m.nature?`<br>${escapeHtml(natureLabel(m.nature))}`:'')}</div></article>`}
 function renderSaveProfile(){const el=document.getElementById('saveProfile');const imp=state.imports.find(x=>x.trainerName||x.caughtCount!=null);if(!imp){el.innerHTML='';return}const presentSpecies=new Set((imp.mons||[]).map(m=>m.dex)).size;const region=imp.regionName||'Dex',max=imp.regionMax||imp.maxDex||386,caught=imp.caughtCount??(imp.ownedDex||[]).filter(d=>d<=max).length,seen=imp.seenCount??(imp.seenDex||[]).filter(d=>d<=max).length;const pct=max?caught/max*100:0;el.innerHTML=`<div class="saveProfileTop"><div><small>LETZTER ANALYSIERTER SPIELSTAND</small><b>${escapeHtml(imp.game)}</b></div><span class="badge">${escapeHtml(imp.trainerName||'Trainer')}</span></div><div class="profileStats"><div class="profileStat"><small>Trainer</small><b>${escapeHtml(imp.trainerName||'—')}</b></div><div class="profileStat"><small>Spielzeit</small><b>${escapeHtml(formatPlayTime(imp.playTime))}</b></div><div class="profileStat"><small>${escapeHtml(region)}-Dex gefangen</small><b>${caught} / ${max}</b></div><div class="profileStat"><small>Gesehen</small><b>${seen}</b></div><div class="profileStat"><small>Aktuell vorhanden</small><b>${presentSpecies}</b></div><div class="profileStat"><small>Dex-Fortschritt</small><b>${pct.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})} %</b></div></div><div class="miniProgress"><span style="width:${Math.min(100,pct)}%"></span></div>`}
 
 function syncPrepared(id){return !!(state.syncPrefs&&state.syncPrefs[id])}
@@ -685,8 +400,7 @@ async function shareIphoneTest(){
 }
 
 function renderAll(){const mons=allMons(),entries=dexEntries(),species=[...new Set(entries.map(x=>x.dex))],shinies=mons.filter(m=>m.shiny);document.getElementById('collectionCount').textContent=mons.length;const latest=state.imports.find(x=>x.caughtCount!=null||x.ownedDex?.length);let caught=0,seen=0,maxDex=386,region='National';if(latest){maxDex=latest.regionMax||latest.maxDex||386;region=latest.regionName||'National';caught=latest.caughtCount??(latest.ownedDex||[]).filter(d=>d<=maxDex).length;seen=latest.seenCount??(latest.seenDex||[]).filter(d=>d<=maxDex).length;}else{caught=species.length;}document.getElementById('heroDexInfo').textContent=latest?`${region}-Pokédex: ${caught} / ${maxDex} gefangen · ${seen} gesehen`:`${caught} Arten in deiner Sammlung`;const dexPct=maxDex?caught/maxDex*100:0;document.getElementById('dexProgress').style.width=`${Math.min(100,dexPct)}%`;document.getElementById('dexProgressText').textContent=latest?`${dexPct.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})} % des ${region}-Pokédex`:`${dexPct.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})} % des Pokédex`;document.getElementById('creatureCount').textContent=mons.length;document.getElementById('shinyCount').textContent=shinies.length;document.getElementById('gameCount').textContent=new Set(state.imports.map(x=>x.game)).size;document.getElementById('dexSubtitle').textContent=`${species.length} Dex-Einträge · ${new Set(mons.map(x=>x.dex)).size} aktuell vorhanden`;const recent=mons.slice(0,6);document.getElementById('recentCards').innerHTML=recent.length?recent.map(m=>monCard({...m,dexOwned:ownedDexSet().has(m.dex)})).join(''):'<div class="empty" style="grid-column:1/-1">Importiere deinen ersten Save oder starte die Demo.</div>';document.getElementById('lastNew').textContent=state.imports[0]?`${Math.min(6,mons.length)} von ${mons.length} · ${new Date(state.imports[0].importedAt).toLocaleDateString('de-DE')}`:'noch keine';const allBtn=document.getElementById('showAllRecentBtn');allBtn.style.display=mons.length>6?'inline-block':'none';allBtn.textContent=`Alle ${mons.length} ansehen`;renderSaveProfile();renderActivity();renderTrainerCard();renderPremium();renderDex();renderSpecial(mons);renderBoxes(mons);renderGames();bindMonClicks();}
-function renderDex(){let arr=dexEntries();if(searchTerm){const q=searchTerm.toLowerCase();arr=arr.filter(m=>speciesLabel(m.dex).toLowerCase().includes(q)||String(m.dex).includes(q))}if(currentTypeFilter!=='all')arr=arr.filter(m=>typesForDex(m.dex).includes(currentTypeFilter));if(currentSpecialFilterDex==='legendary')arr=arr.filter(m=>isLegendaryDex(m.dex));if(currentSpecialFilterDex==='shiny')arr=arr.filter(m=>m.shiny);if(currentOwnershipFilter==='present')arr=arr.filter(m=>!m.historical);if(currentOwnershipFilter==='owned')arr=arr.filter(m=>m.dexOwned);if(currentOwnershipFilter==='history')arr=arr.filter(m=>m.historical);if(currentOwnershipFilter==='onlyPresent')arr=arr.filter(m=>!m.historical&&!m.dexOwned);if(currentSort==='name')arr.sort((a,b)=>speciesLabel(a.dex).localeCompare(speciesLabel(b.dex),'de'));else if(currentSort==='nameDesc')arr.sort((a,b)=>speciesLabel(b.dex).localeCompare(speciesLabel(a.dex),'de'));else if(currentSort==='shiny')arr.sort((a,b)=>(Number(b.shiny)-Number(a.shiny))||(a.dex-b.dex));else if(currentSort==='legendary')arr.sort((a,b)=>(Number(isLegendaryDex(b.dex))-Number(isLegendaryDex(a.dex)))||(a.dex-b.dex));else arr.sort((a,b)=>a.dex-b.dex);document.getElementById('dexCards').innerHTML=arr.length?arr.map(monCard).join(''):'<div class="empty" style="grid-column:1/-1">Noch keine passenden Einträge.</div>';enrichNames(arr.map(x=>x.dex));}
-function renderSpecial(mons){const arr=currentSpecialPage==='shiny'?mons.filter(m=>m.shiny):mons.filter(m=>isLegendaryDex(m.dex));document.getElementById('specialCount').textContent=arr.length;document.getElementById('specialText').textContent=currentSpecialPage==='shiny'?'Shinys in deiner Sammlung':'Legendäre & Mysteriöse in deiner Sammlung';document.getElementById('specialShinyBtn').classList.toggle('active',currentSpecialPage==='shiny');document.getElementById('specialLegendaryBtn').classList.toggle('active',currentSpecialPage==='legendary');document.getElementById('specialCards').innerHTML=arr.length?arr.map(monCard).join(''):`<div class="empty" style="grid-column:1/-1">Noch keine ${currentSpecialPage==='shiny'?'Shinys':'Legendären'} gefunden.</div>`;}
+function renderDex(){let arr=completeDexEntries();if(searchTerm){const q=searchTerm.toLowerCase();arr=arr.filter(m=>speciesLabel(m.dex).toLowerCase().includes(q)||String(m.dex).includes(q))}if(currentTypeFilter!=='all')arr=arr.filter(m=>typesForDex(m.dex).includes(currentTypeFilter));if(currentSpecialFilterDex==='legendary')arr=arr.filter(m=>isLegendaryDex(m.dex));if(currentSpecialFilterDex==='shiny')arr=arr.filter(m=>m.shiny);if(currentOwnershipFilter==='present')arr=arr.filter(m=>!m.missing&&!m.historical);if(currentOwnershipFilter==='owned')arr=arr.filter(m=>!m.missing&&m.dexOwned);if(currentOwnershipFilter==='history')arr=arr.filter(m=>!m.missing&&m.historical);if(currentOwnershipFilter==='onlyPresent')arr=arr.filter(m=>!m.missing&&!m.historical&&!m.dexOwned);if(currentSort==='name')arr.sort((a,b)=>speciesLabel(a.dex).localeCompare(speciesLabel(b.dex),'de'));else if(currentSort==='nameDesc')arr.sort((a,b)=>speciesLabel(b.dex).localeCompare(speciesLabel(a.dex),'de'));else if(currentSort==='shiny')arr.sort((a,b)=>(Number(b.shiny)-Number(a.shiny))||(a.dex-b.dex));else if(currentSort==='legendary')arr.sort((a,b)=>(Number(isLegendaryDex(b.dex))-Number(isLegendaryDex(a.dex)))||(a.dex-b.dex));else arr.sort((a,b)=>a.dex-b.dex);const owned=ownedDexSet(),max=visibleDexMax();document.getElementById('dexSubtitle').textContent=`${[...owned].filter(d=>d>=1&&d<=max).length} von ${max} gefangen · fehlende grau`;document.getElementById('dexCards').innerHTML=arr.length?arr.map(monCard).join(''):'<div class="empty" style="grid-column:1/-1">Noch keine passenden Einträge.</div>';enrichNames(arr.slice(0,40).map(x=>x.dex))}
 function renderBoxes(mons){const sources=['all',...new Set(mons.map(m=>m.source).filter(Boolean))];const f=document.getElementById('boxFilter');f.innerHTML=sources.map(s=>`<button data-box="${escapeHtml(s)}" class="${s===currentBoxFilter?'active':''}">${s==='all'?'Alle':escapeHtml(s)}</button>`).join('');f.querySelectorAll('button').forEach(b=>b.onclick=()=>{currentBoxFilter=b.dataset.box;renderBoxes(mons);bindMonClicks()});const arr=currentBoxFilter==='all'?mons:mons.filter(m=>m.source===currentBoxFilter);document.getElementById('boxSubtitle').textContent=currentBoxFilter==='all'?`${mons.length} Pokémon`:currentBoxFilter;document.getElementById('boxCards').innerHTML=arr.length?arr.map(m=>monCard({...m,dexOwned:ownedDexSet().has(m.dex)})).join(''):'<div class="empty" style="grid-column:1/-1">Diese Box ist leer.</div>'}
 function renderGames(){
   const list=document.getElementById("gamesList");if(!list)return;
@@ -707,11 +421,11 @@ function renderGames(){
   list.querySelectorAll("[data-remove]").forEach(function(b){b.onclick=function(){state.imports=state.imports.filter(function(x){return x.id!==b.dataset.remove});if(state.syncPrefs)delete state.syncPrefs[b.dataset.remove];saveState();renderAll();toast("Import entfernt.")}});
 }
 function bindMonClicks(){document.querySelectorAll('.mon').forEach(el=>el.onclick=()=>showDetail(el.dataset.fp))}
-function showDetail(fp){const m=dexEntries().find(x=>x.fingerprint===fp)||allMons().find(x=>x.fingerprint===fp);if(!m)return;const name=speciesLabel(m.dex),own=ownershipLabel({...m,dexOwned:m.dexOwned??ownedDexSet().has(m.dex)});document.getElementById('detailTitle').textContent=name;document.getElementById('detailDexBadge').textContent=`#${String(m.dex).padStart(3,'0')}`;document.getElementById('detailSubtitle').textContent=`${m.historical?'Pokédex-Historie':m.source}${m.level?` · Lv. ${m.level}`:''}${m.shiny?' · ★ Shiny':''}`;document.getElementById('detailSprite').innerHTML=spriteMarkup(m.dex,name,'large');const typeText=typesForDex(m.dex).length?typesForDex(m.dex).map(typeLabel).join(' / '):'werden geladen …';const fields=[['National Dex',`#${String(m.dex).padStart(3,'0')}`],['Status',own.text],['Typ',typeText],['Quelle',m.source],['Level',m.level??(m.historical?'—':'aus Box nicht berechnet')],['Shiny',m.shiny?'Ja ★':'Nein']];if(isPremium())fields.push(['Slot',m.slot],['Wesen',natureLabel(m.nature)],['Legendär / Mysteriös',isLegendaryDex(m.dex)?'Ja ✦':'Nein'],['Generation',m.generation||3],['Spielstand',m.game||m.importName||'—'],['Personality ID',m.pid??'—'],['OT-ID (intern)',m.otid??'—']);document.getElementById('detailBody').innerHTML=fields.map(([a,b])=>`<div class="detail"><small>${escapeHtml(a)}</small><b>${escapeHtml(b)}</b></div>`).join('')+(isPremium()?'':'<div class="proDetailLock">💎 Premium zeigt zusätzlich Wesen, genaue Herkunft, Slot, Generation sowie technische Trainer-/Pokémon-Daten.</div>');document.getElementById('modal').classList.add('show')}
+function showDetail(fp){const m=completeDexEntries().find(x=>x.fingerprint===fp)||allMons().find(x=>x.fingerprint===fp);if(!m)return;const name=speciesLabel(m.dex),own=ownershipLabel({...m,dexOwned:m.dexOwned??ownedDexSet().has(m.dex)});document.getElementById('detailTitle').textContent=name;document.getElementById('detailDexBadge').textContent=`#${String(m.dex).padStart(3,'0')}`;document.getElementById('detailSubtitle').textContent=`${m.historical?'Pokédex-Historie':m.source}${m.level?` · Lv. ${m.level}`:''}${m.shiny?' · ★ Shiny':''}`;document.getElementById('detailSprite').innerHTML=spriteMarkup(m.dex,name,'large');const typeText=typesForDex(m.dex).length?typesForDex(m.dex).map(typeLabel).join(' / '):'werden geladen …';const fields=[['National Dex',`#${String(m.dex).padStart(3,'0')}`],['Status',own.text],['Typ',typeText],['Quelle',m.source],['Level',m.level??(m.historical?'—':'aus Box nicht berechnet')],['Shiny',m.shiny?'Ja ★':'Nein']];if(isPremium())fields.push(['Slot',m.slot],['Wesen',natureLabel(m.nature)],['Legendär / Mysteriös',isLegendaryDex(m.dex)?'Ja ✦':'Nein'],['Generation',m.generation||3],['Spielstand',m.game||m.importName||'—'],['Personality ID',m.pid??'—'],['OT-ID (intern)',m.otid??'—']);document.getElementById('detailBody').innerHTML=fields.map(([a,b])=>`<div class="detail"><small>${escapeHtml(a)}</small><b>${escapeHtml(b)}</b></div>`).join('')+(isPremium()?'':'<div class="proDetailLock">💎 Premium zeigt zusätzlich Wesen, genaue Herkunft, Slot, Generation sowie technische Trainer-/Pokémon-Daten.</div>');document.getElementById('modal').classList.add('show')}
 function switchPage(page){document.querySelectorAll('.tabPage').forEach(x=>x.classList.toggle('active',x.id===page));document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo({top:0,behavior:'smooth'})}
 
-document.getElementById('generateTokenBtn').onclick=generateManicToken;document.getElementById('shareIphoneTestBtn').onclick=shareIphoneTest;document.getElementById('hideIosInstallBtn').onclick=()=>{safeSet('romdex-hide-ios-install','1');renderIOSInstall();};document.getElementById('copyEndpointBtn').onclick=()=>copyShortcutValue('shortcutEndpoint');document.getElementById('copyTokenBtn').onclick=()=>copyShortcutValue('shortcutToken');document.getElementById('trainerAvatarBtn').onclick=cycleTrainerAvatar;document.getElementById('testFreeBtn').onclick=()=>setPlan('free');document.getElementById('testPremiumBtn').onclick=()=>setPlan('premium');document.getElementById('authTabLogin').onclick=()=>switchAuthMode('login');document.getElementById('authTabSignup').onclick=()=>switchAuthMode('signup');document.getElementById('authForm').onsubmit=handleAuthSubmit;document.getElementById('authGoogleBtn').onclick=signInWithGoogle;document.getElementById('guestBtn').onclick=()=>{window.__romdexGuest=true;const bypass=document.getElementById('guestBypass');if(bypass)bypass.checked=true;const gate=document.getElementById('authGate');if(gate){gate.classList.add('hidden');gate.style.display='none'};safeSet(GUEST_KEY,'1');try{updateAuthUI()}catch{};try{toast('Gastmodus aktiviert.')}catch{}};document.getElementById('openAuthBtn').onclick=openAuthGate;document.getElementById('signOutBtn').onclick=signOutAuth;document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();document.getElementById('fileInput').onchange=async e=>{const files=[...(e.target.files||[])];if(files.length){for(const f of files)await importFile(f);if(files.length>1)toast(files.length+' Save-Dateien verarbeitet.')}e.target.value=''};document.getElementById('demoBtn').onclick=demoImport;document.getElementById('showAllRecentBtn').onclick=()=>switchPage('boxesPage');document.getElementById('searchInput').oninput=e=>{searchTerm=e.target.value;renderDex();bindMonClicks()};document.getElementById('typeFilter').onchange=e=>{currentTypeFilter=e.target.value;renderDex();bindMonClicks()};document.getElementById('specialFilter').onchange=e=>{currentSpecialFilterDex=e.target.value;renderDex();bindMonClicks()};document.getElementById('sortSelect').onchange=e=>{currentSort=e.target.value;renderDex();bindMonClicks()};document.getElementById('ownershipFilter').onchange=e=>{currentOwnershipFilter=e.target.value;renderDex();bindMonClicks()};document.getElementById('specialShinyBtn').onclick=()=>{currentSpecialPage='shiny';renderSpecial(allMons());bindMonClicks()};document.getElementById('specialLegendaryBtn').onclick=()=>{currentSpecialPage='legendary';renderSpecial(allMons());bindMonClicks()};document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.remove('show');document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')e.currentTarget.classList.remove('show')};document.getElementById('clearDemoBtn').onclick=()=>{state.imports=state.imports.filter(x=>!x.demo);saveState();renderAll();toast('Demo entfernt.')};document.getElementById('clearAllBtn').onclick=()=>{if(confirm('Wirklich alle lokalen ROMDex-Daten löschen?')){state.imports=[];state.history=[];state.nameCache={};state.metaCache={};state.syncPrefs={};saveState();renderAll();toast('Alle lokalen Daten gelöscht.')}};document.getElementById('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),plan:isPremium()?'premium':'free',imports:state.imports,history:isPremium()?(state.history||[]):[]},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='romdex-collection.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js?v=13',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
+document.getElementById('generateTokenBtn').onclick=generateManicToken;document.getElementById('shareIphoneTestBtn').onclick=shareIphoneTest;document.getElementById('hideIosInstallBtn').onclick=()=>{safeSet('romdex-hide-ios-install','1');renderIOSInstall();};document.getElementById('copyEndpointBtn').onclick=()=>copyShortcutValue('shortcutEndpoint');document.getElementById('copyTokenBtn').onclick=()=>copyShortcutValue('shortcutToken');document.getElementById('trainerAvatarBtn').onclick=cycleTrainerAvatar;document.getElementById('testFreeBtn').onclick=()=>setPlan('free');document.getElementById('testPremiumBtn').onclick=()=>setPlan('premium');document.getElementById('importBtn').onclick=()=>document.getElementById('fileInput').click();document.getElementById('fileInput').onchange=async e=>{const files=[...(e.target.files||[])];if(files.length){for(const f of files)await importFile(f);if(files.length>1)toast(files.length+' Save-Dateien verarbeitet.')}e.target.value=''};document.getElementById('demoBtn').onclick=demoImport;document.getElementById('showAllRecentBtn').onclick=()=>switchPage('boxesPage');document.getElementById('searchInput').oninput=e=>{searchTerm=e.target.value;renderDex();bindMonClicks()};document.getElementById('typeFilter').onchange=e=>{currentTypeFilter=e.target.value;renderDex();bindMonClicks()};document.getElementById('specialFilter').onchange=e=>{currentSpecialFilterDex=e.target.value;renderDex();bindMonClicks()};document.getElementById('sortSelect').onchange=e=>{currentSort=e.target.value;renderDex();bindMonClicks()};document.getElementById('ownershipFilter').onchange=e=>{currentOwnershipFilter=e.target.value;renderDex();bindMonClicks()};document.getElementById('specialShinyBtn').onclick=()=>{currentSpecialPage='shiny';renderSpecial(allMons());bindMonClicks()};document.getElementById('specialLegendaryBtn').onclick=()=>{currentSpecialPage='legendary';renderSpecial(allMons());bindMonClicks()};document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.remove('show');document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')e.currentTarget.classList.remove('show')};document.getElementById('clearDemoBtn').onclick=()=>{state.imports=state.imports.filter(x=>!x.demo);saveState();renderAll();toast('Demo entfernt.')};document.getElementById('clearAllBtn').onclick=()=>{if(confirm('Wirklich alle lokalen ROMDex-Daten löschen?')){state.imports=[];state.history=[];state.nameCache={};state.metaCache={};state.syncPrefs={};saveState();renderAll();toast('Alle lokalen Daten gelöscht.')}};document.getElementById('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({exportedAt:new Date().toISOString(),plan:isPremium()?'premium':'free',imports:state.imports,history:isPremium()?(state.history||[]):[]},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='romdex-collection.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js?v=14',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{});
 renderAll();renderIOSInstall();renderShortcutSetup();initAuth();if(uniqueSpecies().length)enrichNames(uniqueSpecies());
 </script>
 </body>
