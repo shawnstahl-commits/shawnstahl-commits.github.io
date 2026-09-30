@@ -1,3 +1,26 @@
+## Version 7.4 – Production Readiness (Staging)
+
+Branch: `staging-v7.4-production-readiness`
+
+- Produktions- und Entwicklungsoberfläche getrennt: Testplan, Tester-Diagnose, Feedback-Testbutton und Beta-Vergleich sind im normalen Modus verborgen.
+- Entwicklerwerkzeuge bleiben mit `?dev=1` verfügbar; `?dev=0` deaktiviert den lokalen Entwicklermodus wieder.
+- Lokaler PLUS-TEST kann außerhalb des Entwicklermodus keine Premiumfunktionen mehr freischalten.
+- Supabase-Audit: alle App-Tabellen haben RLS aktiviert; nutzerbezogene Policies sind an `auth.uid()` gebunden.
+- Data-API-Grants auf Minimalrechte reduziert; anon hat keinen Zugriff mehr auf Verlauf, Favoriten oder Profile.
+- Feedback bleibt absichtlich INSERT-only für anon/authenticated.
+- Moderne Supabase-Publishable-Key-Nutzung im Frontend bestätigt; kein service_role/secret key im Browsercode gefunden.
+- `delete-account` verlangt ein gültiges JWT.
+- Index `feedback_reports_user_id_idx` ergänzt.
+- Default-Privileges für neue public-Tabellen/Funktionen restriktiver gesetzt.
+
+### Offene Produktionsblocker
+
+- Supabase Leaked Password Protection ist noch deaktiviert und muss vor Release aktiviert werden.
+- Impressum und Datenschutzerklärung benötigen finale Betreiber-/Kontaktangaben und rechtliche Prüfung.
+- Externe Browser-Abhängigkeiten und PWA/Icons werden im nächsten Production-Readiness-Schritt geprüft.
+- Vor Merge nach `main`: vollständiger Smoke-Test (Scanner, OCR, Auth, Verlauf, Favoriten, Familienprofile, Vergleich, Offline/Fehlerfälle).
+
+
 # E-Check Kids – Projekt-Checkpoint
 
 Stand: 29.09.2026
