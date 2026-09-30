@@ -28,7 +28,7 @@
 <div class="layout">
 <main>
 <section id="street" class="tab">
-<div class="panel"><div class="profile"><div class="avatar">😎</div><div style="flex:1"><b id="playerName">Rookie</b><div class="tiny">Bezirk: <span id="district">Hinterhof</span> · Kampfstärke <span id="power">7</span></div><input id="name" maxlength="16" value="Rookie" placeholder="Spielername"></div></div></div>
+<div class="panel"><div class="profile"><div class="avatar">😎</div><div style="flex:1"><b id="playerName">Rookie</b><div class="tiny">Bezirk: <span id="districtName">Hinterhof</span> · Kampfstärke <span id="power">7</span></div><input id="playerNameInput" maxlength="16" value="Rookie" placeholder="Spielername"></div></div></div>
 <div class="panel"><h2>Geld verdienen</h2><div class="muted">Jobs kosten Energie. Bessere Jobs werden mit höheren Levels freigeschaltet.</div><div class="cards" id="jobs"></div></div>
 <div class="panel"><h2>Stadtfortschritt</h2><div class="kv"><span>Hinterhof</span><b class="good">Offen</b></div><div class="kv"><span>Bahnhofsviertel</span><b id="d3">ab Level 3</b></div><div class="kv"><span>Innenstadt</span><b id="d6">ab Level 6</b></div><div class="kv"><span>Business District</span><b id="d10">ab Level 10</b></div></div>
 </section>
@@ -76,7 +76,7 @@ function district(){return s.level>=10?"Business District":s.level>=6?"Innenstad
 function save(show=false){localStorage.setItem("streetEmpireV1",JSON.stringify(s));render();if(show)say("Gespeichert")}
 function render(){
 tick();
-level.textContent=s.level;cash.textContent=Math.round(s.cash).toLocaleString("de-DE")+" €";energy.textContent=Math.floor(s.energy)+"/100";gems.textContent=s.gems+" 💎";xpbar.style.width=Math.min(100,s.xp/need()*100)+"%";energybar.style.width=s.energy+"%";str.textContent=s.str;biz.textContent=s.biz;cha.textContent=s.cha;gearBonus.textContent=s.gear;powerEl=document.getElementById("power");powerEl.textContent=power();district.textContent=window.district();playerName.textContent=s.name;name.value=s.name;
+level.textContent=s.level;cash.textContent=Math.round(s.cash).toLocaleString("de-DE")+" €";energy.textContent=Math.floor(s.energy)+"/100";gems.textContent=s.gems+" 💎";xpbar.style.width=Math.min(100,s.xp/need()*100)+"%";energybar.style.width=s.energy+"%";str.textContent=s.str;biz.textContent=s.biz;cha.textContent=s.cha;gearBonus.textContent=s.gear;powerEl=document.getElementById("power");powerEl.textContent=power();document.getElementById("districtName").textContent=district();playerName.textContent=s.name;document.getElementById("playerNameInput").value=s.name;
 [[d3,3],[d6,6],[d10,10]].forEach(x=>{x[0].textContent=s.level>=x[1]?"Offen":"ab Level "+x[1];x[0].className=s.level>=x[1]?"good":""});
 jobsEl=document.getElementById("jobs");jobsEl.innerHTML=jobs.map((j,i)=>`<div class="card" style="${s.level<j[6]?'opacity:.45;filter:grayscale(1)':''}"><h3>${j[0]} ${j[1]}</h3><div class="tiny">Verdiene Geld und Erfahrung.</div><div class="chips"><span class="chip">⚡ ${j[2]}</span><span class="chip">💶 ${j[3]}-${j[4]} €+</span><span class="chip">⭐ ${j[5]} XP</span></div><button class="btn full" ${s.level<j[6]?'disabled':''} onclick="work(${i})">${s.level<j[6]?'Ab Level '+j[6]:'Loslegen'}</button></div>`).join("");
 trainingList.innerHTML=trains.map(t=>{let c=Math.round(t[3]*Math.pow(1.55,s[t[0]]-1));return `<div class="row"><div><b>${t[1]} ${t[2]} · Stufe ${s[t[0]]}</b><div class="tiny">Nächstes Training: ${c} €</div></div><button class="btn" onclick="train('${t[0]}')">${c} €</button></div>`}).join("");
@@ -86,7 +86,7 @@ let score=Math.round(s.level*1000+s.cash+power()*100),rs=[["KingKev",15600],["Mi
 log.innerHTML=s.log.map(x=>typeof x==="string"?`<div>${x}</div>`:`<div class="${x.c||''}">${x.t}</div>`).join("");
 }
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));document.getElementById(b.dataset.tab).classList.remove("hidden")});
-name.onchange=e=>{s.name=e.target.value.trim()||"Rookie";save()};
+document.getElementById("playerNameInput").onchange=e=>{s.name=e.target.value.trim()||"Rookie";save()};
 setInterval(()=>{tick();render()},30000);render();
 </script>
 </body></html>
