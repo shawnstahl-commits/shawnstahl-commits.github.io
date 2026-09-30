@@ -59,6 +59,16 @@ jobs:
           cp staging/manifest.webmanifest android-preview/www/manifest.webmanifest
           cp staging/icon.svg android-preview/www/icon.svg
           cp staging/sw.js android-preview/www/sw.js
+          cp android-preview/native-barcode.js android-preview/www/native-barcode.js
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("android-preview/www/index.html")
+          s=p.read_text()
+          tag='<script src="./native-barcode.js"></script>'
+          if tag not in s:
+              s=s.replace("</body>",tag+"\n</body>")
+          p.write_text(s)
+          PY
 
       - name: Add Android platform
         working-directory: android-preview
@@ -117,7 +127,11 @@ jobs:
           for(const s of scripts) new Function(s);
           if(!html.includes("7.4.1 RC Staging")) throw new Error("Unexpected app version");
           if(/sb_secret_/i.test(html)) throw new Error("Secret Supabase key found in web bundle");
-          console.log("Bundled JS and version check OK");
+          if(!html.includes('native-barcode.js')) throw new Error("Native barcode bridge is not injected");
+          const native=fs.readFileSync("android-preview/www/native-barcode.js","utf8");
+          new Function(native);
+          if(!native.includes('CapacitorBarcodeScanner')) throw new Error("Native barcode plugin bridge missing");
+          console.log("Bundled JS, native barcode bridge and version check OK");
           NODE
 
       - name: Build debug APK
@@ -146,6 +160,8 @@ jobs:
           unzip -l E-Check-Kids-preview.apk | grep -F "assets/public/index.html"
           unzip -l E-Check-Kids-preview.apk | grep -F "assets/public/manifest.webmanifest"
           unzip -l E-Check-Kids-preview.apk | grep -F "assets/public/icon.svg"
+          unzip -l E-Check-Kids-preview.apk | grep -F "assets/public/native-barcode.js"
+          unzip -p E-Check-Kids-preview.apk assets/capacitor.plugins.json | grep -F "CapacitorBarcodeScanner"
           test "$(stat -c%s E-Check-Kids-preview.apk)" -gt 1000000
           sha256sum E-Check-Kids-preview.apk
 
