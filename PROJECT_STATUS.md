@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **7.3 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=54
-- Aktueller Frontend-Checkpoint: `f49f0c96a0373de31d1600f63106b5ed32b56b47`
-- Aktueller Cache-Checkpoint: `55b6f147108af7ddee9627864f8bb07e4a3148f0`
+- Version: **7.3.1 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=55
+- Aktueller Frontend-Checkpoint: `aa6dea188602348d84c5f77e47a61d57b3e52068`
+- Aktueller Cache-Checkpoint: `7fe209d7b9785ba24e278211d79c6d2968647967`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -76,6 +76,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 7.3.1 – E-Nummern-Erklärung sichtbarer: `aa6dea188602348d84c5f77e47a61d57b3e52068`
 - Version 7.3 – Quellen, Alternativen & Scan-Hierarchie: `f49f0c96a0373de31d1600f63106b5ed32b56b47`
 - Version 7.2 – Scan-Sicherheit & Datenqualität: `6c5ea592cee68a694f86174574a7edd9aad444f3`
 - Version 7.1 – Stabilität & Feinschliff: `1ab68d00ebf59212f44fdba2ff8f6214ce4ce664`
@@ -134,6 +135,11 @@ Stand: 29.09.2026
 - 7.3: E-Nummern werden bei Alternativen nur dann als Vorteil verglichen, wenn Zutatenangaben vorhanden sind
 - 7.3: Allergie-Filter prüft zusätzlich den verfügbaren Zutaten-Text, nicht nur Open-Food-Facts-Allergen-Tags
 - 7.3: Bis zu vier nachvollziehbar sortierte Alternativen statt drei
+
+- 7.3.1: Der aufklappbare E-Nummern-Bereich ist als eigener hervorgehobener Block gestaltet
+- 7.3.1: Überschrift „E-NUMMERN ERKLÄRT“ und klare Aufforderung zum Tippen
+- 7.3.1: Erkannte E-Nummern werden schon im geschlossenen Zustand als kleine Chips angezeigt
+- 7.3.1: Der Pfeil ist größer und der geöffnete Zustand visuell deutlicher
 
 ## Als Nächstes
 1. Produktvergleich weiter testen und stabilisieren
