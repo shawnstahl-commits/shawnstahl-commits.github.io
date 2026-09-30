@@ -2086,7 +2086,7 @@ async function lookupBarcode(forced,fromScanner){
    traces_tags:Array.isArray(p.traces_tags)?p.traces_tags:[],
    ingredients_present:!!String(ing||"").trim(),
    allergen_data_present:!!((Array.isArray(p.allergens_tags)&&p.allergens_tags.length)||(Array.isArray(p.traces_tags)&&p.traces_tags.length)),
-   data_quality:dataQualityV72(p,ing,productImages)
+   data_quality:dataQualityV72(p,ing,productImageCandidates(p))
   };
   if(currentUser){
     var favBar='<div style="margin-top:14px"><button id="favoriteCurrentBtn" class="btn soft" onclick="toggleCurrentFavorite()">☆ Zu Favoriten</button></div>';
