@@ -262,6 +262,10 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 .production-mode-v74 .plus-eyebrow-v5::after{content:" · VORSCHAU"}
 .developer-mode-v74::before{content:"ENTWICKLERMODUS";position:fixed;z-index:9000;left:50%;top:4px;transform:translateX(-50%);background:#243c36;color:#fff;border-radius:999px;padding:4px 9px;font-size:8px;font-weight:950;letter-spacing:.1em;pointer-events:none}
 
+
+/* Android native scanner integration 7.4.1 */
+body.cap-native-scanner-v741 .scan-instruction-v4 small{font-weight:800}
+
 </style>
 </head>
 <body>
@@ -706,7 +710,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts (ODbL) • Produktbilder: Open Food Facts (CC BY-SA) • Version 7.4 RC Staging</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts (ODbL) • Produktbilder: Open Food Facts (CC BY-SA) • Version 7.4.1 RC Staging</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -716,7 +720,7 @@ var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTi
 var familyMembersV68=[],personalAllergensV68=[],activeFamilyMemberV68=null,editingFamilyMemberV69=null,historyCacheV68=[];
 var productLookupBusyV71=false,familyProfilesErrorV71=false;
 var scanCandidateV72="",scanCandidateCountV72=0,scanCandidateAtV72=0;
-var APP_VERSION_V70="7.4 RC Staging",feedbackKindV70="bug",diagnosticEventsV70=[];
+var APP_VERSION_V70="7.4.1 RC Staging",feedbackKindV70="bug",diagnosticEventsV70=[];
 function diagV70(event,data){
  try{
   diagnosticEventsV70.push({t:new Date().toISOString(),event:String(event||""),data:data&&typeof data==="object"?data:{}});
@@ -1538,6 +1542,78 @@ async function switchScannerEngine(session){
  await startHtml5Scanner(session,true);
 }
 
+
+function nativeBarcodePluginV741(){
+ try{
+  var cap=window.Capacitor;
+  if(!cap||typeof cap.isNativePlatform!=="function"||!cap.isNativePlatform())return null;
+  if(typeof cap.isPluginAvailable==="function"&&!cap.isPluginAvailable("CapacitorBarcodeScanner"))return null;
+  return cap.Plugins&&cap.Plugins.CapacitorBarcodeScanner?cap.Plugins.CapacitorBarcodeScanner:null;
+ }catch(e){return null}
+}
+async function handleNativeBarcodeResultV741(raw,session){
+ if(session!==scannerSessionId||scanLookupBusy)return;
+ var code=String(raw||"").replace(/\D/g,"");
+ if(code.length<8||code.length>14){
+  diagV70("native_barcode_invalid_length",{length:code.length});
+  setStatus("Barcode konnte nicht eindeutig gelesen werden – bitte erneut scannen.");
+  setTimeout(function(){if(session===scannerSessionId&&!scanLookupBusy)startScanner(session)},250);
+  return;
+ }
+ if(!validGtinChecksumV64(code)){
+  diagV70("native_barcode_checksum_failed",{length:code.length});
+  setStatus("Barcode-Prüfziffer passt nicht – bitte erneut scannen.");
+  setTimeout(function(){if(session===scannerSessionId&&!scanLookupBusy)startScanner(session)},250);
+  return;
+ }
+ diagV70("native_barcode_confirmed",{length:code.length});
+ lastScanCode=code;lastScanAt=Date.now();
+ locked=true;scanLookupBusy=true;
+ var targetSlot=compareTargetSlot;
+ document.getElementById("barcodeInput").value=code;
+ setStatus("✓ Barcode erkannt: "+code);
+ document.body.classList.add("scan-processing");
+ try{if(navigator.vibrate)navigator.vibrate([80,40,80])}catch(e){}
+ try{
+  if(targetSlot)await lookupCompareProduct(code,targetSlot);
+  else await lookupBarcode(code,true);
+ }finally{
+  setTimeout(function(){locked=false;scanLookupBusy=false},700);
+ }
+}
+async function startNativeAppScannerV741(session){
+ var plugin=nativeBarcodePluginV741();
+ if(!plugin||typeof plugin.scanBarcode!=="function")return false;
+ try{
+  diagV70("native_scanner_start",{});
+  setStatus("Native Kamera wird geöffnet …");
+  document.getElementById("photoFallback").classList.add("hidden");
+  var r=await plugin.scanBarcode({
+   hint:17,
+   scanInstructions:"Barcode mittig in den Rahmen halten",
+   scanButton:false,
+   scanText:"Scannen",
+   cameraDirection:1,
+   scanOrientation:3,
+   android:{scanningLibrary:"zxing"}
+  });
+  if(session!==scannerSessionId)return true;
+  var raw=r&&r.ScanResult?r.ScanResult:"";
+  if(!raw){
+   diagV70("native_scanner_cancelled",{});
+   setStatus("Scan abgebrochen.");
+   return true;
+  }
+  await handleNativeBarcodeResultV741(raw,session);
+  return true;
+ }catch(e){
+  if(session!==scannerSessionId)return true;
+  diagV70("native_scanner_error",{type:e&&e.message?String(e.message).slice(0,80):"unknown"});
+  setStatus("Nativer Scanner nicht verfügbar – Web-Scanner wird gestartet …");
+  return false;
+ }
+}
+
 async function startScanner(session){
  diagV70("scanner_start",{page:currentPageV70()});
  session=session||scannerSessionId;
@@ -1545,6 +1621,9 @@ async function startScanner(session){
  if(session!==scannerSessionId)return;
  scanCandidateV72="";scanCandidateCountV72=0;scanCandidateAtV72=0;
  clearError();locked=false;torchOn=false;scannerPassV63=0;
+ var nativeStarted=await startNativeAppScannerV741(session);
+ if(nativeStarted)return;
+ if(session!==scannerSessionId)return;
  var torchBtn=document.getElementById("scanTorchBtn");
  if(torchBtn){torchBtn.classList.add("hidden");torchBtn.textContent="🔦 Licht an"}
  if(!window.isSecureContext && location.hostname!=="localhost"){
@@ -1612,7 +1691,7 @@ async function stopScanner(){
  if(scannerRetryTimer){clearTimeout(scannerRetryTimer);scannerRetryTimer=null}
  scannerPassV63=0;
  var hint=document.querySelector(".scan-instruction-v4 small");
- if(hint)hint.textContent="Die Erkennung startet automatisch";
+ if(hint)hint.textContent=nativeBarcodePluginV741()?"Native Barcode-Erkennung startet automatisch":"Die Erkennung startet automatisch";
  await stopNative();
  if(html5Scanner){try{await html5Scanner.stop()}catch(e){}try{html5Scanner.clear()}catch(e){}html5Scanner=null}
  document.getElementById("reader").classList.add("hidden");
@@ -1680,7 +1759,7 @@ async function lookupCompareProduct(code,slot){
    lactose:lactoseAssessment(p,ing),
    allergens_tags:Array.isArray(p.allergens_tags)?p.allergens_tags:[],
    traces_tags:Array.isArray(p.traces_tags)?p.traces_tags:[],
-   data_quality:dataQualityV72(p,ing,productImages)
+   data_quality:dataQualityV72(p,ing,productImageCandidates(p))
   };
   document.body.classList.remove("scanner-fullscreen","scan-processing");
   compareTargetSlot=null;
