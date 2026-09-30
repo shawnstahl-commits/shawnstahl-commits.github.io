@@ -8,6 +8,12 @@ const PREFIX = ['Aero','Bram','Cryo','Dra','Ember','Ferro','Glim','Hydro','Ixo',
 const SUFFIX = ['bit','fang','flare','fox','horn','ling','moth','nox','paw','rex','rift','scale','spark','tail','thorn','wing','wyrm','zen'];
 const RARITY_REWARD = {'Gewöhnlich':0,'Selten':5,'Episch':10,'Legendär':25,'Mythisch':50};
 
+const RETAIL_CAMPAIGNS = [
+  {id:'fresh-mission',partner:'DemoMarkt',title:'Frische Mission',condition:'Kaufe 3 Obst- oder Gemüseartikel.',coins:120,scans:2,icon:'🥕'},
+  {id:'family-weekend',partner:'CityFresh',title:'Familien-Wochenende',condition:'Bestätigter Einkauf ab 20 €.',coins:180,scans:1,icon:'🛒'},
+  {id:'quest-drop',partner:'DemoMarkt',title:'ScanQuest Drop',condition:'Kaufe ein teilnehmendes Aktionsprodukt.',coins:80,scans:3,icon:'🎁'}
+];
+
 let state = loadState();
 let htmlScanner = null;
 let scanning = false;
@@ -27,6 +33,7 @@ function freshState(){
     coins: 25,
     collection: {},
     totalScans: 0,
+    retailClaims: {},
     daily: {date:localDateKey(),used:0,bonus:0,newCount:0,rarePlus:0,uniqueIds:[],rewarded:{}}
   };
 }
@@ -38,6 +45,7 @@ function loadState(){
     raw.collection = raw.collection || {};
     raw.coins = Number(raw.coins || 0);
     raw.totalScans = Number(raw.totalScans || 0);
+    raw.retailClaims = raw.retailClaims || {};
     raw.daily = raw.daily || {};
     if(raw.daily.date !== localDateKey()){
       raw.daily = {date:localDateKey(),used:0,bonus:0,newCount:0,rarePlus:0,uniqueIds:[],rewarded:{}};
@@ -203,7 +211,7 @@ function renderAll(){
   $('#dexCount').textContent=count; $('#dexCount2').textContent=count;
   $('#dexBar').style.width=(count/SPECIES_TOTAL*100)+'%';
   $('#todayCount').textContent=state.daily.used;
-  renderQuests(); renderRecent(); renderDex(); renderArena(); renderShop();
+  renderQuests(); renderRecent(); renderDex(); renderArena(); renderShop(); renderRetail();
 }
 
 function renderQuests(){
@@ -290,6 +298,41 @@ function runBattle(){
   $('#battleResult').innerHTML='<div class="battle-log"><div class="battle-line">'+a.name+' eröffnet mit Stärke '+a.power+'.</div><div class="battle-line">'+b.name+' kontert mit Tempo '+b.speed+'.</div><div class="battle-line">Die Energie entscheidet die Schlussphase…</div><div class="winner">🏆 '+winner.name+' gewinnt den Testkampf!</div></div>';
 }
 
+function renderRetail(){
+  const wrap=$('#retailCampaigns');
+  if(!wrap) return;
+  const claims=state.retailClaims||{};
+  const claimedCount=Object.keys(claims).length;
+  const label=$('#retailClaimsLabel');
+  if(label) label.textContent=claimedCount+' Demo-Käufe bestätigt';
+  wrap.innerHTML=RETAIL_CAMPAIGNS.map(c=>{
+    const claimed=!!claims[c.id];
+    return '<article class="card retail-campaign '+(claimed?'claimed':'')+'">'+
+      '<div class="retail-brand"><div class="retail-logo">'+c.icon+'</div><div><small>PARTNER-DEMO</small><b>'+c.partner+'</b></div></div>'+
+      '<h3>'+c.title+'</h3><p>'+c.condition+'</p>'+
+      '<div class="retail-rewards"><span>+'+c.coins+' 🪙</span><span>+'+c.scans+' ⚡</span></div>'+
+      '<button class="'+(claimed?'secondary':'primary')+' retail-claim" data-campaign="'+c.id+'" '+(claimed?'disabled':'')+'>'+
+      (claimed?'✓ Belohnung erhalten':'Demo-Kauf bestätigen')+'</button>'+
+      '<small class="retail-tech">'+(claimed?'Bestätigung gespeichert.':'Simuliert später die Rückmeldung von Kasse / Loyalty-System.')+'</small>'+
+      '</article>';
+  }).join('');
+  wrap.querySelectorAll('.retail-claim').forEach(btn=>btn.addEventListener('click',()=>confirmRetailPurchase(btn.dataset.campaign)));
+}
+
+function confirmRetailPurchase(id){
+  const campaign=RETAIL_CAMPAIGNS.find(c=>c.id===id);
+  if(!campaign) return;
+  state.retailClaims=state.retailClaims||{};
+  if(state.retailClaims[id]){ toast('Diese Demo-Kampagne wurde bereits eingelöst.'); return; }
+  const confirmationId='DEMO-'+Date.now().toString(36).toUpperCase();
+  state.retailClaims[id]={confirmedAt:Date.now(),confirmationId};
+  state.coins += campaign.coins;
+  state.daily.bonus = Number(state.daily.bonus||0)+campaign.scans;
+  saveState();
+  renderAll();
+  toast('Kauf bestätigt: +'+campaign.coins+' 🪙 und +'+campaign.scans+' ⚡');
+}
+
 function renderShop(){
   const btn=$('#buyScanBtn');
   btn.disabled=state.coins<40;
@@ -312,6 +355,7 @@ function setView(name){
   window.scrollTo({top:0,behavior:'smooth'});
   if(name==='dex')renderDex();
   if(name==='arena')renderArena();
+  if(name==='rewards')renderRetail();
 }
 
 function bindViewButtons(root=document){
