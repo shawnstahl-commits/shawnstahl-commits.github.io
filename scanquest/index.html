@@ -8,7 +8,7 @@
   <meta name="description" content="Scanne echte Barcodes, entdecke Kreaturen und fülle deinen ScanDex.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=1">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
   <div class="bg-glow g1"></div><div class="bg-glow g2"></div>
@@ -26,7 +26,10 @@
         <span class="eyebrow">SCAN · ENTDECKEN · SAMMELN</span>
         <h1>Jeder Barcode<br><span>kann ein Wesen sein.</span></h1>
         <p>Scanne Produkte im Alltag und entdecke eines von 120 ScanQuest-Wesen. Jeder Barcode erzeugt immer dieselbe Entdeckung.</p>
-        <button id="heroScanBtn" class="primary big">📷 Jetzt scannen</button>
+        <div class="hero-actions">
+          <button id="heroScanBtn" class="primary big">📷 Jetzt scannen</button>
+          <button class="secondary big" data-view="rewards">🎁 Händler-Rewards</button>
+        </div>
       </div>
 
       <div class="dashboard">
@@ -90,6 +93,40 @@
       <div id="dexGrid" class="dex-grid"></div>
     </section>
 
+    <section id="rewardsView" class="view">
+      <button class="back" data-view="home">← Zurück</button>
+      <div class="section-title rewards-head">
+        <div>
+          <span class="eyebrow">SCANQUEST RETAIL REWARDS · DEMO</span>
+          <h1>Kaufen. Bestätigen. Belohnung bekommen.</h1>
+          <p>Später bestätigt die Händler-App, Kundenkarte oder Kasse den echten Einkauf. Erst danach werden Coins, Extra-Scans oder exklusive Wesen freigeschaltet.</p>
+        </div>
+      </div>
+
+      <div class="card retail-flow">
+        <div class="flow-step"><span>1</span><b>Im Partnerladen einkaufen</b><small>Produkt oder Aktionsziel erfüllen</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span>2</span><b>Kauf wird bestätigt</b><small>Kasse, Loyalty-App oder Bon-API</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span>3</span><b>Game-Rewards erhalten</b><small>Coins, Scans, Wesen & Events</small></div>
+      </div>
+
+      <div class="section-title">
+        <div><span class="eyebrow">AKTIVE PARTNER-MISSIONEN</span><h2>Demo-Kampagnen</h2></div>
+        <span id="retailClaimsLabel" class="muted"></span>
+      </div>
+      <div id="retailCampaigns" class="retail-campaigns"></div>
+
+      <div class="card retailer-note">
+        <div class="info-icon">B2B</div>
+        <div>
+          <b>Für Händler: ScanQuest als Kundenbindungs-Modul</b>
+          <p>Der Händler legt Kampagnen fest, ScanQuest vergibt die Spielbelohnung erst nach bestätigtem Kauf. Diese Webversion simuliert die Bestätigung – es findet noch keine echte Kassen-, Kundenkarten- oder PAYBACK-Anbindung statt.</p>
+          <a class="secondary partner-link" href="partner.html">Händler-Demo öffnen →</a>
+        </div>
+      </div>
+    </section>
+
     <section id="arenaView" class="view">
       <button class="back" data-view="home">← Zurück</button>
       <div class="section-title"><div><span class="eyebrow">TEST-ARENA</span><h1>Wesen gegen Wesen</h1><p>Nur zum Spaß – Kämpfe verändern keine Werte und kosten nichts.</p></div></div>
@@ -124,7 +161,7 @@
     <button data-view="home" class="nav active"><span>⌂</span><small>Home</small></button>
     <button data-view="scan" class="nav"><span>▦</span><small>Scan</small></button>
     <button data-view="dex" class="nav"><span>◫</span><small>ScanDex</small></button>
-    <button data-view="arena" class="nav"><span>⚔</span><small>Arena</small></button>
+    <button data-view="rewards" class="nav"><span>🎁</span><small>Rewards</small></button>
     <button data-view="shop" class="nav"><span>◇</span><small>Shop</small></button>
   </nav>
 
@@ -139,6 +176,6 @@
   <div id="toast" class="toast hidden"></div>
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="app.js?v=1"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
