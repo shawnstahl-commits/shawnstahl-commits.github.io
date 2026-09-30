@@ -3,10 +3,10 @@
 Stand: 29.09.2026
 
 ## Aktuelle Version
-- Version: **7.2 Preview**
-- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=53
-- Aktueller Frontend-Checkpoint: `6c5ea592cee68a694f86174574a7edd9aad444f3`
-- Aktueller Cache-Checkpoint: `03591c5668ba72c605f4620de87ca0eda958f267`
+- Version: **7.3 Preview**
+- Öffentliche Test-URL: https://shawnstahl-commits.github.io/?v=54
+- Aktueller Frontend-Checkpoint: `f49f0c96a0373de31d1600f63106b5ed32b56b47`
+- Aktueller Cache-Checkpoint: `55b6f147108af7ddee9627864f8bb07e4a3148f0`
 
 ## Was bereits funktioniert
 - Barcode-Scan per Kamera
@@ -76,6 +76,7 @@ Stand: 29.09.2026
 - JavaScript nach Änderungen auf Syntaxfehler geprüft
 
 ## Wichtige Rücksprungpunkte
+- Version 7.3 – Quellen, Alternativen & Scan-Hierarchie: `f49f0c96a0373de31d1600f63106b5ed32b56b47`
 - Version 7.2 – Scan-Sicherheit & Datenqualität: `6c5ea592cee68a694f86174574a7edd9aad444f3`
 - Version 7.1 – Stabilität & Feinschliff: `1ab68d00ebf59212f44fdba2ff8f6214ce4ce664`
 - Version 7.0 – Tester-/Feedbackmodus, Diagnose und Rechtstransparenz: `48028dd3b1a986b6a6f5ac4de16b592c9d4e441d`
@@ -126,6 +127,13 @@ Stand: 29.09.2026
 - 7.2: Native Android-Barcodedetektion läuft nach dem ersten Kandidaten weiter, bis die Bestätigung erfolgt
 - 7.2: Scan-Ergebnis zeigt Datenqualität für Zutatenliste, Allergen-/Spurentags, Nährwerte und Produktbild
 - 7.2: Datenqualität bewertet nur Datenverfügbarkeit, nicht die gesundheitliche Qualität eines Produkts
+
+- 7.3: Wichtige E-Nummern bekommen direkte offizielle Quellenlinks zu EU/EFSA
+- 7.3: Scan-Ergebnis hat einen neuen Bereich „Was bei diesem Scan wichtig ist“ für Kinderhinweis, ausgewählte Allergene, Laktose und Datenlücken
+- 7.3: Alternativensuche lädt mehr Kandidaten, dedupliziert Barcodes und wertet unvollständige Zutaten-/Allergendaten ab
+- 7.3: E-Nummern werden bei Alternativen nur dann als Vorteil verglichen, wenn Zutatenangaben vorhanden sind
+- 7.3: Allergie-Filter prüft zusätzlich den verfügbaren Zutaten-Text, nicht nur Open-Food-Facts-Allergen-Tags
+- 7.3: Bis zu vier nachvollziehbar sortierte Alternativen statt drei
 
 ## Als Nächstes
 1. Produktvergleich weiter testen und stabilisieren
