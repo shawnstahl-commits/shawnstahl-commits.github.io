@@ -64,6 +64,19 @@ jobs:
         working-directory: android-preview
         run: npx cap add android
 
+      - name: Set native scanner minimum Android SDK
+        working-directory: android-preview
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("android/variables.gradle")
+          s=p.read_text()
+          s=s.replace("minSdkVersion = 24","minSdkVersion = 26")
+          s=s.replace("minSdkVersion = 23","minSdkVersion = 26")
+          p.write_text(s)
+          assert "minSdkVersion = 26" in s
+          PY
+
       - name: Add Android camera permission
         working-directory: android-preview
         run: |
@@ -102,7 +115,7 @@ jobs:
           const scripts=[]; let m;
           while((m=re.exec(html))!==null){ if(m[1].trim()) scripts.push(m[1]); }
           for(const s of scripts) new Function(s);
-          if(!html.includes("7.4 RC Staging")) throw new Error("Unexpected app version");
+          if(!html.includes("7.4.1 RC Staging")) throw new Error("Unexpected app version");
           if(/sb_secret_/i.test(html)) throw new Error("Secret Supabase key found in web bundle");
           console.log("Bundled JS and version check OK");
           NODE
@@ -126,6 +139,7 @@ jobs:
           echo "$BADGING"
           echo "$PERMS"
           echo "$BADGING" | grep -F "package: name='de.echeckkids.preview'"
+          echo "$BADGING" | grep -F "sdkVersion:'26'"
           echo "$BADGING" | grep -F "application-label:'E-Check Kids'"
           echo "$PERMS" | grep -F "android.permission.CAMERA"
           echo "$PERMS" | grep -F "android.permission.INTERNET"
