@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0e12">
+<title>Street Empire</title>
+<style>
+:root{--bg:#090b0e;--p:#13171d;--p2:#1b2028;--line:#2c3440;--txt:#f7f8fa;--mut:#97a3b3;--gold:#f2b84b;--green:#59d88e;--blue:#65b7ff;--purple:#8e7dff;--red:#ff7272}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#25303d 0,#0b0e12 37%,#080a0d 100%);color:var(--txt);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial;min-height:100vh}button,input{font:inherit}.wrap{max-width:1150px;margin:auto;padding:14px}.hero,.panel{background:rgba(19,23,29,.96);border:1px solid var(--line);border-radius:19px;box-shadow:0 18px 40px rgba(0,0,0,.28)}.hero{padding:20px;display:grid;grid-template-columns:1.35fr 1fr;gap:16px}.tag{font-size:11px;font-weight:900;letter-spacing:.13em;color:var(--gold);text-transform:uppercase}h1{font-size:clamp(30px,6vw,50px);line-height:1;margin:5px 0 8px;letter-spacing:-2px}.muted{color:var(--mut)}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:var(--p2);border:1px solid #29313b;border-radius:14px;padding:11px}.stat small{display:block;color:var(--mut);font-size:10px;text-transform:uppercase}.stat b{font-size:20px}.money{color:var(--green)}.energy{color:var(--blue)}.gems{color:#b8afff}.bar{height:7px;background:#0c0f13;border-radius:9px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--gold)}.bar.energybar i{background:var(--blue)}nav{position:sticky;top:0;z-index:5;display:flex;gap:7px;overflow:auto;padding:12px 0;background:linear-gradient(#090b0eee,#090b0ecc,transparent);backdrop-filter:blur(10px)}nav button{white-space:nowrap;background:var(--p);border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:9px 13px}nav button.active{background:var(--gold);border-color:var(--gold);color:#111;font-weight:900}.layout{display:grid;grid-template-columns:2fr 1fr;gap:14px}.panel{padding:16px;margin-bottom:14px}.panel h2{margin:0 0 5px;font-size:20px}.profile{display:flex;align-items:center;gap:12px}.avatar{height:58px;width:58px;display:grid;place-items:center;border-radius:16px;font-size:28px;background:linear-gradient(135deg,#efba53,#65450d)}input{width:100%;margin-top:7px;padding:8px 10px;border:1px solid var(--line);background:#0d1014;color:white;border-radius:10px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.card,.row{background:linear-gradient(145deg,#1b2028,#14181e);border:1px solid #29313b;border-radius:15px;padding:13px}.card h3{margin:0 0 5px}.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.chip{background:#0e1115;border:1px solid #2b333e;border-radius:999px;padding:4px 7px;font-size:11px}.btn{border:0;border-radius:11px;padding:10px 12px;background:var(--gold);color:#111;font-weight:900;cursor:pointer}.btn.full{width:100%}.btn.alt{background:#262d36;color:white;border:1px solid #384351}.btn.gem{background:var(--purple);color:white}.btn:disabled{opacity:.38;cursor:not-allowed}.row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;margin-top:8px}.row .btn{width:auto}.kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #252c35}.kv:last-child{border:0}.good{color:var(--green)}.bad{color:var(--red)}.tiny{font-size:11px;color:var(--mut)}.hidden{display:none!important}.log{max-height:250px;overflow:auto}.log div{padding:7px 0;border-bottom:1px solid #242b33;font-size:12px}.rank{display:grid;grid-template-columns:38px 1fr auto;gap:8px;padding:9px 0;border-bottom:1px solid #252c35;align-items:center}.rank.me{color:var(--gold);font-weight:900}.premium{background:linear-gradient(135deg,#342c78,#171523);border-color:#564aa7}.toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;transition:.2s;background:white;color:#111;padding:10px 15px;border-radius:999px;font-weight:900;z-index:20}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:780px){.hero,.layout{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.wrap{padding:9px}.stats{grid-template-columns:repeat(4,1fr)}.stat{padding:8px}.stat b{font-size:14px}.stat small{font-size:8px}.hero{padding:15px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<div><div class="tag">Vom Nichts zum Imperium</div><h1>STREET EMPIRE</h1><div class="muted">Starte ganz unten. Verdiene Geld, trainiere, kaufe Ausrüstung und kämpfe dich nach oben.</div></div>
+<div class="stats">
+<div class="stat"><small>Level</small><b id="level">1</b><div class="bar"><i id="xpbar"></i></div></div>
+<div class="stat"><small>Geld</small><b class="money" id="cash">120 €</b></div>
+<div class="stat"><small>Energie</small><b class="energy" id="energy">100/100</b><div class="bar energybar"><i id="energybar"></i></div></div>
+<div class="stat"><small>Diamanten</small><b class="gems" id="gems">25 💎</b></div>
+</div>
+</section>
+<nav>
+<button class="active" data-tab="street">🏙️ Straße</button><button data-tab="training">🏋️ Training</button><button data-tab="gear">🛒 Ausrüstung</button><button data-tab="fight">⚔️ Rivalen</button><button data-tab="rank">🏆 Rangliste</button><button data-tab="premium">💎 Premium</button>
+</nav>
+<div class="layout">
+<main>
+<section id="street" class="tab">
+<div class="panel"><div class="profile"><div class="avatar">😎</div><div style="flex:1"><b id="playerName">Rookie</b><div class="tiny">Bezirk: <span id="district">Hinterhof</span> · Kampfstärke <span id="power">7</span></div><input id="name" maxlength="16" value="Rookie" placeholder="Spielername"></div></div></div>
+<div class="panel"><h2>Geld verdienen</h2><div class="muted">Jobs kosten Energie. Bessere Jobs werden mit höheren Levels freigeschaltet.</div><div class="cards" id="jobs"></div></div>
+<div class="panel"><h2>Stadtfortschritt</h2><div class="kv"><span>Hinterhof</span><b class="good">Offen</b></div><div class="kv"><span>Bahnhofsviertel</span><b id="d3">ab Level 3</b></div><div class="kv"><span>Innenstadt</span><b id="d6">ab Level 6</b></div><div class="kv"><span>Business District</span><b id="d10">ab Level 10</b></div></div>
+</section>
+<section id="training" class="tab hidden"><div class="panel"><h2>Training</h2><div class="muted">Höhere Werte bringen mehr Einkommen und bessere Chancen im Kampf.</div><div id="trainingList"></div></div></section>
+<section id="gear" class="tab hidden"><div class="panel"><h2>Ausrüstung</h2><div class="muted">Einmal kaufen, dauerhaft stärker.</div><div id="gearList"></div></div></section>
+<section id="fight" class="tab hidden"><div class="panel"><h2>Rivalen</h2><div class="muted">In dieser Testversion kämpfst du noch gegen Computergegner.</div><div id="rivals"></div></div></section>
+<section id="rank" class="tab hidden"><div class="panel"><h2>Rangliste</h2><div class="muted">Später wird daraus eine echte Online-Rangliste.</div><div id="ranking"></div></div></section>
+<section id="premium" class="tab hidden">
+<div class="panel premium"><div class="tag">Testshop · kein Echtgeld</div><h2>Premium</h2><div class="muted">Hier testen wir das spätere Pay-to-Win-System. Es wird nichts berechnet.</div></div>
+<div class="panel"><div class="row"><div><b>Starter Pack</b><div class="tiny">100 💎 + 500 €</div></div><button class="btn gem" onclick="pack(100,500)">TEST</button></div><div class="row"><div><b>Boss Pack</b><div class="tiny">600 💎 + 5.000 €</div></div><button class="btn gem" onclick="pack(600,5000)">TEST</button></div><div class="row"><div><b>Energie voll</b><div class="tiny">100 Energie für 10 💎</div></div><button class="btn gem" onclick="refill()">10 💎</button></div><div class="row"><div><b>Turbo-Training</b><div class="tiny">Zufälliger Wert +1 für 20 💎</div></div><button class="btn gem" onclick="turbo()">20 💎</button></div></div>
+</section>
+</main>
+<aside>
+<div class="panel"><h2>Deine Werte</h2><div class="kv"><span>💪 Stärke</span><b id="str">1</b></div><div class="kv"><span>🧠 Geschäftssinn</span><b id="biz">1</b></div><div class="kv"><span>🗣️ Charisma</span><b id="cha">1</b></div><div class="kv"><span>🎒 Ausrüstung</span><b id="gearBonus">0</b></div></div>
+<div class="panel"><h2>Aktivitäten</h2><div class="log" id="log"></div></div>
+<div class="panel"><button class="btn alt full" onclick="save(true)">Spielstand speichern</button></div>
+</aside>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const base={name:"Rookie",level:1,xp:0,cash:120,gems:25,energy:100,str:1,biz:1,cha:1,gear:0,owned:[],last:Date.now(),log:["Willkommen bei Street Empire. Dein Weg beginnt im Hinterhof."]};
+let s=JSON.parse(localStorage.getItem("streetEmpireV1")||"null")||structuredClone(base);
+const jobs=[
+["♻️","Pfandtour",6,12,24,6,1],["🚲","Lieferjob",10,28,48,10,1],["📦","Flohmarkt-Deal",15,55,90,16,3],["🎪","Event-Helfer",20,95,150,22,6],["💼","Business-Termin",25,170,260,30,10]
+];
+const trains=[["str","💪","Stärke",110],["biz","🧠","Geschäftssinn",130],["cha","🗣️","Charisma",125]];
+const items=[["bag","Großer Rucksack",2,350],["bike","Gebrauchtes E-Bike",5,1200],["stall","Mobiler Verkaufsstand",9,3500],["office","Kleines Büro",16,9000]];
+const foes=[["Kalle Kiosk",5,140],["Mira Markt",11,360],["Don Dario",20,850],["City Boss",34,2100]];
+function need(){return 70+(s.level-1)*45}
+function power(){return s.str*3+s.biz*2+s.cha*2+s.gear}
+function mult(){return 1+(s.biz-1)*.07+(s.cha-1)*.025+s.gear*.015}
+function say(t){let e=document.getElementById("toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1300)}
+function note(t,c=""){s.log.unshift({t,c});s.log=s.log.slice(0,25)}
+function xp(n){s.xp+=n;while(s.xp>=need()){s.xp-=need();s.level++;s.energy=Math.min(100,s.energy+30);note("Level "+s.level+" erreicht! +30 Energie","good");say("LEVEL "+s.level+"!")}}
+function tick(){let n=Date.now(),m=Math.floor((n-s.last)/60000);if(m>0){s.energy=Math.min(100,s.energy+m*2);s.last+=m*60000;localStorage.setItem("streetEmpireV1",JSON.stringify(s))}}
+function work(i){let j=jobs[i];if(s.level<j[6])return;if(s.energy<j[2])return say("Nicht genug Energie");s.energy-=j[2];let r=Math.round((j[3]+Math.random()*(j[4]-j[3]))*mult());s.cash+=r;xp(j[5]);note(j[0]+" "+j[1]+": +"+r+" € und +"+j[5]+" XP","good");save()}
+function train(k){let t=trains.find(x=>x[0]===k),cost=Math.round(t[3]*Math.pow(1.55,s[k]-1));if(s.cash<cost)return say("Zu wenig Geld");s.cash-=cost;s[k]++;xp(8);note(t[1]+" "+t[2]+" auf "+s[k]+" trainiert","good");save()}
+function buy(id){let g=items.find(x=>x[0]===id);if(s.owned.includes(id))return;if(s.cash<g[3])return say("Zu wenig Geld");s.cash-=g[3];s.owned.push(id);s.gear+=g[2];note("🛒 "+g[1]+" gekauft","good");save()}
+function battle(i){let f=foes[i];if(s.energy<12)return say("Du brauchst 12 Energie");s.energy-=12;let chance=Math.max(.15,Math.min(.85,.5+(power()-f[1])*.035));if(Math.random()<chance){s.cash+=f[2];xp(18);note("⚔️ "+f[0]+" besiegt: +"+f[2]+" €","good");say("Sieg!")}else{let loss=Math.min(s.cash,Math.round(f[2]*.18));s.cash-=loss;note("⚔️ Gegen "+f[0]+" verloren: -"+loss+" €","bad");say("Niederlage")}save()}
+function pack(g,c){s.gems+=g;s.cash+=c;note("💎 Testpaket: +"+g+" Diamanten, +"+c+" €","good");save();say("Testpaket aktiviert")}
+function refill(){if(s.gems<10)return say("Zu wenig Diamanten");s.gems-=10;s.energy=100;note("⚡ Energie aufgefüllt (-10 💎)","good");save()}
+function turbo(){if(s.gems<20)return say("Zu wenig Diamanten");s.gems-=20;let k=["str","biz","cha"][Math.floor(Math.random()*3)];s[k]++;note("🚀 Turbo-Training: +1 Wert (-20 💎)","good");save()}
+function district(){return s.level>=10?"Business District":s.level>=6?"Innenstadt":s.level>=3?"Bahnhofsviertel":"Hinterhof"}
+function save(show=false){localStorage.setItem("streetEmpireV1",JSON.stringify(s));render();if(show)say("Gespeichert")}
+function render(){
+tick();
+level.textContent=s.level;cash.textContent=Math.round(s.cash).toLocaleString("de-DE")+" €";energy.textContent=Math.floor(s.energy)+"/100";gems.textContent=s.gems+" 💎";xpbar.style.width=Math.min(100,s.xp/need()*100)+"%";energybar.style.width=s.energy+"%";str.textContent=s.str;biz.textContent=s.biz;cha.textContent=s.cha;gearBonus.textContent=s.gear;powerEl=document.getElementById("power");powerEl.textContent=power();district.textContent=window.district();playerName.textContent=s.name;name.value=s.name;
+[[d3,3],[d6,6],[d10,10]].forEach(x=>{x[0].textContent=s.level>=x[1]?"Offen":"ab Level "+x[1];x[0].className=s.level>=x[1]?"good":""});
+jobsEl=document.getElementById("jobs");jobsEl.innerHTML=jobs.map((j,i)=>`<div class="card" style="${s.level<j[6]?'opacity:.45;filter:grayscale(1)':''}"><h3>${j[0]} ${j[1]}</h3><div class="tiny">Verdiene Geld und Erfahrung.</div><div class="chips"><span class="chip">⚡ ${j[2]}</span><span class="chip">💶 ${j[3]}-${j[4]} €+</span><span class="chip">⭐ ${j[5]} XP</span></div><button class="btn full" ${s.level<j[6]?'disabled':''} onclick="work(${i})">${s.level<j[6]?'Ab Level '+j[6]:'Loslegen'}</button></div>`).join("");
+trainingList.innerHTML=trains.map(t=>{let c=Math.round(t[3]*Math.pow(1.55,s[t[0]]-1));return `<div class="row"><div><b>${t[1]} ${t[2]} · Stufe ${s[t[0]]}</b><div class="tiny">Nächstes Training: ${c} €</div></div><button class="btn" onclick="train('${t[0]}')">${c} €</button></div>`}).join("");
+gearList.innerHTML=items.map(g=>{let o=s.owned.includes(g[0]);return `<div class="row"><div><b>${g[1]}</b><div class="tiny">+${g[2]} Ausrüstungsbonus</div></div><button class="btn ${o?'alt':''}" ${o?'disabled':''} onclick="buy('${g[0]}')">${o?'Besitzt du':g[3]+' €'}</button></div>`}).join("");
+rivals.innerHTML=foes.map((f,i)=>{let c=Math.round(Math.max(.15,Math.min(.85,.5+(power()-f[1])*.035))*100);return `<div class="row"><div><b>${f[0]}</b><div class="tiny">Stärke ${f[1]} · ca. ${c}% Siegchance · Gewinn ${f[2]} €</div></div><button class="btn" onclick="battle(${i})">Kämpfen</button></div>`}).join("");
+let score=Math.round(s.level*1000+s.cash+power()*100),rs=[["KingKev",15600],["MiraX",12100],["BetonBen",9400],["DonD",7600],[s.name,score],["TurboTobi",3100],["HinterhofHarry",1300]].sort((a,b)=>b[1]-a[1]);ranking.innerHTML=rs.map((r,i)=>`<div class="rank ${r[0]===s.name?'me':''}"><b>#${i+1}</b><span>${r[0]}</span><b>${r[1].toLocaleString("de-DE")}</b></div>`).join("");
+log.innerHTML=s.log.map(x=>typeof x==="string"?`<div>${x}</div>`:`<div class="${x.c||''}">${x.t}</div>`).join("");
+}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));document.getElementById(b.dataset.tab).classList.remove("hidden")});
+name.onchange=e=>{s.name=e.target.value.trim()||"Rookie";save()};
+setInterval(()=>{tick();render()},30000);render();
+</script>
+</body></html>
