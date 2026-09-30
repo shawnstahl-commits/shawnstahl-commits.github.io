@@ -11,9 +11,9 @@ const RARITY_REWARD = {'Gewöhnlich':0,'Selten':5,'Episch':10,'Legendär':25,'My
 const PARTNER_CAMPAIGNS_KEY = 'scanquest_partner_demo_v1';
 
 const RETAIL_CAMPAIGNS = [
-  {id:'fresh-mission',partner:'DemoMarkt',title:'Frische Mission',condition:'Kaufe 3 Obst- oder Gemüseartikel.',coins:120,scans:2,icon:'🥕'},
-  {id:'family-weekend',partner:'CityFresh',title:'Familien-Wochenende',condition:'Bestätigter Einkauf ab 20 €.',coins:180,scans:1,icon:'🛒'},
-  {id:'quest-drop',partner:'DemoMarkt',title:'ScanQuest Drop',condition:'Kaufe ein teilnehmendes Aktionsprodukt.',coins:80,scans:3,icon:'🎁'}
+  {id:'fresh-mission',partner:'DemoMarkt',title:'Frische Mission',condition:'Produkt zuerst im Markt scannen und anschließend kaufen.',coins:120,scans:2,icon:'🥕',targetBarcode:null,windowMinutes:60},
+  {id:'family-weekend',partner:'CityFresh',title:'Familien-Wochenende',condition:'Produkt im Markt scannen und innerhalb von 45 Minuten kaufen.',coins:180,scans:1,icon:'🛒',targetBarcode:null,windowMinutes:45},
+  {id:'quest-drop',partner:'DemoMarkt',title:'ScanQuest Drop',condition:'Teilnehmendes Produkt vor dem Kauf scannen.',coins:80,scans:3,icon:'🎁',targetBarcode:null,windowMinutes:30}
 ];
 
 let state = loadState();
@@ -39,6 +39,8 @@ function freshState(){
     collection: {},
     totalScans: 0,
     retailClaims: {},
+    retailPreScans: [],
+    retailTransactions: {},
     daily: {date:localDateKey(),used:0,bonus:0,newCount:0,rarePlus:0,uniqueIds:[],rewarded:{}}
   };
 }
@@ -51,6 +53,8 @@ function loadState(){
     raw.coins = Number(raw.coins || 0);
     raw.totalScans = Number(raw.totalScans || 0);
     raw.retailClaims = raw.retailClaims || {};
+    raw.retailPreScans = Array.isArray(raw.retailPreScans) ? raw.retailPreScans : [];
+    raw.retailTransactions = raw.retailTransactions || {};
     raw.daily = raw.daily || {};
     if(raw.daily.date !== localDateKey()){
       raw.daily = {date:localDateKey(),used:0,bonus:0,newCount:0,rarePlus:0,uniqueIds:[],rewarded:{}};
@@ -217,6 +221,14 @@ function processScan(raw){
   }
 
   state.coins += baseReward;
+
+  // Retail demo: trusted server time comes later. For now we store the browser timestamp.
+  state.retailPreScans = Array.isArray(state.retailPreScans) ? state.retailPreScans : [];
+  state.retailPreScans.push({barcode,scannedAt:Date.now()});
+  state.retailPreScans = state.retailPreScans
+    .filter(x=>Date.now()-Number(x.scannedAt||0) <= 24*60*60*1000)
+    .slice(-50);
+
   applyQuestRewards();
   saveState();
   activeCreature = c;
@@ -335,39 +347,114 @@ function allRetailCampaigns(){
   return [...RETAIL_CAMPAIGNS,...custom];
 }
 
+function formatTime(ts){
+  try{return new Date(ts).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});}catch(e){return '--:--'}
+}
+
+function latestEligiblePreScan(campaign, purchaseAt=Date.now()){
+  const scans=Array.isArray(state.retailPreScans)?state.retailPreScans:[];
+  const maxAge=Math.max(1,Number(campaign.windowMinutes||60))*60*1000;
+  return [...scans].reverse().find(s=>{
+    const sameProduct=!campaign.targetBarcode || normalizeBarcode(s.barcode)===normalizeBarcode(campaign.targetBarcode);
+    const age=purchaseAt-Number(s.scannedAt||0);
+    return sameProduct && age>=0 && age<=maxAge;
+  }) || null;
+}
+
 function renderRetail(){
   const wrap=$('#retailCampaigns');
   if(!wrap) return;
   const claims=state.retailClaims||{};
   const claimedCount=Object.keys(claims).length;
   const label=$('#retailClaimsLabel');
-  if(label) label.textContent=claimedCount+' Demo-Käufe bestätigt';
+  if(label) label.textContent=claimedCount+' Kaufbelohnungen erhalten';
+
   wrap.innerHTML=allRetailCampaigns().map(c=>{
-    const claimed=!!claims[c.id];
+    const claimed=claims[c.id];
+    const preScan=latestEligiblePreScan(c);
+    const windowMinutes=Math.max(1,Number(c.windowMinutes||60));
+    const target=c.targetBarcode ? 'Produkt: '+c.targetBarcode : 'Beliebiger zuvor gescannter Produktbarcode';
+
+    let proof='';
+    let buttonLabel='Erst Produkt scannen';
+    let disabled='disabled';
+    let buttonClass='secondary';
+
+    if(claimed){
+      proof='<div class="scan-proof success"><b>✓ Scan + Kauf verknüpft</b><small>Scan '+formatTime(claimed.scannedAt)+' · Kasse '+formatTime(claimed.purchasedAt)+' · Transaktion '+claimed.transactionId+'</small></div>';
+      buttonLabel='✓ Belohnung erhalten';
+    }else if(preScan){
+      proof='<div class="scan-proof ready"><b>✓ Vorscan erkannt</b><small>Barcode '+preScan.barcode+' · '+formatTime(preScan.scannedAt)+' · Kauf innerhalb '+windowMinutes+' Min.</small></div>';
+      buttonLabel='Demo-Kassenkauf jetzt bestätigen';
+      disabled='';
+      buttonClass='primary';
+    }else{
+      proof='<div class="scan-proof"><b>Vorscan fehlt</b><small>'+target+' · Zeitfenster '+windowMinutes+' Min.</small></div>';
+    }
+
     return '<article class="card retail-campaign '+(claimed?'claimed':'')+'">'+
-      '<div class="retail-brand"><div class="retail-logo">'+c.icon+'</div><div><small>PARTNER-DEMO</small><b>'+c.partner+'</b></div></div>'+
+      '<div class="retail-brand"><div class="retail-logo">'+c.icon+'</div><div><small>SCAN → BUY → REWARD</small><b>'+c.partner+'</b></div></div>'+
       '<h3>'+c.title+'</h3><p>'+c.condition+'</p>'+
-      '<div class="retail-rewards"><span>+'+c.coins+' 🪙</span><span>+'+c.scans+' ⚡</span></div>'+
-      '<button class="'+(claimed?'secondary':'primary')+' retail-claim" data-campaign="'+c.id+'" '+(claimed?'disabled':'')+'>'+
-      (claimed?'✓ Belohnung erhalten':'Demo-Kauf bestätigen')+'</button>'+
-      '<small class="retail-tech">'+(claimed?'Bestätigung gespeichert.':'Simuliert später die Rückmeldung von Kasse / Loyalty-System.')+'</small>'+
+      '<div class="retail-rewards"><span>+'+c.coins+' 🪙</span><span>+'+c.scans+' ⚡</span><span>⏱ '+windowMinutes+' Min.</span></div>'+
+      proof+
+      '<button class="'+buttonClass+' retail-claim" data-campaign="'+c.id+'" '+disabled+'>'+buttonLabel+'</button>'+
+      '<small class="retail-tech">'+(claimed?'Belohnung wurde nur einmal für diese Demo-Transaktion vergeben.':'Die Demo-Kaufbestätigung simuliert die spätere Rückmeldung des Kassensystems.')+'</small>'+
       '</article>';
   }).join('');
-  wrap.querySelectorAll('.retail-claim').forEach(btn=>btn.addEventListener('click',()=>confirmRetailPurchase(btn.dataset.campaign)));
+
+  wrap.querySelectorAll('.retail-claim:not([disabled])').forEach(btn=>btn.addEventListener('click',()=>confirmRetailPurchase(btn.dataset.campaign)));
 }
 
 function confirmRetailPurchase(id){
   const campaign=allRetailCampaigns().find(c=>c.id===id);
   if(!campaign) return;
+
   state.retailClaims=state.retailClaims||{};
-  if(state.retailClaims[id]){ toast('Diese Demo-Kampagne wurde bereits eingelöst.'); return; }
-  const confirmationId='DEMO-'+Date.now().toString(36).toUpperCase();
-  state.retailClaims[id]={confirmedAt:Date.now(),confirmationId};
-  state.coins += campaign.coins;
-  state.daily.bonus = Number(state.daily.bonus||0)+campaign.scans;
+  state.retailTransactions=state.retailTransactions||{};
+  if(state.retailClaims[id]){ toast('Diese Kampagne wurde bereits eingelöst.'); return; }
+
+  const purchasedAt=Date.now();
+  const preScan=latestEligiblePreScan(campaign,purchasedAt);
+  if(!preScan){
+    toast('Keine gültige Vorab-Erkennung gefunden. Produkt zuerst scannen.');
+    setView('scan');
+    return;
+  }
+
+  const transactionId='DEMO-'+purchasedAt.toString(36).toUpperCase();
+  if(state.retailTransactions[transactionId]){
+    toast('Diese Kassentransaktion wurde bereits verwendet.');
+    return;
+  }
+
+  const elapsedMs=purchasedAt-Number(preScan.scannedAt||0);
+  const maxMs=Math.max(1,Number(campaign.windowMinutes||60))*60*1000;
+  if(elapsedMs<0 || elapsedMs>maxMs){
+    toast('Der Produkt-Scan liegt außerhalb des erlaubten Zeitfensters.');
+    return;
+  }
+
+  const expectedBarcode=campaign.targetBarcode ? normalizeBarcode(campaign.targetBarcode) : normalizeBarcode(preScan.barcode);
+  if(normalizeBarcode(preScan.barcode)!==expectedBarcode){
+    toast('Der gekaufte Artikel stimmt nicht mit dem vorher gescannten Produkt überein.');
+    return;
+  }
+
+  const claim={
+    confirmedAt:purchasedAt,
+    purchasedAt,
+    scannedAt:Number(preScan.scannedAt),
+    barcode:expectedBarcode,
+    transactionId
+  };
+  state.retailClaims[id]=claim;
+  state.retailTransactions[transactionId]={campaignId:id,barcode:expectedBarcode,purchasedAt};
+
+  state.coins += Number(campaign.coins||0);
+  state.daily.bonus = Number(state.daily.bonus||0)+Number(campaign.scans||0);
   saveState();
   renderAll();
-  toast('Kauf bestätigt: +'+campaign.coins+' 🪙 und +'+campaign.scans+' ⚡');
+  toast('Scan + Kauf bestätigt: +'+campaign.coins+' 🪙 und +'+campaign.scans+' ⚡');
 }
 
 function renderShop(){
