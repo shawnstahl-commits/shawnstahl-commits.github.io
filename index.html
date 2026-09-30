@@ -235,6 +235,23 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 .alt-quality-v73{display:inline-flex;width:max-content;border-radius:999px;padding:4px 7px;font-size:8px;font-weight:900;margin-bottom:5px}.alt-quality-v73.good{background:#e6f6ee;color:#27694f}.alt-quality-v73.limited{background:#fff0dc;color:#8a590d}
 @media(max-width:430px){.e-source-links-v73 a{width:100%;justify-content:center}.scan-priority-item-v73{padding:9px}}
 
+
+/* More visible E-number explanation entry 7.3.1 */
+.scan-explain-v731{margin-top:18px!important;border:2px solid #9fd7ca!important;border-radius:22px!important;background:linear-gradient(145deg,#f0fbf7,#ffffff)!important;box-shadow:0 10px 26px rgba(22,92,75,.09);overflow:hidden}
+.scan-explain-v731>summary{padding:16px!important;align-items:flex-start!important;justify-content:flex-start!important;gap:11px!important;position:relative}
+.scan-explain-icon-v731{width:42px;height:42px;flex:0 0 42px;border-radius:14px;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:21px;font-weight:950;box-shadow:0 7px 17px rgba(8,127,115,.20)}
+.scan-explain-copy-v731{display:flex!important;flex-direction:column;gap:2px!important;min-width:0;padding-right:30px}
+.scan-explain-copy-v731 em{font-style:normal;font-size:9px;font-weight:950;letter-spacing:.12em;color:var(--brand)}
+.scan-explain-copy-v731 b{font-size:16px!important;line-height:1.22}
+.scan-explain-copy-v731 small{font-size:11px!important;color:#56706a!important;line-height:1.35}
+.scan-explain-chips-v731{display:flex!important;flex-direction:row!important;flex-wrap:wrap;gap:5px!important;margin-top:7px}
+.scan-explain-chips-v731>span{display:inline-flex!important;background:#fff;border:1px solid #cde6df;color:#2e665a;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:900;line-height:1}
+.scan-explain-v731 .scan-details-arrow-v60{position:absolute;right:15px;top:19px;width:31px;height:31px;border-radius:10px;background:#dff3ed;color:var(--brand);display:grid;place-items:center;font-size:25px!important;line-height:1;transform:none!important}
+.scan-explain-v731[open] .scan-details-arrow-v60{transform:rotate(90deg)!important}
+.scan-explain-v731[open]>summary{background:#eaf8f4}
+.scan-explain-v731 .scan-details-body-v60{padding:4px 14px 14px!important;border-top:1px solid #d9ebe6!important;background:#fff}
+@media(max-width:430px){.scan-explain-v731>summary{padding:14px!important}.scan-explain-icon-v731{width:38px;height:38px;flex-basis:38px;font-size:19px}.scan-explain-copy-v731 b{font-size:15px!important}}
+
 </style>
 </head>
 <body>
@@ -679,7 +696,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts (ODbL) • Produktbilder: Open Food Facts (CC BY-SA) • Version 7.3 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts (ODbL) • Produktbilder: Open Food Facts (CC BY-SA) • Version 7.3.1 Preview</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -689,7 +706,7 @@ var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTi
 var familyMembersV68=[],personalAllergensV68=[],activeFamilyMemberV68=null,editingFamilyMemberV69=null,historyCacheV68=[];
 var productLookupBusyV71=false,familyProfilesErrorV71=false;
 var scanCandidateV72="",scanCandidateCountV72=0,scanCandidateAtV72=0;
-var APP_VERSION_V70="7.3 Preview",feedbackKindV70="bug",diagnosticEventsV70=[];
+var APP_VERSION_V70="7.3.1 Preview",feedbackKindV70="bug",diagnosticEventsV70=[];
 function diagV70(event,data){
  try{
   diagnosticEventsV70.push({t:new Date().toISOString(),event:String(event||""),data:data&&typeof data==="object"?data:{}});
@@ -1861,8 +1878,10 @@ function renderPlusDeepDiveV68(nums){
 }
 
 function renderScanDetailsV60(p,nums){
- var kids=(nums||[]).some(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0});
- return '<details class="scan-details-v60" '+(kids?"open":"")+'><summary><span><b>Details & Erklärungen</b><small>E-Nummern, ADS/ADHS-Kontext & Quellen</small></span><span class="scan-details-arrow-v60">⌄</span></summary><div class="scan-details-body-v60">'+renderAdhdFocus(nums)+renderE(nums)+renderPlusDeepDiveV68(nums)+'</div></details>';
+ var list=nums||[],kids=list.some(function(n){return ["E102","E104","E110","E122","E124","E129"].indexOf(n)>=0});
+ var preview=list.length?list.slice(0,4).map(function(n){return '<span>'+esc(n)+'</span>'}).join(""):'<span>Keine erkannt</span>';
+ if(list.length>4)preview+='<span>+'+(list.length-4)+'</span>';
+ return '<details class="scan-details-v60 scan-explain-v731" '+(kids?"open":"")+'><summary><div class="scan-explain-icon-v731">E</div><span class="scan-explain-copy-v731"><em>E-NUMMERN ERKLÄRT</em><b>Was bedeuten die gefundenen E-Nummern?</b><small>Hier tippen für Bedeutung, Kinderhinweise und Quellen</small><span class="scan-explain-chips-v731">'+preview+'</span></span><span class="scan-details-arrow-v60">›</span></summary><div class="scan-details-body-v60">'+renderAdhdFocus(list)+renderE(list)+renderPlusDeepDiveV68(list)+'</div></details>';
 }
 function startComparisonWithCurrent(){
  if(!hasPlusAccessV67()){showPlusGateV67("Der Produktvergleich");return}
@@ -2655,12 +2674,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v54"))return;
-  sessionStorage.setItem("echeck-sw-reload-v54","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v55"))return;
+  sessionStorage.setItem("echeck-sw-reload-v55","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=54",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=55",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
