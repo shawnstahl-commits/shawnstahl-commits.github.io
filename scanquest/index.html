@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <title>ScanQuest</title>
+  <meta name="description" content="Scanne echte Barcodes, entdecke Kreaturen und fülle deinen ScanDex.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body>
+  <div class="bg-glow g1"></div><div class="bg-glow g2"></div>
+  <header class="topbar">
+    <button class="brand" data-view="home"><span class="brandmark">S</span><span>ScanQuest</span></button>
+    <div class="topstats">
+      <span class="chip">🪙 <b id="coinsTop">0</b></span>
+      <span class="chip">⚡ <b id="scansTop">5</b></span>
+    </div>
+  </header>
+
+  <main class="app">
+    <section id="homeView" class="view active">
+      <div class="hero">
+        <span class="eyebrow">SCAN · ENTDECKEN · SAMMELN</span>
+        <h1>Jeder Barcode<br><span>kann ein Wesen sein.</span></h1>
+        <p>Scanne Produkte im Alltag und entdecke eines von 120 ScanQuest-Wesen. Jeder Barcode erzeugt immer dieselbe Entdeckung.</p>
+        <button id="heroScanBtn" class="primary big">📷 Jetzt scannen</button>
+      </div>
+
+      <div class="dashboard">
+        <article class="statcard"><small>SCANDEX</small><strong><span id="dexCount">0</span>/120</strong><div class="bar"><i id="dexBar"></i></div></article>
+        <article class="statcard"><small>HEUTE</small><strong><span id="todayCount">0</span> Scans</strong><p id="resetHint">Täglich 5 gratis</p></article>
+        <article class="statcard"><small>COINS</small><strong>🪙 <span id="coinCount">0</span></strong><p>durch Entdeckungen & Quests</p></article>
+      </div>
+
+      <div class="section-title"><div><span class="eyebrow">DEINE QUESTS</span><h2>Heute</h2></div><span id="questDoneLabel" class="muted"></span></div>
+      <div id="questList" class="quest-list"></div>
+
+      <div class="section-title"><div><span class="eyebrow">LETZTE ENTDECKUNGEN</span><h2>Deine Wesen</h2></div><button class="textbtn" data-view="dex">Alle ansehen →</button></div>
+      <div id="recentCreatures" class="creature-row empty-state">Noch keine Wesen entdeckt.</div>
+
+      <div class="card info-card">
+        <div class="info-icon">✦</div>
+        <div><b>Gleicher Barcode = gleiches Wesen</b><p>ScanQuest berechnet das Wesen reproduzierbar aus dem Barcode. Es gibt 120 Arten, fünf Seltenheitsstufen und unterschiedliche Werte.</p></div>
+      </div>
+    </section>
+
+    <section id="scanView" class="view">
+      <button class="back" data-view="home">← Zurück</button>
+      <div class="scan-head">
+        <span class="eyebrow">SCANPORTAL</span><h1>Finde dein nächstes Wesen</h1>
+        <p><span class="chip">⚡ <b id="scansScan">5</b> Scans übrig</span></p>
+      </div>
+      <div class="scanner-card card">
+        <div class="scan-frame">
+          <div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+          <div class="scanline"></div>
+          <div class="camera-icon">▦</div>
+          <p>Halte den Barcode in den Rahmen</p>
+        </div>
+        <button id="openCameraBtn" class="primary big">📷 Kamera starten</button>
+        <div class="or"><span></span>oder<span></span></div>
+        <form id="manualForm" class="manual">
+          <input id="barcodeInput" inputmode="numeric" autocomplete="off" placeholder="Barcode eingeben, z. B. 4006381333931" maxlength="32">
+          <button class="secondary" type="submit">Entdecken</button>
+        </form>
+        <p class="hint">Unterstützt EAN, UPC, Code 128 und weitere gängige Barcodes.</p>
+      </div>
+      <div id="scanStatus" class="status hidden"></div>
+    </section>
+
+    <section id="resultView" class="view">
+      <button class="back" data-view="scan">← Noch einen scannen</button>
+      <div id="resultWrap"></div>
+    </section>
+
+    <section id="dexView" class="view">
+      <button class="back" data-view="home">← Zurück</button>
+      <div class="section-title dex-head"><div><span class="eyebrow">DEINE SAMMLUNG</span><h1>ScanDex</h1><p><span id="dexCount2">0</span> von 120 entdeckt</p></div></div>
+      <div class="filters">
+        <button class="filter active" data-rarity="all">Alle</button>
+        <button class="filter" data-rarity="Gewöhnlich">Gewöhnlich</button>
+        <button class="filter" data-rarity="Selten">Selten</button>
+        <button class="filter" data-rarity="Episch">Episch</button>
+        <button class="filter" data-rarity="Legendär">Legendär</button>
+        <button class="filter" data-rarity="Mythisch">Mythisch</button>
+      </div>
+      <div id="dexGrid" class="dex-grid"></div>
+    </section>
+
+    <section id="arenaView" class="view">
+      <button class="back" data-view="home">← Zurück</button>
+      <div class="section-title"><div><span class="eyebrow">TEST-ARENA</span><h1>Wesen gegen Wesen</h1><p>Nur zum Spaß – Kämpfe verändern keine Werte und kosten nichts.</p></div></div>
+      <div class="arena card">
+        <label>Wesen 1<select id="fighterA"></select></label>
+        <div class="versus">VS</div>
+        <label>Wesen 2<select id="fighterB"></select></label>
+        <button id="battleBtn" class="primary big">⚔️ Kampf starten</button>
+        <div id="battleResult" class="battle-result"></div>
+      </div>
+    </section>
+
+    <section id="shopView" class="view">
+      <button class="back" data-view="home">← Zurück</button>
+      <div class="section-title"><div><span class="eyebrow">SHOP & PREMIUM</span><h1>Mehr ScanQuest</h1><p>Der echte Bezahlbereich kommt später. Aktuell wird nichts abgebucht.</p></div></div>
+
+      <div class="shop-grid">
+        <article class="card offer free"><span class="badge">FREE</span><h3>Entdecker</h3><div class="price">0 €</div><ul><li>✓ 5 Scans täglich</li><li>✓ kompletter ScanDex</li><li>✓ Tagesquests</li><li>✓ Arena</li></ul><button class="secondary" disabled>Aktiv</button></article>
+        <article class="card offer premium"><span class="badge premium-badge">GEPLANT</span><h3>Explorer Pass</h3><div class="price">Preis folgt</div><ul><li>✦ 15 Scans täglich</li><li>✦ Premium-Rahmen & Skins</li><li>✦ Extra-Quests</li><li>✦ besondere Events</li><li>✦ kein Pay-to-Win</li></ul><button class="primary" disabled>Noch nicht buchbar</button></article>
+      </div>
+
+      <div class="card coin-shop">
+        <span class="eyebrow">COINS</span><h3>Extra-Scan mit erspielten Coins</h3>
+        <p>Du kannst jetzt schon 40 erspielte Coins gegen einen zusätzlichen Scan tauschen.</p>
+        <button id="buyScanBtn" class="secondary">⚡ +1 Scan für 40 🪙</button>
+      </div>
+      <p class="legal">ScanQuest ist ein Unterhaltungsspiel. Es gibt keine Geldgewinne, keine auszahlbaren Coins und keine zufallsbasierten Käufe mit Echtgeld.</p>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button data-view="home" class="nav active"><span>⌂</span><small>Home</small></button>
+    <button data-view="scan" class="nav"><span>▦</span><small>Scan</small></button>
+    <button data-view="dex" class="nav"><span>◫</span><small>ScanDex</small></button>
+    <button data-view="arena" class="nav"><span>⚔</span><small>Arena</small></button>
+    <button data-view="shop" class="nav"><span>◇</span><small>Shop</small></button>
+  </nav>
+
+  <div id="scannerModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head"><b>Barcode scannen</b><button id="closeScannerBtn">✕</button></div>
+      <div id="reader"></div>
+      <p id="cameraHelp" class="hint">Erlaube den Kamerazugriff und halte den Barcode ruhig in den Rahmen.</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="app.js?v=1"></script>
+</body>
+</html>
