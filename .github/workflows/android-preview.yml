@@ -98,8 +98,9 @@ jobs:
           node - <<'NODE'
           const fs=require("fs");
           const html=fs.readFileSync("android-preview/www/index.html","utf8");
-          const scripts=[...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)]
-            .map(m=>m[1]).filter(s=>s.trim());
+          const re=new RegExp("<script(?:\\\\s[^>]*)?>([\\\\s\\\\S]*?)</script>","gi");
+          const scripts=[]; let m;
+          while((m=re.exec(html))!==null){ if(m[1].trim()) scripts.push(m[1]); }
           for(const s of scripts) new Function(s);
           if(!html.includes("7.4 RC Staging")) throw new Error("Unexpected app version");
           if(/sb_secret_/i.test(html)) throw new Error("Secret Supabase key found in web bundle");
