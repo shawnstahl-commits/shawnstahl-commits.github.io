@@ -93,12 +93,46 @@ jobs:
         working-directory: android-preview
         run: npx cap sync android
 
+      - name: Validate bundled JavaScript
+        run: |
+          node - <<'NODE'
+          const fs=require("fs");
+          const html=fs.readFileSync("android-preview/www/index.html","utf8");
+          const scripts=[...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)]
+            .map(m=>m[1]).filter(s=>s.trim());
+          for(const s of scripts) new Function(s);
+          if(!html.includes("7.4 RC Staging")) throw new Error("Unexpected app version");
+          if(/sb_secret_/i.test(html)) throw new Error("Secret Supabase key found in web bundle");
+          console.log("Bundled JS and version check OK");
+          NODE
+
       - name: Build debug APK
         working-directory: android-preview/android
         run: ./gradlew assembleDebug --no-daemon
 
       - name: Rename APK
         run: cp android-preview/android/app/build/outputs/apk/debug/app-debug.apk E-Check-Kids-preview.apk
+
+      - name: Verify Android APK
+        run: |
+          AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt"
+          APKSIGNER="$ANDROID_HOME/build-tools/36.0.0/apksigner"
+          test -x "$AAPT"
+          test -x "$APKSIGNER"
+          "$APKSIGNER" verify --verbose E-Check-Kids-preview.apk
+          BADGING="$("$AAPT" dump badging E-Check-Kids-preview.apk)"
+          PERMS="$("$AAPT" dump permissions E-Check-Kids-preview.apk)"
+          echo "$BADGING"
+          echo "$PERMS"
+          echo "$BADGING" | grep -F "package: name='de.echeckkids.preview'"
+          echo "$BADGING" | grep -F "application-label:'E-Check Kids'"
+          echo "$PERMS" | grep -F "android.permission.CAMERA"
+          echo "$PERMS" | grep -F "android.permission.INTERNET"
+          unzip -l E-Check-Kids-preview.apk | grep -F "assets/public/index.html"
+          unzip -l E-Check-Kids-preview.apk | grep -F "assets/public/manifest.webmanifest"
+          unzip -l E-Check-Kids-preview.apk | grep -F "assets/public/icon.svg"
+          test "$(stat -c%s E-Check-Kids-preview.apk)" -gt 1000000
+          sha256sum E-Check-Kids-preview.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
