@@ -66,7 +66,7 @@
   <input id="fileInput" type="file" hidden multiple accept=".sav,.dsv,.dat,.bin,application/octet-stream" />
   <div class="app">
     <header class="top">
-      <div class="brand"><div class="logo">R</div><div><h1>ROMDex</h1><small>DEINE SAVE-SAMMLUNG</small></div></div>
+      <div class="brand"><div class="logo">R</div><div><h1>ROMDex</h1><small>DEINE SAVE-SAMMLUNG · BUILD 14</small></div></div>
       <div class="pill" id="privacyPill">🔒 lokal</div>
     </header>
     <div id="iosInstallCard" class="iosInstall">
@@ -295,7 +295,7 @@ function decodeDexFlags(bytes,maxDex=386){const out=[];for(let dex=1;dex<=maxDex
 function formatPlayTime(p){if(!p)return '—';return `${p.hours}:${String(p.minutes).padStart(2,'0')}:${String(p.seconds).padStart(2,'0')}`}
 function ownedDexSet(){const out=new Set();for(const imp of state.imports)for(const d of imp.ownedDex||[])out.add(Number(d));return out}
 function dexEntries(){const current=allMons(),owned=ownedDexSet(),map=new Map();for(const m of current){const c={...m,dexOwned:owned.has(Number(m.dex)),historical:false};const old=map.get(c.dex);if(!old||c.shiny)map.set(c.dex,c)}for(const d of owned){if(!map.has(d)){const imp=state.imports.find(x=>(x.ownedDex||[]).includes(d));map.set(d,{dex:d,pid:null,otid:null,shiny:false,nature:'',source:'Pokédex-Historie',slot:'—',level:null,fingerprint:`history-${imp?.id||'dex'}-${d}`,historical:true,dexOwned:true,generation:3,game:imp?.game||'Pokédex'})}}return [...map.values()]}
-function visibleDexMax(){const latest=state.imports.find(x=>!x.demo&&(x.regionMax||x.maxDex))||state.imports.find(x=>x.regionMax||x.maxDex);return Math.max(1,Number(latest?.regionMax||latest?.maxDex||386))}
+function visibleDexMax(){const latest=state.imports.find(x=>!x.demo&&(x.regionMax||x.maxDex))||state.imports.find(x=>x.regionMax||x.maxDex);const highestCurrent=Math.max(0,...allMons().map(m=>Number(m.dex)||0),...ownedDexSet());return Math.max(1,Number(latest?.regionMax||latest?.maxDex||386),highestCurrent)}
 function completeDexEntries(){const existing=new Map(dexEntries().map(m=>[Number(m.dex),m])),owned=ownedDexSet(),max=visibleDexMax(),out=[];for(let d=1;d<=max;d++){if(existing.has(d)){out.push({...existing.get(d),missing:false});continue}out.push({dex:d,pid:null,otid:null,shiny:false,nature:'',source:'Noch nicht gefangen',slot:'—',level:null,fingerprint:'missing-'+d,historical:false,dexOwned:owned.has(d),missing:true,generation:3,game:'Pokédex'})}return out}
 function ownershipLabel(m){if(m.historical)return {text:'✓ Gefangen · aktuell nicht vorhanden',cls:'history'};if(m.dexOwned)return {text:'● Aktuell vorhanden · im Pokédex gefangen',cls:'present'};return {text:'● Aktuell vorhanden · nicht als gefangen registriert',cls:'onlyPresent'}}
 function speciesLabel(dex){return state.nameCache[dex]||COMMON_NAMES[dex]||(dex?`Pokémon #${String(dex).padStart(3,'0')}`:'Unbekannt')}
