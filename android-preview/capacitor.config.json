@@ -1,0 +1,10 @@
+{
+  "appId": "de.echeckkids.preview",
+  "appName": "E-Check Kids",
+  "webDir": "www",
+  "loggingBehavior": "none",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true
+  }
+}
