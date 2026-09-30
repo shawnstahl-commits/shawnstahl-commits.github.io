@@ -1,0 +1,12 @@
+{
+  "name": "echeck-kids-android-preview",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Android preview shell for E-Check Kids",
+  "devDependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.2",
+    "@capacitor/core": "8.5.2"
+  }
+}
