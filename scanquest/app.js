@@ -8,6 +8,8 @@ const PREFIX = ['Aero','Bram','Cryo','Dra','Ember','Ferro','Glim','Hydro','Ixo',
 const SUFFIX = ['bit','fang','flare','fox','horn','ling','moth','nox','paw','rex','rift','scale','spark','tail','thorn','wing','wyrm','zen'];
 const RARITY_REWARD = {'Gewöhnlich':0,'Selten':5,'Episch':10,'Legendär':25,'Mythisch':50};
 
+const PARTNER_CAMPAIGNS_KEY = 'scanquest_partner_demo_v1';
+
 const RETAIL_CAMPAIGNS = [
   {id:'fresh-mission',partner:'DemoMarkt',title:'Frische Mission',condition:'Kaufe 3 Obst- oder Gemüseartikel.',coins:120,scans:2,icon:'🥕'},
   {id:'family-weekend',partner:'CityFresh',title:'Familien-Wochenende',condition:'Bestätigter Einkauf ab 20 €.',coins:180,scans:1,icon:'🛒'},
@@ -298,6 +300,15 @@ function runBattle(){
   $('#battleResult').innerHTML='<div class="battle-log"><div class="battle-line">'+a.name+' eröffnet mit Stärke '+a.power+'.</div><div class="battle-line">'+b.name+' kontert mit Tempo '+b.speed+'.</div><div class="battle-line">Die Energie entscheidet die Schlussphase…</div><div class="winner">🏆 '+winner.name+' gewinnt den Testkampf!</div></div>';
 }
 
+function allRetailCampaigns(){
+  let custom=[];
+  try{
+    const parsed=JSON.parse(localStorage.getItem(PARTNER_CAMPAIGNS_KEY)||'[]');
+    if(Array.isArray(parsed)) custom=parsed;
+  }catch(e){}
+  return [...RETAIL_CAMPAIGNS,...custom];
+}
+
 function renderRetail(){
   const wrap=$('#retailCampaigns');
   if(!wrap) return;
@@ -305,7 +316,7 @@ function renderRetail(){
   const claimedCount=Object.keys(claims).length;
   const label=$('#retailClaimsLabel');
   if(label) label.textContent=claimedCount+' Demo-Käufe bestätigt';
-  wrap.innerHTML=RETAIL_CAMPAIGNS.map(c=>{
+  wrap.innerHTML=allRetailCampaigns().map(c=>{
     const claimed=!!claims[c.id];
     return '<article class="card retail-campaign '+(claimed?'claimed':'')+'">'+
       '<div class="retail-brand"><div class="retail-logo">'+c.icon+'</div><div><small>PARTNER-DEMO</small><b>'+c.partner+'</b></div></div>'+
@@ -320,7 +331,7 @@ function renderRetail(){
 }
 
 function confirmRetailPurchase(id){
-  const campaign=RETAIL_CAMPAIGNS.find(c=>c.id===id);
+  const campaign=allRetailCampaigns().find(c=>c.id===id);
   if(!campaign) return;
   state.retailClaims=state.retailClaims||{};
   if(state.retailClaims[id]){ toast('Diese Demo-Kampagne wurde bereits eingelöst.'); return; }
