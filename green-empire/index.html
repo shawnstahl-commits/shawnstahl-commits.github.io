@@ -1,1 +1,130 @@
-The requested file reference is not currently visible. Use files.search or files.list to rediscover the file, then retry with a returned ref_id or file_id.
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101510">
+<title>Green Empire – Browsergame Prototype</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <section class="brand">
+      <div class="logo"><span>GREEN</span> EMPIRE</div>
+      <div class="tag">From zero to city legend</div>
+    </section>
+    <section class="stats">
+      <div class="stat"><small>Level</small><b id="levelStat">1</b></div>
+      <div class="stat"><small>Cash</small><b class="gold" id="cashStat">750 €</b></div>
+      <div class="stat"><small>Bestand</small><b class="green" id="stockStat">0 g</b></div>
+      <div class="stat"><small>Diamanten</small><b class="purple" id="gemsStat">30 💎</b></div>
+    </section>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <button class="active" data-tab="overview">🏠 Übersicht</button>
+      <button data-tab="grow">🌿 Grow Room</button>
+      <button data-tab="orders">📦 Aufträge</button>
+      <button data-tab="market">🛒 Shop / Verkauf</button>
+      <button data-tab="upgrades">🛠️ Upgrades</button>
+      <button data-tab="rivals">🥷 Rivalen</button>
+      <button data-tab="ranking">🏆 Rangliste</button>
+      <button class="premium" data-tab="premium">💎 Premium</button>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div class="cityPins">
+          <div class="pin p1">WOHNUNG<small>Energie & Profil</small></div>
+          <div class="pin p2">GROW ROOM<small>Deine Pflanzen</small></div>
+          <div class="pin p3">LAGER<small>Bestand verwalten</small></div>
+          <div class="pin p4">SHOP<small>NPC-Kunden</small></div>
+          <div class="pin p5">BANDENVIERTEL<small>Rivalen</small></div>
+        </div>
+        <div class="heroTitle"><b>Moordburg</b><div>Dunkle Straßen, große Chancen.</div></div>
+      </section>
+
+      <div class="tabs">
+        <button class="active" data-tab="overview">Übersicht</button>
+        <button data-tab="grow">Grow Room</button>
+        <button data-tab="orders">Aufträge</button>
+        <button data-tab="market">Shop</button>
+        <button data-tab="ranking">Rangliste</button>
+      </div>
+
+      <section id="overview" class="tab">
+        <div class="grid2">
+          <div class="panel">
+            <h2>Mein Grow Room</h2>
+            <div class="sub">Vier sichtbare Pflanzen-Slots. Wachstum und Ernte sind bewusst spielerisch vereinfacht.</div>
+            <div class="growgrid" id="plantGrid"></div>
+          </div>
+          <div>
+            <div class="panel">
+              <h2>Spieler</h2>
+              <div class="profile">
+                <div class="avatar">😎</div>
+                <div style="flex:1">
+                  <b id="playerNameLabel">Rookie</b>
+                  <div class="tiny">Ruf <span id="repStat">0</span> · Raum Stufe <span id="roomStat">1</span></div>
+                </div>
+              </div>
+              <input id="nameInput" class="nameInput" value="Rookie" maxlength="16" aria-label="Spielername">
+            </div>
+            <div class="panel"><h2>Aktivitäts-Log</h2><div class="log" id="logList"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="grow" class="tab hidden">
+        <div class="panel">
+          <h2>Grow Room</h2>
+          <div class="sub">Starte abstrakte Wachstumszyklen und ernte nach Ablauf des Timers.</div>
+          <div class="growgrid" id="plantGridFull"></div>
+        </div>
+      </section>
+
+      <section id="orders" class="tab hidden">
+        <div class="panel"><h2>Aufträge</h2><div class="sub">Fiktive NPC-Aufträge.</div><div id="ordersList"></div></div>
+      </section>
+
+      <section id="market" class="tab hidden">
+        <div class="grid2">
+          <div class="panel"><h2>Shop / Verkauf</h2><div class="sub">Sofortverkauf an NPC-Kunden.</div><div id="sellList"></div></div>
+          <div class="panel"><h2>Lager</h2><div id="inventoryList"></div></div>
+        </div>
+      </section>
+
+      <section id="upgrades" class="tab hidden">
+        <div class="panel"><h2>Upgrades</h2><div class="sub">Mehr Slots, kürzere Spieltimer und mehr Ruf.</div><div id="upgradeList"></div></div>
+      </section>
+
+      <section id="rivals" class="tab hidden">
+        <div class="panel"><h2>Rivalen</h2><div class="sub">Kurze fiktive Duelle um Ruf und Cash.</div><div id="rivalList"></div></div>
+      </section>
+
+      <section id="ranking" class="tab hidden">
+        <div class="panel"><h2>Rangliste</h2><div id="rankingList"></div></div>
+      </section>
+
+      <section id="premium" class="tab hidden">
+        <div class="panel premiumBox">
+          <h2>Premium-Testbereich</h2>
+          <div class="sub">Noch kein Echtgeld. Die Buttons simulieren nur spätere Premium-Vorteile.</div>
+        </div>
+        <div class="panel">
+          <div class="row"><div><b>Starter Pack</b><div class="tiny">+100 💎 und +1.000 €</div></div><button class="btn purpleBtn" onclick="testPack(100,1000)">TESTEN</button></div>
+          <div class="row"><div><b>Growth Boost</b><div class="tiny">Alle laufenden Pflanzen sofort fertig · 25 💎</div></div><button class="btn purpleBtn" onclick="finishAll()">25 💎</button></div>
+          <div class="row"><div><b>VIP Bonus</b><div class="tiny">+10 Ruf und +500 € · 20 💎</div></div><button class="btn purpleBtn" onclick="vipBoost()">20 💎</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<div class="credits">Prototype visuals: Hamburg skyline and cannabis photography from Wikimedia Commons; individual file licenses apply.</div>
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
