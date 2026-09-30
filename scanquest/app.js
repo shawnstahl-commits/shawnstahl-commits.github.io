@@ -19,6 +19,9 @@ const RETAIL_CAMPAIGNS = [
 let state = loadState();
 let htmlScanner = null;
 let scanning = false;
+let scanCandidate = '';
+let scanCandidateHits = 0;
+let scanCandidateAt = 0;
 let activeCreature = null;
 let currentFilter = 'all';
 
@@ -149,9 +152,32 @@ function scansRemaining(){
 
 function isRarePlus(r){ return ['Selten','Episch','Legendär','Mythisch'].includes(r); }
 
-function normalizeBarcode(v){ return String(v||'').trim().replace(/\s+/g,''); }
+function normalizeBarcode(v){
+  let s=String(v||'').trim().replace(/\s+/g,'');
+  if(/^\d+$/.test(s)){
+    // UPC-A kann vom Scanner auch als EAN-13 mit führender 0 geliefert werden.
+    if(s.length===13 && s.startsWith('0')) s=s.slice(1);
+    return s;
+  }
+  return s;
+}
 
-function validBarcode(v){ return /^[0-9A-Za-z._-]{4,32}$/.test(v); }
+function validGtinCheckDigit(code){
+  if(!/^\d+$/.test(code) || ![8,12,13,14].includes(code.length)) return null;
+  const digits=code.split('').map(Number);
+  const check=digits.pop();
+  let sum=0;
+  for(let i=digits.length-1,pos=0;i>=0;i--,pos++){
+    sum += digits[i] * (pos%2===0 ? 3 : 1);
+  }
+  return ((10-(sum%10))%10)===check;
+}
+
+function validBarcode(v){
+  if(!/^[0-9A-Za-z._-]{4,32}$/.test(v)) return false;
+  const gtinValid=validGtinCheckDigit(v);
+  return gtinValid===null ? true : gtinValid;
+}
 
 function applyQuestRewards(){
   const quests = [
@@ -384,18 +410,50 @@ async function openScanner(){
   try{
     if(htmlScanner) await closeScanner();
     $('#scannerModal').classList.remove('hidden');
-    htmlScanner=new Html5Qrcode('reader');
+    const supported = (typeof Html5QrcodeSupportedFormats!=='undefined') ? [
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.CODE_128
+    ] : null;
+    htmlScanner = supported
+      ? new Html5Qrcode('reader',{formatsToSupport:supported,verbose:false})
+      : new Html5Qrcode('reader');
     scanning=true;
+    scanCandidate='';
+    scanCandidateHits=0;
+    scanCandidateAt=0;
     await htmlScanner.start(
       {facingMode:'environment'},
-      {fps:10,qrbox:{width:280,height:160},aspectRatio:1.5},
+      {fps:12,qrbox:{width:280,height:160},aspectRatio:1.5},
       async decoded=>{
         if(!scanning)return;
+        const normalized=normalizeBarcode(decoded);
+        if(!validBarcode(normalized)) {
+          $('#cameraHelp').textContent='Barcode noch nicht sicher erkannt – bitte ruhig halten.';
+          return;
+        }
+
+        const now=Date.now();
+        if(normalized===scanCandidate && now-scanCandidateAt<1800){
+          scanCandidateHits++;
+        }else{
+          scanCandidate=normalized;
+          scanCandidateHits=1;
+        }
+        scanCandidateAt=now;
+
+        if(scanCandidateHits<2){
+          $('#cameraHelp').textContent='Barcode erkannt – kurz ruhig halten zur Bestätigung …';
+          return;
+        }
+
         scanning=false;
         try{await htmlScanner.stop();}catch(e){}
         try{htmlScanner.clear();}catch(e){}
         htmlScanner=null; $('#scannerModal').classList.add('hidden');
-        processScan(decoded);
+        processScan(normalized);
       },
       ()=>{}
     );
@@ -407,6 +465,9 @@ async function openScanner(){
 
 async function closeScanner(){
   scanning=false;
+  scanCandidate='';
+  scanCandidateHits=0;
+  scanCandidateAt=0;
   if(htmlScanner){
     try{await htmlScanner.stop();}catch(e){}
     try{htmlScanner.clear();}catch(e){}
