@@ -252,6 +252,16 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
 .scan-explain-v731 .scan-details-body-v60{padding:4px 14px 14px!important;border-top:1px solid #d9ebe6!important;background:#fff}
 @media(max-width:430px){.scan-explain-v731>summary{padding:14px!important}.scan-explain-icon-v731{width:38px;height:38px;flex-basis:38px;font-size:19px}.scan-explain-copy-v731 b{font-size:15px!important}}
 
+
+/* Production readiness 7.4: development controls stay available only in ?dev=1 mode */
+.production-mode-v74 .tester-pill-v70,
+.production-mode-v74 .tester-row-v70,
+.production-mode-v74 .plan-test-v67,
+.production-mode-v74 .compare-beta-cta-v52,
+.production-mode-v74 .plus-payment-note-v5{display:none!important}
+.production-mode-v74 .plus-eyebrow-v5::after{content:" · VORSCHAU"}
+.developer-mode-v74::before{content:"ENTWICKLERMODUS";position:fixed;z-index:9000;left:50%;top:4px;transform:translateX(-50%);background:#243c36;color:#fff;border-radius:999px;padding:4px 9px;font-size:8px;font-weight:950;letter-spacing:.1em;pointer-events:none}
+
 </style>
 </head>
 <body>
@@ -542,12 +552,12 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  </div>
 
  <div class="plus-feature-grid-v5">
-   <div class="plus-feature-v5"><span>1</span><div><b>Mehr Hintergrund zu jeder E-Nummer</b><small>Nicht nur Name und Funktion: zusätzliche Einordnung und offizielle EU-/EFSA-Quellen. <em>Jetzt im Plus-Test.</em></small></div></div>
+   <div class="plus-feature-v5"><span>1</span><div><b>Mehr Hintergrund zu jeder E-Nummer</b><small>Nicht nur Name und Funktion: zusätzliche Einordnung und offizielle EU-/EFSA-Quellen. <em>Für PLUS vorgesehen.</em></small></div></div>
    <div class="plus-feature-v5"><span>2</span><div><b>ADS-/ADHS-Bereich mit Quellen</b><small>Was ist tatsächlich belegt? Was ist nur ein möglicher Zusammenhang? Mit Quellen statt pauschaler Warnungen.</small></div></div>
    <div class="plus-feature-v5"><span>3</span><div><b>Genauere Alternativen nach dem Scan</b><small>Konkretere Hinweise, worauf du bei einem vergleichbaren Produkt achten kannst.</small></div></div>
-   <div class="plus-feature-v5"><span>4</span><div><b>Produkt gegen Produkt vergleichen</b><small>Zwei Produkte nebeneinander: E-Nummern, Kinderhinweise und wichtige Unterschiede auf einen Blick. <em>Jetzt als Beta testbar.</em></small></div></div>
-   <div class="plus-feature-v5"><span>5</span><div><b>Familienprofile</b><small>Mehrere Kinder bzw. Familienmitglieder verwalten und Allergie-/Laktose-Einstellungen getrennt speichern. <em>Jetzt im Plus-Test.</em></small></div></div>
-   <div class="plus-feature-v5"><span>6</span><div><b>Erweiterter Verlauf & Favoriten</b><small>Verlauf durchsuchen und Produktvergleiche im Konto speichern. <em>Jetzt im Plus-Test.</em></small></div></div>
+   <div class="plus-feature-v5"><span>4</span><div><b>Produkt gegen Produkt vergleichen</b><small>Zwei Produkte nebeneinander: E-Nummern, Kinderhinweise und wichtige Unterschiede auf einen Blick. <em>Für PLUS vorgesehen.</em></small></div></div>
+   <div class="plus-feature-v5"><span>5</span><div><b>Familienprofile</b><small>Mehrere Kinder bzw. Familienmitglieder verwalten und Allergie-/Laktose-Einstellungen getrennt speichern. <em>Für PLUS vorgesehen.</em></small></div></div>
+   <div class="plus-feature-v5"><span>6</span><div><b>Erweiterter Verlauf & Favoriten</b><small>Verlauf durchsuchen und Produktvergleiche im Konto speichern. <em>Für PLUS vorgesehen.</em></small></div></div>
  </div>
 
  <div class="compare-card-v51">
@@ -566,7 +576,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  </div>
  <button class="compare-beta-cta-v52" onclick="openComparisonFromPlusV67()">
    <span class="compare-beta-icon-v52">A:B</span>
-   <span><b>Produktvergleich öffnen</b><small>Im PLUS TEST-Modus freigeschaltet – ohne Zahlung</small></span>
+   <span><b>Produktvergleich öffnen</b><small>Nur im Entwicklermodus testbar</small></span>
    <span>›</span>
  </button>
 
@@ -696,7 +706,7 @@ body.scanner-fullscreen.scan-processing .scan-torch-v58,body.scanner-fullscreen.
  <button class="nav-btn" data-page="favorites" onclick="goPage('favorites')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg></span>Favoriten</button>
  <button class="nav-btn" data-page="profile" onclick="goPage('profile')"><span class="nav-svg-v4"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3-6 7-6s6.2 2 7 6"/></svg></span>Profil</button>
 </nav>
-<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts (ODbL) • Produktbilder: Open Food Facts (CC BY-SA) • Version 7.3.1 Preview</div></footer>
+<footer><div class="wrap">E‑Check Kids • Produktdaten: Open Food Facts (ODbL) • Produktbilder: Open Food Facts (CC BY-SA) • Version 7.4 RC Staging</div></footer>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -706,7 +716,7 @@ var html5Scanner=null,nativeStream=null,nativeTimer=null,locked=false,fallbackTi
 var familyMembersV68=[],personalAllergensV68=[],activeFamilyMemberV68=null,editingFamilyMemberV69=null,historyCacheV68=[];
 var productLookupBusyV71=false,familyProfilesErrorV71=false;
 var scanCandidateV72="",scanCandidateCountV72=0,scanCandidateAtV72=0;
-var APP_VERSION_V70="7.3.1 Preview",feedbackKindV70="bug",diagnosticEventsV70=[];
+var APP_VERSION_V70="7.4 RC Staging",feedbackKindV70="bug",diagnosticEventsV70=[];
 function diagV70(event,data){
  try{
   diagnosticEventsV70.push({t:new Date().toISOString(),event:String(event||""),data:data&&typeof data==="object"?data:{}});
@@ -717,7 +727,24 @@ function diagV70(event,data){
 function currentPageV70(){
  var p=document.querySelector(".app-page.active");return p?p.id.replace("page-",""):"unknown";
 }
-function testerModeEnabledV70(){try{return localStorage.getItem("echeck_tester_mode_v70")==="1"}catch(e){return false}}
+function developerModeV74(){
+ try{
+  var q=new URLSearchParams(location.search);
+  if(q.get("dev")==="1"){localStorage.setItem("echeck_dev_v74","1");return true}
+  if(q.get("dev")==="0"){localStorage.removeItem("echeck_dev_v74");return false}
+  return localStorage.getItem("echeck_dev_v74")==="1";
+ }catch(e){return false}
+}
+function initProductionModeV74(){
+ var dev=developerModeV74();
+ document.body.classList.toggle("developer-mode-v74",dev);
+ document.body.classList.toggle("production-mode-v74",!dev);
+}
+function testerModeEnabledV70(){
+ if(!developerModeV74())return false;
+ try{return localStorage.getItem("echeck_tester_mode_v70")==="1"}catch(e){return false}
+}
+initProductionModeV74();
 
 
 var special={
@@ -2450,26 +2477,30 @@ function testPlanV67(){
  try{return localStorage.getItem(TEST_PLAN_KEY_V67)==="plus"?"plus":"free"}catch(e){return "free"}
 }
 function hasPlusAccessV67(){
- return currentSubscriptionPlusV67||testPlanV67()==="plus";
+ return currentSubscriptionPlusV67||(developerModeV74()&&testPlanV67()==="plus");
 }
 function updateTestPlanUiV67(){
- var plus=hasPlusAccessV67(),freeBtn=document.getElementById("testPlanFreeV67"),plusBtn=document.getElementById("testPlanPlusV67");
+ var dev=developerModeV74(),plus=hasPlusAccessV67(),freeBtn=document.getElementById("testPlanFreeV67"),plusBtn=document.getElementById("testPlanPlusV67");
  if(freeBtn)freeBtn.classList.toggle("active",!plus);
  if(plusBtn)plusBtn.classList.toggle("active",plus);
  var pn=document.getElementById("plusPlanName"),pt=document.getElementById("plusPlanText");
- if(testPlanV67()==="plus"&&!currentSubscriptionPlusV67){
+ if(dev&&testPlanV67()==="plus"&&!currentSubscriptionPlusV67){
   if(pn)pn.textContent="PLUS TEST";
-  if(pt)pt.textContent="Premiumfunktionen sind lokal zum Testen freigeschaltet. Keine Zahlung.";
+  if(pt)pt.textContent="Entwicklermodus: Premiumfunktionen sind lokal freigeschaltet. Keine Zahlung.";
+ }else if(!currentSubscriptionPlusV67){
+  if(pn)pn.textContent="Free";
+  if(pt)pt.textContent="Basisfunktionen sind aktiv. Plus ist noch nicht buchbar.";
  }
  var pb=document.getElementById("profilePlanBadge"),ppt=document.getElementById("profilePlanText");
- if(pb){pb.textContent=plus?"PLUS TEST":"FREE";pb.classList.toggle("plus",plus)}
- if(ppt)ppt.textContent=plus?"Testmodus – keine Zahlung":"Basis-Tarif";
+ if(pb){pb.textContent=plus?(currentSubscriptionPlusV67?"PLUS":"PLUS TEST"):"FREE";pb.classList.toggle("plus",plus)}
+ if(ppt)ppt.textContent=plus?(currentSubscriptionPlusV67?"Plus ist aktiv.":"Entwicklermodus – keine Zahlung"):"Basis-Tarif";
  document.body.classList.toggle("plus-test-active-v67",plus);
  renderFamilyListV68();
  renderHistoryPlusToolsV68();
  if(document.getElementById("savedComparisonsV68"))loadSavedComparisonsV68();
 }
 function setTestPlanV67(plan){
+ if(!developerModeV74())return;
  var next=plan==="plus"?"plus":"free";
  diagV70("test_plan_switch",{plan:next});
  try{localStorage.setItem(TEST_PLAN_KEY_V67,next)}catch(e){}
@@ -2494,7 +2525,9 @@ function showPlusGateV67(feature){
   var msg=document.getElementById("plusGateMessageV67");
   if(msg){
    msg.classList.remove("hidden");
-   msg.innerHTML='<b>'+esc(feature||"Diese Funktion")+' gehört zu PLUS.</b><br>Für unseren Test kannst du oben kostenlos auf „PLUS TEST“ umschalten.';
+   msg.innerHTML=developerModeV74()
+    ?'<b>'+esc(feature||"Diese Funktion")+' gehört zu PLUS.</b><br>Im Entwicklermodus kannst du oben kostenlos auf „PLUS TEST“ umschalten.'
+    :'<b>'+esc(feature||"Diese Funktion")+' gehört zu PLUS.</b><br>PLUS ist derzeit noch nicht buchbar. Die Basis- und Sicherheitshinweise bleiben kostenlos.';
    msg.scrollIntoView({behavior:"smooth",block:"center"});
   }
  },50);
@@ -2674,12 +2707,12 @@ async function installApp(){
 }
 if("serviceWorker" in navigator){
  navigator.serviceWorker.addEventListener("controllerchange",function(){
-  if(sessionStorage.getItem("echeck-sw-reload-v55"))return;
-  sessionStorage.setItem("echeck-sw-reload-v55","1");
+  if(sessionStorage.getItem("echeck-sw-reload-v56"))return;
+  sessionStorage.setItem("echeck-sw-reload-v56","1");
   location.reload();
  });
  window.addEventListener("load",function(){
-  navigator.serviceWorker.register("./sw.js?v=55",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
+  navigator.serviceWorker.register("./sw.js?v=56",{updateViaCache:"none"}).then(function(r){r.update().catch(function(){})}).catch(function(){});
  });
 }
 
