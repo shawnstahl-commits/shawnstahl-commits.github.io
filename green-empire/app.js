@@ -1,4 +1,5 @@
 const key='greenEmpireGamePlantV2';
+const $=id=>document.getElementById(id);
 
 const stageNames=['Keimling','Jungpflanze','Wachstum','Vorblüte','Blüte'];
 const strains=[
@@ -128,8 +129,26 @@ function removePlant(i){if(!s.slots[i])return;if(!confirm('Pflanze wirklich entf
 function emptyRoomPlant(i){
   if(i>=slotMax())return '<article class="roomPlant"><div class="roomPlantCard"><div class="roomPlantPhoto locked">🔒</div><div class="roomPlantInfo"><strong>Slot '+(i+1)+'</strong><div class="stageName">Gesperrt</div><button class="startPlantBtn" disabled>Upgrade nötig</button></div></div></article>';
   const st=strains[(i+s.level)%strains.length];
-  return '<article class="roomPlant"><div class="roomPlantCard"><div class="roomPlantPhoto gamePlant">'+plantSvg(0,0,i,st.hue)+'</div><div class="roomPlantInfo"><strong>Freier Topf · Slot '+(i+1)+'</strong><div class="stageName">Neue Pflanze wählen</div><select class="select" id="roomSelect'+i+'">'+strains.map(x=>'<option value="'+x.id+'">'+x.name+' · '+Math.round(x.value*6)+' €</option>').join('')+'</select><button class="startPlantBtn" onclick="startPlant('+i+',document.getElementById(\'roomSelect'+i+'\').value)">Starten</button></div></div></article>';
+  return '<article class="roomPlant"><div class="roomPlantCard"><div class="roomPlantPhoto gamePlant">'+plantSvg(0,0,i,st.hue)+'</div><div class="roomPlantInfo"><strong>Freier Topf · Slot '+(i+1)+'</strong><div class="stageName">Neue Pflanze wählen</div><select class="select" id="roomSelect'+i+'">'+strains.map(x=>'<option value="'+x.id+'">'+x.name+' · '+Math.round(x.value*6)+' €</option>').join('')+'</select><button class="startPlantBtn" onclick="startSelectedPlant('+i+')">Starten</button></div></div></article>';
 }
+function startSelectedPlant(i){
+  const sel=$('roomSelect'+i);
+  if(!sel)return toast('Auswahl konnte nicht geladen werden');
+  startPlant(i,sel.value);
+}
+window.startSelectedPlant=startSelectedPlant;
+window.startPlant=startPlant;
+window.careBoost=careBoost;
+window.harvest=harvest;
+window.sell=sell;
+window.completeOrder=completeOrder;
+window.upgrade=upgrade;
+window.fight=fight;
+window.testPack=testPack;
+window.finishAll=finishAll;
+window.vipBoost=vipBoost;
+window.resetGame=resetGame;
+
 function activeRoomPlant(i){
   const sl=s.slots[i],st=strain(sl.strainId),p=progress(sl),stage=stageIndex(p);
   return '<article class="roomPlant"><div class="roomPlantCard"><div class="roomPlantPhoto gamePlant">'+plantSvg(stage,p,i,st.hue)+'</div><div class="roomPlantInfo"><strong>'+st.name+'</strong><div class="stageName">'+(stage+1)+'. '+stageNames[stage]+'</div><div class="progress"><i style="width:'+p+'%"></i></div><div class="roomPlantMeta"><span>'+Math.floor(p)+'%</span><span>'+(p>=100?'erntereif':timeLeft(sl))+'</span></div><div class="roomPlantActions"><button onclick="careBoost('+i+')" '+(sl.boosted||p>=100?'disabled':'')+'>Pflegebonus</button><button onclick="harvest('+i+')" '+(p<100?'disabled':'')+'>Ernten</button></div></div></div></article>';
@@ -165,13 +184,45 @@ window.activateTab=activateTab;
 
 function render(){
   const active=s.slots.filter(Boolean).length;
-  playerNameLabel.textContent=s.name;levelStat.textContent=s.level;cashStat.textContent=Math.round(s.cash).toLocaleString('de-DE')+' €';stockStat.textContent=totalStock()+' g';gemsStat.textContent=s.gems;repStat.textContent=s.rep;
-  roomStat.textContent=s.room;roomStat2.textContent=s.room;activePlantsStat.textContent=active;slotStat.textContent=slotMax();freeSlotsStat.textContent=Math.max(0,slotMax()-active);speedStat.textContent='Stufe '+s.upgrades.speed;contactStat.textContent='Stufe '+s.upgrades.rep;
-  levelOverview.textContent=s.level;repOverview.textContent=s.rep;roomOverview.textContent='Stufe '+s.room;xpText.textContent=s.xp+' / '+xpNeed();xpBar.style.width=Math.min(100,s.xp/xpNeed()*100)+'%';
-  const input=document.getElementById('nameInput');if(input&&document.activeElement!==input)input.value=s.name;
-  renderRoomPlants();renderPlantOverview();renderSell();renderInventory();renderOrders();renderUpgrades();renderRivals();renderRanking();renderLog();
+  const setText=(id,val)=>{const el=$(id);if(el)el.textContent=val};
+  setText('playerNameLabel',s.name);
+  setText('levelStat',s.level);
+  setText('cashStat',Math.round(s.cash).toLocaleString('de-DE')+' €');
+  setText('stockStat',totalStock()+' g');
+  setText('gemsStat',s.gems);
+  setText('repStat',s.rep);
+  setText('roomStat',s.room);
+  setText('roomStat2',s.room);
+  setText('activePlantsStat',active);
+  setText('slotStat',slotMax());
+  setText('freeSlotsStat',Math.max(0,slotMax()-active));
+  setText('speedStat','Stufe '+s.upgrades.speed);
+  setText('contactStat','Stufe '+s.upgrades.rep);
+  setText('levelOverview',s.level);
+  setText('repOverview',s.rep);
+  setText('roomOverview','Stufe '+s.room);
+  setText('xpText',s.xp+' / '+xpNeed());
+  const xp=$('xpBar'); if(xp) xp.style.width=Math.min(100,s.xp/xpNeed()*100)+'%';
+  const input=$('nameInput'); if(input&&document.activeElement!==input) input.value=s.name;
+  renderRoomPlants();
+  renderPlantOverview();
+  renderSell();
+  renderInventory();
+  renderOrders();
+  renderUpgrades();
+  renderRivals();
+  renderRanking();
+  renderLog();
   localStorage.setItem(key,JSON.stringify(s));
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab)));
-document.getElementById('nameInput').addEventListener('change',e=>{s.name=e.target.value.trim()||'Rookie';save()});
-setInterval(render,1000);render();
+const nameField=$('nameInput');
+if(nameField) nameField.addEventListener('change',e=>{s.name=e.target.value.trim()||'Rookie';save()});
+try{
+  render();
+  setInterval(render,1000);
+}catch(err){
+  console.error(err);
+  const t=$('toast');
+  if(t){t.textContent='Spiel konnte nicht geladen werden – bitte Seite neu laden.';t.classList.add('show');}
+}
