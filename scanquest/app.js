@@ -32,6 +32,7 @@ const RETAIL_CAMPAIGNS = [
   {id:'quest-drop',partner:'DemoMarkt',title:'ScanQuest Drop',condition:'Teilnehmendes Produkt vor dem Kauf scannen.',coins:80,scans:3,icon:'🎁',targetBarcode:null,windowMinutes:30}
 ];
 
+let rarityMapCache = null;
 let state = loadState();
 let htmlScanner = null;
 let nativeScannerStream = null;
@@ -118,7 +119,6 @@ function speciesName(id){
   return a + b;
 }
 
-let rarityMapCache = null;
 function buildRarityMap(){
   const ranked=Array.from({length:SPECIES_TOTAL},(_,i)=>i+1)
     .sort((a,b)=>(hash32('rarity-rank:'+a)-hash32('rarity-rank:'+b)) || a-b);
@@ -848,9 +848,20 @@ function setView(name){
 }
 
 function bindViewButtons(root=document){
-  root.querySelectorAll('[data-view]').forEach(btn=>{
+  root.querySelectorAll('[data-view]:not(.nav)').forEach(btn=>{
     if(btn.dataset.bound)return; btn.dataset.bound='1';
     btn.addEventListener('click',()=>setView(btn.dataset.view));
+  });
+}
+
+const bottomNav=$('#bottomNav');
+if(bottomNav){
+  bottomNav.addEventListener('click',e=>{
+    const btn=e.target.closest('.nav[data-view]');
+    if(!btn)return;
+    e.preventDefault();
+    e.stopPropagation();
+    setView(btn.dataset.view);
   });
 }
 
