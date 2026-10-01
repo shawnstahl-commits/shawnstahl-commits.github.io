@@ -1150,8 +1150,9 @@ async function startNativeBarcodeScanner(){
   video.srcObject=nativeScannerStream;
   await video.play();
 
+  const cameraFeatures=await optimizeCameraTrack(nativeScannerTrack);
   const continuousFocus=await setContinuousCameraFocus(nativeScannerTrack);
-  if(!continuousFocus)await refocusNativeCamera(false);
+  if(!continuousFocus && !cameraFeatures.focus)await refocusNativeCamera(false);
   startNativeFocusAssist();
 
   const focusTap=reader.querySelector('.focus-tap');
