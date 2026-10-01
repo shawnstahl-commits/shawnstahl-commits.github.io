@@ -10,6 +10,15 @@ const RARITY_REWARD = {'Gewöhnlich':0,'Selten':5,'Episch':10,'Legendär':25,'My
 
 const PARTNER_CAMPAIGNS_KEY = 'scanquest_partner_demo_v1';
 
+const DEMO_MARKET_SEEDS = [
+  {id:'mk-ember',barcode:'4006381333931',seller:'Luna87',price:20},
+  {id:'mk-storm',barcode:'4012345678901',seller:'ScanHunter',price:35},
+  {id:'mk-forest',barcode:'5901234123457',seller:'MikaQuest',price:55},
+  {id:'mk-cosmic',barcode:'7613034626844',seller:'NovaMax',price:90},
+  {id:'mk-shadow',barcode:'8714100633138',seller:'PixelRex',price:140},
+  {id:'mk-mythic',barcode:'5000159484695',seller:'RareFinder',price:240}
+];
+
 const RETAIL_CAMPAIGNS = [
   {id:'fresh-mission',partner:'DemoMarkt',title:'Frische Mission',condition:'Produkt zuerst im Markt scannen und anschließend kaufen.',coins:120,scans:2,icon:'🥕',targetBarcode:null,windowMinutes:60},
   {id:'family-weekend',partner:'CityFresh',title:'Familien-Wochenende',condition:'Produkt im Markt scannen und innerhalb von 45 Minuten kaufen.',coins:180,scans:1,icon:'🛒',targetBarcode:null,windowMinutes:45},
@@ -24,6 +33,7 @@ let scanCandidateHits = 0;
 let scanCandidateAt = 0;
 let activeCreature = null;
 let currentFilter = 'all';
+let activeMarketOfferId = null;
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -41,6 +51,7 @@ function freshState(){
     retailClaims: {},
     retailPreScans: [],
     retailTransactions: {},
+    market: {myListings:[],offers:{},trades:[]},
     daily: {date:localDateKey(),used:0,bonus:0,newCount:0,rarePlus:0,uniqueIds:[],rewarded:{}}
   };
 }
@@ -55,6 +66,10 @@ function loadState(){
     raw.retailClaims = raw.retailClaims || {};
     raw.retailPreScans = Array.isArray(raw.retailPreScans) ? raw.retailPreScans : [];
     raw.retailTransactions = raw.retailTransactions || {};
+    raw.market = raw.market || {};
+    raw.market.myListings = Array.isArray(raw.market.myListings) ? raw.market.myListings : [];
+    raw.market.offers = raw.market.offers || {};
+    raw.market.trades = Array.isArray(raw.market.trades) ? raw.market.trades : [];
     raw.daily = raw.daily || {};
     if(raw.daily.date !== localDateKey()){
       raw.daily = {date:localDateKey(),used:0,bonus:0,newCount:0,rarePlus:0,uniqueIds:[],rewarded:{}};
@@ -251,7 +266,7 @@ function renderAll(){
   $('#dexCount').textContent=count; $('#dexCount2').textContent=count;
   $('#dexBar').style.width=(count/SPECIES_TOTAL*100)+'%';
   $('#todayCount').textContent=state.daily.used;
-  renderQuests(); renderRecent(); renderDex(); renderArena(); renderShop(); renderRetail();
+  renderQuests(); renderRecent(); renderDex(); renderArena(); renderShop(); renderRetail(); renderMarket();
 }
 
 function renderQuests(){
@@ -457,6 +472,230 @@ function confirmRetailPurchase(id){
   toast('Scan + Kauf bestätigt: +'+campaign.coins+' 🪙 und +'+campaign.scans+' ⚡');
 }
 
+
+function marketListings(){
+  const boughtIds=new Set((state.market?.trades||[]).map(t=>t.listingId));
+  return DEMO_MARKET_SEEDS.map(x=>({...x,creature:creatureFor(x.barcode)})).filter(x=>!boughtIds.has(x.id));
+}
+
+function isOwnedSpecies(speciesId){
+  return !!state.collection[String(speciesId)];
+}
+
+function marketEscape(v){
+  return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function marketplaceFee(price){
+  return Math.max(1,Math.floor(Number(price||0)*0.05));
+}
+
+function renderMarket(){
+  const wrap=$('#marketListings');
+  if(!wrap)return;
+
+  state.market=state.market||{myListings:[],offers:{},trades:[]};
+  state.market.myListings=Array.isArray(state.market.myListings)?state.market.myListings:[];
+  state.market.offers=state.market.offers||{};
+  state.market.trades=Array.isArray(state.market.trades)?state.market.trades:[];
+
+  const coinEl=$('#marketCoins');
+  if(coinEl)coinEl.textContent=state.coins;
+
+  const listings=marketListings();
+  wrap.innerHTML=listings.map(l=>{
+    const c=l.creature;
+    const owned=isOwnedSpecies(c.speciesId);
+    const offer=state.market.offers[l.id];
+    const canBuy=!owned && state.coins>=l.price;
+    let negotiation='';
+    if(offer && offer.status==='countered'){
+      negotiation='<div class="market-counter"><small>Dein Angebot: '+offer.amount+' 🪙</small><b>Gegenangebot: '+offer.counter+' 🪙</b>'+
+        '<button class="secondary accept-counter" data-id="'+l.id+'" '+(state.coins<offer.counter?'disabled':'')+'>Gegenangebot annehmen</button></div>';
+    }
+    return '<article class="card market-card">'+
+      '<div class="market-creature-art">'+creatureSVG(c)+'</div>'+
+      '<div class="market-card-top"><span class="rarity r-'+c.rarity+'">'+c.rarity+'</span><small>von '+marketEscape(l.seller)+'</small></div>'+
+      '<h3>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</h3>'+
+      '<p>'+TYPE_ICONS[c.type]+' '+c.type+' · Stärke '+c.power+' · Tempo '+c.speed+'</p>'+
+      '<div class="market-price">'+l.price+' 🪙</div>'+
+      (owned?'<div class="market-owned">✓ Bereits in deinem ScanDex</div>':
+      '<div class="market-actions"><button class="primary market-buy" data-id="'+l.id+'" '+(canBuy?'':'disabled')+'>'+(canBuy?'Kaufen':'Zu wenig Coins')+'</button>'+
+      '<button class="secondary market-negotiate" data-id="'+l.id+'">Verhandeln</button></div>')+
+      negotiation+
+      '</article>';
+  }).join('') || '<div class="empty-state">Alle Demo-Angebote wurden gekauft.</div>';
+
+  wrap.querySelectorAll('.market-buy').forEach(btn=>btn.addEventListener('click',()=>buyMarketListing(btn.dataset.id)));
+  wrap.querySelectorAll('.market-negotiate').forEach(btn=>btn.addEventListener('click',()=>openMarketOffer(btn.dataset.id)));
+  wrap.querySelectorAll('.accept-counter').forEach(btn=>btn.addEventListener('click',()=>acceptMarketCounter(btn.dataset.id)));
+
+  const select=$('#sellMonsterSelect');
+  if(select){
+    const listedIds=new Set(state.market.myListings.map(x=>String(x.speciesId)));
+    const entries=Object.values(state.collection)
+      .filter(e=>!listedIds.has(String(e.creature.speciesId)))
+      .sort((a,b)=>a.creature.speciesId-b.creature.speciesId);
+    select.innerHTML=entries.length
+      ? '<option value="">Monster auswählen …</option>'+entries.map(e=>'<option value="'+e.creature.speciesId+'">#'+String(e.creature.speciesId).padStart(3,'0')+' '+marketEscape(e.creature.name)+' · '+e.creature.rarity+'</option>').join('')
+      : '<option value="">Keine freien Monster zum Verkaufen</option>';
+    select.disabled=!entries.length;
+  }
+
+  const mine=$('#myMarketListings');
+  if(mine){
+    mine.innerHTML=state.market.myListings.length?state.market.myListings.map(l=>{
+      const e=state.collection[String(l.speciesId)];
+      const c=e?.creature || l.creature;
+      if(!c)return '';
+      const offer=l.incomingOffer;
+      return '<div class="my-listing">'+
+        '<div><b>#'+String(c.speciesId).padStart(3,'0')+' '+marketEscape(c.name)+'</b><small>'+l.price+' 🪙 Verkaufspreis</small></div>'+
+        (offer?'<div class="incoming-offer"><small>Demo-Spieler bietet</small><strong>'+offer+' 🪙</strong>'+
+          '<div><button class="primary accept-my-offer" data-id="'+l.id+'">Annehmen</button><button class="secondary reject-my-offer" data-id="'+l.id+'">Ablehnen</button></div></div>':
+          '<button class="secondary create-demo-offer" data-id="'+l.id+'">Demo-Angebot erhalten</button>')+
+        '<button class="text-btn withdraw-listing" data-id="'+l.id+'">Angebot zurückziehen</button>'+
+        '</div>';
+    }).join(''):'<p class="muted">Du hast noch kein Monster eingestellt.</p>';
+
+    mine.querySelectorAll('.withdraw-listing').forEach(btn=>btn.addEventListener('click',()=>withdrawMyListing(btn.dataset.id)));
+    mine.querySelectorAll('.create-demo-offer').forEach(btn=>btn.addEventListener('click',()=>createDemoBuyerOffer(btn.dataset.id)));
+    mine.querySelectorAll('.accept-my-offer').forEach(btn=>btn.addEventListener('click',()=>acceptMyListingOffer(btn.dataset.id)));
+    mine.querySelectorAll('.reject-my-offer').forEach(btn=>btn.addEventListener('click',()=>rejectMyListingOffer(btn.dataset.id)));
+  }
+}
+
+function findMarketListing(id){
+  return marketListings().find(x=>x.id===id) || null;
+}
+
+function executeMarketPurchase(listing,price){
+  if(!listing)return;
+  const c=listing.creature;
+  if(isOwnedSpecies(c.speciesId)){toast('Dieses Monster besitzt du bereits.');return;}
+  price=Math.max(1,Number(price||0));
+  if(state.coins<price){toast('Du hast nicht genug ScanCoins.');return;}
+
+  state.coins-=price;
+  state.collection[String(c.speciesId)]={
+    creature:c,
+    firstBarcode:listing.barcode,
+    discoveredAt:Date.now(),
+    encounters:1,
+    acquiredVia:'market'
+  };
+  state.market.trades.push({listingId:listing.id,price,purchasedAt:Date.now(),speciesId:c.speciesId,seller:listing.seller});
+  delete state.market.offers[listing.id];
+  saveState();
+  renderAll();
+  toast(c.name+' gekauft für '+price+' 🪙');
+}
+
+function buyMarketListing(id){
+  const listing=findMarketListing(id);
+  if(!listing)return;
+  executeMarketPurchase(listing,listing.price);
+}
+
+function openMarketOffer(id){
+  const listing=findMarketListing(id);
+  if(!listing)return;
+  if(isOwnedSpecies(listing.creature.speciesId)){toast('Dieses Monster besitzt du bereits.');return;}
+  activeMarketOfferId=id;
+  $('#offerMonsterPreview').innerHTML='<div class="offer-preview">'+creatureSVG(listing.creature)+'<div><b>'+marketEscape(listing.creature.name)+'</b><small>Preis: '+listing.price+' 🪙</small></div></div>';
+  $('#marketOfferAmount').value=Math.max(1,Math.floor(listing.price*.8));
+  $('#marketOfferModal').classList.remove('hidden');
+}
+
+function closeMarketOffer(){
+  activeMarketOfferId=null;
+  const modal=$('#marketOfferModal');
+  if(modal)modal.classList.add('hidden');
+}
+
+function submitMarketOffer(amount){
+  const listing=findMarketListing(activeMarketOfferId);
+  if(!listing)return;
+  amount=Math.max(1,Number(amount||0));
+  if(state.coins<amount){toast('Für dieses Angebot hast du nicht genug Coins.');return;}
+
+  const minimum=Math.ceil(listing.price*.85);
+  if(amount>=minimum){
+    closeMarketOffer();
+    executeMarketPurchase(listing,amount);
+    return;
+  }
+
+  const counter=Math.max(minimum,Math.ceil(listing.price*.92));
+  state.market.offers[listing.id]={amount,counter,status:'countered',createdAt:Date.now()};
+  saveState();
+  closeMarketOffer();
+  renderMarket();
+  toast('Verkäufer macht ein Gegenangebot: '+counter+' 🪙');
+}
+
+function acceptMarketCounter(id){
+  const listing=findMarketListing(id);
+  const offer=state.market.offers[id];
+  if(!listing||!offer)return;
+  executeMarketPurchase(listing,offer.counter);
+}
+
+function listOwnMonster(speciesId,price){
+  const entry=state.collection[String(speciesId)];
+  if(!entry){toast('Monster nicht gefunden.');return;}
+  if(state.market.myListings.some(x=>String(x.speciesId)===String(speciesId))){toast('Dieses Monster ist bereits eingestellt.');return;}
+  price=Math.max(10,Math.min(100000,Number(price||0)));
+  state.market.myListings.unshift({
+    id:'mine-'+Date.now().toString(36),
+    speciesId:entry.creature.speciesId,
+    creature:entry.creature,
+    price,
+    createdAt:Date.now(),
+    incomingOffer:null
+  });
+  saveState();
+  renderMarket();
+  toast(entry.creature.name+' wurde für '+price+' 🪙 eingestellt.');
+}
+
+function withdrawMyListing(id){
+  state.market.myListings=state.market.myListings.filter(x=>x.id!==id);
+  saveState();renderMarket();toast('Angebot zurückgezogen.');
+}
+
+function createDemoBuyerOffer(id){
+  const listing=state.market.myListings.find(x=>x.id===id);
+  if(!listing)return;
+  const pct=80+(hash32('buyer:'+id)%11);
+  listing.incomingOffer=Math.max(10,Math.floor(listing.price*pct/100));
+  saveState();renderMarket();
+}
+
+function rejectMyListingOffer(id){
+  const listing=state.market.myListings.find(x=>x.id===id);
+  if(!listing)return;
+  listing.incomingOffer=null;
+  saveState();renderMarket();toast('Angebot abgelehnt.');
+}
+
+function acceptMyListingOffer(id){
+  const listing=state.market.myListings.find(x=>x.id===id);
+  if(!listing||!listing.incomingOffer)return;
+  const entry=state.collection[String(listing.speciesId)];
+  if(!entry){toast('Monster nicht mehr vorhanden.');return;}
+
+  const gross=Number(listing.incomingOffer);
+  const fee=marketplaceFee(gross);
+  const net=gross-fee;
+  delete state.collection[String(listing.speciesId)];
+  state.coins+=net;
+  state.market.trades.push({listingId:listing.id,price:gross,fee,soldAt:Date.now(),speciesId:listing.speciesId,buyer:'DemoBuyer',direction:'sale'});
+  state.market.myListings=state.market.myListings.filter(x=>x.id!==id);
+  saveState();renderAll();
+  toast('Verkauft: '+net+' 🪙 erhalten · '+fee+' 🪙 Gebühr');
+}
+
 function renderShop(){
   const btn=$('#buyScanBtn');
   btn.disabled=state.coins<40;
@@ -480,6 +719,7 @@ function setView(name){
   if(name==='dex')renderDex();
   if(name==='arena')renderArena();
   if(name==='rewards')renderRetail();
+  if(name==='market')renderMarket();
 }
 
 function bindViewButtons(root=document){
@@ -573,8 +813,12 @@ $('#closeScannerBtn').addEventListener('click',closeScanner);
 $('#manualForm').addEventListener('submit',e=>{e.preventDefault();processScan($('#barcodeInput').value);$('#barcodeInput').value='';});
 $('#battleBtn').addEventListener('click',runBattle);
 $('#buyScanBtn').addEventListener('click',buyExtraScan);
+$('#sellMonsterForm').addEventListener('submit',e=>{e.preventDefault();const speciesId=$('#sellMonsterSelect').value;const price=$('#sellMonsterPrice').value;if(!speciesId)return;listOwnMonster(speciesId,price);});
+$('#marketOfferForm').addEventListener('submit',e=>{e.preventDefault();submitMarketOffer($('#marketOfferAmount').value);});
+$('#closeOfferModalBtn').addEventListener('click',closeMarketOffer);
 $$('.filter').forEach(btn=>btn.addEventListener('click',()=>{$$('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');currentFilter=btn.dataset.rarity;renderDex();}));
 $('#scannerModal').addEventListener('click',e=>{if(e.target===$('#scannerModal'))closeScanner();});
+$('#marketOfferModal').addEventListener('click',e=>{if(e.target===$('#marketOfferModal'))closeMarketOffer();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&scanning)closeScanner();});
 
 bindViewButtons();
