@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>E-Check Kids – Update</title>
+<style>
+:root{--bg:#07110f;--card:#0f1d1a;--line:#1f3832;--text:#f4fffb;--muted:#a8c1ba;--brand:#18b89e;--brand2:#0f766e}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#10342d 0,#07110f 44%);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:grid;place-items:center;padding:24px}
+.card{width:min(520px,100%);background:rgba(15,29,26,.96);border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+.logo{width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,var(--brand2),var(--brand));display:grid;place-items:center;font-weight:900;font-size:28px;margin-bottom:18px}
+.badge{display:inline-block;padding:7px 11px;border-radius:999px;background:#12352e;color:#9ff4e3;font-size:13px;font-weight:800}
+h1{font-size:34px;line-height:1.05;margin:14px 0 10px}
+p{color:var(--muted);line-height:1.55}
+.version{margin:22px 0;padding:15px 16px;border-radius:16px;background:#0b1715;border:1px solid var(--line)}
+.version strong{display:block;color:white;font-size:17px}
+.btn{display:block;width:100%;padding:17px 18px;border:0;border-radius:16px;text-align:center;text-decoration:none;background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;font-weight:900;font-size:17px;margin-top:18px}
+.note{font-size:13px;margin-top:16px}
+.steps{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.steps div{display:flex;gap:12px;margin:12px 0;color:var(--muted)}
+.num{flex:0 0 28px;height:28px;border-radius:50%;background:#173d35;color:#a9f6e7;display:grid;place-items:center;font-weight:900}
+small{color:#7f9b94}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="logo">E</div>
+  <span class="badge">E-Check Kids Update</span>
+  <h1>Neueste Testversion</h1>
+  <p>Hier bekommst du künftig immer die aktuelle Android-Version von E-Check Kids über denselben Link.</p>
+
+  <div class="version">
+    <small>Aktuelle Version</small>
+    <strong>V7.9.3</strong>
+  </div>
+
+  <a class="btn" href="./E-Check-Kids-LATEST.apk" download>Neueste Version herunterladen</a>
+  <p class="note"><strong>Wichtig:</strong> Bei normalen Updates die bestehende App nicht deinstallieren. Android sollte „Aktualisieren“ anzeigen.</p>
+
+  <div class="steps">
+    <div><span class="num">1</span><span>APK herunterladen</span></div>
+    <div><span class="num">2</span><span>Datei öffnen</span></div>
+    <div><span class="num">3</span><span>„Aktualisieren“ bestätigen</span></div>
+  </div>
+</main>
+</body>
+</html>
