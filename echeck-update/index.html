@@ -29,9 +29,9 @@ small{color:#7f9b94}
   <div class="logo">E</div>
   <span class="badge">E-Check Kids Update</span>
   <h1>Neueste Testversion</h1>
-  <p>Hier bekommst du künftig immer die aktuelle Android-Version von E-Check Kids über denselben Link.</p>
-  <div class="version"><small>Aktuelle Version</small><strong>V7.9.3</strong></div>
-  <a class="btn" href="https://github.com/shawnstahl-commits/shawnstahl-commits.github.io/releases/latest/download/E-Check-Kids-LATEST.apk">Neueste Version herunterladen</a>
+  <p>Hier bekommst du immer die aktuelle Android-Version von E-Check Kids über denselben Link.</p>
+  <div class="version"><small>Aktuelle Version</small><strong id="latestVersion">wird geprüft …</strong></div>
+  <a id="downloadBtn" class="btn" href="https://github.com/shawnstahl-commits/shawnstahl-commits.github.io/releases/latest/download/E-Check-Kids-LATEST.apk">Neueste Version herunterladen</a>
   <p class="note"><strong>Wichtig:</strong> Bei normalen Updates die bestehende App nicht deinstallieren. Android sollte „Aktualisieren“ anzeigen.</p>
   <div class="steps">
     <div><span class="num">1</span><span>APK herunterladen</span></div>
@@ -39,5 +39,18 @@ small{color:#7f9b94}
     <div><span class="num">3</span><span>„Aktualisieren“ bestätigen</span></div>
   </div>
 </main>
+<script>
+(async()=>{
+  try{
+    const r=await fetch("./latest.json?ts="+Date.now(),{cache:"no-store"});
+    if(!r.ok) throw new Error();
+    const j=await r.json();
+    if(j.version) document.getElementById("latestVersion").textContent="V"+j.version;
+    if(j.downloadUrl) document.getElementById("downloadBtn").href=j.downloadUrl;
+  }catch(e){
+    document.getElementById("latestVersion").textContent="Neueste Version";
+  }
+})();
+</script>
 </body>
 </html>
