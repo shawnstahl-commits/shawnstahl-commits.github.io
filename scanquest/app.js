@@ -56,7 +56,7 @@ function localDateKey(){
 
 function freshState(){
   return {
-    coins: 25,
+    coins: 0,
     collection: {},
     totalScans: 0,
     retailClaims: {},
@@ -305,15 +305,14 @@ function validBarcode(v){
 
 function applyQuestRewards(){
   const quests = [
-    {id:'scan3',done:state.daily.uniqueIds.length>=3,reward:20},
-    {id:'new2',done:state.daily.newCount>=2,reward:25},
-    {id:'rare1',done:state.daily.rarePlus>=1,reward:30}
+    {id:'scan3',done:state.daily.uniqueIds.length>=3},
+    {id:'new2',done:state.daily.newCount>=2},
+    {id:'rare1',done:state.daily.rarePlus>=1}
   ];
   quests.forEach(q=>{
     if(q.done && !state.daily.rewarded[q.id]){
       state.daily.rewarded[q.id]=true;
-      state.coins += q.reward;
-      toast('Quest geschafft: +' + q.reward + ' 🪙');
+      toast('Quest geschafft! Coins gibt es nur durch Kaufbestätigung, Monsterverkauf oder Coin-Kauf.');
     }
   });
 }
@@ -321,12 +320,12 @@ function applyQuestRewards(){
 function processScan(raw){
   const barcode = normalizeBarcode(raw);
   if(!validBarcode(barcode)){ showScanStatus('Der Barcode sieht nicht gültig aus. Bitte erneut scannen oder manuell eingeben.',true); return; }
-  if(scansRemaining()<=0){ showScanStatus('Deine Gratis-Scans sind für heute aufgebraucht. Du kannst im Shop für 40 Coins einen Extra-Scan holen.',true); setView('shop'); return; }
+  if(scansRemaining()<=0){ showScanStatus('Deine Gratis-Scans sind für heute aufgebraucht. Ein Extra-Scan kann später mit Coins freigeschaltet werden.',true); return; }
 
   const c = creatureFor(barcode);
   const key = String(c.speciesId);
   const existed = !!state.collection[key];
-  const baseReward = existed ? 0 : 15 + RARITY_REWARD[c.rarity];
+  const baseReward = 0;
 
   state.daily.used++;
   state.totalScans++;
@@ -340,7 +339,8 @@ function processScan(raw){
     state.collection[key].encounters = Number(state.collection[key].encounters||1)+1;
   }
 
-  state.coins += baseReward;
+  // Ein normaler Scan gibt bewusst keine Coins. Er erzeugt nur das Monster.
+  // Coins entstehen nur aus bestätigten Händlerkäufen, Monsterverkäufen oder später echten Coin-Käufen.
 
   // Retail demo: trusted server time comes later. For now we store the browser timestamp.
   state.retailPreScans = Array.isArray(state.retailPreScans) ? state.retailPreScans : [];
@@ -358,9 +358,9 @@ function processScan(raw){
 
 function questData(){
   return [
-    {id:'scan3',title:'Warm-up',desc:'Entdecke heute 3 verschiedene Wesen.',progress:Math.min(state.daily.uniqueIds.length,3),goal:3,reward:20},
-    {id:'new2',title:'Entdecker',desc:'Finde heute 2 neue Wesen.',progress:Math.min(state.daily.newCount,2),goal:2,reward:25},
-    {id:'rare1',title:'Seltene Spur',desc:'Finde ein seltenes oder besseres Wesen.',progress:Math.min(state.daily.rarePlus,1),goal:1,reward:30}
+    {id:'scan3',title:'Warm-up',desc:'Entdecke heute 3 verschiedene Wesen.',progress:Math.min(state.daily.uniqueIds.length,3),goal:3,rewardLabel:'Fortschritt'},
+    {id:'new2',title:'Entdecker',desc:'Finde heute 2 neue Wesen.',progress:Math.min(state.daily.newCount,2),goal:2,rewardLabel:'Fortschritt'},
+    {id:'rare1',title:'Seltene Spur',desc:'Finde ein seltenes oder besseres Wesen.',progress:Math.min(state.daily.rarePlus,1),goal:1,rewardLabel:'Fortschritt'}
   ];
 }
 
@@ -380,7 +380,7 @@ function renderQuests(){
   $('#questDoneLabel').textContent=qs.filter(q=>q.progress>=q.goal).length+'/3 geschafft';
   $('#questList').innerHTML=qs.map(q=>{
     const done=q.progress>=q.goal;
-    return '<article class="quest '+(done?'done':'')+'"><span class="reward">+'+q.reward+' 🪙</span><b>'+(done?'✓ ':'')+q.title+'</b><p>'+q.desc+'</p><div class="qprog"><i style="width:'+Math.min(100,q.progress/q.goal*100)+'%"></i></div><small>'+q.progress+'/'+q.goal+'</small></article>';
+    return '<article class="quest '+(done?'done':'')+'"><span class="reward">'+q.rewardLabel+'</span><b>'+(done?'✓ ':'')+q.title+'</b><p>'+q.desc+'</p><div class="qprog"><i style="width:'+Math.min(100,q.progress/q.goal*100)+'%"></i></div><small>'+q.progress+'/'+q.goal+'</small></article>';
   }).join('');
 }
 
@@ -444,7 +444,7 @@ function showResult(c,isNew,reward,barcode,fromDex=false){
     '<div class="result-art">'+creatureArtwork(c)+'</div>'+
     '<span class="rarity r-'+c.rarity+'">'+c.rarity+'</span>'+
     '<h1>'+c.name+'</h1><p class="muted">#'+String(c.speciesId).padStart(3,'0')+' · '+TYPE_ICONS[c.type]+' '+c.type+' · Barcode '+masked+'</p>'+
-    (reward?'<p><b>+'+reward+' 🪙</b> erhalten</p>':(!isNew&&!fromDex?'<p class="muted"><b>Schon in deiner Sammlung – keine zusätzlichen Coins.</b></p>':''))+
+    (!fromDex?'<p class="scan-coin-note"><b>'+ (isNew?'Monster gesammelt.':'Schon in deiner Sammlung.') +'</b><br><span>Für den Scan selbst gibt es keine Coins. Händler-Coins erst nach bestätigtem Kauf.</span></p>':'')+
     '<div class="stats"><div class="stat"><small>STÄRKE</small><b>'+c.power+'</b></div><div class="stat"><small>TEMPO</small><b>'+c.speed+'</b></div><div class="stat"><small>ENERGIE</small><b>'+c.energy+'</b></div><div class="stat"><small>GLÜCK</small><b>'+c.luck+'</b></div></div>'+
     '<div class="result-actions"><button id="shareCreatureBtn" class="secondary">↗ Teilen</button><button class="primary" data-view="scan">📷 Weiter scannen</button></div></article>';
   activeCreature=c; setView('result'); bindViewButtons($('#resultWrap'));
