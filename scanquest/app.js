@@ -6,7 +6,7 @@ const TYPES = ['Feuer','Wasser','Wald','Sturm','Fels','Schatten','Licht','Kosmos
 const TYPE_ICONS = {Feuer:'🔥',Wasser:'💧',Wald:'🌿',Sturm:'⚡',Fels:'🪨',Schatten:'🌑',Licht:'✨',Kosmos:'🌌'};
 const PREFIX = ['Aero','Bram','Cryo','Dra','Ember','Ferro','Glim','Hydro','Ixo','Jade','Kiro','Luma','Moro','Nyx','Orbi','Pyra','Quill','Runa','Syl','Terra'];
 const SUFFIX = ['bit','fang','flare','fox','horn','ling','moth','nox','paw','rex','rift','scale','spark','tail','thorn','wing','wyrm','zen'];
-const RARITY_REWARD = {'Gewöhnlich':0,'Selten':5,'Episch':10,'Legendär':25,'Mythisch':50};
+const RARITY_REWARD = {'Standard':0,'Selten':8,'Episch':20,'Legendär':60,'Mythisch':120};
 
 const PARTNER_CAMPAIGNS_KEY = 'scanquest_partner_demo_v1';
 
@@ -80,6 +80,14 @@ function loadState(){
     raw.market.myListings = Array.isArray(raw.market.myListings) ? raw.market.myListings : [];
     raw.market.offers = raw.market.offers || {};
     raw.market.trades = Array.isArray(raw.market.trades) ? raw.market.trades : [];
+    Object.values(raw.collection).forEach(entry=>{
+      if(entry && entry.firstBarcode){
+        const encounters=Number(entry.encounters||1);
+        const refreshed=creatureFor(normalizeBarcode(entry.firstBarcode));
+        entry.creature=refreshed;
+        entry.encounters=encounters;
+      }
+    });
     raw.daily = raw.daily || {};
     if(raw.daily.date !== localDateKey()){
       raw.daily = {date:localDateKey(),used:0,bonus:0,newCount:0,rarePlus:0,uniqueIds:[],rewarded:{}};
@@ -110,13 +118,24 @@ function speciesName(id){
   return a + b;
 }
 
+let rarityMapCache = null;
+function buildRarityMap(){
+  const ranked=Array.from({length:SPECIES_TOTAL},(_,i)=>i+1)
+    .sort((a,b)=>(hash32('rarity-rank:'+a)-hash32('rarity-rank:'+b)) || a-b);
+  const map={};
+  ranked.forEach((speciesId,rank)=>{
+    map[speciesId] = rank===0 ? 'Mythisch'
+      : rank===1 ? 'Legendär'
+      : rank<5 ? 'Episch'
+      : rank<12 ? 'Selten'
+      : 'Standard';
+  });
+  return map;
+}
+
 function rarityFor(id){
-  const r = hash32('rarity:' + id) % 1000;
-  if(r < 10) return 'Mythisch';
-  if(r < 60) return 'Legendär';
-  if(r < 180) return 'Episch';
-  if(r < 400) return 'Selten';
-  return 'Gewöhnlich';
+  if(!rarityMapCache) rarityMapCache=buildRarityMap();
+  return rarityMapCache[id] || 'Standard';
 }
 
 function creatureFor(barcode){
@@ -134,44 +153,91 @@ function creatureFor(barcode){
 function hueFor(id,offset=0){ return (hash32('h:' + id) + offset) % 360; }
 
 function creatureSVG(c){
-  const id = c.speciesId;
-  const h1 = hueFor(id,0), h2 = hueFor(id,90), h3 = hueFor(id,180);
-  const eye = c.rarity === 'Mythisch' ? '#ff8be7' : c.rarity === 'Legendär' ? '#ffd166' : '#8ff7ff';
-  const hornMode = id % 4;
-  const earMode = id % 3;
-  const wing = id % 5 === 0;
-  const crest = id % 4 === 1;
-  const stars = [0,1,2,3,4,5].map(i=>{
-    const x=12+(hash32('sx:'+id+':'+i)%76), y=10+(hash32('sy:'+id+':'+i)%70), r=1+(i%2);
-    return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="white" opacity="'+(.18+i*.06)+'"/>';
+  const id=c.speciesId;
+  const h1=hueFor(id,0), h2=hueFor(id,70), h3=hueFor(id,160);
+  const rare=c.rarity!=='Standard';
+  const epic=['Episch','Legendär','Mythisch'].includes(c.rarity);
+  const top=['Legendär','Mythisch'].includes(c.rarity);
+  const mythic=c.rarity==='Mythisch';
+
+  const eyeHue=(hash32('eye:'+id)%360);
+  const furLight='hsl('+h1+' 78% 76%)';
+  const furMid='hsl('+h1+' 66% 55%)';
+  const furDark='hsl('+h2+' 55% 28%)';
+  const accent='hsl('+h3+' 90% 68%)';
+
+  const sparkles=Array.from({length: rare?12:5},(_,i)=>{
+    const x=8+(hash32('gx:'+id+':'+i)%84);
+    const y=7+(hash32('gy:'+id+':'+i)%76);
+    const r=rare?(0.8+(i%3)*0.45):(0.55+(i%2)*0.35);
+    const op=rare?(0.38+(i%4)*0.12):(0.12+(i%3)*0.08);
+    return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="white" opacity="'+op+'"/>';
   }).join('');
-  const horns = hornMode===0
-    ? '<path d="M36 38 C18 20,20 8,34 10 C28 20,31 28,41 32" fill="none" stroke="url(#g2)" stroke-width="6" stroke-linecap="round"/><path d="M64 38 C82 20,80 8,66 10 C72 20,69 28,59 32" fill="none" stroke="url(#g2)" stroke-width="6" stroke-linecap="round"/>'
-    : hornMode===1
-    ? '<path d="M36 38 L24 14 L44 31 Z" fill="url(#g2)"/><path d="M64 38 L76 14 L56 31 Z" fill="url(#g2)"/>'
-    : hornMode===2
-    ? '<path d="M37 34 Q25 20 31 9 Q42 19 44 31" fill="url(#g2)"/><path d="M63 34 Q75 20 69 9 Q58 19 56 31" fill="url(#g2)"/>'
+
+  const crystals=epic?[
+    [14,31,7],[84,24,6],[11,65,5],[88,64,7],[28,12,5],[72,10,5]
+  ].map((p,i)=>'<path d="M'+p[0]+' '+(p[1]-p[2])+' L'+(p[0]+p[2]*.62)+' '+p[1]+' L'+p[0]+' '+(p[1]+p[2])+' L'+(p[0]-p[2]*.62)+' '+p[1]+' Z" fill="url(#cr'+id+')" opacity="'+(0.55+i*.05)+'"/>').join(''):'';
+
+  const halo=rare
+    ? '<circle cx="50" cy="49" r="'+(top?42:39)+'" fill="none" stroke="url(#halo'+id+')" stroke-width="'+(top?2.2:1.3)+'" opacity="'+(top?.95:.62)+'"/>'+
+      (epic?'<circle cx="50" cy="49" r="34" fill="none" stroke="url(#halo'+id+')" stroke-dasharray="3 4" stroke-width="1.2" opacity=".72"/>':'')
     : '';
-  const ears = earMode===0
-    ? '<path d="M34 40 Q17 31 20 49 Q26 55 36 51" fill="url(#g1)"/><path d="M66 40 Q83 31 80 49 Q74 55 64 51" fill="url(#g1)"/>'
-    : earMode===1
-    ? '<path d="M35 40 L21 30 L25 52 Z" fill="url(#g1)"/><path d="M65 40 L79 30 L75 52 Z" fill="url(#g1)"/>'
+
+  const crown=top
+    ? '<path d="M38 28 L43 17 L49 24 L55 14 L61 27 L68 20 L65 34 Q50 30 35 34 Z" fill="url(#gold'+id+')" stroke="rgba(255,255,255,.5)" stroke-width=".7"/>'
     : '';
-  const wings = wing ? '<path d="M33 58 Q9 43 10 70 Q22 74 36 68" fill="url(#g3)" opacity=".8"/><path d="M67 58 Q91 43 90 70 Q78 74 64 68" fill="url(#g3)" opacity=".8"/>' : '';
-  const crestPath = crest ? '<path d="M43 35 L50 16 L57 35 L53 41 L47 41 Z" fill="url(#g3)"/>' : '';
+
+  const mythicAura=mythic
+    ? '<path d="M16 48 C8 25 31 6 49 10 C66 2 91 23 84 47 C95 64 79 91 55 87 C37 96 9 79 16 48 Z" fill="url(#myth'+id+')" opacity=".22" filter="url(#glow'+id+')"/>'
+    : '';
+
+  const earStyle=id%3;
+  const ears=earStyle===0
+    ? '<path d="M34 43 Q15 28 18 51 Q22 61 37 55 Z" fill="'+furMid+'" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/><path d="M66 43 Q85 28 82 51 Q78 61 63 55 Z" fill="'+furMid+'" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/>'
+    : earStyle===1
+    ? '<path d="M35 42 L18 23 Q18 45 27 57 L39 53 Z" fill="'+furMid+'" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/><path d="M65 42 L82 23 Q82 45 73 57 L61 53 Z" fill="'+furMid+'" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/>'
+    : '<path d="M35 43 Q17 20 23 56 L39 52 Z" fill="'+furMid+'" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/><path d="M65 43 Q83 20 77 56 L61 52 Z" fill="'+furMid+'" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/>';
+
+  const horns=(id%4===0 || epic)
+    ? '<path d="M38 35 C28 27 28 17 35 15 C31 24 36 29 42 31" fill="none" stroke="'+accent+'" stroke-width="4.2" stroke-linecap="round"/><path d="M62 35 C72 27 72 17 65 15 C69 24 64 29 58 31" fill="none" stroke="'+accent+'" stroke-width="4.2" stroke-linecap="round"/>'
+    : '';
+
+  const tail=(id%2===0)
+    ? '<path d="M68 72 Q89 67 84 52 Q80 43 73 50 Q82 54 78 62 Q73 68 65 66" fill="none" stroke="'+furMid+'" stroke-width="7" stroke-linecap="round"/>'
+    : '<path d="M69 73 Q87 78 88 62 Q89 49 79 45 Q84 56 78 63 Q73 68 66 66" fill="none" stroke="'+furMid+'" stroke-width="7" stroke-linecap="round"/>';
+
+  const wing=epic
+    ? '<path d="M33 58 Q15 46 12 64 Q18 72 34 69" fill="url(#wing'+id+')" opacity=".78"/><path d="M67 58 Q85 46 88 64 Q82 72 66 69" fill="url(#wing'+id+')" opacity=".78"/>'
+    : '';
+
   return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+c.name+'">'+
-    '<defs><radialGradient id="bg'+id+'" cx="35%" cy="25%" r="80%"><stop stop-color="hsl('+h2+' 55% 24%)"/><stop offset="1" stop-color="#07111f"/></radialGradient>'+
-    '<linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="hsl('+h1+' 80% 67%)"/><stop offset="1" stop-color="hsl('+h2+' 75% 38%)"/></linearGradient>'+
-    '<linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="hsl('+h3+' 90% 78%)"/><stop offset="1" stop-color="hsl('+h1+' 70% 45%)"/></linearGradient>'+
-    '<linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop stop-color="hsl('+h2+' 88% 70%)"/><stop offset="1" stop-color="hsl('+h3+' 80% 40%)"/></linearGradient></defs>'+
-    '<rect width="100" height="100" rx="18" fill="url(#bg'+id+')"/>'+stars+
-    '<circle cx="50" cy="56" r="34" fill="hsl('+h1+' 35% 10%)" opacity=".45"/>'+wings+horns+ears+crestPath+
-    '<path d="M31 47 Q50 31 69 47 L66 72 Q50 86 34 72 Z" fill="url(#g1)" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>'+
-    '<ellipse cx="40" cy="55" rx="5" ry="6" fill="#07111f"/><ellipse cx="60" cy="55" rx="5" ry="6" fill="#07111f"/>'+
-    '<circle cx="40" cy="54" r="2.2" fill="'+eye+'"/><circle cx="60" cy="54" r="2.2" fill="'+eye+'"/>'+
-    '<path d="M46 65 Q50 68 54 65" fill="none" stroke="#07111f" stroke-width="2" stroke-linecap="round"/>'+
-    '<path d="M50 59 L46 63 L54 63 Z" fill="hsl('+h3+' 65% 25%)"/>'+
-    '<circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>'+
+    '<defs>'+
+      '<radialGradient id="bg'+id+'" cx="50%" cy="38%" r="72%"><stop stop-color="hsl('+h2+' 55% '+(rare?26:20)+'%)"/><stop offset="1" stop-color="#06101c"/></radialGradient>'+
+      '<linearGradient id="belly'+id+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+furLight+'"/><stop offset="1" stop-color="'+furMid+'"/></linearGradient>'+
+      '<linearGradient id="cr'+id+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".45" stop-color="'+accent+'"/><stop offset="1" stop-color="hsl('+h2+' 90% 48%)"/></linearGradient>'+
+      '<linearGradient id="halo'+id+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+(mythic?'#ffffff':accent)+'"/><stop offset=".5" stop-color="'+(top?'#ffd76a':'hsl('+h1+' 95% 70%)')+'"/><stop offset="1" stop-color="'+accent+'"/></linearGradient>'+
+      '<linearGradient id="gold'+id+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff6b2"/><stop offset=".45" stop-color="#ffd45d"/><stop offset="1" stop-color="#b96c12"/></linearGradient>'+
+      '<linearGradient id="wing'+id+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="rgba(255,255,255,.88)"/><stop offset="1" stop-color="'+accent+'"/></linearGradient>'+
+      '<radialGradient id="myth'+id+'"><stop stop-color="#fff"/><stop offset=".35" stop-color="#78f8ff"/><stop offset=".68" stop-color="#d871ff"/><stop offset="1" stop-color="#ff7db7"/></radialGradient>'+
+      '<filter id="glow'+id+'" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="'+(top?2.8:1.6)+'" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+    '</defs>'+
+    '<rect width="100" height="100" rx="18" fill="url(#bg'+id+')"/>'+
+    mythicAura+sparkles+halo+crystals+wing+tail+horns+ears+crown+
+    '<ellipse cx="50" cy="70" rx="22" ry="18" fill="'+furDark+'" opacity=".92"/>'+
+    '<circle cx="50" cy="49" r="27" fill="'+furMid+'" stroke="rgba(255,255,255,.2)" stroke-width="1.2"/>'+
+    '<path d="M30 50 Q34 31 50 27 Q66 31 70 50 Q63 42 55 41 Q50 34 45 41 Q37 42 30 50 Z" fill="'+furLight+'" opacity=".85"/>'+
+    '<ellipse cx="50" cy="67" rx="14" ry="13" fill="url(#belly'+id+')" opacity=".92"/>'+
+    '<ellipse cx="40" cy="50" rx="7.4" ry="9.2" fill="#10141d"/><ellipse cx="60" cy="50" rx="7.4" ry="9.2" fill="#10141d"/>'+
+    '<ellipse cx="40" cy="50" rx="4.7" ry="6.6" fill="hsl('+eyeHue+' 82% 58%)"/><ellipse cx="60" cy="50" rx="4.7" ry="6.6" fill="hsl('+eyeHue+' 82% 58%)"/>'+
+    '<circle cx="38" cy="47" r="2.2" fill="#fff"/><circle cx="58" cy="47" r="2.2" fill="#fff"/>'+
+    '<circle cx="42" cy="53" r="1.1" fill="#fff" opacity=".65"/><circle cx="62" cy="53" r="1.1" fill="#fff" opacity=".65"/>'+
+    '<path d="M47 59 Q50 61.5 53 59" fill="none" stroke="#412935" stroke-width="1.8" stroke-linecap="round"/>'+
+    '<path d="M50 56 L47.5 58.3 L52.5 58.3 Z" fill="#6b344d"/>'+
+    '<path d="M45 62 Q50 67 55 62" fill="#6d2a45" stroke="#27151e" stroke-width=".8"/>'+
+    '<path d="M47 63 L48.5 67 L50 64.5" fill="#fff"/><path d="M53 63 L51.5 67 L50 64.5" fill="#fff"/>'+
+    '<ellipse cx="36" cy="72" rx="7" ry="5.5" fill="'+furMid+'"/><ellipse cx="64" cy="72" rx="7" ry="5.5" fill="'+furMid+'"/>'+
+    '<path d="M31 73 q5 4 10 0" fill="none" stroke="rgba(20,20,30,.45)" stroke-width="1"/><path d="M59 73 q5 4 10 0" fill="none" stroke="rgba(20,20,30,.45)" stroke-width="1"/>'+
+    (rare?'<circle cx="50" cy="77" r="4.4" fill="url(#cr'+id+')" stroke="rgba(255,255,255,.75)" stroke-width=".7"/>':'')+
     '</svg>';
 }
 
