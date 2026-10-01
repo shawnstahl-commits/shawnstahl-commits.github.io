@@ -1013,6 +1013,52 @@ async function acceptScannedBarcode(raw){
   return true;
 }
 
+async function optimizeCameraTrack(track){
+  if(!track)return {focus:false,exposure:false,whiteBalance:false};
+  try{ track.contentHint='detail'; }catch(e){}
+
+  const caps=track.getCapabilities?.()||{};
+  const advanced={};
+  let focus=false,exposure=false,whiteBalance=false;
+
+  if(Array.isArray(caps.focusMode)){
+    if(caps.focusMode.includes('continuous')){
+      advanced.focusMode='continuous';
+      focus=true;
+    }else if(caps.focusMode.includes('single-shot')){
+      advanced.focusMode='single-shot';
+      focus=true;
+    }
+  }
+
+  if(Array.isArray(caps.exposureMode) && caps.exposureMode.includes('continuous')){
+    advanced.exposureMode='continuous';
+    exposure=true;
+  }
+
+  if(Array.isArray(caps.whiteBalanceMode) && caps.whiteBalanceMode.includes('continuous')){
+    advanced.whiteBalanceMode='continuous';
+    whiteBalance=true;
+  }
+
+  if(Object.keys(advanced).length){
+    try{ await track.applyConstraints({advanced:[advanced]}); }catch(e){}
+  }
+
+  // Einige Android-Kameras reagieren besser, wenn nach dem Start noch einmal
+  // ein einzelner Fokusimpuls ausgelöst wird und danach continuous übernimmt.
+  if(Array.isArray(caps.focusMode) && caps.focusMode.includes('single-shot') && caps.focusMode.includes('continuous')){
+    try{
+      await track.applyConstraints({advanced:[{focusMode:'single-shot'}]});
+      await new Promise(r=>setTimeout(r,280));
+      await track.applyConstraints({advanced:[{focusMode:'continuous'}]});
+      focus=true;
+    }catch(e){}
+  }
+
+  return {focus,exposure,whiteBalance};
+}
+
 async function startNativeBarcodeScanner(){
   if(!('BarcodeDetector' in window) || !navigator.mediaDevices?.getUserMedia) throw new Error('Native scanner unavailable');
 
@@ -1025,40 +1071,60 @@ async function startNativeBarcodeScanner(){
   nativeScannerStream=await navigator.mediaDevices.getUserMedia({
     video:{
       facingMode:{ideal:'environment'},
-      width:{ideal:1920},
-      height:{ideal:1080},
-      frameRate:{ideal:30}
+      width:{ideal:2560,min:1280},
+      height:{ideal:1440,min:720},
+      frameRate:{ideal:30,max:60}
     },
     audio:false
   });
 
   const reader=$('#reader');
-  reader.innerHTML='<div class="native-reader"><video id="nativeBarcodeVideo" playsinline muted></video><div class="native-guide"><i></i><span>Barcode vollständig in den Rahmen halten</span></div></div>';
+  reader.innerHTML='<div class="native-reader"><video id="nativeBarcodeVideo" playsinline muted autoplay></video><div class="native-guide"><i></i><span>Barcode vollständig in den Rahmen halten</span></div></div>';
   const video=$('#nativeBarcodeVideo');
   video.srcObject=nativeScannerStream;
+
+  if(video.readyState<1){
+    await new Promise(resolve=>{
+      const done=()=>{video.removeEventListener('loadedmetadata',done);resolve();};
+      video.addEventListener('loadedmetadata',done,{once:true});
+      setTimeout(done,1200);
+    });
+  }
   await video.play();
 
-  try{
-    const track=nativeScannerStream.getVideoTracks()[0];
-    const caps=track.getCapabilities?.()||{};
-    if(Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')){
-      await track.applyConstraints({advanced:[{focusMode:'continuous'}]});
-    }
-  }catch(e){}
+  const track=nativeScannerStream.getVideoTracks()[0];
+  const cameraFeatures=await optimizeCameraTrack(track);
 
-  $('#cameraHelp').textContent='Scanner 2.0 aktiv · Barcode quer halten · ca. 10–20 cm Abstand.';
+  // Kurze Einregelzeit: Fokus, Belichtung und Weißabgleich dürfen sich stabilisieren,
+  // bevor die erste Barcode-Erkennung läuft.
+  await new Promise(r=>setTimeout(r,180));
+
+  $('#cameraHelp').textContent=cameraFeatures.focus
+    ? 'Autofokus aktiv · Barcode quer halten · ca. 10–20 cm Abstand.'
+    : 'Scanner aktiv · Barcode quer halten · ca. 10–20 cm Abstand.';
   scanning=true;
 
+  let detectBusy=false;
   const detect=async()=>{
-    if(!scanning || !nativeDetector || !video || video.readyState<2)return;
+    if(!scanning || !nativeDetector || !video || video.readyState<2 || detectBusy)return;
+    detectBusy=true;
     try{
       const results=await nativeDetector.detect(video);
       for(const result of results||[]){
         if(result?.rawValue && await acceptScannedBarcode(result.rawValue)) return;
       }
-    }catch(e){}
+    }catch(e){
+    }finally{
+      detectBusy=false;
+    }
   };
-  nativeScanTimer=setInterval(detect,110);
+
+  const scanLoop=async()=>{
+    if(!scanning)return;
+    await detect();
+    if(scanning)nativeScanTimer=setTimeout(scanLoop,85);
+  };
+  nativeScanTimer=setTimeout(scanLoop,40);
 }
 
 function ensureHtml5Qrcode(){
@@ -1116,10 +1182,10 @@ async function startHtml5BarcodeScanner(){
   await htmlScanner.start(
     {facingMode:'environment'},
     {
-      fps:20,
+      fps:24,
       qrbox:(w,h)=>({
-        width:Math.max(160,Math.min(Math.floor(w*.92),w-12)),
-        height:Math.max(90,Math.min(Math.floor(h*.42),h-12))
+        width:Math.max(180,Math.min(Math.floor(w*.94),w-12)),
+        height:Math.max(96,Math.min(Math.floor(h*.40),h-12))
       }),
       aspectRatio:1.7778,
       disableFlip:true
@@ -1127,6 +1193,15 @@ async function startHtml5BarcodeScanner(){
     decoded=>{ if(scanning) acceptScannedBarcode(decoded); },
     ()=>{}
   );
+
+  // Auch beim Fallback versuchen wir direkt den echten Kamera-Track zu optimieren.
+  try{
+    await new Promise(r=>setTimeout(r,180));
+    const fallbackVideo=$('#reader video');
+    const fallbackTrack=fallbackVideo?.srcObject?.getVideoTracks?.()[0];
+    const features=await optimizeCameraTrack(fallbackTrack);
+    if(features.focus)$('#cameraHelp').textContent='Fallback-Scanner · Autofokus aktiv · Barcode ruhig und vollständig halten.';
+  }catch(e){}
 }
 
 async function openScanner(){
@@ -1155,7 +1230,7 @@ async function openScanner(){
 
 async function stopNativeScanner(){
   if(nativeScanTimer){
-    clearInterval(nativeScanTimer);
+    clearTimeout(nativeScanTimer);
     nativeScanTimer=null;
   }
   nativeDetector=null;
