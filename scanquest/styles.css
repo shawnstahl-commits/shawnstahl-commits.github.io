@@ -134,3 +134,36 @@ button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!impo
 .native-guide span{align-self:end;margin-bottom:18px;padding:8px 11px;border-radius:999px;background:rgba(3,10,18,.78);font-size:11px;color:#dffbff;font-weight:800}
 #reader{overflow:hidden;border-radius:16px}
 #reader video{max-width:100%}
+
+
+/* ScanCoin Shop */
+.coin-chip{border:1px solid rgba(255,209,102,.26);cursor:pointer;position:relative;overflow:visible}
+.coin-chip:hover{border-color:rgba(255,209,102,.6)}
+.coin-bounce{display:inline-block;transform-origin:50% 55%;animation:coinAttention 1.8s ease-in-out infinite}
+.coin-plus{display:grid;place-items:center;width:16px;height:16px;border-radius:999px;background:var(--gold);color:#111;font-size:11px;font-weight:1000;margin-left:2px;box-shadow:0 0 12px rgba(255,209,102,.35)}
+@keyframes coinAttention{
+  0%,100%{transform:translateY(0) rotateY(0deg) scale(1)}
+  20%{transform:translateY(-3px) rotateY(70deg) scale(1.08)}
+  40%{transform:translateY(0) rotateY(145deg) scale(1)}
+  60%{transform:translateY(-2px) rotateY(220deg) scale(1.06)}
+  80%{transform:translateY(0) rotateY(300deg) scale(1)}
+}
+@media (prefers-reduced-motion:reduce){.coin-bounce{animation:none}}
+
+.coin-shop-modal{width:min(620px,100%);padding:18px}
+.coin-shop-modal .modal-head>div{display:grid;gap:3px}
+.coin-shop-modal .modal-head>div>b{font-size:24px}
+.coin-shop-balance{display:flex;align-items:center;gap:12px;padding:15px 16px;border:1px solid rgba(255,209,102,.2);border-radius:16px;background:linear-gradient(135deg,rgba(255,209,102,.08),rgba(255,255,255,.025));margin:8px 0 13px}
+.coin-shop-balance>.coin-bounce{font-size:34px}
+.coin-shop-balance small{display:block;color:var(--muted);font-size:9px;letter-spacing:.1em}
+.coin-shop-balance strong{display:block;font-size:21px;margin-top:2px}
+.coin-shop-intro{color:var(--muted);line-height:1.5;margin:0 0 15px}
+.coin-pack-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.coin-pack{position:relative;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.035);color:#fff;padding:17px 14px;display:grid;gap:5px;text-align:left;cursor:pointer;transition:.18s ease}
+.coin-pack:hover,.coin-pack:focus-visible{transform:translateY(-2px);border-color:rgba(92,225,230,.35);outline:none}
+.coin-pack.featured{border-color:rgba(255,209,102,.34);background:linear-gradient(145deg,rgba(255,209,102,.08),rgba(92,225,230,.035))}
+.pack-coins{font-size:19px;font-weight:1000}.coin-pack strong{font-size:25px}.coin-pack small{color:var(--muted)}
+.pack-tag{position:absolute;right:10px;top:9px;padding:4px 7px;border-radius:999px;background:var(--gold);color:#111;font-size:8px;font-weight:1000;letter-spacing:.08em}
+.coin-purchase-status{margin-top:13px;padding:12px 13px;border:1px solid rgba(92,225,230,.18);border-radius:14px;background:rgba(92,225,230,.035);display:grid;gap:3px}
+.coin-purchase-status b{font-size:13px}.coin-purchase-status span{color:var(--muted);font-size:11px;line-height:1.45}
+@media(max-width:520px){.coin-pack-grid{grid-template-columns:1fr 1fr}.coin-pack{padding:14px 11px}.coin-pack strong{font-size:21px}.pack-coins{font-size:16px}}
