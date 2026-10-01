@@ -1,0 +1,51 @@
+name: E-Check Update Manifest
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Update latest.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG='${{ github.event.release.tag_name }}'
+          VERSION="${TAG#v}"
+          DOWNLOAD_URL="$(jq -r '.release.assets[] | select(.name == "E-Check-Kids-LATEST.apk") | .browser_download_url' "$GITHUB_EVENT_PATH" | head -n1)"
+          if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" = "null" ]; then
+            echo "E-Check-Kids-LATEST.apk fehlt im Release."
+            exit 1
+          fi
+          mkdir -p echeck-update
+          cat > echeck-update/latest.json <<EOF
+          {
+            "version": "$VERSION",
+            "releaseName": "${{ github.event.release.name }}",
+            "downloadUrl": "$DOWNLOAD_URL",
+            "pageUrl": "https://shawnstahl-commits.github.io/echeck-update/",
+            "published": "${{ github.event.release.published_at }}"
+          }
+          EOF
+
+      - name: Commit manifest
+        shell: bash
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add echeck-update/latest.json
+          if git diff --cached --quiet; then
+            echo "Keine Änderung."
+            exit 0
+          fi
+          git commit -m "Update E-Check latest manifest"
+          git push
