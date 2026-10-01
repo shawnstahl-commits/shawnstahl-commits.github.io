@@ -272,26 +272,52 @@ function creatureSVGFallback(c){
 
 let gremlinSpriteReady=false;
 
+const HQ_GREMLIN_ART={
+  0:'assets/hq/q8_0.webp?v=1',
+  1:'assets/gremlins.webp?v=1',
+  3:'assets/gremlins.webp?v=1'
+};
+
 function gremlinSpriteIndex(c){
-  const seed=hash32('art:'+c.speciesId);
-  if(c.rarity==='Mythisch') return 11;
-  if(c.rarity==='Legendär') return 10;
-  if(c.rarity==='Episch') return 8+(seed%2);
-  if(c.rarity==='Selten') return 6+(seed%2);
-  return seed%6;
+  const seed=hash32('hq-art:'+c.speciesId);
+  if(c.rarity==='Mythisch' || c.rarity==='Legendär' || c.rarity==='Episch' || c.rarity==='Selten') return 3;
+  return seed%2;
 }
 
 function creatureArtwork(c){
   const index=gremlinSpriteIndex(c);
-  const col=index%4;
-  const row=Math.floor(index/4);
-  const x=(col/3*100).toFixed(4);
-  const y=(row/2*100).toFixed(4);
-  return '<div class="gremlin-art" role="img" aria-label="'+c.name+'" style="background-position:'+x+'% '+y+'%"></div>';
+  const src=HQ_GREMLIN_ART[index] || HQ_GREMLIN_ART[0];
+  return '<img class="gremlin-art-img" data-hq-art="'+index+'" src="'+src+'" alt="'+c.name+'" loading="eager" decoding="async">';
 }
 
-function loadGremlinSprite(){
+function applyLoadedHqArt(index,src){
+  HQ_GREMLIN_ART[index]=src;
+  document.querySelectorAll('[data-hq-art="'+index+'"]').forEach(img=>{
+    if(img.tagName==='IMG' && img.src!==src) img.src=src;
+  });
+}
+
+async function loadHqB64(index,path){
+  const res=await fetch(path,{cache:'force-cache'});
+  if(!res.ok) throw new Error('HQ-Art '+index+' konnte nicht geladen werden');
+  const b64=(await res.text()).trim();
+  if(!b64.startsWith('UklG')) throw new Error('HQ-Art '+index+' ist ungültig');
+  const src='data:image/webp;base64,'+b64;
+  applyLoadedHqArt(index,src);
+}
+
+async function loadGremlinSprite(){
   document.documentElement.classList.add('gremlin-art-ready');
+  try{
+    await Promise.all([
+      loadHqB64(1,'assets/hq/q8_1.b64?v=1'),
+      loadHqB64(3,'assets/hq/q8_3.b64?v=1')
+    ]);
+    gremlinSpriteReady=true;
+    document.documentElement.classList.add('gremlin-hq-ready');
+  }catch(e){
+    console.warn('HQ-Gremlin-Artwork teilweise nicht geladen',e);
+  }
 }
 
 function refreshScanCycle(){
