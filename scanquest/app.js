@@ -156,7 +156,7 @@ function creatureFor(barcode){
 
 function hueFor(id,offset=0){ return (hash32('h:' + id) + offset) % 360; }
 
-function creatureArtwork(c){
+function creatureSVGFallback(c){
   const id=c.speciesId;
   const h1=hueFor(id,0), h2=hueFor(id,70), h3=hueFor(id,160);
   const rare=c.rarity!=='Standard';
