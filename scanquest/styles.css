@@ -389,3 +389,45 @@ button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!impo
 .creature-card[data-rarity="Mythisch"] .gremlin-art-img,
 .result-card[data-rarity="Mythisch"] .gremlin-art-img,
 .market-card[data-rarity="Mythisch"] .gremlin-art-img{filter:saturate(1.34) contrast(1.08)}
+
+
+/* Scanner autofocus assist */
+.native-reader{position:relative}
+.focus-tap{
+  position:absolute;
+  right:12px;
+  top:12px;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.38);
+  background:rgba(4,14,28,.72);
+  color:#fff;
+  font-size:24px;
+  line-height:1;
+  display:grid;
+  place-items:center;
+  z-index:6;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.focus-tap:active{transform:scale(.94)}
+.native-reader.focus-pulse::after{
+  content:'';
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:72px;
+  height:72px;
+  border:2px solid rgba(255,219,92,.95);
+  border-radius:16px;
+  transform:translate(-50%,-50%) scale(.72);
+  pointer-events:none;
+  z-index:5;
+  animation:scanquestFocusPulse .65s ease-out forwards;
+}
+@keyframes scanquestFocusPulse{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
+  25%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.05)}
+}
