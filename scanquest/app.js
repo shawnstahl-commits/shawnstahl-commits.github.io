@@ -203,7 +203,7 @@ function validBarcode(v){
 
 function applyQuestRewards(){
   const quests = [
-    {id:'scan3',done:state.daily.used>=3,reward:20},
+    {id:'scan3',done:state.daily.uniqueIds.length>=3,reward:20},
     {id:'new2',done:state.daily.newCount>=2,reward:25},
     {id:'rare1',done:state.daily.rarePlus>=1,reward:30}
   ];
@@ -224,7 +224,7 @@ function processScan(raw){
   const c = creatureFor(barcode);
   const key = String(c.speciesId);
   const existed = !!state.collection[key];
-  const baseReward = existed ? 3 : 15 + RARITY_REWARD[c.rarity];
+  const baseReward = existed ? 0 : 15 + RARITY_REWARD[c.rarity];
 
   state.daily.used++;
   state.totalScans++;
@@ -256,7 +256,7 @@ function processScan(raw){
 
 function questData(){
   return [
-    {id:'scan3',title:'Warm-up',desc:'Scanne heute 3 Barcodes.',progress:Math.min(state.daily.used,3),goal:3,reward:20},
+    {id:'scan3',title:'Warm-up',desc:'Entdecke heute 3 verschiedene Wesen.',progress:Math.min(state.daily.uniqueIds.length,3),goal:3,reward:20},
     {id:'new2',title:'Entdecker',desc:'Finde heute 2 neue Wesen.',progress:Math.min(state.daily.newCount,2),goal:2,reward:25},
     {id:'rare1',title:'Seltene Spur',desc:'Finde ein seltenes oder besseres Wesen.',progress:Math.min(state.daily.rarePlus,1),goal:1,reward:30}
   ];
@@ -322,7 +322,7 @@ function showResult(c,isNew,reward,barcode,fromDex=false){
     '<div class="result-art">'+creatureSVG(c)+'</div>'+
     '<span class="rarity r-'+c.rarity+'">'+c.rarity+'</span>'+
     '<h1>'+c.name+'</h1><p class="muted">#'+String(c.speciesId).padStart(3,'0')+' · '+TYPE_ICONS[c.type]+' '+c.type+' · Barcode '+masked+'</p>'+
-    (reward?'<p><b>+'+reward+' 🪙</b> erhalten</p>':'')+
+    (reward?'<p><b>+'+reward+' 🪙</b> erhalten</p>':(!isNew&&!fromDex?'<p class="muted"><b>Schon in deiner Sammlung – keine zusätzlichen Coins.</b></p>':''))+
     '<div class="stats"><div class="stat"><small>STÄRKE</small><b>'+c.power+'</b></div><div class="stat"><small>TEMPO</small><b>'+c.speed+'</b></div><div class="stat"><small>ENERGIE</small><b>'+c.energy+'</b></div><div class="stat"><small>GLÜCK</small><b>'+c.luck+'</b></div></div>'+
     '<div class="result-actions"><button id="shareCreatureBtn" class="secondary">↗ Teilen</button><button class="primary" data-view="scan">📷 Weiter scannen</button></div></article>';
   activeCreature=c; setView('result'); bindViewButtons($('#resultWrap'));
