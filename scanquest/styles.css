@@ -341,3 +341,51 @@ button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!impo
 
 .scan-reset-label{margin:8px 0 0;color:#9fb2c7;font-size:12px;font-weight:800}
 .scan-reset-label.cooldown{color:#ffd166}
+
+
+/* HQ Gremlin individual artwork */
+.gremlin-art-img{
+  display:block;
+  width:100%;
+  height:100%;
+  min-height:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  object-position:center;
+  background:#07111f;
+  image-rendering:auto;
+  transform:translateZ(0);
+  backface-visibility:hidden;
+  transition:filter .2s ease,transform .2s ease;
+}
+.creature-art .gremlin-art-img,
+.market-creature-art .gremlin-art-img{width:100%;height:100%}
+.result-art .gremlin-art-img{
+  width:100%;
+  height:auto;
+  aspect-ratio:1/1;
+  object-fit:cover;
+}
+.offer-preview>.gremlin-art-img{
+  width:90px;
+  height:90px;
+  border-radius:14px;
+  flex:none;
+  object-fit:cover;
+}
+.locked-creature .gremlin-art-img{
+  filter:grayscale(1) saturate(0) brightness(.43) contrast(1.08);
+}
+.collected-card .gremlin-art-img{filter:saturate(1.06) contrast(1.03)}
+.creature-card[data-rarity="Selten"] .gremlin-art-img,
+.result-card[data-rarity="Selten"] .gremlin-art-img,
+.market-card[data-rarity="Selten"] .gremlin-art-img{filter:saturate(1.16) contrast(1.05)}
+.creature-card[data-rarity="Episch"] .gremlin-art-img,
+.result-card[data-rarity="Episch"] .gremlin-art-img,
+.market-card[data-rarity="Episch"] .gremlin-art-img{filter:saturate(1.22) contrast(1.06)}
+.creature-card[data-rarity="Legendär"] .gremlin-art-img,
+.result-card[data-rarity="Legendär"] .gremlin-art-img,
+.market-card[data-rarity="Legendär"] .gremlin-art-img{filter:saturate(1.28) contrast(1.07)}
+.creature-card[data-rarity="Mythisch"] .gremlin-art-img,
+.result-card[data-rarity="Mythisch"] .gremlin-art-img,
+.market-card[data-rarity="Mythisch"] .gremlin-art-img{filter:saturate(1.34) contrast(1.08)}
