@@ -886,7 +886,8 @@ if(bottomNav){
     if(!btn)return;
     e.preventDefault();
     e.stopPropagation();
-    setView(btn.dataset.view);
+    const target=btn.dataset.view;
+    setView(target==='scan'?'scan':target);
   });
 }
 
@@ -978,8 +979,8 @@ async function startHtml5BarcodeScanner(){
 
 async function openScanner(){
   if(scansRemaining()<=0){
-    showScanStatus('Keine Scans mehr übrig. Hol dir im Shop einen Extra-Scan.',true);
-    setView('shop');
+    setView('scan');
+    showScanStatus('Keine freien Scans mehr übrig. Du kannst später einen Extra-Scan mit Coins holen – ich lasse dich aber im Scanner.',true);
     return;
   }
 
