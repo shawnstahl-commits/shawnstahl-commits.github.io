@@ -307,7 +307,7 @@ button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!impo
   min-height:100%;
   aspect-ratio:1/1;
   background-image:
-    var(--gremlin-sprite),
+    url("assets/gremlins.webp?v=1"),
     radial-gradient(circle at 50% 38%,rgba(92,225,230,.18),rgba(7,17,31,.98) 70%);
   background-size:400% 300%,100% 100%;
   background-repeat:no-repeat;
@@ -336,5 +336,5 @@ button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!impo
 .result-card[data-rarity="Mythisch"] .gremlin-art,
 .market-card[data-rarity="Mythisch"] .gremlin-art{filter:saturate(1.45) contrast(1.1)}
 .gremlin-art-fallback .gremlin-art{
-  background-image:radial-gradient(circle at 50% 38%,rgba(92,225,230,.22),rgba(7,17,31,.98) 70%);
+  background-image:url("assets/gremlins.webp?v=1"),radial-gradient(circle at 50% 38%,rgba(92,225,230,.22),rgba(7,17,31,.98) 70%);
 }
