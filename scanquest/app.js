@@ -64,7 +64,7 @@ function freshState(){
     retailPreScans: [],
     retailTransactions: {},
     market: {myListings:[],offers:{},trades:[]},
-    scanCycle: {freeUsed:0,resetAt:0,extraScans:0},
+    scanCycle: {freeUsed:0,resetAt:0,extraScans:0,version:2},
     daily: {date:localDateKey(),used:0,bonus:0,newCount:0,rarePlus:0,uniqueIds:[],rewarded:{}}
   };
 }
@@ -84,13 +84,20 @@ function loadState(){
     raw.market.offers = raw.market.offers || {};
     raw.market.trades = Array.isArray(raw.market.trades) ? raw.market.trades : [];
     raw.scanCycle = raw.scanCycle || {
-      freeUsed: Math.min(BASE_DAILY_SCANS,Number(raw.daily?.used||0)),
+      freeUsed: 0,
       resetAt: 0,
-      extraScans: Number(raw.daily?.bonus||0)
+      extraScans: Number(raw.daily?.bonus||0),
+      version: 2
     };
+    if(Number(raw.scanCycle.version||0)<2){
+      raw.scanCycle.freeUsed=0;
+      raw.scanCycle.resetAt=0;
+      raw.scanCycle.version=2;
+    }
     raw.scanCycle.freeUsed = Math.max(0,Math.min(BASE_DAILY_SCANS,Number(raw.scanCycle.freeUsed||0)));
     raw.scanCycle.extraScans = Math.max(0,Number(raw.scanCycle.extraScans||0));
     raw.scanCycle.resetAt = Number(raw.scanCycle.resetAt||0);
+    raw.scanCycle.version=2;
     if(raw.scanCycle.freeUsed>=BASE_DAILY_SCANS && !raw.scanCycle.resetAt){
       raw.scanCycle.resetAt=Date.now()+FREE_SCAN_WINDOW_MS;
     }
@@ -288,7 +295,7 @@ function loadGremlinSprite(){
 }
 
 function refreshScanCycle(){
-  state.scanCycle=state.scanCycle||{freeUsed:0,resetAt:0,extraScans:0};
+  state.scanCycle=state.scanCycle||{freeUsed:0,resetAt:0,extraScans:0,version:2};
   if(state.scanCycle.resetAt && Date.now()>=state.scanCycle.resetAt){
     state.scanCycle.freeUsed=0;
     state.scanCycle.resetAt=0;
@@ -660,7 +667,7 @@ function confirmRetailPurchase(id){
   state.retailTransactions[transactionId]={campaignId:id,barcode:expectedBarcode,purchasedAt};
 
   state.coins += Number(campaign.coins||0);
-  state.scanCycle=state.scanCycle||{freeUsed:0,resetAt:0,extraScans:0};
+  state.scanCycle=state.scanCycle||{freeUsed:0,resetAt:0,extraScans:0,version:2};
   state.scanCycle.extraScans = Number(state.scanCycle.extraScans||0)+Number(campaign.scans||0);
   saveState();
   renderAll();
@@ -925,7 +932,7 @@ function renderShop(){
 function buyExtraScan(){
   if(state.coins<40){toast('Nicht genug Coins.');return;}
   state.coins-=40;
-  state.scanCycle=state.scanCycle||{freeUsed:0,resetAt:0,extraScans:0};
+  state.scanCycle=state.scanCycle||{freeUsed:0,resetAt:0,extraScans:0,version:2};
   state.scanCycle.extraScans=Number(state.scanCycle.extraScans||0)+1;
   saveState(); renderAll(); toast('+1 Extra-Scan freigeschaltet ⚡');
 }
@@ -1026,7 +1033,51 @@ async function startNativeBarcodeScanner(){
   nativeScanTimer=setInterval(detect,110);
 }
 
+function ensureHtml5Qrcode(){
+  if(typeof Html5Qrcode!=='undefined') return Promise.resolve(true);
+
+  return new Promise((resolve,reject)=>{
+    let settled=false;
+    const finish=(ok,err)=>{
+      if(settled)return;
+      settled=true;
+      clearTimeout(timer);
+      ok?resolve(true):reject(err||new Error('Scanner-Bibliothek konnte nicht geladen werden'));
+    };
+
+    const tryBackup=()=>{
+      if(typeof Html5Qrcode!=='undefined'){ finish(true); return; }
+      const backup=document.createElement('script');
+      backup.src='https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js';
+      backup.async=true;
+      backup.dataset.scanquestFallback='1';
+      backup.onload=()=>typeof Html5Qrcode!=='undefined'?finish(true):finish(false,new Error('Scanner global fehlt'));
+      backup.onerror=()=>finish(false,new Error('Scanner-CDN nicht erreichbar'));
+      document.head.appendChild(backup);
+    };
+
+    const existing=[...document.scripts].find(s=>String(s.src||'').includes('html5-qrcode'));
+    if(existing){
+      existing.addEventListener('load',()=>typeof Html5Qrcode!=='undefined'?finish(true):tryBackup(),{once:true});
+      existing.addEventListener('error',tryBackup,{once:true});
+      setTimeout(()=>{
+        if(settled)return;
+        if(typeof Html5Qrcode!=='undefined') finish(true);
+        else tryBackup();
+      },900);
+    }else{
+      tryBackup();
+    }
+
+    const timer=setTimeout(()=>finish(false,new Error('Scanner-Ladezeit überschritten')),9000);
+  });
+}
+
 async function startHtml5BarcodeScanner(){
+  if(typeof Html5Qrcode==='undefined'){
+    $('#cameraHelp').textContent='Scanner wird geladen …';
+    await ensureHtml5Qrcode();
+  }
   if(typeof Html5Qrcode==='undefined') throw new Error('Fallback scanner unavailable');
 
   $('#reader').innerHTML='';
@@ -1069,7 +1120,7 @@ async function openScanner(){
       await startHtml5BarcodeScanner();
     }catch(fallbackError){
       scanning=false;
-      $('#cameraHelp').textContent='Kamera-Scanner konnte nicht gestartet werden. Prüfe die Kameraberechtigung oder gib den Barcode unten manuell ein.';
+      $('#cameraHelp').textContent='Scanner konnte nicht gestartet werden. Bitte Kameraberechtigung erlauben und erneut versuchen. Manuelle Eingabe bleibt verfügbar.';
     }
   }
 }
