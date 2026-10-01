@@ -27,6 +27,9 @@ const RETAIL_CAMPAIGNS = [
 
 let state = loadState();
 let htmlScanner = null;
+let nativeScannerStream = null;
+let nativeScanTimer = null;
+let nativeDetector = null;
 let scanning = false;
 let scanCandidate = '';
 let scanCandidateHits = 0;
@@ -729,65 +732,128 @@ function bindViewButtons(root=document){
   });
 }
 
-async function openScanner(){
-  if(scansRemaining()<=0){showScanStatus('Keine Scans mehr übrig. Hol dir im Shop einen Extra-Scan.',true);setView('shop');return;}
-  $('#scannerModal').classList.remove('hidden');
-  $('#cameraHelp').textContent='Erlaube den Kamerazugriff und halte den Barcode ruhig in den Rahmen.';
-  if(typeof Html5Qrcode==='undefined'){ $('#cameraHelp').textContent='Scanner-Bibliothek konnte nicht geladen werden. Nutze bitte die manuelle Eingabe.'; return; }
-  try{
-    if(htmlScanner) await closeScanner();
-    $('#scannerModal').classList.remove('hidden');
-    const supported = (typeof Html5QrcodeSupportedFormats!=='undefined') ? [
-      Html5QrcodeSupportedFormats.EAN_13,
-      Html5QrcodeSupportedFormats.EAN_8,
-      Html5QrcodeSupportedFormats.UPC_A,
-      Html5QrcodeSupportedFormats.UPC_E,
-      Html5QrcodeSupportedFormats.CODE_128
-    ] : null;
-    htmlScanner = supported
-      ? new Html5Qrcode('reader',{formatsToSupport:supported,verbose:false})
-      : new Html5Qrcode('reader');
-    scanning=true;
-    scanCandidate='';
-    scanCandidateHits=0;
-    scanCandidateAt=0;
-    await htmlScanner.start(
-      {facingMode:'environment'},
-      {fps:12,qrbox:{width:280,height:160},aspectRatio:1.5},
-      async decoded=>{
-        if(!scanning)return;
-        const normalized=normalizeBarcode(decoded);
-        if(!validBarcode(normalized)) {
-          $('#cameraHelp').textContent='Barcode noch nicht sicher erkannt – bitte ruhig halten.';
-          return;
-        }
-
-        const now=Date.now();
-        if(normalized===scanCandidate && now-scanCandidateAt<1800){
-          scanCandidateHits++;
-        }else{
-          scanCandidate=normalized;
-          scanCandidateHits=1;
-        }
-        scanCandidateAt=now;
-
-        if(scanCandidateHits<2){
-          $('#cameraHelp').textContent='Barcode erkannt – kurz ruhig halten zur Bestätigung …';
-          return;
-        }
-
-        scanning=false;
-        try{await htmlScanner.stop();}catch(e){}
-        try{htmlScanner.clear();}catch(e){}
-        htmlScanner=null; $('#scannerModal').classList.add('hidden');
-        processScan(normalized);
-      },
-      ()=>{}
-    );
-  }catch(e){
-    scanning=false;
-    $('#cameraHelp').textContent='Kamera konnte nicht gestartet werden. Prüfe die Berechtigung oder nutze die manuelle Eingabe.';
+async function acceptScannedBarcode(raw){
+  if(!scanning)return false;
+  const normalized=normalizeBarcode(raw);
+  if(!validBarcode(normalized)){
+    $('#cameraHelp').textContent='Barcode gesehen, aber noch nicht sauber gelesen – etwas Abstand halten und ruhig bleiben.';
+    return false;
   }
+  scanning=false;
+  $('#cameraHelp').textContent='✓ Barcode erkannt: '+normalized;
+  await closeScanner();
+  processScan(normalized);
+  return true;
+}
+
+async function startNativeBarcodeScanner(){
+  if(!('BarcodeDetector' in window) || !navigator.mediaDevices?.getUserMedia) throw new Error('Native scanner unavailable');
+
+  let supported=[];
+  try{ supported=await BarcodeDetector.getSupportedFormats(); }catch(e){}
+  const wanted=['ean_13','ean_8','upc_a','upc_e','code_128','code_39','code_93','codabar','itf'];
+  const formats=wanted.filter(x=>!supported.length || supported.includes(x));
+  nativeDetector=new BarcodeDetector(formats.length?{formats}:undefined);
+
+  nativeScannerStream=await navigator.mediaDevices.getUserMedia({
+    video:{
+      facingMode:{ideal:'environment'},
+      width:{ideal:1920},
+      height:{ideal:1080},
+      frameRate:{ideal:30}
+    },
+    audio:false
+  });
+
+  const reader=$('#reader');
+  reader.innerHTML='<div class="native-reader"><video id="nativeBarcodeVideo" playsinline muted></video><div class="native-guide"><i></i><span>Barcode vollständig in den Rahmen halten</span></div></div>';
+  const video=$('#nativeBarcodeVideo');
+  video.srcObject=nativeScannerStream;
+  await video.play();
+
+  try{
+    const track=nativeScannerStream.getVideoTracks()[0];
+    const caps=track.getCapabilities?.()||{};
+    if(Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')){
+      await track.applyConstraints({advanced:[{focusMode:'continuous'}]});
+    }
+  }catch(e){}
+
+  $('#cameraHelp').textContent='Scanner 2.0 aktiv · Barcode quer halten · ca. 10–20 cm Abstand.';
+  scanning=true;
+
+  const detect=async()=>{
+    if(!scanning || !nativeDetector || !video || video.readyState<2)return;
+    try{
+      const results=await nativeDetector.detect(video);
+      for(const result of results||[]){
+        if(result?.rawValue && await acceptScannedBarcode(result.rawValue)) return;
+      }
+    }catch(e){}
+  };
+  nativeScanTimer=setInterval(detect,110);
+}
+
+async function startHtml5BarcodeScanner(){
+  if(typeof Html5Qrcode==='undefined') throw new Error('Fallback scanner unavailable');
+
+  $('#reader').innerHTML='';
+  htmlScanner=new Html5Qrcode('reader',{verbose:false});
+  scanning=true;
+  $('#cameraHelp').textContent='Fallback-Scanner aktiv · Barcode quer und vollständig in den Rahmen halten.';
+
+  await htmlScanner.start(
+    {facingMode:'environment'},
+    {
+      fps:20,
+      qrbox:(w,h)=>({
+        width:Math.max(220,Math.floor(w*.92)),
+        height:Math.max(120,Math.floor(h*.42))
+      }),
+      aspectRatio:1.7778,
+      disableFlip:true
+    },
+    decoded=>{ if(scanning) acceptScannedBarcode(decoded); },
+    ()=>{}
+  );
+}
+
+async function openScanner(){
+  if(scansRemaining()<=0){
+    showScanStatus('Keine Scans mehr übrig. Hol dir im Shop einen Extra-Scan.',true);
+    setView('shop');
+    return;
+  }
+
+  await closeScanner();
+  $('#scannerModal').classList.remove('hidden');
+  $('#cameraHelp').textContent='Kamera wird gestartet …';
+
+  try{
+    await startNativeBarcodeScanner();
+  }catch(nativeError){
+    try{
+      await stopNativeScanner();
+      await startHtml5BarcodeScanner();
+    }catch(fallbackError){
+      scanning=false;
+      $('#cameraHelp').textContent='Kamera-Scanner konnte nicht gestartet werden. Prüfe die Kameraberechtigung oder gib den Barcode unten manuell ein.';
+    }
+  }
+}
+
+async function stopNativeScanner(){
+  if(nativeScanTimer){
+    clearInterval(nativeScanTimer);
+    nativeScanTimer=null;
+  }
+  nativeDetector=null;
+  if(nativeScannerStream){
+    nativeScannerStream.getTracks().forEach(t=>t.stop());
+    nativeScannerStream=null;
+  }
+  const video=$('#nativeBarcodeVideo');
+  if(video)video.srcObject=null;
 }
 
 async function closeScanner(){
@@ -795,11 +861,17 @@ async function closeScanner(){
   scanCandidate='';
   scanCandidateHits=0;
   scanCandidateAt=0;
+
+  await stopNativeScanner();
+
   if(htmlScanner){
     try{await htmlScanner.stop();}catch(e){}
     try{htmlScanner.clear();}catch(e){}
     htmlScanner=null;
   }
+
+  const reader=$('#reader');
+  if(reader)reader.innerHTML='';
   $('#scannerModal').classList.add('hidden');
 }
 
