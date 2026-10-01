@@ -156,7 +156,7 @@ function creatureFor(barcode){
 
 function hueFor(id,offset=0){ return (hash32('h:' + id) + offset) % 360; }
 
-function creatureSVG(c){
+function creatureArtwork(c){
   const id=c.speciesId;
   const h1=hueFor(id,0), h2=hueFor(id,70), h3=hueFor(id,160);
   const rare=c.rarity!=='Standard';
@@ -243,6 +243,48 @@ function creatureSVG(c){
     '<path d="M31 73 q5 4 10 0" fill="none" stroke="rgba(20,20,30,.45)" stroke-width="1"/><path d="M59 73 q5 4 10 0" fill="none" stroke="rgba(20,20,30,.45)" stroke-width="1"/>'+
     (rare?'<circle cx="50" cy="77" r="4.4" fill="url(#cr'+id+')" stroke="rgba(255,255,255,.75)" stroke-width=".7"/>':'')+
     '</svg>';
+}
+
+
+let gremlinSpriteReady=false;
+
+function gremlinSpriteIndex(c){
+  const seed=hash32('art:'+c.speciesId);
+  if(c.rarity==='Mythisch') return 11;
+  if(c.rarity==='Legendär') return 10;
+  if(c.rarity==='Episch') return 8+(seed%2);
+  if(c.rarity==='Selten') return 6+(seed%2);
+  return seed%6;
+}
+
+function creatureArtwork(c){
+  const index=gremlinSpriteIndex(c);
+  const col=index%4;
+  const row=Math.floor(index/4);
+  const x=(col/3*100).toFixed(4);
+  const y=(row/2*100).toFixed(4);
+  return '<div class="gremlin-art" role="img" aria-label="'+c.name+'" style="background-position:'+x+'% '+y+'%"></div>';
+}
+
+async function loadGremlinSprite(){
+  try{
+    const paths=[
+      'assets/gremlin-sprite/tiny0.b64',
+      'assets/gremlin-sprite/tiny1.b64'
+    ];
+    const parts=await Promise.all(paths.map(async path=>{
+      const res=await fetch(path,{cache:'force-cache'});
+      if(!res.ok) throw new Error('Asset '+path+' konnte nicht geladen werden');
+      return (await res.text()).trim();
+    }));
+    const data='data:image/webp;base64,'+parts.join('');
+    document.documentElement.style.setProperty('--gremlin-sprite','url("'+data+'")');
+    document.documentElement.classList.add('gremlin-art-ready');
+    gremlinSpriteReady=true;
+  }catch(e){
+    console.warn('Gremlin-Artwork konnte nicht geladen werden',e);
+    document.documentElement.classList.add('gremlin-art-fallback');
+  }
 }
 
 function scansRemaining(){
@@ -362,7 +404,7 @@ function renderQuests(){
 function creatureCard(entry){
   const c=entry.creature;
   return '<button class="creature-card collected-card" data-rarity="'+c.rarity+'" data-creature="'+c.speciesId+'">'+
-    '<div class="creature-art">'+creatureSVG(c)+'</div>'+
+    '<div class="creature-art">'+creatureArtwork(c)+'</div>'+
     '<div class="creature-meta"><b>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</b>'+
     '<small>'+TYPE_ICONS[c.type]+' '+c.type+'</small><br>'+
     '<span class="rarity r-'+c.rarity+'">'+c.rarity+'</span>'+
@@ -371,7 +413,7 @@ function creatureCard(entry){
 
 function lockedCreatureCard(c){
   return '<button class="creature-card locked-creature" data-rarity="'+c.rarity+'" data-locked-creature="'+c.speciesId+'">'+
-    '<div class="creature-art">'+creatureSVG(c)+'</div>'+
+    '<div class="creature-art">'+creatureArtwork(c)+'</div>'+
     '<div class="creature-meta"><b>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</b>'+
     '<small>'+TYPE_ICONS[c.type]+' '+c.type+'</small><br>'+
     '<span class="rarity r-'+c.rarity+'">'+c.rarity+'</span>'+
@@ -416,7 +458,7 @@ function showResult(c,isNew,reward,barcode,fromDex=false){
   const masked=barcode.length>5?'•••• '+barcode.slice(-5):barcode;
   $('#resultWrap').innerHTML='<article class="result-card card" data-rarity="'+c.rarity+'">'+
     '<div>'+(isNew?'<span class="new-badge">NEUE ENTDECKUNG</span>':'<span class="duplicate-badge">'+(fromDex?'SCANDEX-EINTRAG':'SCHON ENTDECKT')+'</span>')+'</div>'+
-    '<div class="result-art">'+creatureSVG(c)+'</div>'+
+    '<div class="result-art">'+creatureArtwork(c)+'</div>'+
     '<span class="rarity r-'+c.rarity+'">'+c.rarity+'</span>'+
     '<h1>'+c.name+'</h1><p class="muted">#'+String(c.speciesId).padStart(3,'0')+' · '+TYPE_ICONS[c.type]+' '+c.type+' · Barcode '+masked+'</p>'+
     (reward?'<p><b>+'+reward+' 🪙</b> erhalten</p>':(!isNew&&!fromDex?'<p class="muted"><b>Schon in deiner Sammlung – keine zusätzlichen Coins.</b></p>':''))+
@@ -614,7 +656,7 @@ function renderMarket(){
         '<button class="secondary accept-counter" data-id="'+l.id+'" '+(state.coins<offer.counter?'disabled':'')+'>Gegenangebot annehmen</button></div>';
     }
     return '<article class="card market-card" data-rarity="'+c.rarity+'">'+
-      '<div class="market-creature-art">'+creatureSVG(c)+'</div>'+
+      '<div class="market-creature-art">'+creatureArtwork(c)+'</div>'+
       '<div class="market-card-top"><span class="rarity r-'+c.rarity+'">'+c.rarity+'</span><small>von '+marketEscape(l.seller)+'</small></div>'+
       '<h3>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</h3>'+
       '<p>'+TYPE_ICONS[c.type]+' '+c.type+' · Stärke '+c.power+' · Tempo '+c.speed+'</p>'+
@@ -702,7 +744,7 @@ function openMarketOffer(id){
   if(!listing)return;
   if(isOwnedSpecies(listing.creature.speciesId)){toast('Dieses Monster besitzt du bereits.');return;}
   activeMarketOfferId=id;
-  $('#offerMonsterPreview').innerHTML='<div class="offer-preview">'+creatureSVG(listing.creature)+'<div><b>'+marketEscape(listing.creature.name)+'</b><small>Preis: '+listing.price+' 🪙</small></div></div>';
+  $('#offerMonsterPreview').innerHTML='<div class="offer-preview">'+creatureArtwork(listing.creature)+'<div><b>'+marketEscape(listing.creature.name)+'</b><small>Preis: '+listing.price+' 🪙</small></div></div>';
   $('#marketOfferAmount').value=Math.max(1,Math.floor(listing.price*.8));
   $('#marketOfferModal').classList.remove('hidden');
 }
@@ -1032,3 +1074,4 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&scanning)c
 
 bindViewButtons();
 renderAll();
+loadGremlinSprite();
