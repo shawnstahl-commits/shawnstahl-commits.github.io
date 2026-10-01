@@ -8,7 +8,7 @@
   <meta name="description" content="Scanne echte Barcodes, entdecke Kreaturen und fülle deinen ScanDex.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
   <div class="bg-glow g1"></div><div class="bg-glow g2"></div>
@@ -69,7 +69,7 @@
           <input id="barcodeInput" inputmode="numeric" autocomplete="off" placeholder="Barcode eingeben, z. B. 4006381333931" maxlength="32">
           <button class="secondary" type="submit">Entdecken</button>
         </form>
-        <p class="hint">Unterstützt EAN, UPC, Code 128 und weitere gängige Barcodes.</p>
+        <p class="hint">Scanner 2.0: automatische Handy-Erkennung mit Fallback für EAN, UPC, Code 128 und weitere gängige Barcodes.</p>
       </div>
       <div id="scanStatus" class="status hidden"></div>
     </section>
@@ -239,6 +239,6 @@
   <div id="toast" class="toast hidden"></div>
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
