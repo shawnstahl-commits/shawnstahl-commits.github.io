@@ -8,7 +8,7 @@
   <meta name="description" content="Scanne echte Barcodes, entdecke Kreaturen und fülle deinen ScanDex.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
   <div class="bg-glow g1"></div><div class="bg-glow g2"></div>
@@ -139,6 +139,53 @@
       </div>
     </section>
 
+
+    <section id="marketView" class="view">
+      <button class="back" data-view="home">← Zurück</button>
+      <div class="section-title market-head">
+        <div>
+          <span class="eyebrow">SCANQUEST MARKETPLACE · DEMO</span>
+          <h1>Monster handeln</h1>
+          <p>Monster mit ScanCoins kaufen, verkaufen oder einen Preis verhandeln. Diese Version läuft nur lokal auf deinem Gerät.</p>
+        </div>
+        <div class="market-balance"><small>DEIN GUTHABEN</small><strong><span id="marketCoins">0</span> 🪙</strong></div>
+      </div>
+
+      <div class="card market-info">
+        <b>So funktioniert der spätere echte Marktplatz</b>
+        <p>Jedes Monster gehört genau einem Konto. Beim Kauf werden Coins und Besitz serverseitig in einer Transaktion übertragen. In dieser Demo werden die Abläufe nur im Browser simuliert.</p>
+      </div>
+
+      <div class="market-layout">
+        <div>
+          <div class="section-title compact"><div><span class="eyebrow">ANGEBOTE</span><h2>Öffentlicher Markt</h2></div></div>
+          <div id="marketListings" class="market-grid"></div>
+        </div>
+
+        <aside class="market-side">
+          <article class="card sell-box">
+            <span class="eyebrow">VERKAUFEN</span>
+            <h3>Eigenes Monster anbieten</h3>
+            <form id="sellMonsterForm" class="market-form">
+              <label>Monster
+                <select id="sellMonsterSelect" required></select>
+              </label>
+              <label>Preis in ScanCoins
+                <input id="sellMonsterPrice" type="number" min="10" max="100000" value="100" required>
+              </label>
+              <button class="primary" type="submit">Auf Marktplatz stellen</button>
+            </form>
+            <small class="hint">Bei einem Verkauf behält ScanQuest in der Demo 5 % Marktplatzgebühr ein.</small>
+          </article>
+
+          <article class="card my-sales">
+            <span class="eyebrow">MEINE VERKÄUFE</span>
+            <div id="myMarketListings"></div>
+          </article>
+        </aside>
+      </div>
+    </section>
+
     <section id="shopView" class="view">
       <button class="back" data-view="home">← Zurück</button>
       <div class="section-title"><div><span class="eyebrow">SHOP & PREMIUM</span><h1>Mehr ScanQuest</h1><p>Der echte Bezahlbereich kommt später. Aktuell wird nichts abgebucht.</p></div></div>
@@ -161,6 +208,7 @@
     <button data-view="home" class="nav active"><span>⌂</span><small>Home</small></button>
     <button data-view="scan" class="nav"><span>▦</span><small>Scan</small></button>
     <button data-view="dex" class="nav"><span>◫</span><small>ScanDex</small></button>
+    <button data-view="market" class="nav"><span>⇄</span><small>Markt</small></button>
     <button data-view="rewards" class="nav"><span>🎁</span><small>Rewards</small></button>
     <button data-view="shop" class="nav"><span>◇</span><small>Shop</small></button>
   </nav>
@@ -173,9 +221,24 @@
     </div>
   </div>
 
+
+  <div id="marketOfferModal" class="modal hidden">
+    <div class="modal-card offer-modal-card">
+      <div class="modal-head"><b>Preis verhandeln</b><button id="closeOfferModalBtn">✕</button></div>
+      <div id="offerMonsterPreview"></div>
+      <form id="marketOfferForm" class="market-form">
+        <label>Dein Angebot in ScanCoins
+          <input id="marketOfferAmount" type="number" min="1" max="100000" required>
+        </label>
+        <button class="primary" type="submit">Angebot senden</button>
+      </form>
+      <p class="hint">Demo: Der Verkäufer kann dein Angebot annehmen oder dir automatisch ein Gegenangebot machen.</p>
+    </div>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
