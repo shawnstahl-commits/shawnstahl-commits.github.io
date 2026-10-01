@@ -807,8 +807,8 @@ async function startHtml5BarcodeScanner(){
     {
       fps:20,
       qrbox:(w,h)=>({
-        width:Math.max(220,Math.floor(w*.92)),
-        height:Math.max(120,Math.floor(h*.42))
+        width:Math.max(160,Math.min(Math.floor(w*.92),w-12)),
+        height:Math.max(90,Math.min(Math.floor(h*.42),h-12))
       }),
       aspectRatio:1.7778,
       disableFlip:true
