@@ -266,25 +266,8 @@ function creatureArtwork(c){
   return '<div class="gremlin-art" role="img" aria-label="'+c.name+'" style="background-position:'+x+'% '+y+'%"></div>';
 }
 
-async function loadGremlinSprite(){
-  try{
-    const paths=[
-      'assets/gremlin-sprite/tiny0.b64',
-      'assets/gremlin-sprite/tiny1.b64'
-    ];
-    const parts=await Promise.all(paths.map(async path=>{
-      const res=await fetch(path,{cache:'force-cache'});
-      if(!res.ok) throw new Error('Asset '+path+' konnte nicht geladen werden');
-      return (await res.text()).trim();
-    }));
-    const data='data:image/webp;base64,'+parts.join('');
-    document.documentElement.style.setProperty('--gremlin-sprite','url("'+data+'")');
-    document.documentElement.classList.add('gremlin-art-ready');
-    gremlinSpriteReady=true;
-  }catch(e){
-    console.warn('Gremlin-Artwork konnte nicht geladen werden',e);
-    document.documentElement.classList.add('gremlin-art-fallback');
-  }
+function loadGremlinSprite(){
+  document.documentElement.classList.add('gremlin-art-ready');
 }
 
 function scansRemaining(){
