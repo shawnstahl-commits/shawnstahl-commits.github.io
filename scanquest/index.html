@@ -8,7 +8,7 @@
   <meta name="description" content="Scanne echte Barcodes, entdecke Kreaturen und fülle deinen ScanDex.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
   <div class="bg-glow g1"></div><div class="bg-glow g2"></div>
@@ -206,13 +206,13 @@
     </section>
   </main>
 
-  <nav class="bottom-nav">
-    <button data-view="home" class="nav active"><span>⌂</span><small>Home</small></button>
-    <button data-view="scan" class="nav"><span>▦</span><small>Scan</small></button>
-    <button data-view="dex" class="nav"><span>◫</span><small>ScanDex</small></button>
-    <button data-view="market" class="nav"><span>⇄</span><small>Markt</small></button>
-    <button data-view="rewards" class="nav"><span>🎁</span><small>Rewards</small></button>
-    <button data-view="shop" class="nav"><span>◇</span><small>Shop</small></button>
+  <nav id="bottomNav" class="bottom-nav" aria-label="Hauptnavigation">
+    <button type="button" data-view="home" class="nav active"><span>⌂</span><small>Home</small></button>
+    <button type="button" data-view="scan" class="nav"><span>▦</span><small>Scan</small></button>
+    <button type="button" data-view="dex" class="nav"><span>◫</span><small>ScanDex</small></button>
+    <button type="button" data-view="market" class="nav"><span>⇄</span><small>Markt</small></button>
+    <button type="button" data-view="rewards" class="nav"><span>🎁</span><small>Rewards</small></button>
+    <button type="button" data-view="shop" class="nav"><span>◇</span><small>Shop</small></button>
   </nav>
 
 
@@ -291,6 +291,6 @@
   <div id="toast" class="toast hidden"></div>
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
