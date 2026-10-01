@@ -338,3 +338,6 @@ button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!impo
 .gremlin-art-fallback .gremlin-art{
   background-image:url("assets/gremlins.webp?v=1"),radial-gradient(circle at 50% 38%,rgba(92,225,230,.22),rgba(7,17,31,.98) 70%);
 }
+
+.scan-reset-label{margin:8px 0 0;color:#9fb2c7;font-size:12px;font-weight:800}
+.scan-reset-label.cooldown{color:#ffd166}
