@@ -138,8 +138,7 @@ function rarityFor(id){
   return rarityMapCache[id] || 'Standard';
 }
 
-function creatureFor(barcode){
-  const speciesId = (hash32('species:' + barcode) % SPECIES_TOTAL) + 1;
+function creatureForSpecies(speciesId){
   const seed = hash32('creature:' + speciesId);
   const rarity = rarityFor(speciesId);
   const type = TYPES[seed % TYPES.length];
@@ -148,6 +147,11 @@ function creatureFor(barcode){
   const energy = 35 + (hash32('e:' + speciesId) % 66);
   const luck = 20 + (hash32('l:' + speciesId) % 81);
   return {speciesId,name:speciesName(speciesId),rarity,type,power,speed,energy,luck};
+}
+
+function creatureFor(barcode){
+  const speciesId = (hash32('species:' + barcode) % SPECIES_TOTAL) + 1;
+  return creatureForSpecies(speciesId);
 }
 
 function hueFor(id,offset=0){ return (hash32('h:' + id) + offset) % 360; }
@@ -357,7 +361,21 @@ function renderQuests(){
 
 function creatureCard(entry){
   const c=entry.creature;
-  return '<button class="creature-card" data-rarity="'+c.rarity+'" data-creature="'+c.speciesId+'"><div class="creature-art">'+creatureSVG(c)+'</div><div class="creature-meta"><b>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</b><small>'+TYPE_ICONS[c.type]+' '+c.type+'</small><br><span class="rarity r-'+c.rarity+'">'+c.rarity+'</span></div></button>';
+  return '<button class="creature-card collected-card" data-rarity="'+c.rarity+'" data-creature="'+c.speciesId+'">'+
+    '<div class="creature-art">'+creatureSVG(c)+'</div>'+
+    '<div class="creature-meta"><b>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</b>'+
+    '<small>'+TYPE_ICONS[c.type]+' '+c.type+'</small><br>'+
+    '<span class="rarity r-'+c.rarity+'">'+c.rarity+'</span>'+
+    '<span class="dex-status collected">✓ Gesammelt</span></div></button>';
+}
+
+function lockedCreatureCard(c){
+  return '<button class="creature-card locked-creature" data-rarity="'+c.rarity+'" data-locked-creature="'+c.speciesId+'">'+
+    '<div class="creature-art">'+creatureSVG(c)+'</div>'+
+    '<div class="creature-meta"><b>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</b>'+
+    '<small>'+TYPE_ICONS[c.type]+' '+c.type+'</small><br>'+
+    '<span class="rarity r-'+c.rarity+'">'+c.rarity+'</span>'+
+    '<span class="dex-status locked">🔒 Noch nicht entdeckt</span></div></button>';
 }
 
 function renderRecent(){
@@ -369,17 +387,22 @@ function renderRecent(){
 
 function renderDex(){
   const grid=$('#dexGrid'); if(!grid)return;
-  if(currentFilter!=='all'){
-    const entries=Object.values(state.collection).filter(e=>e.creature.rarity===currentFilter).sort((a,b)=>a.creature.speciesId-b.creature.speciesId);
-    grid.innerHTML=entries.length?entries.map(e=>'<div class="dex-slot">'+creatureCard(e)+'</div>').join(''):'<div class="empty-state" style="grid-column:1/-1">Noch kein Wesen dieser Seltenheit.</div>';
-    bindCreatureCards(grid); return;
-  }
-  let html='';
+  const species=[];
   for(let i=1;i<=SPECIES_TOTAL;i++){
-    const e=state.collection[String(i)];
-    html += e?'<div class="dex-slot">'+creatureCard(e)+'</div>':'<div class="dex-slot locked"><div>?</div><small>#'+String(i).padStart(3,'0')+'<br>unentdeckt</small></div>';
+    const owned=state.collection[String(i)] || null;
+    const c=owned?.creature || creatureForSpecies(i);
+    if(currentFilter==='all' || c.rarity===currentFilter) species.push({owned,c});
   }
-  grid.innerHTML=html; bindCreatureCards(grid);
+
+  grid.innerHTML=species.map(({owned,c})=>
+    '<div class="dex-slot">'+(owned?creatureCard(owned):lockedCreatureCard(c))+'</div>'
+  ).join('');
+
+  bindCreatureCards(grid);
+  grid.querySelectorAll('[data-locked-creature]').forEach(btn=>btn.addEventListener('click',()=>{
+    const c=creatureForSpecies(Number(btn.dataset.lockedCreature));
+    toast(c.name+' hast du noch nicht entdeckt.');
+  }));
 }
 
 function bindCreatureCards(root){
