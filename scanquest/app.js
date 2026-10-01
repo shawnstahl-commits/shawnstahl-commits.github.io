@@ -1,5 +1,6 @@
 const STORAGE_KEY = 'scanquest_state_v1';
-const BASE_DAILY_SCANS = 5;
+const BASE_DAILY_SCANS = 3;
+const FREE_SCAN_WINDOW_MS = 24*60*60*1000;
 const SPECIES_TOTAL = 120;
 
 const TYPES = ['Feuer','Wasser','Wald','Sturm','Fels','Schatten','Licht','Kosmos'];
@@ -63,6 +64,7 @@ function freshState(){
     retailPreScans: [],
     retailTransactions: {},
     market: {myListings:[],offers:{},trades:[]},
+    scanCycle: {freeUsed:0,resetAt:0,extraScans:0},
     daily: {date:localDateKey(),used:0,bonus:0,newCount:0,rarePlus:0,uniqueIds:[],rewarded:{}}
   };
 }
@@ -81,6 +83,21 @@ function loadState(){
     raw.market.myListings = Array.isArray(raw.market.myListings) ? raw.market.myListings : [];
     raw.market.offers = raw.market.offers || {};
     raw.market.trades = Array.isArray(raw.market.trades) ? raw.market.trades : [];
+    raw.scanCycle = raw.scanCycle || {
+      freeUsed: Math.min(BASE_DAILY_SCANS,Number(raw.daily?.used||0)),
+      resetAt: 0,
+      extraScans: Number(raw.daily?.bonus||0)
+    };
+    raw.scanCycle.freeUsed = Math.max(0,Math.min(BASE_DAILY_SCANS,Number(raw.scanCycle.freeUsed||0)));
+    raw.scanCycle.extraScans = Math.max(0,Number(raw.scanCycle.extraScans||0));
+    raw.scanCycle.resetAt = Number(raw.scanCycle.resetAt||0);
+    if(raw.scanCycle.freeUsed>=BASE_DAILY_SCANS && !raw.scanCycle.resetAt){
+      raw.scanCycle.resetAt=Date.now()+FREE_SCAN_WINDOW_MS;
+    }
+    if(raw.scanCycle.resetAt && Date.now()>=raw.scanCycle.resetAt){
+      raw.scanCycle.freeUsed=0;
+      raw.scanCycle.resetAt=0;
+    }
     Object.values(raw.collection).forEach(entry=>{
       if(entry && entry.firstBarcode){
         const encounters=Number(entry.encounters||1);
@@ -270,8 +287,51 @@ function loadGremlinSprite(){
   document.documentElement.classList.add('gremlin-art-ready');
 }
 
+function refreshScanCycle(){
+  state.scanCycle=state.scanCycle||{freeUsed:0,resetAt:0,extraScans:0};
+  if(state.scanCycle.resetAt && Date.now()>=state.scanCycle.resetAt){
+    state.scanCycle.freeUsed=0;
+    state.scanCycle.resetAt=0;
+    saveState();
+  }
+}
+
+function freeScansRemaining(){
+  refreshScanCycle();
+  return Math.max(0,BASE_DAILY_SCANS-Number(state.scanCycle.freeUsed||0));
+}
+
 function scansRemaining(){
-  return Math.max(0, BASE_DAILY_SCANS + Number(state.daily.bonus||0) - Number(state.daily.used||0));
+  refreshScanCycle();
+  return freeScansRemaining()+Math.max(0,Number(state.scanCycle.extraScans||0));
+}
+
+function scanCooldownMs(){
+  refreshScanCycle();
+  if(freeScansRemaining()>0 || !state.scanCycle.resetAt) return 0;
+  return Math.max(0,Number(state.scanCycle.resetAt)-Date.now());
+}
+
+function formatScanCooldown(ms){
+  if(ms<=0)return 'Gratis-Scans sind wieder verfügbar';
+  const total=Math.ceil(ms/1000);
+  const h=Math.floor(total/3600);
+  const m=Math.floor((total%3600)/60);
+  const s=total%60;
+  return (h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+function renderScanCooldown(){
+  const el=$('#scanResetLabel');
+  if(!el)return;
+  const free=freeScansRemaining();
+  if(free>0){
+    el.textContent=free+' von '+BASE_DAILY_SCANS+' Gratis-Scans verfügbar';
+    el.classList.remove('cooldown');
+  }else{
+    el.textContent='Neue 3 Gratis-Scans in '+formatScanCooldown(scanCooldownMs());
+    el.classList.add('cooldown');
+  }
 }
 
 function isRarePlus(r){ return ['Selten','Episch','Legendär','Mythisch'].includes(r); }
@@ -320,13 +380,21 @@ function applyQuestRewards(){
 function processScan(raw){
   const barcode = normalizeBarcode(raw);
   if(!validBarcode(barcode)){ showScanStatus('Der Barcode sieht nicht gültig aus. Bitte erneut scannen oder manuell eingeben.',true); return; }
-  if(scansRemaining()<=0){ showScanStatus('Deine Gratis-Scans sind für heute aufgebraucht. Ein Extra-Scan kann später mit Coins freigeschaltet werden.',true); return; }
+  if(scansRemaining()<=0){ showScanStatus('Deine 3 Gratis-Scans sind aufgebraucht. Kaufe einen Extra-Scan mit Coins oder warte '+formatScanCooldown(scanCooldownMs())+'.',true); return; }
 
   const c = creatureFor(barcode);
   const key = String(c.speciesId);
   const existed = !!state.collection[key];
   const baseReward = 0;
 
+  if(freeScansRemaining()>0){
+    state.scanCycle.freeUsed++;
+    if(state.scanCycle.freeUsed>=BASE_DAILY_SCANS && !state.scanCycle.resetAt){
+      state.scanCycle.resetAt=Date.now()+FREE_SCAN_WINDOW_MS;
+    }
+  }else if(Number(state.scanCycle.extraScans||0)>0){
+    state.scanCycle.extraScans--;
+  }
   state.daily.used++;
   state.totalScans++;
   if(!state.daily.uniqueIds.includes(c.speciesId)) state.daily.uniqueIds.push(c.speciesId);
@@ -372,6 +440,7 @@ function renderAll(){
   $('#dexCount').textContent=count; $('#dexCount2').textContent=count;
   $('#dexBar').style.width=(count/SPECIES_TOTAL*100)+'%';
   $('#todayCount').textContent=state.daily.used;
+  renderScanCooldown();
   renderQuests(); renderRecent(); renderDex(); renderArena(); renderShop(); renderRetail(); renderMarket();
 }
 
@@ -591,7 +660,8 @@ function confirmRetailPurchase(id){
   state.retailTransactions[transactionId]={campaignId:id,barcode:expectedBarcode,purchasedAt};
 
   state.coins += Number(campaign.coins||0);
-  state.daily.bonus = Number(state.daily.bonus||0)+Number(campaign.scans||0);
+  state.scanCycle=state.scanCycle||{freeUsed:0,resetAt:0,extraScans:0};
+  state.scanCycle.extraScans = Number(state.scanCycle.extraScans||0)+Number(campaign.scans||0);
   saveState();
   renderAll();
   toast('Scan + Kauf bestätigt: +'+campaign.coins+' 🪙 und +'+campaign.scans+' ⚡');
@@ -854,7 +924,10 @@ function renderShop(){
 
 function buyExtraScan(){
   if(state.coins<40){toast('Nicht genug Coins.');return;}
-  state.coins-=40; state.daily.bonus=(state.daily.bonus||0)+1; saveState(); renderAll(); toast('+1 Extra-Scan freigeschaltet ⚡');
+  state.coins-=40;
+  state.scanCycle=state.scanCycle||{freeUsed:0,resetAt:0,extraScans:0};
+  state.scanCycle.extraScans=Number(state.scanCycle.extraScans||0)+1;
+  saveState(); renderAll(); toast('+1 Extra-Scan freigeschaltet ⚡');
 }
 
 function showScanStatus(msg,bad=false){
@@ -980,7 +1053,7 @@ async function startHtml5BarcodeScanner(){
 async function openScanner(){
   if(scansRemaining()<=0){
     setView('scan');
-    showScanStatus('Keine freien Scans mehr übrig. Du kannst später einen Extra-Scan mit Coins holen – ich lasse dich aber im Scanner.',true);
+    showScanStatus('Keine Scans mehr übrig. Kaufe einen Extra-Scan mit Coins oder warte '+formatScanCooldown(scanCooldownMs())+'.',true);
     return;
   }
 
@@ -1059,3 +1132,4 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&scanning)c
 bindViewButtons();
 renderAll();
 loadGremlinSprite();
+setInterval(renderScanCooldown,1000);
