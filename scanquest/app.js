@@ -272,10 +272,11 @@ function creatureSVGFallback(c){
 
 let gremlinSpriteReady=false;
 
+const HQ_PLACEHOLDER='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384"><defs><radialGradient id="g"><stop stop-color="#183450"/><stop offset="1" stop-color="#07111f"/></radialGradient></defs><rect width="384" height="384" fill="url(#g)"/><circle cx="192" cy="185" r="72" fill="rgba(255,255,255,.05)"/></svg>');
 const HQ_GREMLIN_ART={
-  0:'assets/hq/q8_0.webp?v=1',
-  1:'assets/gremlins.webp?v=1',
-  3:'assets/gremlins.webp?v=1'
+  0:HQ_PLACEHOLDER,
+  1:HQ_PLACEHOLDER,
+  3:HQ_PLACEHOLDER
 };
 
 function gremlinSpriteIndex(c){
@@ -310,8 +311,9 @@ async function loadGremlinSprite(){
   document.documentElement.classList.add('gremlin-art-ready');
   try{
     await Promise.all([
-      loadHqB64(1,'assets/hq/q8_1.b64?v=1'),
-      loadHqB64(3,'assets/hq/q8_3.b64?v=1')
+      loadHqB64(0,'assets/hq/q8_0.b64?v=2'),
+      loadHqB64(1,'assets/hq/q8_1.b64?v=2'),
+      loadHqB64(3,'assets/hq/q8_3.b64?v=2')
     ]);
     gremlinSpriteReady=true;
     document.documentElement.classList.add('gremlin-hq-ready');
