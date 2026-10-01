@@ -126,3 +126,11 @@ button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!impo
  .market-grid{grid-template-columns:1fr}.market-head{gap:12px}.market-balance{min-width:0}
  .market-actions{grid-template-columns:1fr 1fr}
 }
+
+.native-reader{position:relative;width:100%;overflow:hidden;border-radius:16px;background:#02070d;min-height:280px}
+.native-reader video{display:block;width:100%;height:min(62vh,460px);object-fit:cover;background:#000}
+.native-guide{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.native-guide i{position:absolute;width:min(88%,520px);height:34%;min-height:105px;border:3px solid rgba(92,225,230,.9);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.25),0 0 24px rgba(92,225,230,.18)}
+.native-guide span{align-self:end;margin-bottom:18px;padding:8px 11px;border-radius:999px;background:rgba(3,10,18,.78);font-size:11px;color:#dffbff;font-weight:800}
+#reader{overflow:hidden;border-radius:16px}
+#reader video{max-width:100%}
