@@ -37,7 +37,10 @@ let rarityMapCache = null;
 let state = loadState();
 let htmlScanner = null;
 let nativeScannerStream = null;
+let nativeScannerTrack = null;
 let nativeScanTimer = null;
+let nativeFocusTimer = null;
+let nativeFocusBusy = false;
 let nativeDetector = null;
 let scanning = false;
 let scanCandidate = '';
@@ -1059,6 +1062,66 @@ async function optimizeCameraTrack(track){
   return {focus,exposure,whiteBalance};
 }
 
+function cameraFocusModes(track){
+  try{
+    const caps=track?.getCapabilities?.()||{};
+    return Array.isArray(caps.focusMode)?caps.focusMode:[];
+  }catch(e){ return []; }
+}
+
+async function setContinuousCameraFocus(track){
+  if(!track)return false;
+  try{ track.contentHint='detail'; }catch(e){}
+  const modes=cameraFocusModes(track);
+  if(!modes.includes('continuous'))return false;
+  try{
+    await track.applyConstraints({advanced:[{focusMode:'continuous'}]});
+    return true;
+  }catch(e){ return false; }
+}
+
+async function refocusNativeCamera(showPulse=true){
+  if(nativeFocusBusy || !nativeScannerTrack || nativeScannerTrack.readyState==='ended')return false;
+  nativeFocusBusy=true;
+  const reader=document.querySelector('.native-reader');
+
+  if(showPulse && reader){
+    reader.classList.remove('focus-pulse');
+    void reader.offsetWidth;
+    reader.classList.add('focus-pulse');
+    setTimeout(()=>reader.classList.remove('focus-pulse'),650);
+  }
+
+  try{
+    const modes=cameraFocusModes(nativeScannerTrack);
+    if(modes.includes('single-shot')){
+      await nativeScannerTrack.applyConstraints({advanced:[{focusMode:'single-shot'}]});
+      await new Promise(resolve=>setTimeout(resolve,260));
+    }
+    if(modes.includes('continuous')){
+      await nativeScannerTrack.applyConstraints({advanced:[{focusMode:'continuous'}]});
+    }
+    return modes.length>0;
+  }catch(e){
+    try{return await setContinuousCameraFocus(nativeScannerTrack);}catch(err){return false;}
+  }finally{
+    nativeFocusBusy=false;
+  }
+}
+
+function startNativeFocusAssist(){
+  if(nativeFocusTimer){
+    clearInterval(nativeFocusTimer);
+    nativeFocusTimer=null;
+  }
+  const modes=cameraFocusModes(nativeScannerTrack);
+  if(!modes.includes('continuous') && modes.includes('single-shot')){
+    nativeFocusTimer=setInterval(()=>{
+      if(scanning)refocusNativeCamera(false);
+    },2600);
+  }
+}
+
 async function startNativeBarcodeScanner(){
   if(!('BarcodeDetector' in window) || !navigator.mediaDevices?.getUserMedia) throw new Error('Native scanner unavailable');
 
@@ -1071,60 +1134,51 @@ async function startNativeBarcodeScanner(){
   nativeScannerStream=await navigator.mediaDevices.getUserMedia({
     video:{
       facingMode:{ideal:'environment'},
-      width:{ideal:2560,min:1280},
-      height:{ideal:1440,min:720},
-      frameRate:{ideal:30,max:60}
+      width:{ideal:1920},
+      height:{ideal:1080},
+      frameRate:{ideal:30},
+      advanced:[{focusMode:'continuous'}]
     },
     audio:false
   });
 
+  nativeScannerTrack=nativeScannerStream.getVideoTracks()[0]||null;
+
   const reader=$('#reader');
-  reader.innerHTML='<div class="native-reader"><video id="nativeBarcodeVideo" playsinline muted autoplay></video><div class="native-guide"><i></i><span>Barcode vollständig in den Rahmen halten</span></div></div>';
+  reader.innerHTML='<div class="native-reader"><video id="nativeBarcodeVideo" playsinline muted></video><button type="button" class="focus-tap" aria-label="Kamera neu fokussieren"><span>◎</span></button><div class="native-guide"><i></i><span>Barcode vollständig in den Rahmen halten</span></div></div>';
   const video=$('#nativeBarcodeVideo');
   video.srcObject=nativeScannerStream;
-
-  if(video.readyState<1){
-    await new Promise(resolve=>{
-      const done=()=>{video.removeEventListener('loadedmetadata',done);resolve();};
-      video.addEventListener('loadedmetadata',done,{once:true});
-      setTimeout(done,1200);
-    });
-  }
   await video.play();
 
-  const track=nativeScannerStream.getVideoTracks()[0];
-  const cameraFeatures=await optimizeCameraTrack(track);
+  const continuousFocus=await setContinuousCameraFocus(nativeScannerTrack);
+  if(!continuousFocus)await refocusNativeCamera(false);
+  startNativeFocusAssist();
 
-  // Kurze Einregelzeit: Fokus, Belichtung und Weißabgleich dürfen sich stabilisieren,
-  // bevor die erste Barcode-Erkennung läuft.
-  await new Promise(r=>setTimeout(r,180));
+  const focusTap=reader.querySelector('.focus-tap');
+  if(focusTap){
+    focusTap.addEventListener('click',async e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      $('#cameraHelp').textContent='Fokussiere … Barcode kurz ruhig halten.';
+      await refocusNativeCamera(true);
+      $('#cameraHelp').textContent='Autofokus aktiv · Barcode quer halten · ca. 10–20 cm Abstand.';
+    });
+  }
+  video.addEventListener('pointerup',()=>refocusNativeCamera(true));
 
-  $('#cameraHelp').textContent=cameraFeatures.focus
-    ? 'Autofokus aktiv · Barcode quer halten · ca. 10–20 cm Abstand.'
-    : 'Scanner aktiv · Barcode quer halten · ca. 10–20 cm Abstand.';
+  $('#cameraHelp').textContent=(continuousFocus?'Autofokus aktiv':'Fokus-Assistent aktiv')+' · Barcode quer halten · ca. 10–20 cm Abstand · Tippen zum Nachfokussieren.';
   scanning=true;
 
-  let detectBusy=false;
   const detect=async()=>{
-    if(!scanning || !nativeDetector || !video || video.readyState<2 || detectBusy)return;
-    detectBusy=true;
+    if(!scanning || !nativeDetector || !video || video.readyState<2)return;
     try{
       const results=await nativeDetector.detect(video);
       for(const result of results||[]){
         if(result?.rawValue && await acceptScannedBarcode(result.rawValue)) return;
       }
-    }catch(e){
-    }finally{
-      detectBusy=false;
-    }
+    }catch(e){}
   };
-
-  const scanLoop=async()=>{
-    if(!scanning)return;
-    await detect();
-    if(scanning)nativeScanTimer=setTimeout(scanLoop,85);
-  };
-  nativeScanTimer=setTimeout(scanLoop,40);
+  nativeScanTimer=setInterval(detect,100);
 }
 
 function ensureHtml5Qrcode(){
@@ -1230,10 +1284,16 @@ async function openScanner(){
 
 async function stopNativeScanner(){
   if(nativeScanTimer){
-    clearTimeout(nativeScanTimer);
+    clearInterval(nativeScanTimer);
     nativeScanTimer=null;
   }
+  if(nativeFocusTimer){
+    clearInterval(nativeFocusTimer);
+    nativeFocusTimer=null;
+  }
+  nativeFocusBusy=false;
   nativeDetector=null;
+  nativeScannerTrack=null;
   if(nativeScannerStream){
     nativeScannerStream.getTracks().forEach(t=>t.stop());
     nativeScannerStream=null;
