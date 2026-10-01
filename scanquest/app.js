@@ -357,7 +357,7 @@ function renderQuests(){
 
 function creatureCard(entry){
   const c=entry.creature;
-  return '<button class="creature-card" data-creature="'+c.speciesId+'"><div class="creature-art">'+creatureSVG(c)+'</div><div class="creature-meta"><b>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</b><small>'+TYPE_ICONS[c.type]+' '+c.type+'</small><br><span class="rarity r-'+c.rarity+'">'+c.rarity+'</span></div></button>';
+  return '<button class="creature-card" data-rarity="'+c.rarity+'" data-creature="'+c.speciesId+'"><div class="creature-art">'+creatureSVG(c)+'</div><div class="creature-meta"><b>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</b><small>'+TYPE_ICONS[c.type]+' '+c.type+'</small><br><span class="rarity r-'+c.rarity+'">'+c.rarity+'</span></div></button>';
 }
 
 function renderRecent(){
@@ -391,7 +391,7 @@ function bindCreatureCards(root){
 
 function showResult(c,isNew,reward,barcode,fromDex=false){
   const masked=barcode.length>5?'•••• '+barcode.slice(-5):barcode;
-  $('#resultWrap').innerHTML='<article class="result-card card">'+
+  $('#resultWrap').innerHTML='<article class="result-card card" data-rarity="'+c.rarity+'">'+
     '<div>'+(isNew?'<span class="new-badge">NEUE ENTDECKUNG</span>':'<span class="duplicate-badge">'+(fromDex?'SCANDEX-EINTRAG':'SCHON ENTDECKT')+'</span>')+'</div>'+
     '<div class="result-art">'+creatureSVG(c)+'</div>'+
     '<span class="rarity r-'+c.rarity+'">'+c.rarity+'</span>'+
@@ -590,7 +590,7 @@ function renderMarket(){
       negotiation='<div class="market-counter"><small>Dein Angebot: '+offer.amount+' 🪙</small><b>Gegenangebot: '+offer.counter+' 🪙</b>'+
         '<button class="secondary accept-counter" data-id="'+l.id+'" '+(state.coins<offer.counter?'disabled':'')+'>Gegenangebot annehmen</button></div>';
     }
-    return '<article class="card market-card">'+
+    return '<article class="card market-card" data-rarity="'+c.rarity+'">'+
       '<div class="market-creature-art">'+creatureSVG(c)+'</div>'+
       '<div class="market-card-top"><span class="rarity r-'+c.rarity+'">'+c.rarity+'</span><small>von '+marketEscape(l.seller)+'</small></div>'+
       '<h3>#'+String(c.speciesId).padStart(3,'0')+' '+c.name+'</h3>'+
