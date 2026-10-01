@@ -8,14 +8,16 @@
   <meta name="description" content="Scanne echte Barcodes, entdecke Kreaturen und fülle deinen ScanDex.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
   <div class="bg-glow g1"></div><div class="bg-glow g2"></div>
   <header class="topbar">
     <button class="brand" data-view="home"><span class="brandmark">S</span><span>ScanQuest</span></button>
     <div class="topstats">
-      <span class="chip">🪙 <b id="coinsTop">0</b></span>
+      <button id="openCoinShopBtn" class="chip coin-chip" type="button" aria-label="ScanCoins kaufen">
+        <span class="coin-bounce" aria-hidden="true">🪙</span> <b id="coinsTop">0</b><span class="coin-plus">+</span>
+      </button>
       <span class="chip">⚡ <b id="scansTop">5</b></span>
     </div>
   </header>
@@ -213,6 +215,56 @@
     <button data-view="shop" class="nav"><span>◇</span><small>Shop</small></button>
   </nav>
 
+
+  <div id="coinShopModal" class="modal hidden">
+    <div class="modal-card coin-shop-modal">
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">SCANCOIN SHOP · VORBEREITET</span>
+          <b>ScanCoins kaufen</b>
+        </div>
+        <button id="closeCoinShopBtn" aria-label="Schließen">✕</button>
+      </div>
+
+      <div class="coin-shop-balance">
+        <span class="coin-bounce" aria-hidden="true">🪙</span>
+        <div><small>DEIN GUTHABEN</small><strong><span id="coinShopBalance">0</span> ScanCoins</strong></div>
+      </div>
+
+      <p class="coin-shop-intro">ScanCoins kannst du später für Monster auf dem Marktplatz, Verhandlungen und weitere Spielinhalte verwenden.</p>
+
+      <div class="coin-pack-grid">
+        <button class="coin-pack" type="button" data-coin-pack="starter">
+          <span class="pack-coins">🪙 500</span>
+          <strong>0,99 €</strong>
+          <small>Starter</small>
+        </button>
+        <button class="coin-pack" type="button" data-coin-pack="hunter">
+          <span class="pack-coins">🪙 1.200</span>
+          <strong>1,99 €</strong>
+          <small>Jäger</small>
+        </button>
+        <button class="coin-pack featured" type="button" data-coin-pack="collector">
+          <span class="pack-tag">BELIEBT</span>
+          <span class="pack-coins">🪙 3.000</span>
+          <strong>4,99 €</strong>
+          <small>Sammler</small>
+        </button>
+        <button class="coin-pack" type="button" data-coin-pack="legend">
+          <span class="pack-coins">🪙 7.500</span>
+          <strong>9,99 €</strong>
+          <small>Legende</small>
+        </button>
+      </div>
+
+      <div id="coinPurchaseStatus" class="coin-purchase-status">
+        <b>Noch keine echte Zahlung aktiv</b>
+        <span>Die Pakete sind vorbereitet. Es wird aktuell nichts abgebucht und durch Antippen werden keine Coins gutgeschrieben.</span>
+      </div>
+      <p class="legal">ScanCoins sind reine Spielwährung und nicht in echtes Geld auszahlbar. Preise und Pakete können vor dem echten Start noch geändert werden.</p>
+    </div>
+  </div>
+
   <div id="scannerModal" class="modal hidden">
     <div class="modal-card">
       <div class="modal-head"><b>Barcode scannen</b><button id="closeScannerBtn">✕</button></div>
@@ -239,6 +291,6 @@
   <div id="toast" class="toast hidden"></div>
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
