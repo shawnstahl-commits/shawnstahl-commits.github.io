@@ -56,7 +56,8 @@
       <button class="back" data-view="home">← Zurück</button>
       <div class="scan-head">
         <span class="eyebrow">SCANPORTAL</span><h1>Finde dein nächstes Wesen</h1>
-        <p><span class="chip">⚡ <b id="scansScan">5</b> Scans übrig</span></p>
+        <p><span class="chip">⚡ <b id="scansScan">3</b> Scans übrig</span></p>
+        <p id="scanResetLabel" class="scan-reset-label">3 von 3 Gratis-Scans verfügbar</p>
       </div>
       <div class="scanner-card card">
         <div class="scan-frame">
@@ -193,13 +194,13 @@
       <div class="section-title"><div><span class="eyebrow">SHOP & PREMIUM</span><h1>Mehr ScanQuest</h1><p>Der echte Bezahlbereich kommt später. Aktuell wird nichts abgebucht.</p></div></div>
 
       <div class="shop-grid">
-        <article class="card offer free"><span class="badge">FREE</span><h3>Entdecker</h3><div class="price">0 €</div><ul><li>✓ 5 Scans täglich</li><li>✓ kompletter ScanDex</li><li>✓ Tagesquests</li><li>✓ Arena</li></ul><button class="secondary" disabled>Aktiv</button></article>
+        <article class="card offer free"><span class="badge">FREE</span><h3>Entdecker</h3><div class="price">0 €</div><ul><li>✓ 3 Gratis-Scans pro 24 Std.</li><li>✓ kompletter ScanDex</li><li>✓ Tagesquests</li><li>✓ Arena</li></ul><button class="secondary" disabled>Aktiv</button></article>
         <article class="card offer premium"><span class="badge premium-badge">GEPLANT</span><h3>Explorer Pass</h3><div class="price">Preis folgt</div><ul><li>✦ 15 Scans täglich</li><li>✦ Premium-Rahmen & Skins</li><li>✦ Extra-Quests</li><li>✦ besondere Events</li><li>✦ kein Pay-to-Win</li></ul><button class="primary" disabled>Noch nicht buchbar</button></article>
       </div>
 
       <div class="card coin-shop">
         <span class="eyebrow">COINS</span><h3>Extra-Scan mit erspielten Coins</h3>
-        <p>Du kannst jetzt schon 40 erspielte Coins gegen einen zusätzlichen Scan tauschen.</p>
+        <p>Sind deine 3 Gratis-Scans verbraucht, kannst du für 40 Coins einen zusätzlichen Scan kaufen oder warten, bis nach 24 Stunden wieder 3 Gratis-Scans verfügbar sind.</p>
         <button id="buyScanBtn" class="secondary">⚡ +1 Scan für 40 🪙</button>
       </div>
       <p class="legal">ScanQuest ist ein Unterhaltungsspiel. Es gibt keine Geldgewinne, keine auszahlbaren Coins und keine zufallsbasierten Käufe mit Echtgeld.</p>
@@ -290,7 +291,7 @@
 
   <div id="toast" class="toast hidden"></div>
 
-  <script src="app.js?v=16"></script>
+  <script src="app.js?v=17"></script>
   <script async src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </body>
 </html>
