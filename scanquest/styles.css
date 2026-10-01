@@ -221,3 +221,80 @@ button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!impo
  .bottom-nav{left:5px;right:5px;padding-left:2px;padding-right:2px}
  .nav{padding-left:0;padding-right:0}.nav span{font-size:18px}.nav small{font-size:8px}
 }
+
+
+/* Gremlin card presentation v2 */
+.dex-grid .creature-card{
+  background:linear-gradient(180deg,#121b2a 0%,#080f19 100%);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 8px 22px rgba(0,0,0,.32);
+}
+.dex-grid .creature-art{
+  aspect-ratio:1/1;
+  background:
+    radial-gradient(circle at 50% 38%,rgba(92,225,230,.14),transparent 48%),
+    linear-gradient(180deg,#14253a,#09111d);
+  border-bottom:1px solid rgba(255,255,255,.10);
+}
+.dex-grid .creature-art svg{
+  transform:scale(1.08);
+  transform-origin:center;
+}
+.dex-grid .creature-meta{
+  text-align:center;
+  padding:10px 8px 9px;
+  background:linear-gradient(180deg,rgba(5,12,20,.72),rgba(3,8,14,.96));
+}
+.dex-grid .creature-meta b{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:14px;
+  line-height:1.1;
+  letter-spacing:.015em;
+  text-shadow:0 1px 4px rgba(0,0,0,.8);
+}
+.dex-grid .creature-meta small{font-size:10px}
+.dex-grid .rarity{
+  justify-self:center;
+  margin-top:4px;
+  padding:3px 7px;
+}
+.dex-grid .dex-status{
+  margin-top:5px;
+  padding:5px 6px;
+}
+.dex-grid .collected-card[data-rarity="Standard"]{border-color:rgba(130,174,119,.46)}
+.dex-grid .collected-card[data-rarity="Selten"]{border-color:rgba(78,185,255,.68)}
+.dex-grid .collected-card[data-rarity="Episch"]{border-color:rgba(197,92,255,.78)}
+.dex-grid .collected-card[data-rarity="Legendär"]{border-color:rgba(255,174,46,.9)}
+.dex-grid .collected-card[data-rarity="Mythisch"]{border-color:rgba(255,224,118,.95)}
+.dex-grid .locked-creature{
+  background:linear-gradient(180deg,#181b20,#0c0e12);
+}
+.dex-grid .locked-creature .creature-art{
+  background:radial-gradient(circle at 50% 40%,#282d33,#0e1115 72%);
+}
+.dex-grid .locked-creature .creature-art svg{
+  filter:grayscale(1) saturate(0) brightness(.38) contrast(1.12);
+}
+.dex-grid .locked-creature .creature-meta{
+  opacity:.68;
+  background:linear-gradient(180deg,#15181c,#090b0e);
+}
+@media(max-width:600px){
+  .dex-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .dex-grid .creature-meta{padding:7px 5px 6px}
+  .dex-grid .creature-meta b{font-size:11px}
+  .dex-grid .creature-meta small{font-size:8px}
+  .dex-grid .rarity{font-size:8px;padding:2px 5px}
+  .dex-grid .dex-status{font-size:8px;padding:4px 3px}
+}
+@media(max-width:350px){
+  .dex-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* Keep bottom navigation above Android/iOS browser/system controls */
+.bottom-nav{
+  padding-bottom:max(8px,env(safe-area-inset-bottom));
+  bottom:max(8px,env(safe-area-inset-bottom));
+}
