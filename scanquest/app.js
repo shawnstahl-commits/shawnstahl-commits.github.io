@@ -10,6 +10,13 @@ const RARITY_REWARD = {'Gewöhnlich':0,'Selten':5,'Episch':10,'Legendär':25,'My
 
 const PARTNER_CAMPAIGNS_KEY = 'scanquest_partner_demo_v1';
 
+const COIN_PACKAGES = {
+  starter:{id:'starter',coins:500,price:'0,99 €',label:'Starter'},
+  hunter:{id:'hunter',coins:1200,price:'1,99 €',label:'Jäger'},
+  collector:{id:'collector',coins:3000,price:'4,99 €',label:'Sammler'},
+  legend:{id:'legend',coins:7500,price:'9,99 €',label:'Legende'}
+};
+
 const DEMO_MARKET_SEEDS = [
   {id:'mk-ember',barcode:'4006381333931',seller:'Luna87',price:20},
   {id:'mk-storm',barcode:'4012345678901',seller:'ScanHunter',price:35},
@@ -264,6 +271,7 @@ function questData(){
 
 function renderAll(){
   $('#coinsTop').textContent=state.coins; $('#coinCount').textContent=state.coins;
+  const shopBalance=$('#coinShopBalance'); if(shopBalance) shopBalance.textContent=state.coins;
   $('#scansTop').textContent=scansRemaining(); $('#scansScan').textContent=scansRemaining();
   const count=Object.keys(state.collection).length;
   $('#dexCount').textContent=count; $('#dexCount2').textContent=count;
@@ -699,6 +707,31 @@ function acceptMyListingOffer(id){
   toast('Verkauft: '+net+' 🪙 erhalten · '+fee+' 🪙 Gebühr');
 }
 
+function openCoinShop(){
+  const modal=$('#coinShopModal');
+  if(!modal)return;
+  const balance=$('#coinShopBalance');
+  if(balance)balance.textContent=state.coins;
+  const status=$('#coinPurchaseStatus');
+  if(status)status.innerHTML='<b>Noch keine echte Zahlung aktiv</b><span>Die Pakete sind vorbereitet. Es wird aktuell nichts abgebucht und durch Antippen werden keine Coins gutgeschrieben.</span>';
+  modal.classList.remove('hidden');
+}
+
+function closeCoinShop(){
+  const modal=$('#coinShopModal');
+  if(modal)modal.classList.add('hidden');
+}
+
+function prepareCoinPurchase(id){
+  const pack=COIN_PACKAGES[id];
+  if(!pack)return;
+  const status=$('#coinPurchaseStatus');
+  if(status){
+    status.innerHTML='<b>'+pack.coins.toLocaleString('de-DE')+' ScanCoins · '+pack.price+'</b><span>Dieses Paket ist für den späteren Checkout vorbereitet. Zahlungsanbieter noch nicht verbunden – es wird nichts abgebucht.</span>';
+  }
+  toast('Coin-Paket vorbereitet – Zahlung noch nicht aktiv.');
+}
+
 function renderShop(){
   const btn=$('#buyScanBtn');
   btn.disabled=state.coins<40;
@@ -885,12 +918,16 @@ $('#closeScannerBtn').addEventListener('click',closeScanner);
 $('#manualForm').addEventListener('submit',e=>{e.preventDefault();processScan($('#barcodeInput').value);$('#barcodeInput').value='';});
 $('#battleBtn').addEventListener('click',runBattle);
 $('#buyScanBtn').addEventListener('click',buyExtraScan);
+$('#openCoinShopBtn').addEventListener('click',openCoinShop);
+$('#closeCoinShopBtn').addEventListener('click',closeCoinShop);
+$('[data-coin-pack]').forEach(btn=>btn.addEventListener('click',()=>prepareCoinPurchase(btn.dataset.coinPack)));
 $('#sellMonsterForm').addEventListener('submit',e=>{e.preventDefault();const speciesId=$('#sellMonsterSelect').value;const price=$('#sellMonsterPrice').value;if(!speciesId)return;listOwnMonster(speciesId,price);});
 $('#marketOfferForm').addEventListener('submit',e=>{e.preventDefault();submitMarketOffer($('#marketOfferAmount').value);});
 $('#closeOfferModalBtn').addEventListener('click',closeMarketOffer);
 $$('.filter').forEach(btn=>btn.addEventListener('click',()=>{$$('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');currentFilter=btn.dataset.rarity;renderDex();}));
 $('#scannerModal').addEventListener('click',e=>{if(e.target===$('#scannerModal'))closeScanner();});
 $('#marketOfferModal').addEventListener('click',e=>{if(e.target===$('#marketOfferModal'))closeMarketOffer();});
+$('#coinShopModal').addEventListener('click',e=>{if(e.target===$('#coinShopModal'))closeCoinShop();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&scanning)closeScanner();});
 
 bindViewButtons();
