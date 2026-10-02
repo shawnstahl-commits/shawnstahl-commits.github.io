@@ -25,6 +25,30 @@ main{padding:25px 0 52px}.hero{position:relative;overflow:hidden;border:1px soli
 @media(max-width:900px){.quick{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.stateGrid{grid-template-columns:repeat(2,1fr)}.latest{grid-template-columns:repeat(2,1fr)}.controls{grid-template-columns:1fr 1fr}.controls .input{grid-column:1/-1}}
 @media(max-width:650px){.wrap{width:min(100% - 18px,1160px)}.topbar .inner{min-height:58px}.brand{font-size:14px}.live{font-size:9px}.hero{border-radius:21px;padding:20px 16px}.quick{gap:8px}.metric{padding:12px}.metric strong{font-size:16px}.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.controls .input{grid-column:auto}.budgetStats{grid-template-columns:1fr}.stateGrid{grid-template-columns:1fr 1fr}.latest{grid-template-columns:1fr}.barRow{grid-template-columns:95px 1fr auto}.sectionHead{align-items:flex-start;flex-direction:column;gap:5px}.debt{font-size:31px}}
 @media(max-width:380px){.stateGrid{grid-template-columns:1fr}.quick{grid-template-columns:1fr 1fr}.barRow{grid-template-columns:84px 1fr auto}.barLabel,.barVal{font-size:10px}}
+.nav{display:none}
+main{padding-bottom:108px}
+.appView{display:none;animation:fadeIn .2s ease}
+.appView.active{display:block}
+@keyframes fadeIn{from{opacity:.45;transform:translateY(4px)}to{opacity:1;transform:none}}
+.homeGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.homeTile{appearance:none;border:1px solid var(--line);background:linear-gradient(180deg,#0f1c29,#0a141e);color:var(--text);border-radius:17px;padding:15px;text-align:left;cursor:pointer;min-height:112px;box-shadow:0 10px 25px rgba(0,0,0,.14)}
+.homeTile b{display:block;font-size:23px;margin-bottom:9px}
+.homeTile strong{display:block;font-size:13px}
+.homeTile span{display:block;color:var(--muted);font-size:10px;margin-top:4px;line-height:1.35}
+.sourcesGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.sourceCard{display:flex;flex-direction:column;gap:7px;text-decoration:none;background:linear-gradient(180deg,var(--panel),#0a141e);border:1px solid var(--line);border-radius:17px;padding:16px;min-height:124px}
+.sourceCard small{color:#748ca3;font-size:9px;text-transform:uppercase;letter-spacing:.08em;font-weight:900}
+.sourceCard strong{font-size:15px;line-height:1.3}
+.sourceCard span{color:var(--muted);font-size:11px;line-height:1.45}
+.appBottom{position:fixed;z-index:100;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(570px,calc(100% - 18px));background:rgba(9,18,27,.94);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.09);border-radius:22px;box-shadow:0 18px 50px rgba(0,0,0,.46);padding:7px;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.appNavBtn{appearance:none;border:0;background:transparent;color:#72899f;border-radius:15px;padding:7px 3px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;font:inherit;cursor:pointer;min-width:0}
+.appNavBtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.appNavBtn span{font-size:9px;font-weight:800;white-space:nowrap}
+.appNavBtn.active{color:#fff;background:#142435;box-shadow:inset 0 0 0 1px rgba(106,169,255,.18)}
+.viewTitle{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:4px 2px 18px}
+.viewTitle h1{margin:0;font-size:28px;letter-spacing:-.045em}.viewTitle p{margin:4px 0 0;color:var(--muted);font-size:12px}
+@media(max-width:760px){.homeGrid{grid-template-columns:repeat(2,1fr)}.sourcesGrid{grid-template-columns:1fr}.appBottom{bottom:max(6px,env(safe-area-inset-bottom));border-radius:19px}.appNavBtn span{font-size:8px}}
+@media(min-width:1000px){.appBottom{bottom:18px}}
 </style>
 </head>
 <body>
@@ -45,9 +69,12 @@ main{padding:25px 0 52px}.hero{position:relative;overflow:hidden;border:1px soli
   <div class="sourceLine"><strong>Amtliche Basis:</strong> Öffentlicher Gesamthaushalt zum 30.06.2026. <a href="https://www.destatis.de/DE/Themen/Staat/Oeffentliche-Finanzen/Schulden-Finanzvermoegen/_inhalt.html" target="_blank" rel="noopener">Destatis öffnen ↗</a></div>
 </section>
 
-<nav class="nav" aria-label="Bereiche">
-  <a href="#haushalt">Bundeshaushalt</a><a href="#ebenen">Schuldenebenen</a><a href="#faelle">Prüfungsfälle</a><a href="#laender">Bundesländer</a><a href="#neu">Neue Berichte</a>
-</nav>
+<div class="homeGrid" id="homeShortcuts">
+  <button class="homeTile" data-view-jump="cases"><b>€</b><strong>Prüfungsfälle</strong><span>Dokumentierte Mehrkosten, Planungen und Einsparpotenziale durchsuchen.</span></button>
+  <button class="homeTile" data-view-jump="debt"><b>↗</b><strong>Schulden</strong><span>Bund, Länder, Kommunen und Sozialversicherung im Vergleich.</span></button>
+  <button class="homeTile" data-view-jump="states"><b>16</b><strong>Bundesländer</strong><span>Pro-Kopf-Schulden aller Länder mit eigenem Stichtag.</span></button>
+  <button class="homeTile" data-view-jump="sources"><b>✓</b><strong>Quellen</strong><span>Alle verwendeten amtlichen und prüfenden Stellen direkt öffnen.</span></button>
+</div>
 
 <section class="section" id="haushalt">
   <div class="sectionHead"><div><h2>Bundeshaushalt 2026</h2><p>Planwerte und gebuchte Entwicklung bis Juli 2026.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Oeffentliche_Finanzen/Wirtschafts_und_Finanzdaten/Kurzuebersicht_Haushalts_und_Finanzdaten/2026-08-20-kurzuebersicht-august-2026.html">Quelle: BMF ↗</a></div>
@@ -106,7 +133,17 @@ main{padding:25px 0 52px}.hero{position:relative;overflow:hidden;border:1px soli
   </div>
 </section>
 
-<section class="note"><strong>Transparenz-Regel:</strong> Diese Seite nennt Beträge nur so, wie die jeweilige Quelle sie einordnet. Mehrkosten, geplante Projektkosten, Steuervergünstigungen und Einsparpotenziale sind unterschiedliche Größen. Deshalb gibt es bewusst keine erfundene Gesamtsumme „verschwendetes Geld“.</section>
+<section class="section" id="quellen">
+  <div class="viewTitle"><div><h1>Quellen</h1><p>Die wichtigsten Datenquellen dieser Web-App direkt im Original.</p></div></div>
+  <div class="sourcesGrid">
+    <a class="sourceCard" target="_blank" rel="noopener" href="https://www.destatis.de/DE/Themen/Staat/Oeffentliche-Finanzen/Schulden-Finanzvermoegen/_inhalt.html"><small>Amtliche Statistik</small><strong>Statistisches Bundesamt (Destatis)</strong><span>Öffentliche Schulden des Gesamthaushalts und deren Entwicklung.</span></a>
+    <a class="sourceCard" target="_blank" rel="noopener" href="https://genesis.destatis.de/datenbank/online/statistic/71311/table/71311-0005"><small>Amtliche Datenbank</small><strong>GENESIS-Online</strong><span>Bundesländerwerte und Pro-Kopf-Schulden nach Stichtag.</span></a>
+    <a class="sourceCard" target="_blank" rel="noopener" href="https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Oeffentliche_Finanzen/Wirtschafts_und_Finanzdaten/Kurzuebersicht_Haushalts_und_Finanzdaten/2026-08-20-kurzuebersicht-august-2026.html"><small>Bundeshaushalt</small><strong>Bundesministerium der Finanzen</strong><span>Planwerte und laufende Haushaltsentwicklung des Bundes.</span></a>
+    <a class="sourceCard" target="_blank" rel="noopener" href="https://bundesrechnungshof.de/veroeffentlichungen/berichtssuche"><small>Finanzkontrolle</small><strong>Bundesrechnungshof</strong><span>Prüfberichte, Bemerkungen, Beratungsberichte und dokumentierte Feststellungen.</span></a>
+  </div>
+</section>
+
+<section class="note" id="transparenz"><strong>Transparenz-Regel:</strong> Diese Seite nennt Beträge nur so, wie die jeweilige Quelle sie einordnet. Mehrkosten, geplante Projektkosten, Steuervergünstigungen und Einsparpotenziale sind unterschiedliche Größen. Deshalb gibt es bewusst keine erfundene Gesamtsumme „verschwendetes Geld“.</section>
 <div class="footer">Datenstand 02.10.2026 · Quellen: Statistisches Bundesamt (Destatis), GENESIS-Online, Bundesministerium der Finanzen und Bundesrechnungshof · Unabhängiges Informations-Dashboard, keine amtliche Website.</div>
 </main>
 <script>
@@ -138,6 +175,50 @@ const states=[
 ["Baden-Württemberg",6081],["Bayern",3496],["Berlin",18293],["Brandenburg",9616],["Bremen",35757],["Hamburg",19278],["Hessen",11167],["Mecklenburg-Vorpommern",7079],["Niedersachsen",10683],["Nordrhein-Westfalen",13969],["Rheinland-Pfalz",9891],["Saarland",16766],["Sachsen",2829],["Sachsen-Anhalt",14177],["Schleswig-Holstein",13270],["Thüringen",8078]
 ];
 const sr=document.getElementById("states");states.forEach(s=>{const d=document.createElement("div");d.className="state";d.innerHTML="<span>"+s[0]+"</span><strong>"+fmt.format(s[1])+" €</strong><small>je Einwohner</small>";sr.appendChild(d)});
+
+// App navigation
+const viewMap={
+  overview:["start","homeShortcuts","haushalt","neu"],
+  cases:["faelle"],
+  debt:["ebenen"],
+  states:["laender"],
+  sources:["quellen","transparenz"]
+};
+const allViewIds=[...new Set(Object.values(viewMap).flat())];
+
+function setView(view, push=true){
+  if(!viewMap[view]) view="overview";
+  allViewIds.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.classList.add("appView");el.classList.toggle("active",viewMap[view].includes(id));}
+  });
+  document.querySelectorAll(".appNavBtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.view===view));
+  if(push){
+    history.replaceState(null,"","#"+view);
+  }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("[data-view-jump]").forEach(btn=>btn.addEventListener("click",()=>setView(btn.dataset.viewJump)));
+document.querySelectorAll(".appNavBtn").forEach(btn=>btn.addEventListener("click",()=>setView(btn.dataset.view)));
+setView((location.hash||"#overview").slice(1),false);
 </script>
+
+<nav class="appBottom" aria-label="App-Navigation">
+  <button class="appNavBtn active" data-view="overview" aria-label="Übersicht">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg><span>Übersicht</span>
+  </button>
+  <button class="appNavBtn" data-view="cases" aria-label="Fälle">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5c-.7-.7-1.8-1-3-1-1.7 0-3 .8-3 2s1.1 1.8 3 2.2 3 1 3 2.3-1.3 2.2-3 2.2c-1.3 0-2.5-.4-3.2-1.2"/><path d="M12 5.5v13"/></svg><span>Fälle</span>
+  </button>
+  <button class="appNavBtn" data-view="debt" aria-label="Schulden">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg><span>Schulden</span>
+  </button>
+  <button class="appNavBtn" data-view="states" aria-label="Bundesländer">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18-6 3V6l6-3 6 3 6-3v15l-6 3-6-3Z"/><path d="M9 3v15"/><path d="M15 6v15"/></svg><span>Länder</span>
+  </button>
+  <button class="appNavBtn" data-view="sources" aria-label="Quellen">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg><span>Quellen</span>
+  </button>
+</nav>
 </body>
 </html>
