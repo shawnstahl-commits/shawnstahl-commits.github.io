@@ -1,5 +1,5 @@
-const CACHE="stromtagebuch-v17";
-const ASSETS=["./manifest.webmanifest"];
+const CACHE="stromtagebuch-v18";
+const ASSETS=["./manifest.webmanifest","./icon.svg"];
 self.addEventListener("install",event=>{
   self.skipWaiting();
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));
