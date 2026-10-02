@@ -89,7 +89,7 @@
 <body>
 <div class="app">
   <header>
-    <div class="brand"><div class="logo">🧾</div><div><h1>BonKlar</h1><div class="sub">Ausgaben sehen. Preise vergleichen.</div></div></div>
+    <div class="brand"><div class="logo">🧾</div><div><h1>BonKlar</h1><div class="sub">Ausgaben sehen. Preise vergleichen. · Build 10</div></div></div>
   </header>
 
   <main>
@@ -206,7 +206,7 @@
         <div class="split"><button id="exportBtn" class="btn secondary">Exportieren</button><label class="btn secondary" style="text-align:center">Importieren<input id="importInput" type="file" accept="application/json" style="display:none"></label></div>
         <button id="resetBtn" class="btn danger" style="width:100%;margin-top:10px">Alle Einkäufe löschen</button>
       </div>
-      <div class="card" style="margin-top:12px"><h3 style="color:#0f172a;font-size:16px">Version</h3><div class="tiny">BonKlar 0.1 · kostenloser Prototyp über GitHub Pages</div></div>
+      <div class="card" style="margin-top:12px"><h3 style="color:#0f172a;font-size:16px">Version</h3><div class="tiny">BonKlar Build 10 · Web-Test ohne App-Installation</div></div>
     </section>
   </main>
 </div>
@@ -786,7 +786,12 @@
   if($('retryTechBtn'))$('retryTechBtn').onclick=runTechCheck;
   runTechCheck();
   renderAll();
-  if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.filter(r=>String(r.scope||'').includes('/bonklar/')).map(r=>r.unregister()))).catch(()=>{});
+  }
+  if('caches' in window){
+    caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('bonklar-')).map(k=>caches.delete(k)))).catch(()=>{});
+  }
 })();
 </script>
 <script>
