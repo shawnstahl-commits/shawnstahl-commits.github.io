@@ -1,157 +1,143 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#070a10" />
-  <title>Staatsmonitor Deutschland</title>
-  <meta name="description" content="Öffentliche Schulden und dokumentierte Prüfungsfälle – mit Quellen und klar gekennzeichneten Hochrechnungen." />
-  <style>
-    :root{--bg:#070a10;--panel:#0f1520;--panel2:#121b28;--text:#f3f7fb;--muted:#8fa1b6;--line:#223043;--green:#35e69a;--red:#ff6b6b;--amber:#ffc857;--blue:#63a4ff;--shadow:0 18px 60px rgba(0,0,0,.28)}
-    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:radial-gradient(circle at 50% -10%,#162437 0,#0a0f17 34%,var(--bg) 62%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
-    a{color:inherit}.wrap{width:min(1120px,calc(100% - 28px));margin:auto}.topbar{position:sticky;top:0;z-index:20;background:rgba(7,10,16,.78);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.06)}
-    .topbar .inner{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:66px}.brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:-.03em}.flag{font-size:24px}.live{display:inline-flex;gap:7px;align-items:center;color:#b8c7d8;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 6px rgba(53,230,154,.08),0 0 16px rgba(53,230,154,.8);animation:pulse 1.7s infinite}@keyframes pulse{50%{opacity:.45}}
-    main{padding:28px 0 60px}.hero{background:linear-gradient(180deg,rgba(20,31,47,.95),rgba(12,18,28,.95));border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:clamp(20px,4vw,42px);box-shadow:var(--shadow);overflow:hidden;position:relative}.hero:before{content:"";position:absolute;right:-120px;top:-140px;width:340px;height:340px;background:radial-gradient(circle,rgba(99,164,255,.15),transparent 68%)}
-    .eyebrow{font-size:12px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:#9ab0c7}.title{font-size:clamp(30px,6vw,58px);line-height:1.02;margin:10px 0 24px;letter-spacing:-.055em}.tickerLabel{font-size:13px;color:var(--muted);font-weight:750;margin-bottom:9px}.debt{font-variant-numeric:tabular-nums;font-size:clamp(29px,7vw,69px);font-weight:900;letter-spacing:-.055em;line-height:1;word-break:break-word}.approx{color:var(--amber);font-weight:800;font-size:13px;margin-top:12px;display:flex;gap:8px;align-items:center}.approx b{background:rgba(255,200,87,.12);padding:4px 8px;border-radius:999px;border:1px solid rgba(255,200,87,.25)}
-    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:28px}.metric{background:rgba(4,8,14,.48);border:1px solid rgba(255,255,255,.07);border-radius:17px;padding:15px}.metric span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}.metric strong{display:block;margin-top:6px;font-size:20px;font-variant-numeric:tabular-nums}.green{color:var(--green)}.red{color:var(--red)}.amber{color:var(--amber)}
-    .official{margin-top:16px;padding:14px 16px;border-radius:15px;background:rgba(99,164,255,.08);border:1px solid rgba(99,164,255,.18);color:#c9d9ea;font-size:13px;line-height:1.5}.official strong{color:#fff}
-    .sectionHead{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:34px 2px 16px}.sectionHead h2{margin:0;font-size:24px;letter-spacing:-.035em}.sectionHead p{margin:0;color:var(--muted);font-size:13px}
-    .filters{display:flex;gap:8px;overflow:auto;padding:2px 0 12px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.filter{border:1px solid var(--line);background:#0b111a;color:#aebed0;border-radius:999px;padding:9px 13px;font-weight:750;font-size:12px;cursor:pointer;white-space:nowrap}.filter.active{background:#eaf2fb;color:#07101a;border-color:#eaf2fb}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.card{background:linear-gradient(180deg,var(--panel),#0b1119);border:1px solid rgba(255,255,255,.075);border-radius:20px;padding:20px;box-shadow:0 12px 35px rgba(0,0,0,.16);display:flex;flex-direction:column;min-height:270px}.cardTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;border:1px solid}.badge.confirmed{color:#ff8a8a;background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.22)}.badge.planned{color:#ffd77e;background:rgba(255,200,87,.08);border-color:rgba(255,200,87,.22)}.badge.potential{color:#8fbaff;background:rgba(99,164,255,.08);border-color:rgba(99,164,255,.22)}
-    .amount{font-size:clamp(29px,5vw,44px);font-weight:900;letter-spacing:-.055em;margin:18px 0 8px}.card h3{font-size:18px;line-height:1.25;margin:0 0 9px;letter-spacing:-.025em}.card p{color:#aab8c8;line-height:1.48;font-size:13px;margin:0 0 14px}.meta{color:#73869b;font-size:11px;margin-top:auto;padding-top:8px}.source{margin-top:14px;display:flex;align-items:center;justify-content:center;text-decoration:none;padding:11px 13px;border-radius:12px;background:#eaf2fb;color:#0a111a;font-size:12px;font-weight:900}.source:active{transform:scale(.99)}
-    .note{margin-top:26px;background:#0c121b;border:1px solid var(--line);border-radius:18px;padding:18px;color:#9eafc1;font-size:13px;line-height:1.55}.note strong{color:#f2f6fa}.footer{color:#6f8297;text-align:center;font-size:11px;line-height:1.6;padding:28px 0 0}
-    @media(max-width:760px){.metrics{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.topbar .inner{min-height:58px}.brand{font-size:14px}.live{font-size:10px}.hero{border-radius:22px}.amount{font-size:38px}.sectionHead{align-items:flex-start;flex-direction:column;gap:5px}}
-    @media(max-width:390px){.wrap{width:min(100% - 18px,1120px)}.metric{padding:12px}.metric strong{font-size:17px}.debt{font-size:31px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071018">
+<title>Staatsmonitor Deutschland</title>
+<meta name="description" content="Öffentliche Schulden, Bundeshaushalt und dokumentierte Prüfungsfälle mit Originalquellen.">
+<style>
+:root{--bg:#071018;--panel:#0d1824;--panel2:#101e2c;--text:#f4f8fb;--muted:#91a5b9;--line:#223549;--blue:#6aa9ff;--green:#35dfa0;--red:#ff7777;--amber:#ffc65c;--chip:#132333;--shadow:0 18px 54px rgba(0,0,0,.26)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 50% -12%,#18304a 0,#0a1520 34%,var(--bg) 63%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}a{color:inherit}
+.wrap{width:min(1160px,calc(100% - 28px));margin:auto}.topbar{position:sticky;top:0;z-index:50;background:rgba(7,16,24,.82);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.06)}.topbar .inner{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:-.03em}.brand .flag{font-size:23px}.live{display:flex;align-items:center;gap:7px;font-size:11px;color:#b5c5d5;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 6px rgba(53,223,160,.09),0 0 16px rgba(53,223,160,.7);animation:pulse 1.8s infinite}@keyframes pulse{50%{opacity:.45}}
+main{padding:25px 0 52px}.hero{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:28px;background:linear-gradient(180deg,rgba(19,34,50,.98),rgba(10,18,28,.98));padding:clamp(22px,4vw,44px);box-shadow:var(--shadow)}.hero:before{content:"";position:absolute;right:-130px;top:-160px;width:390px;height:390px;background:radial-gradient(circle,rgba(106,169,255,.18),transparent 67%)}.eyebrow{font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#9fb6cb}.hero h1{font-size:clamp(32px,6vw,58px);line-height:1.02;letter-spacing:-.055em;margin:10px 0 24px}.tickerLabel{font-size:13px;color:var(--muted);font-weight:750;margin-bottom:8px}.debt{font-size:clamp(31px,6.4vw,68px);font-weight:950;line-height:1;letter-spacing:-.055em;font-variant-numeric:tabular-nums;word-break:break-word}.approx{margin-top:12px;display:flex;gap:8px;align-items:center;color:#f6cf7a;font-size:12px;font-weight:750}.approx b{font-size:10px;border:1px solid rgba(255,198,92,.26);background:rgba(255,198,92,.09);padding:5px 8px;border-radius:999px;letter-spacing:.08em}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:25px}.metric{background:rgba(3,9,15,.42);border:1px solid rgba(255,255,255,.065);border-radius:16px;padding:14px}.metric span{display:block;font-size:10px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.08em}.metric strong{display:block;margin-top:6px;font-size:19px;letter-spacing:-.025em;font-variant-numeric:tabular-nums}.red{color:var(--red)}.amber{color:var(--amber)}.green{color:var(--green)}.blue{color:var(--blue)}
+.sourceLine{margin-top:15px;padding:13px 15px;border-radius:14px;border:1px solid rgba(106,169,255,.18);background:rgba(106,169,255,.065);font-size:12px;color:#c7d7e6;line-height:1.5}.sourceLine a{font-weight:850;text-decoration:none;color:#fff}
+.nav{display:flex;gap:8px;overflow:auto;scrollbar-width:none;padding:14px 0 2px}.nav::-webkit-scrollbar{display:none}.nav a{text-decoration:none;white-space:nowrap;background:#0b1621;border:1px solid var(--line);border-radius:999px;padding:8px 11px;font-size:11px;font-weight:800;color:#bdcad6}
+.section{margin-top:30px}.sectionHead{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:0 2px 13px}.sectionHead h2{margin:0;font-size:24px;letter-spacing:-.04em}.sectionHead p{margin:4px 0 0;color:var(--muted);font-size:12px}.sourceMini{font-size:11px;color:#90a6bb;text-decoration:none;border-bottom:1px dotted #57718a}
+.panel{background:linear-gradient(180deg,var(--panel),#0a141e);border:1px solid rgba(255,255,255,.07);border-radius:20px;box-shadow:0 12px 32px rgba(0,0,0,.15);padding:18px}.two{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.budgetBig{font-size:42px;font-weight:950;letter-spacing:-.05em}.sub{color:var(--muted);font-size:12px;line-height:1.5}.budgetStats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:16px}.stat{padding:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.05);border-radius:14px}.stat span{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:850;letter-spacing:.06em}.stat strong{display:block;margin-top:5px;font-size:18px}.progress{height:12px;background:#08101a;border-radius:999px;overflow:hidden;border:1px solid #1c3043;margin:15px 0 8px}.progress>i{display:block;height:100%;width:55.16%;background:linear-gradient(90deg,#5c9cf3,#7ec4ff);border-radius:999px}.legend{font-size:11px;color:var(--muted)}
+.levels{display:flex;flex-direction:column;gap:13px}.barRow{display:grid;grid-template-columns:112px 1fr auto;gap:10px;align-items:center}.barLabel{font-size:12px;font-weight:850}.bar{height:10px;background:#07101a;border-radius:999px;overflow:hidden;border:1px solid #1b2d3e}.bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#6aa9ff,#35dfa0)}.barVal{font-size:12px;font-weight:850;font-variant-numeric:tabular-nums}
+.controls{display:grid;grid-template-columns:1fr 210px 170px;gap:9px;margin-bottom:12px}.input,.select{width:100%;border:1px solid var(--line);background:#09131e;color:#eaf2f8;border-radius:13px;padding:12px 13px;outline:none;font:inherit;font-size:13px}.input:focus,.select:focus{border-color:#508dd0;box-shadow:0 0 0 3px rgba(80,141,208,.12)}.select option{background:#0b1621}.filters{display:flex;gap:8px;overflow:auto;scrollbar-width:none;margin-bottom:12px}.filters::-webkit-scrollbar{display:none}.filter{border:1px solid var(--line);background:#0a1520;color:#aabccc;border-radius:999px;padding:8px 11px;font-weight:800;font-size:11px;white-space:nowrap;cursor:pointer}.filter.active{background:#e9f2fb;color:#08121c;border-color:#e9f2fb}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.card{background:linear-gradient(180deg,var(--panel),#0a131d);border:1px solid rgba(255,255,255,.07);border-radius:19px;padding:18px;min-height:288px;display:flex;flex-direction:column}.cardTop{display:flex;justify-content:space-between;align-items:start;gap:10px}.badge{display:inline-flex;border-radius:999px;padding:5px 8px;font-size:9px;font-weight:950;letter-spacing:.07em;text-transform:uppercase;border:1px solid}.badge.confirmed{color:#ff9898;background:rgba(255,119,119,.08);border-color:rgba(255,119,119,.23)}.badge.planned{color:#ffd57e;background:rgba(255,198,92,.08);border-color:rgba(255,198,92,.23)}.badge.potential{color:#9bc3ff;background:rgba(106,169,255,.08);border-color:rgba(106,169,255,.23)}.ressort{font-size:10px;color:#7890a6;text-align:right}.amount{font-size:clamp(30px,5vw,43px);font-weight:950;letter-spacing:-.055em;margin:15px 0 8px}.card h3{font-size:17px;line-height:1.25;letter-spacing:-.025em;margin:0 0 8px}.card p{font-size:12px;line-height:1.5;color:#a8b8c8;margin:0 0 12px}.meta{margin-top:auto;font-size:10px;color:#72889d;padding-top:8px}.sourceBtn{margin-top:13px;text-decoration:none;display:flex;justify-content:center;align-items:center;background:#eaf2fa;color:#08111a;border-radius:11px;padding:10px 11px;font-size:11px;font-weight:900}
+.empty{grid-column:1/-1;padding:30px;text-align:center;color:#8fa4b9;border:1px dashed var(--line);border-radius:18px}
+.stateGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.state{background:#0a1520;border:1px solid var(--line);border-radius:14px;padding:12px}.state span{display:block;color:#91a7bc;font-size:10px;min-height:25px}.state strong{display:block;font-size:20px;margin-top:5px;font-variant-numeric:tabular-nums}.state small{display:block;color:#647c92;font-size:9px;margin-top:2px}.stateSource{margin-top:12px;font-size:11px;color:#8da3b8}
+.latest{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.latest a{text-decoration:none;background:#0a1520;border:1px solid var(--line);border-radius:15px;padding:14px;display:flex;flex-direction:column;min-height:150px}.latest time{font-size:10px;color:#71899f;font-weight:800}.latest strong{font-size:13px;line-height:1.35;margin:10px 0}.latest span{margin-top:auto;font-size:10px;color:#94abc0}.note{margin-top:24px;padding:16px;border-radius:17px;background:#0a141e;border:1px solid var(--line);font-size:12px;line-height:1.55;color:#9fb0c0}.note strong{color:#edf4f9}.footer{text-align:center;color:#667f95;font-size:10px;line-height:1.6;padding:25px 0 0}
+@media(max-width:900px){.quick{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.stateGrid{grid-template-columns:repeat(2,1fr)}.latest{grid-template-columns:repeat(2,1fr)}.controls{grid-template-columns:1fr 1fr}.controls .input{grid-column:1/-1}}
+@media(max-width:650px){.wrap{width:min(100% - 18px,1160px)}.topbar .inner{min-height:58px}.brand{font-size:14px}.live{font-size:9px}.hero{border-radius:21px;padding:20px 16px}.quick{gap:8px}.metric{padding:12px}.metric strong{font-size:16px}.grid{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.controls .input{grid-column:auto}.budgetStats{grid-template-columns:1fr}.stateGrid{grid-template-columns:1fr 1fr}.latest{grid-template-columns:1fr}.barRow{grid-template-columns:95px 1fr auto}.sectionHead{align-items:flex-start;flex-direction:column;gap:5px}.debt{font-size:31px}}
+@media(max-width:380px){.stateGrid{grid-template-columns:1fr}.quick{grid-template-columns:1fr 1fr}.barRow{grid-template-columns:84px 1fr auto}.barLabel,.barVal{font-size:10px}}
+</style>
 </head>
 <body>
-<header class="topbar">
-  <div class="wrap inner">
-    <div class="brand"><span class="flag">🇩🇪</span> Staatsmonitor Deutschland</div>
-    <div class="live"><span class="dot"></span> Live-Hochrechnung</div>
-  </div>
-</header>
+<header class="topbar"><div class="wrap inner"><div class="brand"><span class="flag">🇩🇪</span> Staatsmonitor Deutschland</div><div class="live"><span class="dot"></span> Live-Hochrechnung</div></div></header>
 <main class="wrap">
-  <section class="hero">
-    <div class="eyebrow">Öffentliche Schulden · Bund, Länder, Kommunen & Sozialversicherung</div>
-    <h1 class="title">Was kostet der Staat?</h1>
-    <div class="tickerLabel">Trend-Hochrechnung auf Basis der letzten amtlichen Quartalsveränderung</div>
-    <div class="debt" id="debt">2.753.500.000.000 €</div>
-    <div class="approx"><b>HOCHRECHNUNG</b> kein sekundengenauer amtlicher Schuldenstand</div>
+<section class="hero" id="start">
+  <div class="eyebrow">Öffentliche Finanzen · Quellenprüfbar</div>
+  <h1>Deutschlands Staatsfinanzen auf einen Blick</h1>
+  <div class="tickerLabel">Trend-Hochrechnung auf Basis der letzten amtlichen Quartalsveränderung</div>
+  <div class="debt" id="debt">2.753.500.000.000 €</div>
+  <div class="approx"><b>HOCHRECHNUNG</b> kein sekundengenauer amtlicher Schuldenstand</div>
+  <div class="quick">
+    <div class="metric"><span>Amtlicher Stand Q2</span><strong>2,7535 Bio. €</strong></div>
+    <div class="metric"><span>Veränderung Q2</span><strong class="red">+26,3 Mrd. €</strong></div>
+    <div class="metric"><span>Trend/Sekunde*</span><strong class="amber">+3.345 €</strong></div>
+    <div class="metric"><span>Veröffentlicht</span><strong>29.09.2026</strong></div>
+  </div>
+  <div class="sourceLine"><strong>Amtliche Basis:</strong> Öffentlicher Gesamthaushalt zum 30.06.2026. <a href="https://www.destatis.de/DE/Themen/Staat/Oeffentliche-Finanzen/Schulden-Finanzvermoegen/_inhalt.html" target="_blank" rel="noopener">Destatis öffnen ↗</a></div>
+</section>
 
-    <div class="metrics">
-      <div class="metric"><span>Letzter amtlicher Stand</span><strong>2,7535 Bio. €</strong></div>
-      <div class="metric"><span>Q2-Veränderung</span><strong class="red">+26,3 Mrd. €</strong></div>
-      <div class="metric"><span>Trend pro Sekunde*</span><strong class="amber">+3.345 €</strong></div>
-      <div class="metric"><span>Veröffentlicht</span><strong>29.09.2026</strong></div>
+<nav class="nav" aria-label="Bereiche">
+  <a href="#haushalt">Bundeshaushalt</a><a href="#ebenen">Schuldenebenen</a><a href="#faelle">Prüfungsfälle</a><a href="#laender">Bundesländer</a><a href="#neu">Neue Berichte</a>
+</nav>
+
+<section class="section" id="haushalt">
+  <div class="sectionHead"><div><h2>Bundeshaushalt 2026</h2><p>Planwerte und gebuchte Entwicklung bis Juli 2026.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Oeffentliche_Finanzen/Wirtschafts_und_Finanzdaten/Kurzuebersicht_Haushalts_und_Finanzdaten/2026-08-20-kurzuebersicht-august-2026.html">Quelle: BMF ↗</a></div>
+  <div class="panel">
+    <div class="budgetBig">524,5 Mrd. €</div><div class="sub">Geplante Ausgaben des Bundes im Haushaltsjahr 2026.</div>
+    <div class="progress"><i></i></div><div class="legend">289,3 Mrd. € gebuchte Ausgaben bis Ende Juli 2026 · entspricht 55,2 % des Jahres-Sollwerts. Der Jahresverlauf ist nicht gleichmäßig.</div>
+    <div class="budgetStats">
+      <div class="stat"><span>Einnahmen bis Juli</span><strong>237,3 Mrd. €</strong></div>
+      <div class="stat"><span>Finanzierungssaldo</span><strong class="red">−52,0 Mrd. €</strong></div>
+      <div class="stat"><span>Nettokreditaufnahme Soll</span><strong>98,0 Mrd. €</strong></div>
     </div>
-
-    <div class="official"><strong>Amtliche Basis:</strong> Destatis meldet für den öffentlichen Gesamthaushalt zum 30.06.2026 Schulden von 2.753,5 Mrd. €. Gegenüber dem 1. Quartal 2026 waren das +26,3 Mrd. € bzw. +1,0 %. Der Live-Zähler schreibt ausschließlich diesen letzten Quartalstrend rechnerisch fort.</div>
-  </section>
-
-  <div class="sectionHead">
-    <div><h2>Dokumentierte Prüfungsfälle</h2><p>Keine eigene politische Bewertung – Bezeichnungen und Beträge aus den angegebenen Quellen.</p></div>
   </div>
+</section>
 
-  <div class="filters" id="filters">
-    <button class="filter active" data-filter="all">Alle</button>
-    <button class="filter" data-filter="confirmed">Ausgegeben / Mehrkosten</button>
-    <button class="filter" data-filter="planned">Geplant</button>
-    <button class="filter" data-filter="potential">Einsparpotenzial</button>
+<section class="section" id="ebenen">
+  <div class="sectionHead"><div><h2>Wo liegen die Schulden?</h2><p>Vorläufiger Stand zum 30.06.2026.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://www.destatis.de/DE/Themen/Staat/Oeffentliche-Finanzen/Schulden-Finanzvermoegen/_inhalt.html">Quelle: Destatis ↗</a></div>
+  <div class="two">
+    <div class="panel levels">
+      <div class="barRow"><div class="barLabel">Bund</div><div class="bar"><i style="width:69.3%"></i></div><div class="barVal">1.907,1 Mrd. €</div></div>
+      <div class="barRow"><div class="barLabel">Länder</div><div class="bar"><i style="width:23.5%"></i></div><div class="barVal">646,2 Mrd. €</div></div>
+      <div class="barRow"><div class="barLabel">Kommunen</div><div class="bar"><i style="width:7.3%"></i></div><div class="barVal">200,2 Mrd. €</div></div>
+      <div class="barRow"><div class="barLabel">Sozialvers.</div><div class="bar"><i style="width:.34%"></i></div><div class="barVal">9,1 Mrd. €</div></div>
+    </div>
+    <div class="panel">
+      <div class="eyebrow">Einordnung</div>
+      <h3 style="margin:8px 0 8px;font-size:22px;letter-spacing:-.035em">Keine Doppelzählung</h3>
+      <div class="sub">Destatis weist den Öffentlichen Gesamthaushalt gegenüber dem nicht-öffentlichen Bereich aus. Kreditbeziehungen innerhalb des Staatssektors werden dadurch nicht einfach doppelt als Gesamtschuld gezählt.</div>
+    </div>
   </div>
+</section>
 
-  <section class="grid" id="cards"></section>
+<section class="section" id="faelle">
+  <div class="sectionHead"><div><h2>Dokumentierte Prüfungsfälle</h2><p>Suche nach Betrag, Thema oder Ressort. Kategorien werden nicht miteinander addiert.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://bundesrechnungshof.de/veroeffentlichungen/berichtssuche">Bundesrechnungshof ↗</a></div>
+  <div class="controls">
+    <input class="input" id="search" type="search" placeholder="Suchen, z. B. Zoll, Verkehr, Bundeswehr …">
+    <select class="select" id="ressort"><option value="all">Alle Ressorts</option><option value="BMF">Finanzen / BMF</option><option value="BMVg">Verteidigung / BMVg</option><option value="BMV">Verkehr / BMV</option><option value="Bundesregierung">Bundesregierung</option></select>
+    <select class="select" id="sort"><option value="new">Neueste zuerst</option><option value="amount">Betrag absteigend</option></select>
+  </div>
+  <div class="filters"><button class="filter active" data-type="all">Alle</button><button class="filter" data-type="confirmed">Ausgegeben / Mehrkosten</button><button class="filter" data-type="planned">Geplant</button><button class="filter" data-type="potential">Einsparpotenzial</button></div>
+  <div class="grid" id="cards"></div>
+</section>
 
-  <section class="note">
-    <strong>Warum nicht einfach alles als „Verschwendung“ addieren?</strong><br>
-    Weil die Quellen unterschiedliche Sachverhalte beschreiben: bereits entstandene Mehrkosten, laut Bundesrechnungshof fehlinvestierte Mittel, geplante Ausgaben und mögliches Einsparpotenzial. Eine gemeinsame „Verschwendungssumme“ würde diese Kategorien vermischen und wäre irreführend.
-  </section>
+<section class="section" id="laender">
+  <div class="sectionHead"><div><h2>Bundesländer</h2><p>Schulden des Öffentlichen Gesamthaushalts je Einwohner · Stand 31.03.2026.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://genesis.destatis.de/datenbank/online/statistic/71311/table/71311-0005">GENESIS-Tabelle 71311-0005 ↗</a></div>
+  <div class="stateGrid" id="states"></div>
+  <div class="stateSource">Die Länderwerte haben einen eigenen Stichtag (31.03.2026) und werden deshalb nicht mit dem Q2-Gesamtstand vom 30.06.2026 vermischt.</div>
+</section>
 
-  <div class="footer">Datenstand: 02.10.2026 · Quellen: Statistisches Bundesamt (Destatis) und Bundesrechnungshof · Unabhängiges Informations-Dashboard, keine amtliche Website.</div>
+<section class="section" id="neu">
+  <div class="sectionHead"><div><h2>Neue Prüfberichte</h2><p>Aktuelle Veröffentlichungen des Bundesrechnungshofs. Ein neuer Bericht bedeutet nicht automatisch einen bezifferten Schaden.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://bundesrechnungshof.de/veroeffentlichungen/berichtssuche">Alle Berichte ↗</a></div>
+  <div class="latest">
+    <a target="_blank" rel="noopener" href="https://bundesrechnungshof.de/veroeffentlichungen/berichtssuche"><time>07.09.2026</time><strong>Entwicklung des Einzelplans 19 – Bundesverfassungsgericht für den Bundeshaushalt 2027</strong><span>Beratungsbericht ↗</span></a>
+    <a target="_blank" rel="noopener" href="https://bundesrechnungshof.de/berichte/rehapro"><time>26.08.2026</time><strong>Umsetzung des Bundesprogramms rehapro</strong><span>BMAS · Beratungsbericht ↗</span></a>
+    <a target="_blank" rel="noopener" href="https://bundesrechnungshof.de/berichte/militaerstrassengrundnetz-teil-1"><time>14.08.2026</time><strong>Militärstraßengrundnetz – Verlagerung von Haushaltsmitteln</strong><span>BMVg · Prüfungsmitteilung ↗</span></a>
+    <a target="_blank" rel="noopener" href="https://bundesrechnungshof.de/berichte/umbau-eines-dienstgebaeudes-unwirtschaftlich-vorbereitet-bundesanstalt-fuer-immobilienaufgaben-und-bundesamt-fuer-bauwesen-und-raumordnung-kennen-ihre-aufgaben-bei-bedarfs-und-nachtragsplanung-nicht"><time>04.08.2026</time><strong>Umbau eines Dienstgebäudes unwirtschaftlich vorbereitet</strong><span>BMF / BMWSB · Beratungsbericht ↗</span></a>
+  </div>
+</section>
+
+<section class="note"><strong>Transparenz-Regel:</strong> Diese Seite nennt Beträge nur so, wie die jeweilige Quelle sie einordnet. Mehrkosten, geplante Projektkosten, Steuervergünstigungen und Einsparpotenziale sind unterschiedliche Größen. Deshalb gibt es bewusst keine erfundene Gesamtsumme „verschwendetes Geld“.</section>
+<div class="footer">Datenstand 02.10.2026 · Quellen: Statistisches Bundesamt (Destatis), GENESIS-Online, Bundesministerium der Finanzen und Bundesrechnungshof · Unabhängiges Informations-Dashboard, keine amtliche Website.</div>
 </main>
-
 <script>
-const BASE_DEBT = 2753500000000;
-const BASE_DATE = new Date('2026-06-30T23:59:59+02:00').getTime();
-const Q2_CHANGE = 26300000000;
-const Q2_SECONDS = 91*24*60*60;
-const PER_SECOND = Q2_CHANGE/Q2_SECONDS;
-const money = new Intl.NumberFormat('de-DE',{maximumFractionDigits:0});
+const BASE_DEBT=2753500000000,BASE_DATE=new Date("2026-06-30T23:59:59+02:00").getTime(),Q2_CHANGE=26300000000,Q2_SECONDS=91*24*60*60,PER_SECOND=Q2_CHANGE/Q2_SECONDS;
+const fmt=new Intl.NumberFormat("de-DE",{maximumFractionDigits:0});
+function updateDebt(){const e=Math.max(0,(Date.now()-BASE_DATE)/1000);document.getElementById("debt").textContent=fmt.format(BASE_DEBT+e*PER_SECOND)+" €"}updateDebt();setInterval(updateDebt,1000);
 
-function updateDebt(){
-  const elapsed = Math.max(0,(Date.now()-BASE_DATE)/1000);
-  const estimate = BASE_DEBT + elapsed*PER_SECOND;
-  document.getElementById('debt').textContent = money.format(estimate)+' €';
-}
-updateDebt(); setInterval(updateDebt,1000);
-
-const cases = [
-  {
-    type:'confirmed', badge:'Fehlinvestition laut BRH', amount:'35 Mio. €',
-    title:'„Sichere“ Smartphones für den Zoll',
-    text:'Der Bundesrechnungshof bezeichnet 35 Mio. € für mehr als 17.000 Smartphones als Fehlinvestition. Die Geräte konnten nicht wie vorgesehen verschlüsselt kommunizieren und waren laut BRH nur begrenzt einsetzbar.',
-    meta:'Bundesministerium der Finanzen · Bemerkungen 2025 Nr. 3 · 10.12.2025',
-    url:'https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1'
-  },
-  {
-    type:'confirmed', badge:'Mehrkosten laut BRH', amount:'≥ 20 Mio. €',
-    title:'Unterbringung von Fregattenbesatzungen',
-    text:'Bei der Unterbringung der Besatzungen von vier Fregatten während deren Modernisierung entstanden laut Bundesrechnungshof Mehrkosten von mindestens 20 Mio. €.',
-    meta:'Bundeswehr · Bemerkungen 2025 Nr. 13 · 10.12.2025',
-    url:'https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1'
-  },
-  {
-    type:'planned', badge:'Geplante Kosten', amount:'855 Mio. €',
-    title:'Ausbau von sieben Moselschleusen',
-    text:'Für den Ausbau waren 855 Mio. € vorgesehen. Der Bundesrechnungshof bewertet das Vorhaben als weder notwendig noch wirtschaftlich und empfiehlt, den Ausbau zu stoppen.',
-    meta:'Bundesministerium für Verkehr · Bemerkungen 2025 Nr. 9 · 10.12.2025',
-    url:'https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1'
-  },
-  {
-    type:'potential', badge:'Jährliche Steuervergünstigung', amount:'2,4 Mrd. €',
-    title:'Steuerermäßigung für Handwerkerleistungen',
-    text:'Nach Angaben des Bundesrechnungshofes verzichtete der Fiskus 2024 dadurch auf 2,4 Mrd. € Einnahmen. Der BRH bewertet die Subvention als unwirksam und kritisiert überwiegende Mitnahmeeffekte.',
-    meta:'Bundesrechnungshof · Bemerkungen 2025 Nr. 22 · Wert für 2024',
-    url:'https://bundesrechnungshof.de/presse/pressemitteilungen/verkehr-bundeswehr-buergergeld-steuern-zollverwaltung-it-wirtschaftsfoerderung'
-  },
-  {
-    type:'potential', badge:'Einsparpotenzial laut BRH', amount:'> 35 Mrd. €',
-    title:'Finanzhilfen des Bundes',
-    text:'Der Bundesrechnungshof beziffert ein Einsparpotenzial von mehr als 35 Mrd. €, falls Finanzhilfen auf das Niveau vor der Corona-Pandemie zurückgeführt werden. Das ist ausdrücklich ein Potenzial, keine bereits verlorene Summe.',
-    meta:'Beratungsbericht „Subventionen verdreifacht“ · 15.07.2026',
-    url:'https://bundesrechnungshof.de/berichte/subventionen-verdreifacht-enormes-einsparpotenzial-noch-nicht-genutzt'
-  },
-  {
-    type:'potential', badge:'Steuervergünstigungen laut BRH', amount:'≈ 17 Mrd. €/Jahr',
-    title:'Unwirksame oder klimaschädliche Steuervergünstigungen',
-    text:'Der Bundesrechnungshof schreibt, dass nachweislich unwirksame oder klimaschädliche Steuervergünstigungen sich jährlich auf rund 17 Mrd. € summieren.',
-    meta:'Beratungsbericht „Subventionen verdreifacht“ · 15.07.2026',
-    url:'https://bundesrechnungshof.de/berichte/subventionen-verdreifacht-enormes-einsparpotenzial-noch-nicht-genutzt'
-  }
+const cases=[
+{type:"confirmed",amountNum:35000000,amount:"35 Mio. €",badge:"Fehlinvestition laut BRH",ressort:"BMF",date:"2025-12-10",title:"„Sichere“ Smartphones für den Zoll",text:"Der Bundesrechnungshof bezeichnet 35 Mio. € für mehr als 17.000 Smartphones als Fehlinvestition. Die Geräte konnten nicht wie vorgesehen verschlüsselt kommunizieren und waren laut BRH nur begrenzt einsetzbar.",meta:"Bemerkungen 2025 Nr. 3",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
+{type:"confirmed",amountNum:20000000,amount:"≥ 20 Mio. €",badge:"Mehrkosten laut BRH",ressort:"BMVg",date:"2025-12-10",title:"Unterbringung von Fregattenbesatzungen",text:"Bei der Unterbringung der Besatzungen von vier Fregatten während deren Modernisierung entstanden laut Bundesrechnungshof Mehrkosten von mindestens 20 Mio. €.",meta:"Bemerkungen 2025 Nr. 13",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
+{type:"planned",amountNum:855000000,amount:"855 Mio. €",badge:"Geplante Kosten",ressort:"BMV",date:"2025-12-10",title:"Ausbau von sieben Moselschleusen",text:"Für den Ausbau waren 855 Mio. € vorgesehen. Der Bundesrechnungshof bewertet das Vorhaben als weder notwendig noch wirtschaftlich und empfiehlt, den Ausbau zu stoppen.",meta:"Bemerkungen 2025 Nr. 9",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
+{type:"potential",amountNum:2400000000,amount:"2,4 Mrd. €/Jahr",badge:"Steuervergünstigung",ressort:"BMF",date:"2025-12-10",title:"Steuerermäßigung für Handwerkerleistungen",text:"Nach Angaben des Bundesrechnungshofes verzichtete der Fiskus 2024 dadurch auf 2,4 Mrd. € Einnahmen. Der BRH bewertet die Subvention als unwirksam und kritisiert überwiegende Mitnahmeeffekte.",meta:"Bemerkungen 2025 Nr. 22 · Wert für 2024",url:"https://bundesrechnungshof.de/presse/pressemitteilungen/verkehr-bundeswehr-buergergeld-steuern-zollverwaltung-it-wirtschaftsfoerderung"},
+{type:"potential",amountNum:35000000000,amount:"> 35 Mrd. €",badge:"Einsparpotenzial laut BRH",ressort:"Bundesregierung",date:"2026-07-15",title:"Finanzhilfen des Bundes",text:"Der Bundesrechnungshof beziffert ein Einsparpotenzial von mehr als 35 Mrd. €, falls Finanzhilfen auf das Niveau vor der Corona-Pandemie zurückgeführt werden. Dies ist ein Potenzial, keine bereits verlorene Summe.",meta:"Beratungsbericht „Subventionen verdreifacht“",url:"https://bundesrechnungshof.de/berichte/subventionen-verdreifacht-enormes-einsparpotenzial-noch-nicht-genutzt"},
+{type:"potential",amountNum:17000000000,amount:"≈ 17 Mrd. €/Jahr",badge:"Steuervergünstigungen laut BRH",ressort:"Bundesregierung",date:"2026-07-15",title:"Unwirksame oder klimaschädliche Steuervergünstigungen",text:"Der Bundesrechnungshof schreibt, dass nachweislich unwirksame oder klimaschädliche Steuervergünstigungen sich jährlich auf rund 17 Mrd. € summieren.",meta:"Beratungsbericht „Subventionen verdreifacht“",url:"https://bundesrechnungshof.de/berichte/subventionen-verdreifacht-enormes-einsparpotenzial-noch-nicht-genutzt"}
 ];
-
-function render(filter='all'){
-  const root=document.getElementById('cards');
-  root.innerHTML='';
-  cases.filter(x=>filter==='all'||x.type===filter).forEach(x=>{
-    const article=document.createElement('article');
-    article.className='card';
-    article.innerHTML=`
-      <div class="cardTop"><span class="badge ${x.type}">${x.badge}</span></div>
-      <div class="amount">${x.amount}</div>
-      <h3>${x.title}</h3>
-      <p>${x.text}</p>
-      <div class="meta">${x.meta}</div>
-      <a class="source" href="${x.url}" target="_blank" rel="noopener">Originalquelle öffnen ↗</a>`;
-    root.appendChild(article);
-  });
+let activeType="all";
+function renderCases(){
+ const q=document.getElementById("search").value.trim().toLowerCase(),r=document.getElementById("ressort").value,s=document.getElementById("sort").value;
+ let arr=cases.filter(x=>(activeType==="all"||x.type===activeType)&&(r==="all"||x.ressort===r)&&(!q||(x.title+" "+x.text+" "+x.ressort+" "+x.amount+" "+x.badge).toLowerCase().includes(q)));
+ arr.sort((a,b)=>s==="amount"?b.amountNum-a.amountNum:new Date(b.date)-new Date(a.date));
+ const root=document.getElementById("cards");root.innerHTML="";
+ if(!arr.length){root.innerHTML='<div class="empty">Keine passenden Einträge gefunden.</div>';return}
+ arr.forEach(x=>{const el=document.createElement("article");el.className="card";el.innerHTML='<div class="cardTop"><span class="badge '+x.type+'">'+x.badge+'</span><span class="ressort">'+x.ressort+'</span></div><div class="amount">'+x.amount+'</div><h3>'+x.title+'</h3><p>'+x.text+'</p><div class="meta">'+x.meta+' · '+x.date.split("-").reverse().join(".")+'</div><a class="sourceBtn" target="_blank" rel="noopener" href="'+x.url+'">Originalquelle öffnen ↗</a>';root.appendChild(el)})
 }
-render();
+document.querySelectorAll(".filter").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");activeType=b.dataset.type;renderCases()}));
+["search","ressort","sort"].forEach(id=>document.getElementById(id).addEventListener(id==="search"?"input":"change",renderCases));renderCases();
 
-document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{
-  document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); render(btn.dataset.filter);
-}));
+const states=[
+["Baden-Württemberg",6081],["Bayern",3496],["Berlin",18293],["Brandenburg",9616],["Bremen",35757],["Hamburg",19278],["Hessen",11167],["Mecklenburg-Vorpommern",7079],["Niedersachsen",10683],["Nordrhein-Westfalen",13969],["Rheinland-Pfalz",9891],["Saarland",16766],["Sachsen",2829],["Sachsen-Anhalt",14177],["Schleswig-Holstein",13270],["Thüringen",8078]
+];
+const sr=document.getElementById("states");states.forEach(s=>{const d=document.createElement("div");d.className="state";d.innerHTML="<span>"+s[0]+"</span><strong>"+fmt.format(s[1])+" €</strong><small>je Einwohner</small>";sr.appendChild(d)});
 </script>
 </body>
 </html>
