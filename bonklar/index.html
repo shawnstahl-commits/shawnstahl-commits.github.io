@@ -125,6 +125,14 @@ function runDiag(){var lines=[];lines.push('HTTPS: '+(window.isSecureContext?'�
 var nav=document.querySelectorAll('.nav button'),i;for(i=0;i<nav.length;i++)nav[i].addEventListener('click',function(){go(this.getAttribute('data-view'))});var gos=document.querySelectorAll('[data-go]');for(i=0;i<gos.length;i++)gos[i].addEventListener('click',function(){go(this.getAttribute('data-go'))});
 el('manualDate').value=today();el('manualSaveBtn').addEventListener('click',manualSave);el('receiptReadBtn').addEventListener('click',readReceipt);el('openBarcodeBtn').addEventListener('click',openBarcode);el('closeBarcodeBtn').addEventListener('click',stopBarcode);el('openManualBarcodeBtn').addEventListener('click',function(){el('barcodeOverlay').classList.add('open');el('manualBarcodeBox').classList.add('show');document.body.style.overflow='hidden';setTimeout(function(){el('manualBarcodeInput').focus()},50)});el('manualBarcodeCancelBtn').addEventListener('click',stopBarcode);el('manualBarcodeSearchBtn').addEventListener('click',function(){lookupBarcode(el('manualBarcodeInput').value)});el('diagBtn').addEventListener('click',runDiag);el('clearBtn').addEventListener('click',function(){if(confirm('Alle Einkäufe löschen?')){saveState({budget:800,purchases:[]});renderPurchases()}});
 renderPurchases();runDiag();el('bootState').textContent='Basis ✓';
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(rs){
+    for(var i=0;i<rs.length;i++){if(String(rs[i].scope||'').indexOf('/bonklar/')>=0)rs[i].unregister()}
+  }).catch(function(){});
+}
+if('caches' in window){
+  caches.keys().then(function(keys){for(var i=0;i<keys.length;i++){if(keys[i].indexOf('bonklar-')===0)caches.delete(keys[i])}}).catch(function(){});
+}
 })();
 </script>
 </body>
