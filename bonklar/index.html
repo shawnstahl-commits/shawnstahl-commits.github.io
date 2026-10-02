@@ -109,7 +109,7 @@
       <div class="scanbox">
         <div style="font-size:44px">📸</div>
         <h3 style="margin:8px 0 5px">Kassenbon fotografieren</h3>
-        <div class="tiny">Die Texterkennung läuft kostenlos direkt in deinem Browser.</div>
+        <div class="tiny">Bon möglichst gerade, vollständig und ohne Schatten fotografieren. Die Texterkennung läuft kostenlos direkt im Browser.</div>
         <label for="receiptImage" class="btn green" style="display:inline-block;margin-top:14px">Foto aufnehmen / auswählen</label>
         <input id="receiptImage" type="file" accept="image/*" capture="environment" />
         <img id="scanPreview" class="scan-preview" alt="Bon Vorschau" />
@@ -288,24 +288,136 @@
   $('resetBtn').onclick=()=>{if(confirm('Wirklich alle gespeicherten Einkäufe auf diesem Gerät löschen?')){state.purchases=[];save();toast('Alle Einkäufe gelöscht')}};
   $('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bonklar-backup.json';a.click();URL.revokeObjectURL(a.href)};
   $('importInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.purchases)throw 0;state=x;save();toast('Daten importiert')}catch{alert('Die Datei konnte nicht importiert werden.')}};r.readAsText(f)};
-  $('receiptImage').onchange=e=>{const f=e.target.files[0];if(!f)return;const url=URL.createObjectURL(f);$('scanPreview').src=url;$('scanPreview').style.display='block';$('ocrBtn').style.display='inline-block';$('scanStatus').className='status';$('scanStatus').textContent='Bild bereit. Tippe auf „Bon erkennen“.'};
+  $('receiptImage').onchange=e=>{const f=e.target.files[0];if(!f)return;const url=URL.createObjectURL(f);$('scanPreview').src=url;$('scanPreview').style.display='block';$('ocrBtn').style.display='inline-block';$('scanStatus').className='status';$('scanStatus').textContent='Bild bereit – Bon wird automatisch erkannt …';setTimeout(()=>{$('ocrBtn').click()},120)};
   function inferBase(name){const n=name.toLowerCase();if(n.includes('milch'))return'Milch';if(n.includes('butter'))return'Butter';if(n.includes('gouda')||n.includes('käse'))return'Gouda';if(n.includes('wasser'))return'Mineralwasser';if(n.includes('cola'))return'Cola';if(n.includes('kaffee'))return'Kaffee';return name.trim()}
   function inferCategory(name){const n=name.toLowerCase();if(/cola|wasser|saft|bier|limo|getränk/.test(n))return'Getränke';if(/spül|wasch|reiniger|papier|seife|haushalt/.test(n))return'Haushalt';if(/milch|brot|butter|käse|gouda|banan|apfel|kaffee|joghurt|fleisch|nudel|reis|ei/.test(n))return'Lebensmittel';return'Sonstiges'}
   function parseReceipt(text){
-    const lines=text.split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);const joined=lines.join('\n');
-    let merchant=lines[0]||'';const known=['LIDL','ALDI','REWE','EDEKA','NETTO','PENNY','KAUFLAND','ROSSMANN','DM'];for(const k of known){if(joined.toUpperCase().includes(k)){merchant=k==='DM'?'dm':k[0]+k.slice(1).toLowerCase();break}}
-    let date=new Date().toISOString().slice(0,10);const dm=joined.match(/\b(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})\b/);if(dm){let y=dm[3];if(y.length===2)y='20'+y;date=y.padStart(4,'0')+'-'+dm[2].padStart(2,'0')+'-'+dm[1].padStart(2,'0')}
-    let total=0;for(const l of lines){if(/summe|gesamt|total|zu zahlen|betrag/i.test(l)){const nums=l.match(/\d+[,.]\d{2}/g);if(nums)total=Math.max(total,...nums.map(x=>Number(x.replace(',','.'))))}}
-    const items=[];for(const l of lines){if(/summe|gesamt|total|mwst|ust|steuer|bar|karte|rückgeld|gegeben|zu zahlen|eur/i.test(l))continue;const m=l.match(/^(.+?)\s+(-?\d+[,.]\d{2})\s*[A-Z]?$/i);if(m){const name=m[1].replace(/\s+[A-Z]$/,'').trim();const price=Number(m[2].replace(',','.'));if(name.length>1&&price>0&&price<500){let qty=1,unit='stk';const qm=name.match(/(\d+[,.]?\d*)\s*(kg|g|l|ml)\b/i);if(qm){qty=Number(qm[1].replace(',','.'));unit=qm[2].toLowerCase();if(unit==='g'){qty/=1000;unit='kg'}if(unit==='ml'){qty/=1000;unit='l'}}items.push({name,base:inferBase(name),category:inferCategory(name),qty,unit,price})}}
+    const cleanMoney=s=>Number(String(s||'').replace(/\s/g,'').replace(/[€*ABCD]$/i,'').replace(',','.'));
+    const rawLines=String(text||'').split(/\r?\n/).map(x=>x.replace(/[|¦]/g,'I').replace(/\s+/g,' ').trim()).filter(Boolean);
+    const lines=[];
+    for(let i=0;i<rawLines.length;i++){
+      const line=rawLines[i];
+      // OCR teilt Produktname und Preis auf zwei Zeilen: wieder zusammenführen.
+      if(i+1<rawLines.length && !/[\d][,.]\d{2}/.test(line) && /^[-+]?\s*\d{1,4}[,.]\d{2}\s*[A-D*€]?$/i.test(rawLines[i+1])){
+        lines.push(line+' '+rawLines[i+1]); i++; continue;
+      }
+      lines.push(line);
     }
-    if(!total&&items.length)total=items.reduce((s,i)=>s+i.price,0);return{merchant,date,total,items:items.slice(0,40)}
+    const joined=lines.join('\n');
+    const up=joined.toUpperCase();
+    let merchant='';
+    const shops=[
+      ['LIDL','Lidl'],['ALDI','Aldi'],['REWE','REWE'],['EDEKA','EDEKA'],['NETTO','Netto'],
+      ['PENNY','Penny'],['KAUFLAND','Kaufland'],['ROSSMANN','Rossmann'],['DM DROGERIE','dm'],
+      ['DM-DROGERIE','dm'],['MARKTKAUF','Marktkauf'],['FAMILA','famila'],['COMBI','Combi'],
+      ['NORMA','Norma'],['GLOBUS','Globus'],['BUDNI','Budni'],['MÜLLER','Müller']
+    ];
+    for(const s of shops){if(up.includes(s[0])){merchant=s[1];break}}
+    if(!merchant){
+      const candidate=lines.find(l=>/[A-Za-zÄÖÜäöüß]{3}/.test(l) && !/kasse|filiale|tel|www\.|straße|str\.|datum|bon|beleg/i.test(l));
+      merchant=(candidate||'').replace(/[^A-Za-zÄÖÜäöüß0-9 .&'-]/g,'').trim().slice(0,40);
+    }
+
+    let date=new Date().toISOString().slice(0,10);
+    const dm=joined.match(/\b(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})\b/);
+    if(dm){let y=dm[3];if(y.length===2)y='20'+y;date=y.padStart(4,'0')+'-'+dm[2].padStart(2,'0')+'-'+dm[1].padStart(2,'0')}
+
+    const totals=[];
+    for(const l of lines){
+      if(/summe|gesamt|total|zu zahlen|zahlbetrag|endbetrag|betrag eur|kartenbetrag/i.test(l)){
+        const nums=l.match(/\d{1,5}[,.]\d{2}/g)||[];
+        nums.forEach(n=>{const v=cleanMoney(n);if(v>0&&v<10000)totals.push(v)});
+      }
+    }
+    let total=totals.length?Math.max(...totals):0;
+
+    const items=[];
+    const skip=/summe|gesamt|total|zu zahlen|zahlbetrag|endbetrag|mwst|ust\b|steuer|bar\b|karte|giro|ec\b|visa|mastercard|rückgeld|gegeben|zahlung|eur\b|datum|uhrzeit|beleg|bon-?nr|transaktion|terminal|kundenbeleg|filiale|kasse|ust-id|www\.|tel\.?|iban|konto|rabatt gesamt|pfandbon/i;
+    for(const l0 of lines){
+      if(skip.test(l0))continue;
+      let l=l0.replace(/\s+[A-D]\s*$/i,'').trim();
+      // Preis am Zeilenende, optional mit Steuerbuchstabe / Stern / Euro.
+      let m=l.match(/^(.{2,}?)\s+(-?\d{1,4}[,.]\d{2})\s*[A-D*€]?$/i);
+      if(!m){
+        // Manche OCR-Ausgaben kleben Preis direkt an den Namen.
+        m=l.match(/^(.{3,}?)[ ]{0,1}(-?\d{1,4}[,.]\d{2})\s*[A-D*€]?$/i);
+      }
+      if(!m)continue;
+      let name=m[1].replace(/^\d+\s*[xX]\s*/,'').replace(/\s{2,}/g,' ').replace(/[*#]+$/,'').trim();
+      const price=cleanMoney(m[2]);
+      if(!name || name.length<2 || !(price>0) || price>=1000)continue;
+      // Zeilen, die praktisch nur Datum/Zeit/Nummern sind, nicht als Produkt übernehmen.
+      if(/^\d[\d .:/-]+$/.test(name) || /^(zwischensumme|subtotal|summe)$/i.test(name))continue;
+
+      let qty=1,unit='stk';
+      const qm=name.match(/(\d+[,.]?\d*)\s*(kg|g|l|ml)\b/i);
+      if(qm){
+        qty=Number(qm[1].replace(',','.'));unit=qm[2].toLowerCase();
+        if(unit==='g'){qty/=1000;unit='kg'}if(unit==='ml'){qty/=1000;unit='l'}
+      }
+      const xqty=l0.match(/^\s*(\d+)\s*[xX]\b/);if(xqty && !qm)qty=Math.max(1,Number(xqty[1]));
+      items.push({name,base:inferBase(name),category:inferCategory(name),qty,unit,price});
+    }
+
+    // Doppelte OCR-Zeilen vermeiden.
+    const unique=[];const seen=new Set();
+    for(const item of items){const k=(item.name.toLowerCase()+'|'+item.price.toFixed(2));if(!seen.has(k)){seen.add(k);unique.push(item)}}
+    if(!total && unique.length) total=unique.reduce((s,i)=>s+i.price,0);
+    return{merchant,date,total,items:unique.slice(0,60),lineCount:lines.length};
+  }
+
+  async function preprocessReceiptImage(file){
+    const bmp=await createImageBitmap(file);
+    const maxW=1800,maxH=3000,scale=Math.min(1,maxW/bmp.width,maxH/bmp.height);
+    const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bmp.width*scale));canvas.height=Math.max(1,Math.round(bmp.height*scale));
+    const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(bmp,0,0,canvas.width,canvas.height);
+    const img=ctx.getImageData(0,0,canvas.width,canvas.height),d=img.data;
+    let min=255,max=0;
+    for(let i=0;i<d.length;i+=4){const y=Math.round(.299*d[i]+.587*d[i+1]+.114*d[i+2]);if(y<min)min=y;if(y>max)max=y}
+    const span=Math.max(30,max-min);
+    for(let i=0;i<d.length;i+=4){
+      let y=Math.round(.299*d[i]+.587*d[i+1]+.114*d[i+2]);
+      y=Math.max(0,Math.min(255,Math.round((y-min)*255/span)));
+      // Thermopapier: dunkle Schrift verstärken, hellen Hintergrund weiß halten.
+      y=y<190?Math.max(0,Math.round((y-128)*1.35+128)):Math.min(255,Math.round(y*1.04));
+      d[i]=d[i+1]=d[i+2]=y;
+    }
+    ctx.putImageData(img,0,0);return canvas;
+  }
+
+  function receiptQuality(parsed,text){
+    let q=0;if(parsed.merchant)q+=2;if(parsed.total>0)q+=3;q+=Math.min(6,parsed.items.length);if(String(text||'').length>80)q+=1;return q;
+  }
+
+  function applyReceiptResult(parsed,text){
+    $('merchantInput').value=parsed.merchant||'';
+    $('dateInput').value=parsed.date||new Date().toISOString().slice(0,10);
+    $('totalInput').value=parsed.total?parsed.total.toFixed(2):'';
+    scanItems=parsed.items||[];$('rawText').textContent=text||'';renderItemEditor();$('reviewCard').style.display='block';
+    $('reviewCard').scrollIntoView({behavior:'smooth',block:'start'});
   }
   function itemEditorRow(item){
     const idx=scanItems.indexOf(item);return '<div class="item-edit" data-idx="'+idx+'"><input class="iname" value="'+esc(item.name)+'" placeholder="Produkt"><input class="iprice" type="number" step="0.01" value="'+Number(item.price||0).toFixed(2)+'"><button class="btn danger small iremove">×</button></div>'
   }
   function renderItemEditor(){$('itemsEditor').innerHTML=scanItems.map(itemEditorRow).join('')||'<div class="empty" style="padding:12px">Noch keine Produkte erkannt. Du kannst welche hinzufügen.</div>';$('itemsEditor').querySelectorAll('.item-edit').forEach(row=>{const idx=Number(row.dataset.idx);row.querySelector('.iname').oninput=e=>{scanItems[idx].name=e.target.value;scanItems[idx].base=inferBase(e.target.value);scanItems[idx].category=inferCategory(e.target.value)};row.querySelector('.iprice').oninput=e=>scanItems[idx].price=Number(e.target.value||0);row.querySelector('.iremove').onclick=()=>{scanItems.splice(idx,1);renderItemEditor()}})}
   $('addItemBtn').onclick=()=>{scanItems.push({name:'',base:'',category:'Sonstiges',qty:1,unit:'stk',price:0});renderItemEditor()};
-  $('ocrBtn').onclick=async()=>{const f=$('receiptImage').files[0];if(!f)return;try{$('scanStatus').className='status working';$('scanStatus').textContent='Bon wird erkannt … das kann auf dem Handy kurz dauern.';$('ocrBtn').disabled=true;const res=await Tesseract.recognize(f,'deu',{logger:m=>{if(m.status==='recognizing text')$('scanStatus').textContent='Texterkennung '+Math.round((m.progress||0)*100)+' %'}});const parsed=parseReceipt(res.data.text);$('merchantInput').value=parsed.merchant;$('dateInput').value=parsed.date;$('totalInput').value=parsed.total?parsed.total.toFixed(2):'';scanItems=parsed.items;$('rawText').textContent=res.data.text;renderItemEditor();$('reviewCard').style.display='block';$('scanStatus').className='status good';$('scanStatus').textContent='Erkennung fertig. Bitte kurz prüfen und speichern.'}catch(err){$('scanStatus').className='status bad';$('scanStatus').textContent='Erkennung fehlgeschlagen. Du kannst den Einkauf trotzdem manuell eintragen.';console.error(err)}finally{$('ocrBtn').disabled=false}};
+  $('ocrBtn').onclick=async()=>{const f=$('receiptImage').files[0];if(!f||$('ocrBtn').disabled)return;try{
+    if(!window.Tesseract)throw new Error('OCR_LIBRARY_MISSING');
+    $('scanStatus').className='status working';$('scanStatus').textContent='Bon wird vorbereitet …';$('ocrBtn').disabled=true;
+    let source=f;try{source=await preprocessReceiptImage(f)}catch(e){}
+    const res=await Tesseract.recognize(source,'deu',{logger:m=>{if(m.status==='recognizing text')$('scanStatus').textContent='Bon lesen: '+Math.round((m.progress||0)*100)+' %'}});
+    let text=String(res&&res.data&&res.data.text||'');let parsed=parseReceipt(text);
+    // Falls der Kontrast-Durchlauf zu wenig findet, einmal das Original probieren.
+    if(receiptQuality(parsed,text)<5){
+      $('scanStatus').textContent='Zweiter Erkennungsversuch …';
+      const retry=await Tesseract.recognize(f,'deu',{logger:m=>{if(m.status==='recognizing text')$('scanStatus').textContent='Zweiter Versuch: '+Math.round((m.progress||0)*100)+' %'}});
+      const text2=String(retry&&retry.data&&retry.data.text||''),parsed2=parseReceipt(text2);
+      if(receiptQuality(parsed2,text2)>receiptQuality(parsed,text)){text=text2;parsed=parsed2}
+    }
+    applyReceiptResult(parsed,text);
+    $('scanStatus').className=(parsed.total||parsed.items.length)?'status good':'status bad';
+    $('scanStatus').textContent=(parsed.total||parsed.items.length)?('Bon erkannt: '+parsed.items.length+' Position'+(parsed.items.length===1?'':'en')+' gefunden. Bitte kurz prüfen.'):'Text wurde gelesen, aber Preise/Positionen nicht sicher erkannt. Bitte Felder unten prüfen oder ergänzen.';
+  }catch(err){$('scanStatus').className='status bad';$('scanStatus').textContent=err&&err.message==='OCR_LIBRARY_MISSING'?'Texterkennung konnte nicht geladen werden. Seite bitte einmal mit Internet neu öffnen.':'Bon konnte nicht sauber gelesen werden. Bitte möglichst gerade, nah und ohne Schatten fotografieren.';console.error(err)}finally{$('ocrBtn').disabled=false}};
   $('manualReceiptBtn').onclick=()=>{$('merchantInput').value='';$('dateInput').value=new Date().toISOString().slice(0,10);$('totalInput').value='';scanItems=[];$('rawText').textContent='';renderItemEditor();$('reviewCard').style.display='block';$('reviewCard').scrollIntoView({behavior:'smooth'})};
   $('saveReceiptBtn').onclick=()=>{const merchant=$('merchantInput').value.trim()||'Unbekannter Laden',date=$('dateInput').value||new Date().toISOString().slice(0,10);let total=Number($('totalInput').value||0);scanItems=scanItems.filter(i=>i.name.trim()).map(i=>({...i,base:inferBase(i.name),category:inferCategory(i.name),qty:i.qty||1,unit:i.unit||'stk',price:Number(i.price||0)}));if(!total)total=scanItems.reduce((s,i)=>s+i.price,0);state.purchases.push({id:uid(),merchant,date,total,items:scanItems});save();$('reviewCard').style.display='none';$('receiptImage').value='';$('scanPreview').style.display='none';$('ocrBtn').style.display='none';$('scanStatus').textContent='Gespeichert.';toast('Einkauf gespeichert');go('dashboard')};
 
