@@ -50,6 +50,9 @@
     .receipt-frame:before,.receipt-frame:after{content:"";position:absolute;left:7%;right:7%;height:1px;background:rgba(36,223,199,.7)}
     .receipt-frame:before{top:33%}.receipt-frame:after{bottom:33%}.receipt-frame-label{position:absolute;left:50%;bottom:-36px;transform:translateX(-50%);white-space:nowrap;font-size:12px;color:rgba(255,255,255,.86);text-shadow:0 2px 8px #000}
     .receipt-camera-status{position:absolute;z-index:512;left:18px;right:18px;bottom:112px;text-align:center;font-size:12px;color:rgba(255,255,255,.82);text-shadow:0 2px 8px #000}
+    .focus-pulse{position:absolute;left:50%;top:50%;width:58px;height:58px;transform:translate(-50%,-50%);border:2px solid #24dfc7;border-radius:12px;box-shadow:0 0 20px rgba(36,223,199,.6);animation:focusPulse .65s ease-out forwards}@keyframes focusPulse{0%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}100%{opacity:.15;transform:translate(-50%,-50%) scale(.75)}}
+    .receipt-camera-zoom{position:absolute;z-index:514;left:50%;bottom:72px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.42);padding:7px 10px;border-radius:999px;backdrop-filter:blur(8px)}
+    .receipt-camera-zoom button{width:34px;height:34px;border:1px solid rgba(255,255,255,.25);border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:20px}.receipt-camera-zoom span{min-width:42px;text-align:center;font-weight:800;font-size:12px}
     .receipt-camera-actions{position:absolute;z-index:515;left:0;right:0;bottom:max(22px,env(safe-area-inset-bottom));display:flex;justify-content:center}
     .receipt-capture{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.18);display:grid;place-items:center;box-shadow:0 6px 24px rgba(0,0,0,.35)}
     .receipt-capture span{width:56px;height:56px;border-radius:50%;background:#fff;display:block}
@@ -216,10 +219,16 @@
     <button id="receiptTorchBtn" class="receipt-torch hidden" type="button">🔦</button>
   </div>
   <video id="receiptCameraVideo" playsinline muted></video>
-  <div class="receipt-frame">
-    <div class="receipt-frame-label">Bon vollständig in den Rahmen</div>
+  <div id="receiptFrame" class="receipt-frame">
+    <div class="receipt-frame-label">Bon vollständig in den Rahmen · zum Fokussieren tippen</div>
+    <div id="focusPulse" class="focus-pulse hidden"></div>
   </div>
   <div id="receiptCameraStatus" class="receipt-camera-status">Kamera wird gestartet …</div>
+  <div class="receipt-camera-zoom">
+    <button id="receiptZoomOutBtn" type="button">−</button>
+    <span id="receiptZoomText">1.0×</span>
+    <button id="receiptZoomInBtn" type="button">+</button>
+  </div>
   <div class="receipt-camera-actions">
     <button id="captureReceiptBtn" class="receipt-capture" type="button" aria-label="Foto aufnehmen"><span></span></button>
   </div>
@@ -403,7 +412,7 @@
   $('resetBtn').onclick=()=>{if(confirm('Wirklich alle gespeicherten Einkäufe auf diesem Gerät löschen?')){state.purchases=[];save();toast('Alle Einkäufe gelöscht')}};
   $('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bonklar-backup.json';a.click();URL.revokeObjectURL(a.href)};
   $('importInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.purchases)throw 0;state=x;save();toast('Daten importiert')}catch{alert('Die Datei konnte nicht importiert werden.')}};r.readAsText(f)};
-  let receiptStream=null,receiptTorchOn=false,receiptCapturedFile=null;
+  let receiptStream=null,receiptTorchOn=false,receiptCapturedFile=null,receiptZoom=1;
   async function setupReceiptCameraTrack(track){
     if(!track)return;
     try{
@@ -412,13 +421,38 @@
       if(Array.isArray(caps.exposureMode)&&caps.exposureMode.includes('continuous'))adv.exposureMode='continuous';
       if(Array.isArray(caps.whiteBalanceMode)&&caps.whiteBalanceMode.includes('continuous'))adv.whiteBalanceMode='continuous';
       if(caps.zoom&&Number.isFinite(Number(caps.zoom.min))&&Number.isFinite(Number(caps.zoom.max))){
-        const z=Math.min(Number(caps.zoom.max),Math.max(Number(caps.zoom.min),1.08));
-        if(z>Number(caps.zoom.min))adv.zoom=z;
+        receiptZoom=Math.min(Number(caps.zoom.max),Math.max(Number(caps.zoom.min),1.0));adv.zoom=receiptZoom;
       }
       if(Object.keys(adv).length)await track.applyConstraints({advanced:[adv]});
       const torch=$('receiptTorchBtn');if(torch)torch.classList.toggle('hidden',!caps.torch);
-      $('receiptCameraStatus').textContent='Autofokus aktiv – Bon ruhig und gerade halten.';
-    }catch(e){$('receiptCameraStatus').textContent='Kamera läuft – zum Scharfstellen kurz ruhig halten.'}
+      const settings=track.getSettings?track.getSettings():{};
+      $('receiptCameraStatus').textContent=(settings.focusMode==='continuous'?'Autofokus aktiv':'Kamera fokussiert automatisch, soweit vom Browser unterstützt')+' – Bon ruhig halten.';
+      if($('receiptZoomText'))$('receiptZoomText').textContent=(Number(settings.zoom||receiptZoom||1)).toFixed(1)+'×';
+    }catch(e){$('receiptCameraStatus').textContent='Kamera läuft – zum Fokussieren auf den Bon tippen.'}
+  }
+  async function refocusReceiptCamera(){
+    const track=receiptStream&&receiptStream.getVideoTracks?receiptStream.getVideoTracks()[0]:null;if(!track)return;
+    const pulse=$('focusPulse');if(pulse){pulse.classList.remove('hidden');pulse.style.animation='none';void pulse.offsetWidth;pulse.style.animation='focusPulse .65s ease-out forwards';setTimeout(()=>pulse.classList.add('hidden'),700)}
+    try{
+      const caps=track.getCapabilities?track.getCapabilities():{};
+      if(Array.isArray(caps.focusMode)&&caps.focusMode.includes('single-shot')){
+        await track.applyConstraints({advanced:[{focusMode:'single-shot'}]});$('receiptCameraStatus').textContent='Fokus wird neu gesetzt …';
+        setTimeout(async()=>{try{if(Array.isArray(caps.focusMode)&&caps.focusMode.includes('continuous'))await track.applyConstraints({advanced:[{focusMode:'continuous'}]})}catch(e){}},700);
+      }else if(Array.isArray(caps.focusMode)&&caps.focusMode.includes('continuous')){
+        await track.applyConstraints({advanced:[{focusMode:'continuous'}]});$('receiptCameraStatus').textContent='Autofokus neu aktiviert.';
+      }else{$('receiptCameraStatus').textContent='Der Browser steuert den Fokus automatisch.'}
+    }catch(e){$('receiptCameraStatus').textContent='Der Browser steuert den Fokus automatisch.'}
+  }
+  async function changeReceiptZoom(delta){
+    const track=receiptStream&&receiptStream.getVideoTracks?receiptStream.getVideoTracks()[0]:null;if(!track||!track.getCapabilities)return;
+    try{
+      const caps=track.getCapabilities();if(!caps.zoom)return;
+      const step=Number(caps.zoom.step||0.1),min=Number(caps.zoom.min||1),max=Number(caps.zoom.max||1);
+      const current=Number((track.getSettings&&track.getSettings().zoom)||receiptZoom||1);
+      receiptZoom=Math.min(max,Math.max(min,current+delta*step*2));
+      await track.applyConstraints({advanced:[{zoom:receiptZoom}]});$('receiptZoomText').textContent=receiptZoom.toFixed(1)+'×';
+      setTimeout(refocusReceiptCamera,100);
+    }catch(e){}
   }
   async function openReceiptCamera(){
     if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('receiptImage').click();return}
@@ -443,15 +477,24 @@
     try{const caps=track.getCapabilities();if(!caps.torch)return;receiptTorchOn=!receiptTorchOn;await track.applyConstraints({advanced:[{torch:receiptTorchOn}]});$('receiptTorchBtn').textContent=receiptTorchOn?'💡':'🔦'}catch(e){}
   }
   async function captureReceiptFromVideo(){
-    const video=$('receiptCameraVideo');if(!video.videoWidth||!video.videoHeight)return;
-    $('receiptCameraStatus').textContent='Foto wird aufgenommen …';
-    const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
-    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.96));if(!blob)return;
-    receiptCapturedFile=new File([blob],'bon.jpg',{type:'image/jpeg'});
+    const video=$('receiptCameraVideo'),frame=$('receiptFrame');if(!video.videoWidth||!video.videoHeight||!frame)return;
+    $('receiptCameraStatus').textContent='Bon-Ausschnitt wird aufgenommen …';
+    const vr=video.getBoundingClientRect(),fr=frame.getBoundingClientRect();
+    const scale=Math.max(vr.width/video.videoWidth,vr.height/video.videoHeight);
+    const displayedW=video.videoWidth*scale,displayedH=video.videoHeight*scale;
+    const offX=(displayedW-vr.width)/2,offY=(displayedH-vr.height)/2;
+    let sx=(fr.left-vr.left+offX)/scale,sy=(fr.top-vr.top+offY)/scale,sw=fr.width/scale,sh=fr.height/scale;
+    const padX=sw*.025,padY=sh*.02;sx=Math.max(0,sx-padX);sy=Math.max(0,sy-padY);sw=Math.min(video.videoWidth-sx,sw+padX*2);sh=Math.min(video.videoHeight-sy,sh+padY*2);
+    const targetW=Math.min(1800,Math.round(sw*1.35)),targetH=Math.round(targetW*(sh/sw));
+    const canvas=document.createElement('canvas');canvas.width=Math.max(900,targetW);canvas.height=Math.max(1200,targetH);
+    const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(video,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.98));if(!blob)return;
+    receiptCapturedFile=new File([blob],'bon-ausschnitt.jpg',{type:'image/jpeg'});
     const url=URL.createObjectURL(blob);$('scanPreview').src=url;$('scanPreview').style.display='block';$('ocrBtn').style.display='inline-block';
-    await closeReceiptCamera(true);$('scanStatus').className='status working';$('scanStatus').textContent='Scharfes Foto aufgenommen – Bon wird erkannt …';setTimeout(()=>{$('ocrBtn').click()},120);
+    await closeReceiptCamera(true);$('scanStatus').className='status working';$('scanStatus').textContent='Bon-Ausschnitt aufgenommen – Texterkennung startet …';setTimeout(()=>{$('ocrBtn').click()},120);
   }
   $('openReceiptCameraBtn').onclick=openReceiptCamera;$('closeReceiptCameraBtn').onclick=()=>closeReceiptCamera(true);$('receiptTorchBtn').onclick=toggleReceiptTorch;$('captureReceiptBtn').onclick=captureReceiptFromVideo;
+  $('receiptFrame').onclick=refocusReceiptCamera;$('receiptZoomOutBtn').onclick=()=>changeReceiptZoom(-1);$('receiptZoomInBtn').onclick=()=>changeReceiptZoom(1);
 
   $('receiptImage').onchange=e=>{const f=e.target.files[0];if(!f)return;receiptCapturedFile=null;const url=URL.createObjectURL(f);$('scanPreview').src=url;$('scanPreview').style.display='block';$('ocrBtn').style.display='inline-block';$('scanStatus').className='status';$('scanStatus').textContent='Bild bereit – Bon wird automatisch erkannt …';setTimeout(()=>{$('ocrBtn').click()},120)};
   function inferBase(name){const n=name.toLowerCase();if(n.includes('milch'))return'Milch';if(n.includes('butter'))return'Butter';if(n.includes('gouda')||n.includes('käse'))return'Gouda';if(n.includes('wasser'))return'Mineralwasser';if(n.includes('cola'))return'Cola';if(n.includes('kaffee'))return'Kaffee';return name.trim()}
@@ -553,6 +596,24 @@
   function receiptQuality(parsed,text){
     let q=0;if(parsed.merchant)q+=2;if(parsed.total>0)q+=3;q+=Math.min(6,parsed.items.length);if(String(text||'').length>80)q+=1;return q;
   }
+  async function recognizeReceiptStrong(source,label){
+    if(!window.Tesseract){const ok=await ensureTesseract();if(!ok)throw new Error('OCR_LIBRARY_MISSING')}
+    const worker=await Tesseract.createWorker('deu');
+    try{
+      const psm=(Tesseract.PSM&&Tesseract.PSM.AUTO)||'3';
+      await worker.setParameters({tessedit_pageseg_mode:psm,preserve_interword_spaces:'1',user_defined_dpi:'300'});
+      $('scanStatus').textContent=(label||'Bon')+' wird gelesen …';
+      const a=await worker.recognize(source);let bestText=String(a&&a.data&&a.data.text||''),best=parseReceipt(bestText),bestScore=receiptQuality(best,bestText);
+      if(bestScore<8){
+        const psm2=(Tesseract.PSM&&Tesseract.PSM.SPARSE_TEXT)||'11';
+        await worker.setParameters({tessedit_pageseg_mode:psm2,preserve_interword_spaces:'1',user_defined_dpi:'300'});
+        $('scanStatus').textContent='Zweiter OCR-Durchlauf für kleine Preiszeilen …';
+        const b=await worker.recognize(source);const t2=String(b&&b.data&&b.data.text||''),p2=parseReceipt(t2),s2=receiptQuality(p2,t2);
+        if(s2>bestScore){bestText=t2;best=p2;bestScore=s2}
+      }
+      return{text:bestText,parsed:best};
+    }finally{try{await worker.terminate()}catch(e){}}
+  }
 
   function applyReceiptResult(parsed,text){
     $('merchantInput').value=parsed.merchant||'';
@@ -567,22 +628,19 @@
   function renderItemEditor(){$('itemsEditor').innerHTML=scanItems.map(itemEditorRow).join('')||'<div class="empty" style="padding:12px">Noch keine Produkte erkannt. Du kannst welche hinzufügen.</div>';$('itemsEditor').querySelectorAll('.item-edit').forEach(row=>{const idx=Number(row.dataset.idx);row.querySelector('.iname').oninput=e=>{scanItems[idx].name=e.target.value;scanItems[idx].base=inferBase(e.target.value);scanItems[idx].category=inferCategory(e.target.value)};row.querySelector('.iprice').oninput=e=>scanItems[idx].price=Number(e.target.value||0);row.querySelector('.iremove').onclick=()=>{scanItems.splice(idx,1);renderItemEditor()}})}
   $('addItemBtn').onclick=()=>{scanItems.push({name:'',base:'',category:'Sonstiges',qty:1,unit:'stk',price:0});renderItemEditor()};
   $('ocrBtn').onclick=async()=>{const f=receiptCapturedFile||$('receiptImage').files[0];if(!f||$('ocrBtn').disabled)return;try{
-    if(!window.Tesseract){const ok=await ensureTesseract();if(!ok)throw new Error('OCR_LIBRARY_MISSING');}
     $('scanStatus').className='status working';$('scanStatus').textContent='Bon wird vorbereitet …';$('ocrBtn').disabled=true;
     let source=f;try{source=await preprocessReceiptImage(f)}catch(e){}
-    const res=await Tesseract.recognize(source,'deu',{logger:m=>{if(m.status==='recognizing text')$('scanStatus').textContent='Bon lesen: '+Math.round((m.progress||0)*100)+' %'}});
-    let text=String(res&&res.data&&res.data.text||'');let parsed=parseReceipt(text);
-    // Falls der Kontrast-Durchlauf zu wenig findet, einmal das Original probieren.
-    if(receiptQuality(parsed,text)<5){
-      $('scanStatus').textContent='Zweiter Erkennungsversuch …';
-      const retry=await Tesseract.recognize(f,'deu',{logger:m=>{if(m.status==='recognizing text')$('scanStatus').textContent='Zweiter Versuch: '+Math.round((m.progress||0)*100)+' %'}});
-      const text2=String(retry&&retry.data&&retry.data.text||''),parsed2=parseReceipt(text2);
-      if(receiptQuality(parsed2,text2)>receiptQuality(parsed,text)){text=text2;parsed=parsed2}
+    let result=await recognizeReceiptStrong(source,'Bon');
+    if(receiptQuality(result.parsed,result.text)<5){
+      $('scanStatus').textContent='Originalfoto wird zusätzlich geprüft …';
+      const retry=await recognizeReceiptStrong(f,'Originalfoto');
+      if(receiptQuality(retry.parsed,retry.text)>receiptQuality(result.parsed,result.text))result=retry;
     }
-    applyReceiptResult(parsed,text);
+    applyReceiptResult(result.parsed,result.text);
+    const parsed=result.parsed;
     $('scanStatus').className=(parsed.total||parsed.items.length)?'status good':'status bad';
-    $('scanStatus').textContent=(parsed.total||parsed.items.length)?('Bon erkannt: '+parsed.items.length+' Position'+(parsed.items.length===1?'':'en')+' gefunden. Bitte kurz prüfen.'):'Text wurde gelesen, aber Preise/Positionen nicht sicher erkannt. Bitte Felder unten prüfen oder ergänzen.';
-  }catch(err){$('scanStatus').className='status bad';$('scanStatus').textContent=err&&err.message==='OCR_LIBRARY_MISSING'?'Texterkennung konnte nicht geladen werden. Seite bitte einmal mit Internet neu öffnen.':'Bon konnte nicht sauber gelesen werden. Bitte möglichst gerade, nah und ohne Schatten fotografieren.';console.error(err)}finally{$('ocrBtn').disabled=false}};
+    $('scanStatus').textContent=(parsed.total||parsed.items.length)?('Bon erkannt: '+parsed.items.length+' Position'+(parsed.items.length===1?'':'en')+' gefunden. Bitte kurz prüfen.'):'Text wurde gelesen, aber Preise/Positionen nicht sicher erkannt. Bitte Foto näher aufnehmen und den Bon vollständig in den Rahmen legen.';
+  }catch(err){$('scanStatus').className='status bad';$('scanStatus').textContent=err&&err.message==='OCR_LIBRARY_MISSING'?'Texterkennung konnte nicht geladen werden. Technik-Check bitte prüfen.':'Bon konnte nicht sauber gelesen werden. Bitte Bon näher in den Rahmen legen, einmal auf den Bon tippen und neu fotografieren.';console.error(err)}finally{$('ocrBtn').disabled=false}};
   $('manualReceiptBtn').onclick=()=>{$('merchantInput').value='';$('dateInput').value=new Date().toISOString().slice(0,10);$('totalInput').value='';scanItems=[];$('rawText').textContent='';renderItemEditor();$('reviewCard').style.display='block';$('reviewCard').scrollIntoView({behavior:'smooth'})};
   $('saveReceiptBtn').onclick=()=>{const merchant=$('merchantInput').value.trim()||'Unbekannter Laden',date=$('dateInput').value||new Date().toISOString().slice(0,10);let total=Number($('totalInput').value||0);scanItems=scanItems.filter(i=>i.name.trim()).map(i=>({...i,base:inferBase(i.name),category:inferCategory(i.name),qty:i.qty||1,unit:i.unit||'stk',price:Number(i.price||0)}));if(!total)total=scanItems.reduce((s,i)=>s+i.price,0);state.purchases.push({id:uid(),merchant,date,total,items:scanItems});save();$('reviewCard').style.display='none';$('receiptImage').value='';receiptCapturedFile=null;$('scanPreview').style.display='none';$('ocrBtn').style.display='none';$('scanStatus').textContent='Gespeichert.';toast('Einkauf gespeichert');go('dashboard')};
 
