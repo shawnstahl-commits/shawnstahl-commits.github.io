@@ -103,11 +103,28 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 }
 .calendarBtn svg{width:22px;height:22px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 [data-theme="dark"] .calendarBtn{background:#14222c;color:#fff}
-@media print{.nav,.top .icon,.actions,.noPrint,.primary,.secondary,.danger,.mini{display:none!important}body{background:white;color:#111;padding:0}.top{position:static;background:white}.view{display:none!important}.view.active{display:block!important}.card,.form,.hero{box-shadow:none;break-inside:avoid}.hero{color:#111;background:white;border:1px solid #ccc}.heroBox{background:#f4f4f4}.wrap{max-width:none}}
+
+.balanceExplain{margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.balanceExplain>div{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px}
+.balanceExplain b{display:block;font-size:18px;margin-top:3px}
+.reportHero{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:17px;box-shadow:var(--shadow)}
+.reportGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.reportCard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px}
+.reportCard b{display:block;font-size:20px;margin-top:5px}
+.reminderBanner{display:none;margin:12px 0;background:color-mix(in srgb,var(--orange) 12%,var(--card));border:1px solid color-mix(in srgb,var(--orange) 35%,var(--line));border-radius:16px;padding:13px}
+.reminderBanner.show{display:block}
+.backupStatus{display:flex;align-items:center;gap:8px}.backupStatus i{width:9px;height:9px;border-radius:50%;background:var(--green);display:block}
+.splash{position:fixed;inset:0;z-index:9999;background:#0b6b57;color:white;display:grid;place-items:center;transition:.25s;opacity:1}
+.splash.hide{opacity:0;pointer-events:none}
+.splashInner{text-align:center;font-weight:900}.splashIcon{font-size:54px;margin-bottom:10px}.splashName{font-size:24px}
+.pvMonthList{display:grid;gap:8px;margin-top:10px}
+@media(max-width:520px){.balanceExplain{grid-template-columns:1fr 1fr}.balanceExplain>div:last-child{grid-column:1/-1}.reportGrid{grid-template-columns:1fr 1fr}}
+@media print{.nav,.top .icon,.actions,.noPrint,.primary,.secondary,.danger,.mini{display:none!important}body{background:white;color:#111;padding:0}.top{position:static;background:white}.view{display:none!important}.view.active{display:block!important}.splash,.drawer,.drawerBackdrop{display:none!important}.card,.form,.hero{box-shadow:none;break-inside:avoid}.hero{color:#111;background:white;border:1px solid #ccc}.heroBox{background:#f4f4f4}.wrap{max-width:none}}
 @media(max-width:520px){.big{font-size:34px}.row{grid-template-columns:1fr}.value{font-size:21px}.kpi3{grid-template-columns:1fr 1fr}.kpi3 .wideMobile{grid-column:1/-1}}
 </style>
 </head>
 <body>
+<div class="splash" id="splash"><div class="splashInner"><div class="splashIcon">⚡</div><div class="splashName">Stromtagebuch</div><div style="font-size:12px;font-weight:600;opacity:.8;margin-top:4px">Strom · PV · Kosten</div></div></div>
 <div class="drawerBackdrop" id="drawerBackdrop"></div>
 <aside class="drawer" id="drawer">
   <div class="drawerHead"><div><div class="drawerBrand">⚡ Stromtagebuch</div><div class="hint">Bereiche</div></div><button class="icon" id="menuClose">✕</button></div>
@@ -119,6 +136,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="heat"><span class="ico">🔥</span>Wärmepumpe</button>
     <button data-go="ev"><span class="ico">🚗</span>BYD-Laden</button>
     <button data-go="history"><span class="ico">▥</span>Verlauf</button>
+    <button data-go="report"><span class="ico">📊</span>Monatsbericht</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙</span>Einstellungen</button>
   </div>
@@ -135,6 +153,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button class="dashAction" data-go="add">＋ Neue Ablesung</button>
     <button class="dashAction ghost" data-go="pv">☀ Energie-Zentrale</button>
   </div>
+</div>
+<div class="reminderBanner" id="reminderBanner"><b id="reminderTitle">Erinnerung</b><div class="hint" id="reminderText" style="margin-top:4px">–</div><div class="actions" style="margin-top:8px"><button class="secondary" data-go="add">Jetzt ablesen</button><button class="mini" id="dismissReminder">Heute ausblenden</button></div></div>
+<div class="balanceExplain">
+  <div><div class="label">Abschläge bis heute</div><b id="balancePaid">–</b></div>
+  <div><div class="label">Stromkosten bis Zählerstand</div><b id="balanceCost">–</b></div>
+  <div><div class="label">Ergebnis</div><b id="balanceResult">–</b></div>
 </div>
 
 <div class="quickTitle"><h2>Auf einen Blick</h2><div class="statusLine"><i></i><span id="homeStatusDate">aktuell</span></div></div>
@@ -260,6 +284,15 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 </div>
 
 
+<h2>PV-Monatswerte</h2>
+<div class="form noPrint">
+  <div class="row"><div><label>Monat</label><input class="input" type="month" id="pvMonthKey"></div><div><label>Erzeugung (kWh)</label><input class="input" type="number" step="0.01" id="pvMonthGen" inputmode="decimal"></div></div>
+  <div class="row" style="margin-top:8px"><div><label>Eigenverbrauch (kWh)</label><input class="input" type="number" step="0.01" id="pvMonthOwn" inputmode="decimal"></div><div><label>Einspeisung (kWh)</label><input class="input" type="number" step="0.01" id="pvMonthExport" inputmode="decimal"></div></div>
+  <button class="primary" id="savePvMonth" style="width:100%;margin-top:12px">PV-Monat speichern</button>
+  <div class="hint" style="margin-top:8px">Hier kommen die echten Monatswerte aus deiner PV-App hinein. Fehlende Monate werden nicht geschätzt.</div>
+</div>
+<div class="card" style="margin-top:10px"><div class="label">Gespeicherte PV-Monate</div><div class="pvMonthList" id="pvMonthList"></div></div>
+
 <h2>Monatsübersicht</h2><div class="table"><table><thead><tr><th>Monat</th><th>Netz</th><th>Einspeisung</th><th>Stromkosten*</th><th>PV €</th></tr></thead><tbody id="monthRows"></tbody></table></div><div class="hint" style="margin:8px 2px">* inkl. anteiligem Grundpreis; Zwischenstände werden tageweise auf Monate verteilt.</div>
 
 
@@ -285,6 +318,27 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 </section>
 
+
+<section class="view" data-view="report">
+<div class="viewTitle"><h2>📊 Monatsbericht</h2><span class="pill" id="reportStatePill">Monat</span></div>
+<div class="form noPrint"><label>Monat auswählen</label><input class="input" type="month" id="reportMonth"></div>
+<div id="reportContent" style="margin-top:10px">
+  <div class="reportHero"><div class="label">MONATSERGEBNIS</div><div class="value" id="reportTitle">–</div><div class="hint" id="reportHint">–</div></div>
+  <div class="reportGrid">
+    <div class="reportCard"><div class="label">Netzbezug</div><b id="reportImp">–</b></div>
+    <div class="reportCard"><div class="label">Einspeisung</div><b class="good" id="reportFeed">–</b></div>
+    <div class="reportCard"><div class="label">Stromkosten</div><b id="reportCost">–</b></div>
+    <div class="reportCard"><div class="label">Einspeisevergütung</div><b class="good" id="reportRevenue">–</b></div>
+    <div class="reportCard"><div class="label">PV-Erzeugung</div><b id="reportPvGen">–</b></div>
+    <div class="reportCard"><div class="label">PV-Eigenverbrauch</div><b id="reportPvOwn">–</b></div>
+    <div class="reportCard"><div class="label">Wärmepumpe</div><b id="reportHeat">–</b></div>
+    <div class="reportCard"><div class="label">BYD geladen</div><b id="reportEv">–</b></div>
+  </div>
+  <div class="card" style="margin-top:10px"><div class="label">Vergleich zum Vormonat</div><div class="value" id="reportCompare">–</div><div class="hint" id="reportCompareHint">–</div></div>
+</div>
+<div class="actions noPrint" style="margin-top:12px"><button class="primary" id="printCurrentReport">Bericht drucken / als PDF</button></div>
+</section>
+
 <section class="view" data-view="settings"><h2>Einstellungen</h2><div class="form">
 <div class="row"><div><label>Arbeitspreis €/kWh</label><input class="input" id="sWork" type="number" step="0.0001"></div><div><label>Grundpreis €/Jahr</label><input class="input" id="sBase" type="number" step="0.01"></div></div>
 <div class="row"><div><label>Abschlag €/Monat</label><input class="input" id="sPay" type="number" step="0.01"></div><div><label>Vergütung €/kWh</label><input class="input" id="sFeed" type="number" step="0.0001"></div></div>
@@ -292,7 +346,16 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="row"><div><label>PV-Leistung kWp</label><input class="input" id="sPv" type="number" step="0.01"></div><div><label>PV-Inbetriebnahme</label><input class="input" id="sStart" type="date"></div></div>
 <button class="primary" style="width:100%;margin-top:14px" id="saveSettings">Einstellungen speichern</button>
 </div>
-<h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><button class="secondary" id="backup">Backup speichern</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine neuen Einträge werden nur in diesem Browser auf deinem Gerät gespeichert.</div></div>
+<h2>Erinnerungen</h2><div class="form">
+<label style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="sReminder" style="width:20px;height:20px"> Beim Öffnen am Monatsanfang an Zählerstände erinnern</label>
+<div class="hint" style="margin-top:8px">Die Erinnerung erscheint in der App, solange für den laufenden Monat noch keine Ablesung gespeichert wurde.</div>
+</div>
+<h2>App & Sicherung</h2><div class="card">
+<div class="backupStatus"><i></i><div><b>Automatische Gerätesicherung aktiv</b><div class="hint" id="autoBackupStatus">–</div></div></div>
+<div class="actions" style="margin-top:12px"><button class="secondary" id="restoreAutoBackup">Letzte Gerätesicherung wiederherstellen</button><button class="secondary" id="installApp" style="display:none">App installieren</button></div>
+<div class="hint" style="margin-top:10px">Diese automatische Sicherung liegt zusätzlich im Browser auf diesem Gerät. Für Handywechsel/gelöschte Browserdaten bleibt der manuelle Backup-Export wichtig, bis eine eigene Cloud-Sicherung verbunden ist.</div>
+</div>
+<h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><button class="secondary" id="backup">Backup speichern</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div></div>
 </section>
 </main>
 </div>
@@ -300,7 +363,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="toast" id="toast"></div>
 
 <script>
-var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
+var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
 {date:"2026-03-10",imp:8239,feed:null,note:""},
@@ -315,9 +378,10 @@ var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feed
 ]};
 function clone(x){return JSON.parse(JSON.stringify(x))}
 var state;try{state=JSON.parse(localStorage.getItem("stromtagebuch_v2"))||clone(DEFAULTS)}catch(e){state=clone(DEFAULTS)}
-function ensureState(){if(!state.settings)state.settings=clone(DEFAULTS.settings);if(state.settings.feedStart==null)state.settings.feedStart=0;if(!Array.isArray(state.entries))state.entries=clone(DEFAULTS.entries);if(!Array.isArray(state.heatLogs))state.heatLogs=[];if(!state.meta)state.meta={};if(!state.meta.seedHeatRemoved){state.heatLogs=state.heatLogs.filter(function(x){return !(x&&x.date==="2026-03-31"&&Number(x.kwh)===1884&&x.note==="App-Verbrauch bis März")});state.meta.seedHeatRemoved=true}if(!Array.isArray(state.heatMeter))state.heatMeter=[];if(!state.pvSnapshot)state.pvSnapshot=clone(DEFAULTS.pvSnapshot);if(!Array.isArray(state.ewePayments))state.ewePayments=[];if(!state.meta.heatMeterBaseline20261002){if(!state.heatMeter.some(function(x){return x.date==="2026-10-02"&&Math.abs(Number(x.reading)-20210.16)<0.001}))state.heatMeter.push({date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"});state.meta.heatMeterBaseline20261002=true}if(!Array.isArray(state.evLogs))state.evLogs=[];if(!Array.isArray(state.events))state.events=clone(DEFAULTS.events);state.entries.forEach(function(e){if(!("pvProd" in e))e.pvProd=null})}
+function ensureState(){if(!state.settings)state.settings=clone(DEFAULTS.settings);if(state.settings.feedStart==null)state.settings.feedStart=0;if(state.settings.monthlyReminder==null)state.settings.monthlyReminder=true;if(!Array.isArray(state.entries))state.entries=clone(DEFAULTS.entries);if(!Array.isArray(state.heatLogs))state.heatLogs=[];if(!state.meta)state.meta={};if(!state.meta.seedHeatRemoved){state.heatLogs=state.heatLogs.filter(function(x){return !(x&&x.date==="2026-03-31"&&Number(x.kwh)===1884&&x.note==="App-Verbrauch bis März")});state.meta.seedHeatRemoved=true}if(!Array.isArray(state.heatMeter))state.heatMeter=[];if(!state.pvSnapshot)state.pvSnapshot=clone(DEFAULTS.pvSnapshot);if(!Array.isArray(state.pvMonths))state.pvMonths=[];if(!Array.isArray(state.ewePayments))state.ewePayments=[];if(!state.meta.heatMeterBaseline20261002){if(!state.heatMeter.some(function(x){return x.date==="2026-10-02"&&Math.abs(Number(x.reading)-20210.16)<0.001}))state.heatMeter.push({date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"});state.meta.heatMeterBaseline20261002=true}if(!Array.isArray(state.evLogs))state.evLogs=[];if(!Array.isArray(state.events))state.events=clone(DEFAULTS.events);state.entries.forEach(function(e){if(!("pvProd" in e))e.pvProd=null})}
 ensureState();
-function save(){ensureState();localStorage.setItem("stromtagebuch_v2",JSON.stringify(state));render()}
+function autoBackup(){try{var snaps=JSON.parse(localStorage.getItem("stromtagebuch_auto_backups_v1")||"[]");snaps.unshift({time:new Date().toISOString(),data:clone(state)});snaps=snaps.slice(0,5);localStorage.setItem("stromtagebuch_auto_backups_v1",JSON.stringify(snaps));return snaps[0].time}catch(e){return null}}
+function save(){ensureState();localStorage.setItem("stromtagebuch_v2",JSON.stringify(state));autoBackup();render()}
 function sorted(){return state.entries.slice().sort(function(a,b){return a.date.localeCompare(b.date)})}
 function days(a,b){return Math.max(0,Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000))}
 function n(v,d){return Number(v).toLocaleString("de-DE",{minimumFractionDigits:d||0,maximumFractionDigits:d==null?1:d})}
@@ -346,9 +410,19 @@ function heatCurrent(){var a=heatReadings();return a.length?a[a.length-1]:null}
 function heatStats(){var a=heatReadings();if(!a.length)return null;var first=a[0],last=a[a.length-1],v=Math.max(0,Number(last.reading)-Number(first.reading)),d=days(first.date,last.date);return{first:first,last:last,v:v,d:d,day:d?v/d:0}}
 function heatLastDelta(){var a=heatReadings();if(a.length<2)return null;var p=a[a.length-2],q=a[a.length-1],d=days(p.date,q.date),v=Number(q.reading)-Number(p.reading);return{v:v,d:d,day:d?v/d:0}}
 function evTotals(){return state.evLogs.reduce(function(t,x){t.kwh+=Number(x.kwh)||0;t.cost+=Number(x.cost)||0;return t},{kwh:0,cost:0})}
+
+function pvMonthEntry(key){return state.pvMonths.find(function(x){return x.key===key})||null}
+function bestPvMonth(){var a=state.pvMonths.filter(function(x){return isFinite(Number(x.generation))});if(!a.length)return null;return a.slice().sort(function(a,b){return Number(b.generation)-Number(a.generation)})[0]}
+function heatMonthlyStats(){var out={},a=heatReadings();for(var i=1;i<a.length;i++)distribute(out,a[i-1].date,a[i].date,"heat",Number(a[i].reading)-Number(a[i-1].reading));return out}
+function evMonthTotal(key){return state.evLogs.filter(function(x){return monthKey(x.date)===key}).reduce(function(t,x){t.kwh+=Number(x.kwh)||0;t.cost+=Number(x.cost)||0;return t},{kwh:0,cost:0})}
+function reportData(key){var ms=monthlyStats(),m=ms.find(function(x){return x.key===key})||{key:key,imp:0,feed:0,cost:state.settings.baseAnnual/12,revenue:0},pv=pvMonthEntry(key),hm=heatMonthlyStats(),ev=evMonthTotal(key),prevDate=new Date(key+"-15T12:00:00");prevDate.setMonth(prevDate.getMonth()-1);var pk=prevDate.getFullYear()+"-"+String(prevDate.getMonth()+1).padStart(2,"0"),pm=ms.find(function(x){return x.key===pk})||null;return{month:m,pv:pv,heat:(hm[key]&&hm[key].heat)||0,ev:ev,prev:pm,prevKey:pk}}
+function renderReport(){var sel=document.getElementById("reportMonth");if(!sel)return;var key=sel.value||currentMonthKey();if(!sel.value)sel.value=key;var r=reportData(key),running=key===currentMonthKey();document.getElementById("reportStatePill").textContent=running?"läuft":"abgeschlossen";document.getElementById("reportTitle").textContent=monthLabel(key)+(running?" · läuft":"");document.getElementById("reportHint").textContent="Netzwerte werden zwischen Zählerständen tageweise auf den Monat verteilt.";document.getElementById("reportImp").textContent=n(r.month.imp)+" kWh";document.getElementById("reportFeed").textContent=n(r.month.feed)+" kWh";document.getElementById("reportCost").textContent=euro(r.month.cost);document.getElementById("reportRevenue").textContent=euro(r.month.revenue);document.getElementById("reportPvGen").textContent=r.pv?n(r.pv.generation)+" kWh":"–";document.getElementById("reportPvOwn").textContent=r.pv&&r.pv.selfConsumed!=null?n(r.pv.selfConsumed)+" kWh":"–";document.getElementById("reportHeat").textContent=r.heat?n(r.heat,1)+" kWh":"–";document.getElementById("reportEv").textContent=r.ev.kwh?n(r.ev.kwh,1)+" kWh":"–";var rc=document.getElementById("reportCompare"),rh=document.getElementById("reportCompareHint");if(r.prev&&r.prev.imp){var p=(r.month.imp-r.prev.imp)/r.prev.imp*100;rc.textContent=(p>0?"+":"")+n(p,1)+" %";rc.className="value "+(p<=0?"good":"orange");rh.textContent="Netzbezug gegenüber "+monthLabel(r.prevKey)}else{rc.textContent="–";rc.className="value";rh.textContent="Kein vollständiger Vergleichswert im Vormonat."}}
+function renderPvMonths(){var box=document.getElementById("pvMonthList");if(!box)return;var a=state.pvMonths.slice().sort(function(a,b){return b.key.localeCompare(a.key)});box.innerHTML=a.map(function(x){return "<div class=logitem><div><b>"+monthLabel(x.key)+" · "+n(x.generation)+" kWh</b><br><span>Eigenverbrauch "+(x.selfConsumed==null?"–":n(x.selfConsumed)+" kWh")+" · Einspeisung "+(x.exported==null?"–":n(x.exported)+" kWh")+"</span></div><button class=mini onclick=\"delPvMonth('"+x.key+"')\">×</button></div>"}).join("")||"<div class=mutedBox>Noch keine echten PV-Monatswerte eingetragen.</div>";var best=bestPvMonth(),el=document.getElementById("bestPvMonth"),hint=document.getElementById("bestPvMonthHint");if(el){el.textContent=best?monthLabel(best.key)+" · "+n(best.generation)+" kWh":"–";hint.textContent=best?"höchste eingetragene PV-Erzeugung":"Monatswerte aus der PV-App fehlen noch"}}
+function updateReminder(){var box=document.getElementById("reminderBanner");if(!box)return;box.classList.remove("show");if(!state.settings.monthlyReminder)return;var now=new Date(),key=currentMonthKey(),today=localToday();if(localStorage.getItem("stromtagebuch_reminder_dismissed")===today)return;var has=sorted().some(function(e){return monthKey(e.date)===key});if(now.getDate()<=5&&!has){document.getElementById("reminderTitle").textContent="Monatsablesung fehlt";document.getElementById("reminderText").textContent="Für "+monthLabel(key)+" ist noch kein Stromzählerstand gespeichert. Dein Abschlag wurde trotzdem automatisch berücksichtigt.";box.classList.add("show")}}
+function backupStatus(){var e=document.getElementById("autoBackupStatus");if(!e)return;try{var a=JSON.parse(localStorage.getItem("stromtagebuch_auto_backups_v1")||"[]");e.textContent=a.length?"Letzte Sicherung: "+new Date(a[0].time).toLocaleString("de-DE")+" · "+a.length+" Versionen gespeichert":"Noch keine automatische Sicherung vorhanden."}catch(err){e.textContent="Sicherungsstatus nicht verfügbar."}}
 function toast(t){var e=document.getElementById("toast");e.textContent=t;e.classList.add("show");setTimeout(function(){e.classList.remove("show")},2000)}
 function closeMenu(){document.getElementById("drawer").classList.remove("open");document.getElementById("drawerBackdrop").classList.remove("open")}
-function go(name){document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("active",v.dataset.view===name)});document.querySelectorAll("[data-go]").forEach(function(b){b.classList.toggle("active",b.dataset.go===name)});if(name==="history")setTimeout(draw,50);if(name==="add")prepAdd();if(["ewe","pv","heat","ev","notes"].indexOf(name)>=0)renderEnergy();var labels={home:"Auf einen Blick",add:"Neue Ablesung",ewe:"EWE-Vergütung",pv:"PV-Anlage",heat:"Wärmepumpe",ev:"BYD-Laden",history:"Verlauf",notes:"Ereignisse",settings:"Einstellungen"};var ps=document.getElementById("pageSub");if(ps)ps.textContent=labels[name]||"Strom · PV · Kosten";closeMenu();scrollTo({top:0,behavior:"smooth"})}
+function go(name){document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("active",v.dataset.view===name)});document.querySelectorAll("[data-go]").forEach(function(b){b.classList.toggle("active",b.dataset.go===name)});if(name==="history")setTimeout(draw,50);if(name==="add")prepAdd();if(["ewe","pv","heat","ev","notes"].indexOf(name)>=0)renderEnergy();if(name==="report")renderReport();var labels={home:"Auf einen Blick",add:"Neue Ablesung",ewe:"EWE-Vergütung",pv:"PV-Anlage",heat:"Wärmepumpe",ev:"BYD-Laden",history:"Verlauf",report:"Monatsbericht",notes:"Ereignisse",settings:"Einstellungen"};var ps=document.getElementById("pageSub");if(ps)ps.textContent=labels[name]||"Strom · PV · Kosten";closeMenu();scrollTo({top:0,behavior:"smooth"})}
 document.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(b)go(b.dataset.go)})
 document.getElementById("menuOpen").onclick=function(){document.getElementById("drawer").classList.add("open");document.getElementById("drawerBackdrop").classList.add("open")}
 document.getElementById("menuClose").onclick=closeMenu;
@@ -371,7 +445,7 @@ function render(){
  document.getElementById("periodRevenue").textContent=df?euro(df.v*state.settings.feedRate):"–";
  document.getElementById("totalImp").textContent=ti?n(ti.v)+" kWh":"–";
  document.getElementById("totalFeed").textContent=tf?n(tf.v)+" kWh":"–";
- var bal=accountBalance();var be=document.getElementById("balance");var bh=document.getElementById("balanceHint");if(bal){be.textContent=(bal.balance>=0?"+":"")+euro(bal.balance)+(bal.balance>=0?" im Plus":" im Minus");be.className="dashMoney "+(bal.balance>=0?"positive":"negative");bh.textContent="Abschläge bis "+dateDE(bal.paidThrough)+": "+euro(bal.paid)+" · Stromkosten bis "+dateDE(bal.date)+": "+euro(bal.totalCost)+" (inkl. "+euro(bal.base)+" Grundpreis) · PV-Vergütung separat"}else{be.textContent="–";be.className="dashMoney";bh.textContent="Abschläge minus Stromkosten inkl. Grundpreis · PV-Vergütung separat"}document.getElementById("forecastCost").textContent=di?euro(di.day*30*state.settings.workRate+state.settings.baseAnnual/12):"–";
+ var bal=accountBalance();var be=document.getElementById("balance");var bh=document.getElementById("balanceHint");if(bal){be.textContent=(bal.balance>=0?"+":"")+euro(bal.balance)+(bal.balance>=0?" im Plus":" im Minus");be.className="dashMoney "+(bal.balance>=0?"positive":"negative");bh.textContent="Abschläge bis "+dateDE(bal.paidThrough)+": "+euro(bal.paid)+" · Stromkosten bis "+dateDE(bal.date)+": "+euro(bal.totalCost)+" (inkl. "+euro(bal.base)+" Grundpreis) · PV-Vergütung separat";document.getElementById("balancePaid").textContent=euro(bal.paid);document.getElementById("balanceCost").textContent=euro(bal.totalCost);document.getElementById("balanceResult").textContent=(bal.balance>=0?"+":"")+euro(bal.balance)}else{be.textContent="–";be.className="dashMoney";bh.textContent="Abschläge minus Stromkosten inkl. Grundpreis · PV-Vergütung separat";document.getElementById("balancePaid").textContent="–";document.getElementById("balanceCost").textContent="–";document.getElementById("balanceResult").textContent="–"}document.getElementById("forecastCost").textContent=di?euro(di.day*30*state.settings.workRate+state.settings.baseAnnual/12):"–";
  document.getElementById("pvPower").textContent=n(state.settings.pvKwp,2)+" kWp";
  document.getElementById("pvRate").textContent=n(state.settings.feedRate*100,2)+" ct/kWh";
  document.getElementById("workRate").textContent=n(state.settings.workRate*100,2)+" ct/kWh";
@@ -381,12 +455,12 @@ function render(){
  var forecast30=di?di.day*30*state.settings.workRate+state.settings.baseAnnual/12:null,dot=document.getElementById("paymentDot"),ps=document.getElementById("paymentStatus"),ph=document.getElementById("paymentHint");dot.className="dot";if(forecast30!=null){var ratio=state.settings.monthlyPayment/forecast30;if(ratio>=1.08){dot.classList.add("green");ps.textContent="Grün";ph.textContent="Abschlag liegt ca. "+euro(state.settings.monthlyPayment-forecast30)+" über der 30-Tage-Kostenschätzung."}else if(ratio>=.92){dot.classList.add("yellow");ps.textContent="Gelb";ph.textContent="Abschlag und Kostenschätzung liegen nah beieinander."}else{dot.classList.add("red");ps.textContent="Rot";ph.textContent="Kostenschätzung liegt ca. "+euro(forecast30-state.settings.monthlyPayment)+" über dem Abschlag."}}else{ps.textContent="–";ph.textContent="Noch nicht genug Daten."}
  var ms=monthlyStats(),mc=document.getElementById("monthCompare"),mch=document.getElementById("monthCompareHint"),cmk=currentMonthKey(),lastMonth=ms.length?ms[ms.length-1]:null,completeMonths=ms.filter(function(x){return x.key<cmk});
  if(lastMonth&&lastMonth.key===cmk){mc.textContent="Läuft";mc.className="value";mch.textContent=monthLabel(cmk)+" ist noch nicht abgeschlossen – Vergleich folgt nach Monatsende."}else if(ms.length>=2){var m1=ms[ms.length-2],m2=ms[ms.length-1],pct=m1.imp?((m2.imp-m1.imp)/m1.imp*100):0;mc.textContent=(pct>0?"+":"")+n(pct,1)+" %";mc.className="value "+(pct<=0?"good":"orange");mch.textContent=monthLabel(m2.key)+" gegenüber "+monthLabel(m1.key)+" · Netzbezug"}else{mc.textContent="–";mch.textContent="Noch nicht genug abgeschlossene Monatsdaten."}
- if(completeMonths.length){var best=completeMonths.slice().sort(function(a,b){return a.imp-b.imp})[0],worst=completeMonths.slice().sort(function(a,b){return b.imp-a.imp})[0];document.getElementById("bestWorst").textContent=monthLabel(best.key)+" / "+monthLabel(worst.key)}else document.getElementById("bestWorst").textContent="–";var bpm=document.getElementById("bestPvMonth"),bph=document.getElementById("bestPvMonthHint");if(bpm){bpm.textContent="–";bph.textContent="Monatswerte aus der PV-App fehlen noch"}
+ if(completeMonths.length){var best=completeMonths.slice().sort(function(a,b){return a.imp-b.imp})[0],worst=completeMonths.slice().sort(function(a,b){return b.imp-a.imp})[0];document.getElementById("bestWorst").textContent=monthLabel(best.key)+" / "+monthLabel(worst.key)}else document.getElementById("bestWorst").textContent="–";
  var opHome=officialFeedPayout();document.getElementById("totalRevenue").textContent=opHome?euro(opHome.value):"–";var hc=heatCurrent(),hs=heatStats();var evt=evTotals();document.getElementById("evTotalHome").textContent=n(evt.kwh,1)+" kWh";
  var hb=eweBalance(),hoe=document.getElementById("homeEweOpen"),hoh=document.getElementById("homeEweHint");if(hb){hoe.textContent=euro(Math.max(0,hb.open));hoe.className="value "+(hb.open>=0?"good":"orange");hoh.textContent=n(hb.kwh)+" kWh · "+(hb.paid?euro(hb.paid)+" erhalten":"noch keine Auszahlung erfasst")}else{hoe.textContent="–";hoh.textContent="Noch kein 2.8.0-Wert"}
  var hsd=document.getElementById("homeStatusDate");if(hsd)hsd.textContent=last?"Stromstand "+dateDE(last.date):"noch keine Ablesung";
  var flowSum=(di?di.v:0)+(df?df.v:0),feedShare=flowSum>0?(df?df.v:0)/flowSum*100:0;document.getElementById("flowMeter").style.width=Math.max(0,Math.min(100,feedShare))+"%";document.getElementById("flowHint").textContent=di&&df?n(di.v)+" kWh Netzbezug · "+n(df.v)+" kWh Einspeisung":"Für den Vergleich brauchen wir passende Bezugs- und Einspeisezeiträume.";
- renderMonthBars(ms);renderRows();renderSettings();renderEnergy();prepAdd();
+ renderMonthBars(ms);renderRows();renderSettings();renderEnergy();renderPvMonths();renderReport();prepAdd();updateReminder();backupStatus();
 }
 function prepAdd(){var a=sorted(),last=a[a.length-1],hc=heatCurrent(),snap=state.pvSnapshot;if(!document.getElementById("date").value)document.getElementById("date").value=new Date().toISOString().slice(0,10);var bits=[];if(last)bits.push("Strom "+dateDE(last.date)+" · 1.8.0 "+n(last.imp)+" · 2.8.0 "+(last.feed==null?"–":n(last.feed)));if(hc)bits.push("WP "+dateDE(hc.date)+" · "+n(hc.reading,2)+" kWh");if(snap)bits.push("PV-App "+dateDE(snap.date)+" · Erzeugung "+n(snap.generation)+" kWh");document.getElementById("prev").innerHTML=bits.length?bits.map(function(x){return "<div style='padding:4px 0'>"+x+"</div>"}).join(""):"–";var hh=document.getElementById("heatCentralHint");if(hh&&hc)hh.textContent="Letzter WP-Zählerstand: "+n(hc.reading,2)+" kWh am "+dateDE(hc.date);validate()}
 ["date","imp","feed","pvProd","heatCentral"].forEach(function(id){document.getElementById(id).addEventListener("input",validate)})
@@ -451,14 +525,23 @@ function renderEnergy(){var ms=monthlyStats(),mr=document.getElementById("monthR
 window.delHeatMeter=function(date,reading){if(!confirm("Wärmepumpen-Zählerstand vom "+dateDE(date)+" löschen?"))return;state.heatMeter=state.heatMeter.filter(function(x){return !(x.date===date&&Math.abs(Number(x.reading)-Number(reading))<0.001)});save()}
 window.delEv=function(i){var list=state.evLogs.slice().sort(function(a,b){return b.date.localeCompare(a.date)}),x=list[i];state.evLogs=state.evLogs.filter(function(z){return z!==x});save()}
 window.delEvent=function(i){var list=state.events.slice().sort(function(a,b){return b.date.localeCompare(a.date)}),x=list[i];state.events=state.events.filter(function(z){return z!==x});save()}
-function renderSettings(){document.getElementById("sWork").value=state.settings.workRate;document.getElementById("sBase").value=state.settings.baseAnnual;document.getElementById("sPay").value=state.settings.monthlyPayment;document.getElementById("sFeed").value=state.settings.feedRate;document.getElementById("sFeedStart").value=state.settings.feedStart||0;document.getElementById("sPv").value=state.settings.pvKwp;document.getElementById("sStart").value=state.settings.pvStart}
-document.getElementById("saveSettings").onclick=function(){state.settings.workRate=parseFloat(document.getElementById("sWork").value)||0;state.settings.baseAnnual=parseFloat(document.getElementById("sBase").value)||0;state.settings.monthlyPayment=parseFloat(document.getElementById("sPay").value)||0;state.settings.feedRate=parseFloat(document.getElementById("sFeed").value)||0;state.settings.feedStart=parseFloat(document.getElementById("sFeedStart").value)||0;state.settings.pvKwp=parseFloat(document.getElementById("sPv").value)||0;state.settings.pvStart=document.getElementById("sStart").value;save();toast("Einstellungen gespeichert")}
+function renderSettings(){document.getElementById("sWork").value=state.settings.workRate;document.getElementById("sBase").value=state.settings.baseAnnual;document.getElementById("sPay").value=state.settings.monthlyPayment;document.getElementById("sFeed").value=state.settings.feedRate;document.getElementById("sFeedStart").value=state.settings.feedStart||0;document.getElementById("sPv").value=state.settings.pvKwp;document.getElementById("sStart").value=state.settings.pvStart;document.getElementById("sReminder").checked=!!state.settings.monthlyReminder}
+document.getElementById("saveSettings").onclick=function(){state.settings.workRate=parseFloat(document.getElementById("sWork").value)||0;state.settings.baseAnnual=parseFloat(document.getElementById("sBase").value)||0;state.settings.monthlyPayment=parseFloat(document.getElementById("sPay").value)||0;state.settings.feedRate=parseFloat(document.getElementById("sFeed").value)||0;state.settings.feedStart=parseFloat(document.getElementById("sFeedStart").value)||0;state.settings.pvKwp=parseFloat(document.getElementById("sPv").value)||0;state.settings.pvStart=document.getElementById("sStart").value;state.settings.monthlyReminder=document.getElementById("sReminder").checked;save();toast("Einstellungen gespeichert")}
 document.getElementById("addEwePayment").onclick=function(){var d=document.getElementById("ewePayDate").value,a=parseFloat(document.getElementById("ewePayAmount").value),note=document.getElementById("ewePayNote").value.trim();if(!d||!isFinite(a)||a<=0){toast("Datum und Auszahlungsbetrag eintragen");return}state.ewePayments.push({date:d,amount:a,note:note});document.getElementById("ewePayAmount").value="";document.getElementById("ewePayNote").value="";save();toast("EWE-Auszahlung gespeichert")}
 window.delEwePayment=function(date,amount){if(!confirm("Diese EWE-Auszahlung löschen?"))return;var removed=false;state.ewePayments=state.ewePayments.filter(function(x){if(!removed&&x.date===date&&Math.abs(Number(x.amount)-Number(amount))<0.001){removed=true;return false}return true});save()}
 document.getElementById("addHeat").onclick=function(){var d=document.getElementById("heatDate").value,r=parseFloat(document.getElementById("heatKwh").value),note=document.getElementById("heatNote").value.trim();if(!d||!isFinite(r)){toast("Datum und Zählerstand eintragen");return}var prior=heatReadings().filter(function(x){return x.date<d}).slice(-1)[0];if(prior&&r<Number(prior.reading)){toast("Zählerstand ist kleiner als vorher");return}var same=state.heatMeter.find(function(x){return x.date===d});if(same){if(!confirm("Für dieses Datum gibt es bereits einen Wärmepumpen-Zählerstand. Überschreiben?"))return;same.reading=r;same.note=note}else state.heatMeter.push({date:d,reading:r,note:note});document.getElementById("heatKwh").value="";document.getElementById("heatNote").value="";save();toast("WP-Zählerstand gespeichert")}
 document.getElementById("addEv").onclick=function(){var d=document.getElementById("evDate").value,k=parseFloat(document.getElementById("evKwh").value),c=parseFloat(document.getElementById("evCost").value)||0,p=document.getElementById("evPlace").value.trim();if(!d||!isFinite(k)){toast("Datum und kWh eintragen");return}state.evLogs.push({date:d,kwh:k,cost:c,place:p});document.getElementById("evKwh").value="";document.getElementById("evCost").value="";document.getElementById("evPlace").value="";save();toast("Ladung gespeichert")}
 document.getElementById("addEvent").onclick=function(){var d=document.getElementById("eventDate").value,t=document.getElementById("eventText").value.trim();if(!d||!t){toast("Datum und Ereignis eintragen");return}state.events.push({date:d,text:t});document.getElementById("eventText").value="";save();toast("Ereignis gespeichert")}
-document.getElementById("printReport").onclick=function(){go("pv");setTimeout(function(){window.print()},120)}
+document.getElementById("printReport").onclick=function(){go("report");setTimeout(function(){window.print()},120)}
+
+document.getElementById("savePvMonth").onclick=function(){var key=document.getElementById("pvMonthKey").value,g=parseFloat(document.getElementById("pvMonthGen").value),o=document.getElementById("pvMonthOwn").value,x=document.getElementById("pvMonthExport").value;if(!key||!isFinite(g)){toast("Monat und PV-Erzeugung eintragen");return}var obj=state.pvMonths.find(function(z){return z.key===key});var data={key:key,generation:g,selfConsumed:o===""?null:parseFloat(o),exported:x===""?null:parseFloat(x)};if(obj)Object.assign(obj,data);else state.pvMonths.push(data);document.getElementById("pvMonthGen").value="";document.getElementById("pvMonthOwn").value="";document.getElementById("pvMonthExport").value="";save();toast("PV-Monat gespeichert")}
+window.delPvMonth=function(key){if(!confirm("PV-Monatswert "+monthLabel(key)+" löschen?"))return;state.pvMonths=state.pvMonths.filter(function(x){return x.key!==key});save()}
+document.getElementById("reportMonth").onchange=renderReport;
+document.getElementById("printCurrentReport").onclick=function(){go("report");setTimeout(function(){window.print()},100)}
+document.getElementById("dismissReminder").onclick=function(){localStorage.setItem("stromtagebuch_reminder_dismissed",localToday());document.getElementById("reminderBanner").classList.remove("show")}
+document.getElementById("restoreAutoBackup").onclick=function(){try{var a=JSON.parse(localStorage.getItem("stromtagebuch_auto_backups_v1")||"[]");if(!a.length){toast("Keine Gerätesicherung vorhanden");return}if(!confirm("Letzte automatische Gerätesicherung wiederherstellen?"))return;state=clone(a[0].data);localStorage.setItem("stromtagebuch_v2",JSON.stringify(state));render();toast("Gerätesicherung wiederhergestellt")}catch(e){toast("Sicherung konnte nicht geladen werden")}}
+var deferredInstallPrompt=null;window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredInstallPrompt=e;var b=document.getElementById("installApp");if(b)b.style.display="inline-block"});
+document.getElementById("installApp").onclick=async function(){if(!deferredInstallPrompt){toast("Im Browser-Menü „Zum Startbildschirm hinzufügen“ wählen");return}deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice}catch(e){}deferredInstallPrompt=null;this.style.display="none"};
 document.getElementById("theme").onclick=function(){state.settings.dark=!state.settings.dark;save()}
 function download(name,data,type){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type:type}));a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},1000)}
 document.getElementById("csv").onclick=function(){var rows=[["Datum","1.8.0 Netzbezug kWh","2.8.0 Einspeisung kWh","PV Erzeugung gesamt kWh","Notiz"]].concat(sorted().map(function(e){return[e.date,e.imp,e.feed==null?"":e.feed,e.pvProd==null?"":e.pvProd,e.note||""]}));download("stromtagebuch.csv",rows.map(function(r){return r.map(function(v){v=String(v);return /[;\"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(";")}).join("\n"),"text/csv;charset=utf-8")}
@@ -466,7 +549,7 @@ document.getElementById("backup").onclick=function(){download("stromtagebuch-bac
 document.getElementById("restore").onchange=function(e){var f=e.target.files[0];if(!f)return;f.text().then(function(t){var x=JSON.parse(t);if(!x.entries||!x.settings)throw new Error();state=x;save();toast("Backup geladen")}).catch(function(){toast("Backup ungültig")});e.target.value=""}
 document.getElementById("reset").onclick=function(){if(confirm("Wirklich alle eigenen Änderungen verwerfen und Startdaten laden?")){state=clone(DEFAULTS);save();toast("Startdaten geladen")}}
 window.addEventListener("resize",function(){if(document.querySelector('[data-view="history"]').classList.contains("active"))draw()})
-var today=new Date().toISOString().slice(0,10);["heatDate","evDate","eventDate","ewePayDate"].forEach(function(id){var e=document.getElementById(id);if(e&&!e.value)e.value=today});
+var today=new Date().toISOString().slice(0,10);["heatDate","evDate","eventDate","ewePayDate"].forEach(function(id){var e=document.getElementById(id);if(e&&!e.value)e.value=today});var cm=currentMonthKey();if(document.getElementById("pvMonthKey"))document.getElementById("pvMonthKey").value=cm;if(document.getElementById("reportMonth"))document.getElementById("reportMonth").value=cm;
 var photoFile=null;document.getElementById("meterPhoto").onchange=function(e){photoFile=e.target.files[0]||null;var img=document.getElementById("photoPreview");if(photoFile){img.src=URL.createObjectURL(photoFile);img.style.display="block";document.getElementById("ocrHint").textContent="Foto bereit. Jetzt „Zahl aus Foto erkennen“ tippen."}};
 function loadOCR(){return new Promise(function(resolve,reject){if(window.Tesseract){resolve();return}var sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc)})}
 document.getElementById("ocrButton").onclick=async function(){if(!photoFile){toast("Erst ein Foto aufnehmen");return}var hint=document.getElementById("ocrHint"),btn=this;btn.disabled=true;hint.textContent="Erkennung läuft…";try{await loadOCR();var res=await Tesseract.recognize(photoFile,"eng",{logger:function(m){if(m.status==="recognizing text")hint.textContent="Erkennung "+Math.round((m.progress||0)*100)+" %"}});var txt=res.data.text.replace(/,/g,".");var matches=txt.match(/\d{2,7}(?:\.\d{1,3})?/g)||[];var nums=matches.map(function(x){return parseFloat(x)}).filter(function(x){return isFinite(x)});if(!nums.length)throw new Error("no number");nums.sort(function(a,b){return b-a});var val=nums[0],target=document.getElementById("ocrTarget").value;document.getElementById(target).value=val;hint.textContent="Erkannt: "+n(val,3)+" · bitte am Zähler prüfen.";validate();toast("Zahl übernommen")}catch(err){hint.textContent="Keine sichere Zahl erkannt. Foto möglichst gerade, nah und ohne Spiegelung aufnehmen.";toast("Erkennung nicht sicher")}finally{btn.disabled=false}};
@@ -492,7 +575,7 @@ function enhanceDateInputs(){
 }
 enhanceDateInputs();
 if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(function(){});
-render();
+render();setTimeout(function(){var sp=document.getElementById("splash");if(sp)sp.classList.add("hide")},180);setTimeout(function(){var sp=document.getElementById("splash");if(sp)sp.remove()},500);
 </script>
 </body>
 </html>
