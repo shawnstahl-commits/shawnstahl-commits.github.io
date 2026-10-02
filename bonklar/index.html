@@ -89,7 +89,7 @@
 <body>
 <div class="app">
   <header>
-    <div class="brand"><div class="logo">🧾</div><div><h1>BonKlar</h1><div class="sub">Ausgaben sehen. Preise vergleichen. · Build 10</div></div></div>
+    <div class="brand"><div class="logo">🧾</div><div><h1>BonKlar</h1><div class="sub">Ausgaben sehen. Preise vergleichen. · Build 11</div></div></div>
   </header>
 
   <main>
@@ -206,7 +206,7 @@
         <div class="split"><button id="exportBtn" class="btn secondary">Exportieren</button><label class="btn secondary" style="text-align:center">Importieren<input id="importInput" type="file" accept="application/json" style="display:none"></label></div>
         <button id="resetBtn" class="btn danger" style="width:100%;margin-top:10px">Alle Einkäufe löschen</button>
       </div>
-      <div class="card" style="margin-top:12px"><h3 style="color:#0f172a;font-size:16px">Version</h3><div class="tiny">BonKlar Build 10 · Web-Test ohne App-Installation</div></div>
+      <div class="card" style="margin-top:12px"><h3 style="color:#0f172a;font-size:16px">Version</h3><div class="tiny">BonKlar Build 11 · Web-Test ohne App-Installation</div></div>
     </section>
   </main>
 </div>
@@ -274,6 +274,119 @@
 <div id="productModal" class="modal"><div class="sheet"><div class="handle"></div><div id="productDetail"></div><button id="closeModal" class="btn secondary" style="width:100%;margin-top:16px">Schließen</button></div></div>
 <div id="purchaseModal" class="modal"><div class="sheet"><div class="handle"></div><div id="purchaseDetail"></div><button id="closePurchaseModal" class="btn secondary" style="width:100%;margin-top:16px">Schließen</button></div></div>
 <div id="toast" class="toast"></div>
+
+<script>
+(function(){
+  const KEY='bonklar_v1';
+  const $=id=>document.getElementById(id);
+  const today=()=>new Date().toISOString().slice(0,10);
+
+  function readState(){
+    try{
+      const x=JSON.parse(localStorage.getItem(KEY)||'null');
+      if(x&&typeof x==='object')return {budget:Number(x.budget||800),purchases:Array.isArray(x.purchases)?x.purchases:[]};
+    }catch(e){}
+    return {budget:800,purchases:[]};
+  }
+  function writeState(s){
+    try{localStorage.setItem(KEY,JSON.stringify(s));return true}catch(e){alert('Speichern im Browser ist blockiert. Bitte die Seite direkt in Chrome öffnen.');return false}
+  }
+  function bootToast(msg){
+    const t=$('toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}else alert(msg);
+  }
+  function hardGo(view){
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+    try{window.scrollTo(0,0)}catch(e){}
+  }
+
+  // Navigation works even if the main app script fails later.
+  document.querySelectorAll('.nav button').forEach(b=>{
+    b.addEventListener('click',()=>hardGo(b.dataset.view),true);
+  });
+  document.querySelectorAll('[data-go]').forEach(b=>{
+    b.addEventListener('click',()=>hardGo(b.dataset.go),true);
+  });
+
+  // Always initialize manual date.
+  const md=$('manualDate');if(md&&!md.value)md.value=today();
+
+  // Independent manual receipt save.
+  const qs=$('manualQuickSaveBtn');
+  if(qs){
+    qs.addEventListener('click',()=>{
+      const shop=String($('manualShop')?.value||'').trim()||'Unbekannter Laden';
+      const date=String($('manualDate')?.value||today());
+      const total=Number($('manualTotal')?.value||0);
+      const product=String($('manualProduct')?.value||'').trim();
+      const productPrice=Number($('manualProductPrice')?.value||0);
+      if(total<=0&&productPrice<=0){bootToast('Bitte Gesamtsumme oder Produktpreis eingeben.');return}
+      const s=readState();
+      const itemPrice=productPrice>0?productPrice:total;
+      const items=product?[{name:product,base:product,category:'Sonstiges',qty:1,unit:'stk',price:itemPrice}]:[];
+      s.purchases.push({
+        id:'m'+Date.now().toString(36),
+        merchant:shop,date,total:total>0?total:itemPrice,items
+      });
+      if(writeState(s)){
+        bootToast('✓ Manueller Einkauf gespeichert');
+        if($('manualTotal'))$('manualTotal').value='';
+        if($('manualProduct'))$('manualProduct').value='';
+        if($('manualProductPrice'))$('manualProductPrice').value='';
+      }
+    },true);
+  }
+
+  // "Erweiterte manuelle Eingabe" also works independently.
+  const mr=$('manualReceiptBtn');
+  if(mr){
+    mr.addEventListener('click',()=>{
+      const card=$('reviewCard');if(!card)return;
+      if($('merchantInput'))$('merchantInput').value='';
+      if($('dateInput'))$('dateInput').value=today();
+      if($('totalInput'))$('totalInput').value='';
+      if($('itemsEditor'))$('itemsEditor').innerHTML='<div class="empty" style="padding:12px">Noch keine Produkte. Mit + Produkt kannst du welche ergänzen.</div>';
+      card.style.display='block';card.scrollIntoView({behavior:'smooth',block:'start'});
+    },true);
+  }
+
+  // Manual barcode overlay opening independent of scanner engine.
+  const openManual=$('barcodeManualOpenBtn');
+  if(openManual){
+    openManual.addEventListener('click',()=>{
+      const ov=$('barcodeScannerOverlay');if(!ov)return;
+      ov.classList.remove('hidden');ov.classList.add('manual-entry-v56');
+      document.body.style.overflow='hidden';
+      setTimeout(()=>{const i=$('barcodeManualFullscreen');if(i)i.focus()},50);
+    },true);
+  }
+  const startScanner=$('startProductScannerBtn');
+  if(startScanner){
+    // Long fallback: if main scanner did not open within 800 ms, open manual option visibly.
+    startScanner.addEventListener('click',()=>{
+      setTimeout(()=>{
+        const ov=$('barcodeScannerOverlay');
+        if(ov&&ov.classList.contains('hidden')){
+          ov.classList.remove('hidden');ov.classList.add('manual-entry-v56');
+          document.body.style.overflow='hidden';
+        }
+      },800);
+    },true);
+  }
+  const closeManual=$('barcodeManualCloseBtn');
+  if(closeManual){
+    closeManual.addEventListener('click',()=>{
+      const ov=$('barcodeScannerOverlay');if(ov){ov.classList.add('hidden');ov.classList.remove('manual-entry-v56')}
+      document.body.style.overflow='';
+    },true);
+  }
+
+  // Visible proof that fallback JS itself is running.
+  document.documentElement.dataset.bonklarBoot='ok';
+  const sub=document.querySelector('.brand .sub');
+  if(sub&&!sub.textContent.includes('Basis ✓'))sub.textContent+=' · Basis ✓';
+})();
+</script>
 
 <script>
 (function(){
@@ -811,27 +924,7 @@
     else alert(msg);
   }
   const date=byId('manualDate');if(date&&!date.value)date.value=today();
-  const quick=byId('manualQuickSaveBtn');
-  if(quick){
-    quick.addEventListener('click',function(){
-      const shop=(byId('manualShop')?.value||'').trim()||'Unbekannter Laden';
-      const dateVal=byId('manualDate')?.value||today();
-      const total=Number(byId('manualTotal')?.value||0);
-      const product=(byId('manualProduct')?.value||'').trim();
-      const productPrice=Number(byId('manualProductPrice')?.value||0);
-      if(total<=0&&productPrice<=0){quickToast('Bitte Gesamtsumme oder Produktpreis eintragen.');return}
-      const s=safeState();
-      const items=product?[{name:product,base:product,category:'Sonstiges',qty:1,unit:'stk',price:productPrice>0?productPrice:total}]:[];
-      s.purchases.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),merchant:shop,date:dateVal,total:total>0?total:productPrice,items});
-      localStorage.setItem(KEY,JSON.stringify(s));
-      if(byId('manualShop'))byId('manualShop').value='';
-      if(byId('manualTotal'))byId('manualTotal').value='';
-      if(byId('manualProduct'))byId('manualProduct').value='';
-      if(byId('manualProductPrice'))byId('manualProductPrice').value='';
-      quickToast('Einkauf gespeichert');
-      setTimeout(()=>location.reload(),350);
-    });
-  }
+  // Manual quick-save is handled by the independent Build 11 basis layer above.
 
   // Independent fallback for manual product barcode input.
   const lookup=byId('barcodeManualLookupBtn');
