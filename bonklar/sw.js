@@ -1,4 +1,4 @@
-const CACHE='bonklar-v5';
+const CACHE='bonklar-v6';
 const CORE=['./','./index.html','./manifest.webmanifest'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE))));
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([self.clients.claim(),caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE&&k.startsWith('bonklar-')).map(k=>caches.delete(k))))])));
