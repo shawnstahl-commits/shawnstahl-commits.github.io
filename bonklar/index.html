@@ -7,8 +7,6 @@
   <meta name="description" content="BonKlar – Kassenbons, Einkäufe und Preise vergleichen." />
   <link rel="manifest" href="./manifest.webmanifest" />
   <title>BonKlar</title>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root{--bg:#f6f7fb;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#16a34a;--brand2:#22c55e;--warn:#f59e0b;--danger:#dc2626;--shadow:0 10px 30px rgba(15,23,42,.08)}
     *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
@@ -112,6 +110,12 @@
     <section id="scan" class="view">
       
       <div class="section-title"><h2>Produkt erfassen</h2></div>
+      <div id="techStatusCard" class="card" style="margin-top:12px">
+        <h3 style="color:#0f172a;font-size:15px">Technik-Check</h3>
+        <div id="techStatusText" class="tiny">Wird geprüft …</div>
+        <button id="retryTechBtn" class="btn secondary small" type="button" style="margin-top:10px">Erneut prüfen</button>
+      </div>
+
       <div class="scanner-launch">
         <h3>▦ Produkt-Barcode scannen</h3>
         <p>Hier steckt jetzt derselbe Scanner-Ablauf wie bei E‑Kids drin: Autofokus, doppelte Bestätigung, automatischer zweiter Scanmodus und Licht, wenn dein Handy es unterstützt.</p>
@@ -298,6 +302,51 @@
   let categoryFilter='Alle';
   let scanItems=[];
   const $=id=>document.getElementById(id);
+  function loadScriptOnce(url,key){
+    return new Promise((resolve,reject)=>{
+      if(key&&window[key])return resolve(true);
+      const existing=document.querySelector('script[data-dyn="'+url+'"]');
+      if(existing){existing.addEventListener('load',()=>resolve(true),{once:true});existing.addEventListener('error',()=>reject(new Error('LOAD_FAIL')),{once:true});return}
+      const s=document.createElement('script');s.src=url;s.async=true;s.dataset.dyn=url;
+      s.onload=()=>resolve(true);s.onerror=()=>reject(new Error('LOAD_FAIL'));document.head.appendChild(s);
+    });
+  }
+  async function ensureHtml5Qrcode(){
+    if(window.Html5Qrcode)return true;
+    const urls=[
+      'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js',
+      'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js'
+    ];
+    for(const u of urls){try{await loadScriptOnce(u,'Html5Qrcode');if(window.Html5Qrcode)return true}catch(e){}}
+    return false;
+  }
+  async function ensureTesseract(){
+    if(window.Tesseract)return true;
+    const urls=[
+      'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
+      'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js'
+    ];
+    for(const u of urls){try{await loadScriptOnce(u,'Tesseract');if(window.Tesseract)return true}catch(e){}}
+    return false;
+  }
+  async function runTechCheck(){
+    const out=$('techStatusText');if(!out)return;
+    out.textContent='Prüfe Kamera und Erkennung …';
+    const secure=!!window.isSecureContext;
+    const media=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
+    const nativeBarcode='BarcodeDetector' in window;
+    const [html5,ocr]=await Promise.all([ensureHtml5Qrcode(),ensureTesseract()]);
+    const parts=[
+      'HTTPS: '+(secure?'✓':'✗'),
+      'Kamera: '+(media?'✓':'✗'),
+      'Nativer Barcode: '+(nativeBarcode?'✓':'–'),
+      'Barcode-Ersatzscanner: '+(html5?'✓':'✗'),
+      'Bon-Texterkennung: '+(ocr?'✓':'✗')
+    ];
+    out.innerHTML=parts.join('<br>');
+    out.dataset.ok=(secure&&media&&(nativeBarcode||html5)&&ocr)?'1':'0';
+  }
   function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
   function startOfWeek(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setHours(0,0,0,0);x.setDate(x.getDate()-day);return x}
   function renderDashboard(){
@@ -518,7 +567,7 @@
   function renderItemEditor(){$('itemsEditor').innerHTML=scanItems.map(itemEditorRow).join('')||'<div class="empty" style="padding:12px">Noch keine Produkte erkannt. Du kannst welche hinzufügen.</div>';$('itemsEditor').querySelectorAll('.item-edit').forEach(row=>{const idx=Number(row.dataset.idx);row.querySelector('.iname').oninput=e=>{scanItems[idx].name=e.target.value;scanItems[idx].base=inferBase(e.target.value);scanItems[idx].category=inferCategory(e.target.value)};row.querySelector('.iprice').oninput=e=>scanItems[idx].price=Number(e.target.value||0);row.querySelector('.iremove').onclick=()=>{scanItems.splice(idx,1);renderItemEditor()}})}
   $('addItemBtn').onclick=()=>{scanItems.push({name:'',base:'',category:'Sonstiges',qty:1,unit:'stk',price:0});renderItemEditor()};
   $('ocrBtn').onclick=async()=>{const f=receiptCapturedFile||$('receiptImage').files[0];if(!f||$('ocrBtn').disabled)return;try{
-    if(!window.Tesseract)throw new Error('OCR_LIBRARY_MISSING');
+    if(!window.Tesseract){const ok=await ensureTesseract();if(!ok)throw new Error('OCR_LIBRARY_MISSING');}
     $('scanStatus').className='status working';$('scanStatus').textContent='Bon wird vorbereitet …';$('ocrBtn').disabled=true;
     let source=f;try{source=await preprocessReceiptImage(f)}catch(e){}
     const res=await Tesseract.recognize(source,'deu',{logger:m=>{if(m.status==='recognizing text')$('scanStatus').textContent='Bon lesen: '+Math.round((m.progress||0)*100)+' %'}});
@@ -591,7 +640,7 @@
     if(session!==scannerSessionId||scannerLocked||scannerLookupBusy)return;scannerPass=2;await startHtml5Scanner(session,true,2);
   }
   async function startHtml5Scanner(session,switched,pass){
-    if(session!==scannerSessionId||scannerLocked||scannerLookupBusy)return;if(!window.Html5Qrcode){scannerError('Scanner konnte nicht geladen werden. Seite bitte neu laden.');return}
+    if(session!==scannerSessionId||scannerLocked||scannerLookupBusy)return;if(!window.Html5Qrcode){const ok=await ensureHtml5Qrcode();if(!ok){scannerError('Barcode-Scanner konnte nicht geladen werden. Technik-Check unten prüfen.');return}}
     pass=pass||1;scannerPass=pass;
     try{
       $('reader').classList.remove('hidden');const f=window.Html5QrcodeSupportedFormats;const formats=f?[f.EAN_13,f.EAN_8,f.UPC_A,f.UPC_E,f.CODE_128]:undefined;
@@ -651,7 +700,7 @@
     scannerLookupBusy=true;scannerLocked=true;$('barcodeScannerOverlay').classList.remove('manual-entry-v56');$('barcodeScannerOverlay').classList.add('scan-processing');scannerSetStatus('🔎 Produkt wird gesucht …');await stopProductScannerEngine();try{await lookupScannedProduct(code)}finally{scannerLookupBusy=false;scannerLocked=false}
   }
   async function scanBarcodePhoto(file){
-    if(!file||!window.Html5Qrcode)return;scannerSetStatus('Barcode-Foto wird ausgewertet …');await stopProductScannerEngine();const div=document.createElement('div');div.id='tmpReaderBonKlar';div.style.display='none';document.body.appendChild(div);const f=window.Html5QrcodeSupportedFormats,formats=f?[f.EAN_13,f.EAN_8,f.UPC_A,f.UPC_E,f.CODE_128]:undefined;const s=new Html5Qrcode('tmpReaderBonKlar',formats?{formatsToSupport:formats,verbose:false}:{verbose:false});
+    if(!file)return;if(!window.Html5Qrcode){const ok=await ensureHtml5Qrcode();if(!ok){scannerError('Barcode-Fotoerkennung konnte nicht geladen werden.');return}}scannerSetStatus('Barcode-Foto wird ausgewertet …');await stopProductScannerEngine();const div=document.createElement('div');div.id='tmpReaderBonKlar';div.style.display='none';document.body.appendChild(div);const f=window.Html5QrcodeSupportedFormats,formats=f?[f.EAN_13,f.EAN_8,f.UPC_A,f.UPC_E,f.CODE_128]:undefined;const s=new Html5Qrcode('tmpReaderBonKlar',formats?{formatsToSupport:formats,verbose:false}:{verbose:false});
     try{const x=await s.scanFile(file,true);foundProductCode(x);if(scanCandidateCount===1){scanCandidateCount=2;foundProductCode(x)}}catch(e){scannerError('Barcode auf dem Foto nicht erkannt. Bitte näher, gerade und ohne Spiegelung fotografieren.')}finally{try{s.clear()}catch(e){}div.remove()}
   }
   async function lookupScannedProduct(code){
@@ -676,6 +725,8 @@
   $('barcodeManualOpenBtn').onclick=()=>toggleManualBarcode(true);$('barcodeManualCloseBtn').onclick=()=>toggleManualBarcode(false);$('barcodeManualLookupBtn').onclick=lookupManualBarcode;
   $('barcodePhotoBtn').onclick=()=>$('barcodePhoto').click();$('barcodePhoto').onchange=function(){if(this.files&&this.files[0])scanBarcodePhoto(this.files[0]);this.value=''};
 
+  if($('retryTechBtn'))$('retryTechBtn').onclick=runTechCheck;
+  runTechCheck();
   renderAll();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
