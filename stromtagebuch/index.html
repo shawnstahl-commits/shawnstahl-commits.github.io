@@ -50,6 +50,13 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 .nav{display:none!important}
 body{padding-bottom:24px}
 @media(max-width:520px){.top{padding-left:8px;padding-right:8px}.brand{font-size:17px}.sub{font-size:11px}}
+
+[data-theme="dark"] input[type="date"]{color-scheme:dark}
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator{
+  filter:invert(1) brightness(1.9);
+  opacity:1;
+  cursor:pointer;
+}
 @media print{.nav,.top .icon,.actions,.noPrint,.primary,.secondary,.danger,.mini{display:none!important}body{background:white;color:#111;padding:0}.top{position:static;background:white}.view{display:none!important}.view.active{display:block!important}.card,.form,.hero{box-shadow:none;break-inside:avoid}.hero{color:#111;background:white;border:1px solid #ccc}.heroBox{background:#f4f4f4}.wrap{max-width:none}}
 @media(max-width:520px){.big{font-size:34px}.row{grid-template-columns:1fr}.value{font-size:21px}.kpi3{grid-template-columns:1fr 1fr}.kpi3 .wideMobile{grid-column:1/-1}}
 </style>
