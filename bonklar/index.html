@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="BonKlar – Kassenbons, Einkäufe und Preise vergleichen." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>BonKlar</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#16a34a;--brand2:#22c55e;--warn:#f59e0b;--danger:#dc2626;--shadow:0 10px 30px rgba(15,23,42,.08)}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select{font:inherit} button{cursor:pointer} .app{max-width:720px;margin:0 auto;min-height:100vh;padding-bottom:92px}
+    header{position:sticky;top:0;z-index:20;background:rgba(246,247,251,.92);backdrop-filter:blur(16px);padding:18px 18px 10px}
+    .brand{display:flex;align-items:center;gap:10px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:#fff;font-size:22px;box-shadow:var(--shadow)}
+    h1{font-size:21px;margin:0}.sub{font-size:13px;color:var(--muted);margin-top:2px}
+    main{padding:8px 16px 24px}.view{display:none}.view.active{display:block}
+    .hero{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border-radius:24px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
+    .hero small{opacity:.72}.hero .amount{font-size:38px;font-weight:800;letter-spacing:-1px;margin:6px 0}.hero-row{display:flex;justify-content:space-between;align-items:end;gap:12px}
+    .pill{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.12);font-size:12px;white-space:nowrap}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 5px 18px rgba(15,23,42,.04)}
+    .card h3{margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:650}.big{font-size:23px;font-weight:800}.tiny{font-size:12px;color:var(--muted)}
+    .section-title{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 10px}.section-title h2{font-size:17px;margin:0}
+    .progress{height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-top:10px}.progress span{height:100%;display:block;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:999px;width:0}
+    .list{display:flex;flex-direction:column;gap:10px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:16px}
+    .row-left{display:flex;gap:12px;align-items:center;min-width:0}.icon{width:42px;height:42px;border-radius:13px;background:#f1f5f9;display:grid;place-items:center;font-size:20px;flex:0 0 auto}
+    .row-title{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row-sub{font-size:12px;color:var(--muted);margin-top:3px}.row-price{font-weight:800;white-space:nowrap}
+    .btn{border:0;border-radius:14px;padding:12px 15px;font-weight:750;background:#0f172a;color:#fff}.btn.secondary{background:#eef2f7;color:#0f172a}.btn.green{background:var(--brand)}.btn.danger{background:#fee2e2;color:#991b1b}.btn.small{padding:8px 11px;border-radius:10px;font-size:13px}
+    .scanbox{border:2px dashed #cbd5e1;border-radius:22px;background:#fff;padding:22px;text-align:center}.scanbox input{display:none}.scan-preview{max-width:100%;max-height:280px;border-radius:16px;margin-top:14px;display:none}
+    .status{margin-top:12px;font-size:13px;color:var(--muted)}.status.working{color:#0369a1}.status.good{color:#15803d}.status.bad{color:#b91c1c}
+    .form{display:grid;gap:12px;margin-top:14px}.field label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px 3px}.field input,.field select{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 13px;outline:none}.field input:focus,.field select:focus{border-color:#86efac;box-shadow:0 0 0 3px #dcfce7}
+    .items-editor{display:grid;gap:8px}.item-edit{display:grid;grid-template-columns:1.8fr .8fr auto;gap:8px}.item-edit input{min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px}
+    .search{position:relative}.search input{width:100%;padding:13px 14px 13px 42px;border:1px solid var(--line);border-radius:15px;background:#fff}.search span{position:absolute;left:15px;top:12px}
+    .chipbar{display:flex;gap:8px;overflow:auto;padding:10px 0 2px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;white-space:nowrap;font-size:13px}.chip.active{background:#0f172a;color:white;border-color:#0f172a}
+    .product{cursor:pointer}.cheap{color:#15803d;font-weight:800}.compare{margin-top:12px}.compare-head{background:#ecfdf5;border:1px solid #bbf7d0;border-radius:18px;padding:15px;margin-bottom:12px}.compare-head .winner{font-size:22px;font-weight:850;color:#166534}
+    .bar-row{display:grid;grid-template-columns:80px 1fr 70px;align-items:center;gap:8px;font-size:13px;margin:10px 0}.bar-track{height:9px;background:#e2e8f0;border-radius:99px;overflow:hidden}.bar-fill{height:100%;background:#334155;border-radius:99px}
+    .modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:end;z-index:50}.modal.open{display:flex}.sheet{width:100%;max-height:86vh;overflow:auto;background:var(--bg);border-radius:26px 26px 0 0;padding:18px 16px 34px}.handle{width:48px;height:5px;background:#cbd5e1;border-radius:99px;margin:0 auto 15px}
+    .nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);z-index:40;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
+    .nav button{border:0;background:transparent;color:var(--muted);font-size:10px;padding:5px 2px}.nav button b{display:block;font-size:21px;line-height:24px}.nav button.active{color:#15803d;font-weight:800}
+    .empty{text-align:center;color:var(--muted);padding:30px 12px}.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:11px 15px;border-radius:13px;opacity:0;pointer-events:none;transition:.2s;z-index:99;font-size:13px}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mutedbox{background:#f8fafc;border:1px solid var(--line);padding:13px;border-radius:14px}.raw{white-space:pre-wrap;font:12px ui-monospace,monospace;max-height:180px;overflow:auto;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:14px}
+    @media(max-width:420px){.hero .amount{font-size:34px}.grid{gap:9px}.card{padding:14px}.item-edit{grid-template-columns:1.5fr .7fr auto}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><div class="logo">🧾</div><div><h1>BonKlar</h1><div class="sub">Ausgaben sehen. Preise vergleichen.</div></div></div>
+  </header>
+
+  <main>
+    <section id="dashboard" class="view active">
+      <div class="hero">
+        <small>Ausgaben diesen Monat</small>
+        <div id="monthTotal" class="amount">0,00 €</div>
+        <div class="hero-row"><div><small>Monatsbudget</small><div id="budgetText" style="font-weight:750;margin-top:2px">0 € von 0 €</div></div><div id="budgetPill" class="pill">0 % genutzt</div></div>
+        <div class="progress"><span id="budgetBar"></span></div>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>Heute</h3><div id="todayTotal" class="big">0,00 €</div><div id="todayCount" class="tiny">0 Einkäufe</div></div>
+        <div class="card"><h3>Diese Woche</h3><div id="weekTotal" class="big">0,00 €</div><div class="tiny">alle Einkäufe</div></div>
+        <div class="card"><h3>Top-Kategorie</h3><div id="topCategory" class="big" style="font-size:18px">–</div><div id="topCategoryValue" class="tiny">0,00 €</div></div>
+        <div class="card"><h3>Preis-Tipp</h3><div id="cheapTip" class="big" style="font-size:18px">–</div><div id="cheapTipSub" class="tiny">noch keine Daten</div></div>
+      </div>
+      <div class="section-title"><h2>Letzte Einkäufe</h2><button class="btn secondary small" data-go="purchases">Alle</button></div>
+      <div id="recentPurchases" class="list"></div>
+    </section>
+
+    <section id="scan" class="view">
+      <div class="section-title"><h2>Bon scannen</h2></div>
+      <div class="scanbox">
+        <div style="font-size:44px">📸</div>
+        <h3 style="margin:8px 0 5px">Kassenbon fotografieren</h3>
+        <div class="tiny">Die Texterkennung läuft kostenlos direkt in deinem Browser.</div>
+        <label for="receiptImage" class="btn green" style="display:inline-block;margin-top:14px">Foto aufnehmen / auswählen</label>
+        <input id="receiptImage" type="file" accept="image/*" capture="environment" />
+        <img id="scanPreview" class="scan-preview" alt="Bon Vorschau" />
+        <div id="scanStatus" class="status">Noch kein Bon gewählt.</div>
+        <button id="ocrBtn" class="btn" style="margin-top:10px;display:none">Bon erkennen</button>
+      </div>
+
+      <div id="reviewCard" class="card" style="margin-top:14px;display:none">
+        <h3 style="color:#0f172a;font-size:16px">Ergebnis prüfen</h3>
+        <div class="form">
+          <div class="split">
+            <div class="field"><label>Laden</label><input id="merchantInput" placeholder="z. B. Lidl" /></div>
+            <div class="field"><label>Datum</label><input id="dateInput" type="date" /></div>
+          </div>
+          <div class="field"><label>Gesamtsumme</label><input id="totalInput" type="number" inputmode="decimal" step="0.01" placeholder="0,00" /></div>
+          <div>
+            <div class="section-title" style="margin:8px 0"><h2 style="font-size:14px">Erkannte Produkte</h2><button id="addItemBtn" class="btn secondary small">+ Produkt</button></div>
+            <div id="itemsEditor" class="items-editor"></div>
+          </div>
+          <button id="saveReceiptBtn" class="btn green">Einkauf speichern</button>
+          <details><summary class="tiny">Erkannten Rohtext anzeigen</summary><div id="rawText" class="raw" style="margin-top:8px"></div></details>
+        </div>
+      </div>
+
+      <div class="section-title"><h2>Oder schnell manuell</h2></div>
+      <button id="manualReceiptBtn" class="btn secondary" style="width:100%">Leeren Einkauf anlegen</button>
+    </section>
+
+    <section id="products" class="view">
+      <div class="section-title"><h2>Produkte & Preisvergleich</h2></div>
+      <div class="search"><span>🔎</span><input id="productSearch" placeholder="z. B. Milch" /></div>
+      <div class="chipbar">
+        <button class="chip active" data-category="Alle">Alle</button>
+        <button class="chip" data-category="Lebensmittel">Lebensmittel</button>
+        <button class="chip" data-category="Getränke">Getränke</button>
+        <button class="chip" data-category="Haushalt">Haushalt</button>
+        <button class="chip" data-category="Sonstiges">Sonstiges</button>
+      </div>
+      <div id="productList" class="list" style="margin-top:10px"></div>
+    </section>
+
+    <section id="purchases" class="view">
+      <div class="section-title"><h2>Alle Einkäufe</h2></div>
+      <div class="search"><span>🔎</span><input id="purchaseSearch" placeholder="Laden oder Produkt suchen" /></div>
+      <div id="purchaseList" class="list" style="margin-top:12px"></div>
+    </section>
+
+    <section id="settings" class="view">
+      <div class="section-title"><h2>Einstellungen</h2></div>
+      <div class="card">
+        <h3 style="color:#0f172a;font-size:16px">Monatsbudget</h3>
+        <div class="field"><label>Budget in Euro</label><input id="budgetInput" type="number" min="0" step="10" /></div>
+        <button id="saveBudgetBtn" class="btn green" style="margin-top:10px">Budget speichern</button>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3 style="color:#0f172a;font-size:16px">Daten</h3>
+        <p class="tiny">Deine Einkäufe werden lokal auf diesem Gerät gespeichert.</p>
+        <div class="split"><button id="exportBtn" class="btn secondary">Exportieren</button><label class="btn secondary" style="text-align:center">Importieren<input id="importInput" type="file" accept="application/json" style="display:none"></label></div>
+        <button id="resetBtn" class="btn danger" style="width:100%;margin-top:10px">Demo-Daten zurücksetzen</button>
+      </div>
+      <div class="card" style="margin-top:12px"><h3 style="color:#0f172a;font-size:16px">Version</h3><div class="tiny">BonKlar 0.1 · kostenloser Prototyp über GitHub Pages</div></div>
+    </section>
+  </main>
+</div>
+
+<nav class="nav">
+  <button class="active" data-view="dashboard"><b>🏠</b>Start</button>
+  <button data-view="scan"><b>📸</b>Scannen</button>
+  <button data-view="products"><b>🥛</b>Produkte</button>
+  <button data-view="purchases"><b>🧾</b>Einkäufe</button>
+  <button data-view="settings"><b>⚙️</b>Mehr</button>
+</nav>
+
+<div id="productModal" class="modal"><div class="sheet"><div class="handle"></div><div id="productDetail"></div><button id="closeModal" class="btn secondary" style="width:100%;margin-top:16px">Schließen</button></div></div>
+<div id="purchaseModal" class="modal"><div class="sheet"><div class="handle"></div><div id="purchaseDetail"></div><button id="closePurchaseModal" class="btn secondary" style="width:100%;margin-top:16px">Schließen</button></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+  const KEY='bonklar_v1';
+  const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(n||0));
+  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const isoDaysAgo=n=>{const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().slice(0,10)};
+  const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  const icons={Lebensmittel:'🍎',Getränke:'🥤',Haushalt:'🧽',Sonstiges:'📦'};
+  function seed(){
+    return {budget:800,purchases:[
+      {id:uid(),merchant:'Lidl',date:isoDaysAgo(1),total:18.57,items:[
+        {name:'Frische Vollmilch 3,5%',base:'Milch',category:'Lebensmittel',qty:1,unit:'l',price:0.99},
+        {name:'Bananen',base:'Bananen',category:'Lebensmittel',qty:1.2,unit:'kg',price:1.79},
+        {name:'Brot',base:'Brot',category:'Lebensmittel',qty:1,unit:'stk',price:2.49},
+        {name:'Weitere Produkte',base:'Weitere Produkte',category:'Sonstiges',qty:1,unit:'stk',price:13.30}
+      ]},
+      {id:uid(),merchant:'Aldi',date:isoDaysAgo(5),total:24.31,items:[
+        {name:'Milsani H-Milch 3,5%',base:'Milch',category:'Lebensmittel',qty:1,unit:'l',price:1.09},
+        {name:'Gouda jung 400g',base:'Gouda',category:'Lebensmittel',qty:.4,unit:'kg',price:3.19},
+        {name:'Mineralwasser 6x1,5l',base:'Mineralwasser',category:'Getränke',qty:9,unit:'l',price:3.99},
+        {name:'Weitere Produkte',base:'Weitere Produkte',category:'Sonstiges',qty:1,unit:'stk',price:16.04}
+      ]},
+      {id:uid(),merchant:'REWE',date:isoDaysAgo(10),total:36.42,items:[
+        {name:'ja! Vollmilch 3,5%',base:'Milch',category:'Lebensmittel',qty:1,unit:'l',price:1.29},
+        {name:'Markenbutter 250g',base:'Butter',category:'Lebensmittel',qty:.25,unit:'kg',price:2.49},
+        {name:'Cola 1,5l',base:'Cola',category:'Getränke',qty:1.5,unit:'l',price:1.89},
+        {name:'Weitere Produkte',base:'Weitere Produkte',category:'Sonstiges',qty:1,unit:'stk',price:30.75}
+      ]},
+      {id:uid(),merchant:'EDEKA',date:isoDaysAgo(21),total:29.84,items:[
+        {name:'Weihenstephan Milch 3,5%',base:'Milch',category:'Lebensmittel',qty:1,unit:'l',price:1.49},
+        {name:'Kaffee 500g',base:'Kaffee',category:'Lebensmittel',qty:.5,unit:'kg',price:6.99},
+        {name:'Spülmittel',base:'Spülmittel',category:'Haushalt',qty:1,unit:'stk',price:2.29},
+        {name:'Weitere Produkte',base:'Weitere Produkte',category:'Sonstiges',qty:1,unit:'stk',price:19.07}
+      ]}
+    ]};
+  }
+  let state=JSON.parse(localStorage.getItem(KEY)||'null')||seed();
+  let categoryFilter='Alle';
+  let scanItems=[];
+  const $=id=>document.getElementById(id);
+  function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+  function startOfWeek(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setHours(0,0,0,0);x.setDate(x.getDate()-day);return x}
+  function renderDashboard(){
+    const now=new Date(), y=now.getFullYear(), m=now.getMonth();
+    const month=state.purchases.filter(p=>{const d=new Date(p.date+'T12:00:00');return d.getFullYear()===y&&d.getMonth()===m});
+    const monthTotal=month.reduce((s,p)=>s+p.total,0), budget=Number(state.budget||0), pct=budget?Math.round(monthTotal/budget*100):0;
+    $('monthTotal').textContent=euro(monthTotal);$('budgetText').textContent=euro(monthTotal)+' von '+euro(budget);$('budgetPill').textContent=pct+' % genutzt';$('budgetBar').style.width=Math.min(pct,100)+'%';
+    const today=state.purchases.filter(p=>p.date===new Date().toISOString().slice(0,10));$('todayTotal').textContent=euro(today.reduce((s,p)=>s+p.total,0));$('todayCount').textContent=today.length+' Einkauf'+(today.length===1?'':'e');
+    const sw=startOfWeek(now);const week=state.purchases.filter(p=>new Date(p.date+'T12:00:00')>=sw);$('weekTotal').textContent=euro(week.reduce((s,p)=>s+p.total,0));
+    const cats={};month.forEach(p=>p.items.forEach(i=>cats[i.category]=(cats[i.category]||0)+i.price));const top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];$('topCategory').textContent=top?top[0]:'–';$('topCategoryValue').textContent=top?euro(top[1]):euro(0);
+    const milk=getProductGroups().find(g=>g.base.toLowerCase()==='milch');if(milk){const best=milk.entries.slice().sort((a,b)=>a.unitPrice-b.unitPrice)[0];$('cheapTip').textContent=best.merchant;$('cheapTipSub').textContent='Milch '+euro(best.unitPrice)+' / '+best.unit}else{$('cheapTip').textContent='–';$('cheapTipSub').textContent='noch keine Vergleichsdaten'}
+    renderPurchasesInto('recentPurchases',state.purchases.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,4),true);
+  }
+  function unitPrice(i){const q=Number(i.qty||1);if(['l','kg'].includes((i.unit||'').toLowerCase())&&q>0)return Number(i.price)/q;return Number(i.price)}
+  function getProductGroups(){
+    const map={};state.purchases.forEach(p=>p.items.forEach(i=>{if(i.base==='Weitere Produkte')return;const key=(i.base||i.name).trim();if(!map[key])map[key]={base:key,category:i.category||'Sonstiges',entries:[]};map[key].entries.push({...i,merchant:p.merchant,date:p.date,unitPrice:unitPrice(i)})}));
+    return Object.values(map).map(g=>{g.avg=g.entries.reduce((s,e)=>s+e.unitPrice,0)/g.entries.length;g.min=Math.min(...g.entries.map(e=>e.unitPrice));g.unit=['l','kg'].includes((g.entries[0].unit||'').toLowerCase())?g.entries[0].unit.toLowerCase():'Stück';return g}).sort((a,b)=>a.base.localeCompare(b.base,'de'));
+  }
+  function renderProducts(){
+    const q=$('productSearch').value.trim().toLowerCase();const groups=getProductGroups().filter(g=>(categoryFilter==='Alle'||g.category===categoryFilter)&&g.base.toLowerCase().includes(q));const box=$('productList');
+    if(!groups.length){box.innerHTML='<div class="empty">Keine passenden Produkte gefunden.</div>';return}
+    box.innerHTML=groups.map(g=>'<div class="row product" data-product="'+esc(g.base)+'"><div class="row-left"><div class="icon">'+(icons[g.category]||'📦')+'</div><div><div class="row-title">'+esc(g.base)+'</div><div class="row-sub">'+g.entries.length+' Käufe · Ø '+euro(g.avg)+' / '+esc(g.unit)+'</div></div></div><div><div class="cheap">'+euro(g.min)+'</div><div class="row-sub">günstigster</div></div></div>').join('');
+    box.querySelectorAll('[data-product]').forEach(el=>el.onclick=()=>openProduct(el.dataset.product));
+  }
+  function openProduct(base){
+    const g=getProductGroups().find(x=>x.base===base);if(!g)return;const entries=g.entries.slice().sort((a,b)=>a.unitPrice-b.unitPrice);const best=entries[0],max=Math.max(...entries.map(e=>e.unitPrice),.01),latest=entries.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
+    const byStore={};entries.forEach(e=>{if(!byStore[e.merchant])byStore[e.merchant]=[];byStore[e.merchant].push(e.unitPrice)});const stores=Object.entries(byStore).map(([name,v])=>({name,price:v.reduce((a,b)=>a+b,0)/v.length})).sort((a,b)=>a.price-b.price);
+    $('productDetail').innerHTML='<h2 style="margin:0 0 4px">'+esc(g.base)+'</h2><div class="tiny">'+esc(g.category)+' · '+g.entries.length+' gespeicherte Käufe</div><div class="compare-head"><div class="tiny">Bisher am günstigsten</div><div class="winner">'+esc(best.merchant)+' · '+euro(best.unitPrice)+' / '+esc(g.unit)+'</div><div class="tiny" style="margin-top:4px">gekauft am '+formatDate(best.date)+'</div></div><div class="grid"><div class="card"><h3>Letzter Preis</h3><div class="big" style="font-size:20px">'+euro(latest.unitPrice)+'</div><div class="tiny">'+esc(latest.merchant)+'</div></div><div class="card"><h3>Durchschnitt</h3><div class="big" style="font-size:20px">'+euro(g.avg)+'</div><div class="tiny">pro '+esc(g.unit)+'</div></div></div><div class="section-title"><h2>Nach Laden</h2></div><div class="compare">'+stores.map(s=>'<div class="bar-row"><div>'+esc(s.name)+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.max(8,Math.round(s.price/max*100))+'%"></div></div><div style="text-align:right;font-weight:750">'+euro(s.price)+'</div></div>').join('')+'</div><div class="section-title"><h2>Preisverlauf</h2></div><div class="list">'+entries.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>'<div class="row"><div><div class="row-title">'+esc(e.name)+'</div><div class="row-sub">'+esc(e.merchant)+' · '+formatDate(e.date)+'</div></div><div class="row-price">'+euro(e.unitPrice)+' / '+esc(g.unit)+'</div></div>').join('')+'</div>';
+    $('productModal').classList.add('open');
+  }
+  function formatDate(s){if(!s)return'–';const [y,m,d]=s.split('-');return d+'.'+m+'.'+y}
+  function renderPurchasesInto(id,arr,compact){
+    const box=$(id);if(!arr.length){box.innerHTML='<div class="empty">Noch keine Einkäufe gespeichert.</div>';return}
+    box.innerHTML=arr.map(p=>'<div class="row" data-purchase="'+p.id+'"><div class="row-left"><div class="icon">🛒</div><div><div class="row-title">'+esc(p.merchant)+'</div><div class="row-sub">'+formatDate(p.date)+' · '+p.items.length+' Positionen</div></div></div><div class="row-price">'+euro(p.total)+'</div></div>').join('');
+    box.querySelectorAll('[data-purchase]').forEach(el=>el.onclick=()=>openPurchase(el.dataset.purchase));
+  }
+  function renderPurchases(){
+    const q=$('purchaseSearch').value.trim().toLowerCase();let arr=state.purchases.slice().sort((a,b)=>b.date.localeCompare(a.date));if(q)arr=arr.filter(p=>p.merchant.toLowerCase().includes(q)||p.items.some(i=>i.name.toLowerCase().includes(q)||(i.base||'').toLowerCase().includes(q)));renderPurchasesInto('purchaseList',arr,false)
+  }
+  function openPurchase(id){
+    const p=state.purchases.find(x=>x.id===id);if(!p)return;
+    $('purchaseDetail').innerHTML='<h2 style="margin:0">'+esc(p.merchant)+'</h2><div class="tiny">'+formatDate(p.date)+'</div><div class="hero" style="margin-top:14px"><small>Gesamtsumme</small><div class="amount" style="font-size:34px">'+euro(p.total)+'</div></div><div class="list">'+p.items.map(i=>'<div class="row"><div><div class="row-title">'+esc(i.name)+'</div><div class="row-sub">'+esc(i.category)+' · '+esc(i.qty)+' '+esc(i.unit)+'</div></div><div class="row-price">'+euro(i.price)+'</div></div>').join('')+'</div><button class="btn danger" id="deletePurchaseBtn" style="width:100%;margin-top:14px">Einkauf löschen</button>';
+    $('purchaseModal').classList.add('open');$('deletePurchaseBtn').onclick=()=>{if(confirm('Diesen Einkauf wirklich löschen?')){state.purchases=state.purchases.filter(x=>x.id!==id);save();$('purchaseModal').classList.remove('open');toast('Einkauf gelöscht')}}
+  }
+  function renderAll(){renderDashboard();renderProducts();renderPurchases();$('budgetInput').value=state.budget}
+  function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+  function go(view){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));scrollTo({top:0,behavior:'smooth'});if(view==='products')renderProducts();if(view==='purchases')renderPurchases()}
+  document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.view));document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');categoryFilter=b.dataset.category;renderProducts()});
+  $('productSearch').oninput=renderProducts;$('purchaseSearch').oninput=renderPurchases;
+  $('closeModal').onclick=()=>$('productModal').classList.remove('open');$('productModal').onclick=e=>{if(e.target===$('productModal'))$('productModal').classList.remove('open')};
+  $('closePurchaseModal').onclick=()=>$('purchaseModal').classList.remove('open');$('purchaseModal').onclick=e=>{if(e.target===$('purchaseModal'))$('purchaseModal').classList.remove('open')};
+  $('saveBudgetBtn').onclick=()=>{state.budget=Math.max(0,Number($('budgetInput').value||0));save();toast('Budget gespeichert')};
+  $('resetBtn').onclick=()=>{if(confirm('Eigene Daten löschen und Demo-Daten wiederherstellen?')){state=seed();save();toast('Demo-Daten wiederhergestellt')}};
+  $('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bonklar-backup.json';a.click();URL.revokeObjectURL(a.href)};
+  $('importInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.purchases)throw 0;state=x;save();toast('Daten importiert')}catch{alert('Die Datei konnte nicht importiert werden.')}};r.readAsText(f)};
+  $('receiptImage').onchange=e=>{const f=e.target.files[0];if(!f)return;const url=URL.createObjectURL(f);$('scanPreview').src=url;$('scanPreview').style.display='block';$('ocrBtn').style.display='inline-block';$('scanStatus').className='status';$('scanStatus').textContent='Bild bereit. Tippe auf „Bon erkennen“.'};
+  function inferBase(name){const n=name.toLowerCase();if(n.includes('milch'))return'Milch';if(n.includes('butter'))return'Butter';if(n.includes('gouda')||n.includes('käse'))return'Gouda';if(n.includes('wasser'))return'Mineralwasser';if(n.includes('cola'))return'Cola';if(n.includes('kaffee'))return'Kaffee';return name.trim()}
+  function inferCategory(name){const n=name.toLowerCase();if(/cola|wasser|saft|bier|limo|getränk/.test(n))return'Getränke';if(/spül|wasch|reiniger|papier|seife|haushalt/.test(n))return'Haushalt';if(/milch|brot|butter|käse|gouda|banan|apfel|kaffee|joghurt|fleisch|nudel|reis|ei/.test(n))return'Lebensmittel';return'Sonstiges'}
+  function parseReceipt(text){
+    const lines=text.split(/\r?\n/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);const joined=lines.join('\n');
+    let merchant=lines[0]||'';const known=['LIDL','ALDI','REWE','EDEKA','NETTO','PENNY','KAUFLAND','ROSSMANN','DM'];for(const k of known){if(joined.toUpperCase().includes(k)){merchant=k==='DM'?'dm':k[0]+k.slice(1).toLowerCase();break}}
+    let date=new Date().toISOString().slice(0,10);const dm=joined.match(/\b(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})\b/);if(dm){let y=dm[3];if(y.length===2)y='20'+y;date=y.padStart(4,'0')+'-'+dm[2].padStart(2,'0')+'-'+dm[1].padStart(2,'0')}
+    let total=0;for(const l of lines){if(/summe|gesamt|total|zu zahlen|betrag/i.test(l)){const nums=l.match(/\d+[,.]\d{2}/g);if(nums)total=Math.max(total,...nums.map(x=>Number(x.replace(',','.'))))}}
+    const items=[];for(const l of lines){if(/summe|gesamt|total|mwst|ust|steuer|bar|karte|rückgeld|gegeben|zu zahlen|eur/i.test(l))continue;const m=l.match(/^(.+?)\s+(-?\d+[,.]\d{2})\s*[A-Z]?$/i);if(m){const name=m[1].replace(/\s+[A-Z]$/,'').trim();const price=Number(m[2].replace(',','.'));if(name.length>1&&price>0&&price<500){let qty=1,unit='stk';const qm=name.match(/(\d+[,.]?\d*)\s*(kg|g|l|ml)\b/i);if(qm){qty=Number(qm[1].replace(',','.'));unit=qm[2].toLowerCase();if(unit==='g'){qty/=1000;unit='kg'}if(unit==='ml'){qty/=1000;unit='l'}}items.push({name,base:inferBase(name),category:inferCategory(name),qty,unit,price})}}
+    }
+    if(!total&&items.length)total=items.reduce((s,i)=>s+i.price,0);return{merchant,date,total,items:items.slice(0,40)}
+  }
+  function itemEditorRow(item){
+    const idx=scanItems.indexOf(item);return '<div class="item-edit" data-idx="'+idx+'"><input class="iname" value="'+esc(item.name)+'" placeholder="Produkt"><input class="iprice" type="number" step="0.01" value="'+Number(item.price||0).toFixed(2)+'"><button class="btn danger small iremove">×</button></div>'
+  }
+  function renderItemEditor(){$('itemsEditor').innerHTML=scanItems.map(itemEditorRow).join('')||'<div class="empty" style="padding:12px">Noch keine Produkte erkannt. Du kannst welche hinzufügen.</div>';$('itemsEditor').querySelectorAll('.item-edit').forEach(row=>{const idx=Number(row.dataset.idx);row.querySelector('.iname').oninput=e=>{scanItems[idx].name=e.target.value;scanItems[idx].base=inferBase(e.target.value);scanItems[idx].category=inferCategory(e.target.value)};row.querySelector('.iprice').oninput=e=>scanItems[idx].price=Number(e.target.value||0);row.querySelector('.iremove').onclick=()=>{scanItems.splice(idx,1);renderItemEditor()}})}
+  $('addItemBtn').onclick=()=>{scanItems.push({name:'',base:'',category:'Sonstiges',qty:1,unit:'stk',price:0});renderItemEditor()};
+  $('ocrBtn').onclick=async()=>{const f=$('receiptImage').files[0];if(!f)return;try{$('scanStatus').className='status working';$('scanStatus').textContent='Bon wird erkannt … das kann auf dem Handy kurz dauern.';$('ocrBtn').disabled=true;const res=await Tesseract.recognize(f,'deu',{logger:m=>{if(m.status==='recognizing text')$('scanStatus').textContent='Texterkennung '+Math.round((m.progress||0)*100)+' %'}});const parsed=parseReceipt(res.data.text);$('merchantInput').value=parsed.merchant;$('dateInput').value=parsed.date;$('totalInput').value=parsed.total?parsed.total.toFixed(2):'';scanItems=parsed.items;$('rawText').textContent=res.data.text;renderItemEditor();$('reviewCard').style.display='block';$('scanStatus').className='status good';$('scanStatus').textContent='Erkennung fertig. Bitte kurz prüfen und speichern.'}catch(err){$('scanStatus').className='status bad';$('scanStatus').textContent='Erkennung fehlgeschlagen. Du kannst den Einkauf trotzdem manuell eintragen.';console.error(err)}finally{$('ocrBtn').disabled=false}};
+  $('manualReceiptBtn').onclick=()=>{$('merchantInput').value='';$('dateInput').value=new Date().toISOString().slice(0,10);$('totalInput').value='';scanItems=[];$('rawText').textContent='';renderItemEditor();$('reviewCard').style.display='block';$('reviewCard').scrollIntoView({behavior:'smooth'})};
+  $('saveReceiptBtn').onclick=()=>{const merchant=$('merchantInput').value.trim()||'Unbekannter Laden',date=$('dateInput').value||new Date().toISOString().slice(0,10);let total=Number($('totalInput').value||0);scanItems=scanItems.filter(i=>i.name.trim()).map(i=>({...i,base:inferBase(i.name),category:inferCategory(i.name),qty:i.qty||1,unit:i.unit||'stk',price:Number(i.price||0)}));if(!total)total=scanItems.reduce((s,i)=>s+i.price,0);state.purchases.push({id:uid(),merchant,date,total,items:scanItems});save();$('reviewCard').style.display='none';$('receiptImage').value='';$('scanPreview').style.display='none';$('ocrBtn').style.display='none';$('scanStatus').textContent='Gespeichert.';toast('Einkauf gespeichert');go('dashboard')};
+  renderAll();
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
