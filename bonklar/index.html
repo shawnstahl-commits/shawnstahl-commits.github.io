@@ -294,9 +294,21 @@
   function bootToast(msg){
     const t=$('toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}else alert(msg);
   }
+  function hardRenderPurchases(){
+    const box=$('purchaseList');if(!box)return;
+    const s=readState(),arr=s.purchases.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+    if(!arr.length){box.innerHTML='<div class="empty">Noch keine Einkäufe gespeichert.</div>';return}
+    box.innerHTML=arr.map(p=>{
+      const merchant=String(p.merchant||'Unbekannter Laden').replace(/[&<>"]/g,'');
+      const total=Number(p.total||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+      const date=String(p.date||'');
+      return '<div class="row"><div class="row-left"><div class="icon">🧾</div><div><div class="row-title">'+merchant+'</div><div class="row-sub">'+date+'</div></div></div><div class="row-price">'+total+'</div></div>';
+    }).join('');
+  }
   function hardGo(view){
     document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));
     document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+    if(view==='purchases')hardRenderPurchases();
     try{window.scrollTo(0,0)}catch(e){}
   }
 
@@ -333,6 +345,8 @@
         if($('manualTotal'))$('manualTotal').value='';
         if($('manualProduct'))$('manualProduct').value='';
         if($('manualProductPrice'))$('manualProductPrice').value='';
+        hardRenderPurchases();
+        setTimeout(()=>hardGo('purchases'),250);
       }
     },true);
   }
