@@ -43,6 +43,7 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 <h2>Gesamt seit Aufzeichnung</h2><div class="grid">
 <div class="card"><div class="label">Netzbezug</div><div class="value" id="totalImp">–</div></div>
 <div class="card"><div class="label">Einspeisung</div><div class="value good" id="totalFeed">–</div></div>
+<div class="card wide"><div class="label">Dein Stromkonto</div><div class="value good" id="balance">–</div><div class="hint" id="balanceHint">Abschläge minus Stromkosten inkl. Grundpreis · PV-Vergütung separat</div></div>
 <div class="card wide"><div class="label">30-Tage-Prognose Stromkosten</div><div class="value" id="forecastCost">–</div><div class="hint">auf Basis des letzten Zeitraums inkl. Grundpreis-Anteil</div></div>
 </div>
 </section>
@@ -109,6 +110,8 @@ function dateDE(s){if(!s)return "–";return new Date(s+"T12:00:00").toLocaleDat
 function lastPair(field){var a=sorted().filter(function(e){return e[field]!=null});return a.length>=2?[a[a.length-2],a[a.length-1]]:[null,a[a.length-1]||null]}
 function delta(field){var p=lastPair(field),a=p[0],b=p[1];if(!a||!b)return null;var d=days(a.date,b.date);return{v:b[field]-a[field],d:d,day:d?(b[field]-a[field])/d:0,a:a,b:b}}
 function firstLast(field){var a=sorted().filter(function(e){return e[field]!=null});if(a.length<2)return null;return{v:a[a.length-1][field]-a[0][field],d:days(a[0].date,a[a.length-1].date)}}
+function paidUntil(dateStr){if(!dateStr)return 0;var y=Number(dateStr.slice(0,4)),m=Number(dateStr.slice(5,7));if(y<2026||(y===2026&&m<2))return 0;var total=0;for(var mm=2;mm<=m;mm++){total+=mm<=4?240:state.settings.monthlyPayment}return total}
+function accountBalance(){var a=sorted().filter(function(e){return e.imp!=null});if(a.length<2)return null;var first=a[0],last=a[a.length-1],cons=last.imp-first.imp,energy=cons*state.settings.workRate,baseDays=days(first.date,last.date),base=baseDays*(state.settings.baseAnnual/365),paid=paidUntil(last.date);return{balance:paid-energy-base,paid:paid,energy:energy,base:base,totalCost:energy+base,date:last.date}}
 function toast(t){var e=document.getElementById("toast");e.textContent=t;e.classList.add("show");setTimeout(function(){e.classList.remove("show")},2000)}
 function go(name){document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("active",v.dataset.view===name)});document.querySelectorAll("[data-go]").forEach(function(b){b.classList.toggle("active",b.dataset.go===name)});if(name==="history")setTimeout(draw,50);if(name==="add")prepAdd();scrollTo({top:0,behavior:"smooth"})}
 document.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(b)go(b.dataset.go)})
@@ -128,7 +131,7 @@ function render(){
  document.getElementById("periodRevenue").textContent=df?euro(df.v*state.settings.feedRate):"–";
  document.getElementById("totalImp").textContent=ti?n(ti.v)+" kWh":"–";
  document.getElementById("totalFeed").textContent=tf?n(tf.v)+" kWh":"–";
- document.getElementById("forecastCost").textContent=di?euro(di.day*30*state.settings.workRate+state.settings.baseAnnual/12):"–";
+ var bal=accountBalance();var be=document.getElementById("balance");var bh=document.getElementById("balanceHint");if(bal){be.textContent=(bal.balance>=0?"+":"")+euro(bal.balance)+(bal.balance>=0?" im Plus":" im Minus");be.className="value "+(bal.balance>=0?"good":"orange");bh.textContent="Stand "+dateDE(bal.date)+" · Abschläge "+euro(bal.paid)+" − Stromkosten "+euro(bal.totalCost)+" (inkl. "+euro(bal.base)+" Grundpreis) · PV-Vergütung separat"}else{be.textContent="–";bh.textContent="Abschläge minus Stromkosten inkl. Grundpreis · PV-Vergütung separat"}document.getElementById("forecastCost").textContent=di?euro(di.day*30*state.settings.workRate+state.settings.baseAnnual/12):"–";
  document.getElementById("pvPower").textContent=n(state.settings.pvKwp,2)+" kWp";
  document.getElementById("pvRate").textContent=n(state.settings.feedRate*100,2)+" ct/kWh";
  document.getElementById("workRate").textContent=n(state.settings.workRate*100,2)+" ct/kWh";
