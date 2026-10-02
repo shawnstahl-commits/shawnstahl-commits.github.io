@@ -7,7 +7,7 @@
   <meta name="description" content="BonKlar – Kassenbons, Einkäufe und Preise vergleichen." />
   <link rel="manifest" href="./manifest.webmanifest" />
   <title>BonKlar</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>\n  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root{--bg:#f6f7fb;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#16a34a;--brand2:#22c55e;--warn:#f59e0b;--danger:#dc2626;--shadow:0 10px 30px rgba(15,23,42,.08)}
     *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
@@ -41,6 +41,34 @@
     .empty{text-align:center;color:var(--muted);padding:30px 12px}.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;padding:11px 15px;border-radius:13px;opacity:0;pointer-events:none;transition:.2s;z-index:99;font-size:13px}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mutedbox{background:#f8fafc;border:1px solid var(--line);padding:13px;border-radius:14px}.raw{white-space:pre-wrap;font:12px ui-monospace,monospace;max-height:180px;overflow:auto;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:14px}
     @media(max-width:420px){.hero .amount{font-size:34px}.grid{gap:9px}.card{padding:14px}.item-edit{grid-template-columns:1.5fr .7fr auto}}
+  
+    /* E-Check-Kids scanner copy for BonKlar — original E-Check files stay untouched */
+    .hidden{display:none!important}
+    .scanner-launch{background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;border:0;border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+    .scanner-launch h3{color:#fff;margin:0 0 6px;font-size:18px}.scanner-launch p{margin:0 0 14px;color:rgba(255,255,255,.78);font-size:13px;line-height:1.45}
+    .scanner-launch .btn{background:#fff;color:#0f766e;width:100%}
+    .barcode-result-card{margin-top:12px}.barcode-product{display:grid;grid-template-columns:70px 1fr;gap:13px;align-items:center;margin-bottom:12px}.barcode-product img{width:70px;height:70px;object-fit:contain;background:#f8fafc;border-radius:14px;border:1px solid var(--line)}
+    .barcode-overlay{position:fixed;inset:0;z-index:500;background:#020504;color:#fff;overflow:hidden;height:100dvh}
+    .barcode-overlay .scan-top-v4{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;position:absolute;z-index:540;top:0;left:0;right:0;padding:max(15px,env(safe-area-inset-top)) 16px 12px;background:linear-gradient(180deg,rgba(0,0,0,.62),rgba(0,0,0,0))}
+    .barcode-overlay .scan-top-v4>div{text-align:center}.barcode-overlay .scan-top-v4 strong{display:block;font-size:16px}.barcode-overlay .scan-top-v4 small{display:block;color:rgba(255,255,255,.64);font-size:10px;margin-top:2px}
+    .scan-round-v4{width:40px;height:40px;border:1px solid rgba(255,255,255,.24);border-radius:50%;background:rgba(0,0,0,.28);color:#fff;font-size:26px;line-height:1;backdrop-filter:blur(8px)}
+    .barcode-overlay #nativeWrap,.barcode-overlay #reader{position:absolute!important;inset:0!important;width:100%!important;height:100dvh!important;min-height:100dvh!important;margin:0!important;border-radius:0!important;background:#050807!important}
+    .barcode-overlay #nativeVideo,.barcode-overlay #reader video{width:100%!important;height:100dvh!important;max-height:none!important;object-fit:cover!important;margin:0!important;border-radius:0!important}
+    .barcode-overlay #reader>div{border:0!important}.barcode-overlay .guide{display:none!important}
+    .fullscreen-guide-v4{display:block;position:absolute;z-index:525;left:50%;top:46%;transform:translate(-50%,-50%);width:min(82vw,520px);height:150px;border-radius:22px;background:rgba(255,255,255,.015);box-shadow:0 0 0 9999px rgba(0,0,0,.25)}
+    .scan-corner-v4{position:absolute;width:34px;height:34px;border-color:#fff}.scan-corner-v4.tl{left:0;top:0;border-left:3px solid;border-top:3px solid;border-radius:12px 0 0 0}.scan-corner-v4.tr{right:0;top:0;border-right:3px solid;border-top:3px solid;border-radius:0 12px 0 0}.scan-corner-v4.bl{left:0;bottom:0;border-left:3px solid;border-bottom:3px solid;border-radius:0 0 0 12px}.scan-corner-v4.br{right:0;bottom:0;border-right:3px solid;border-bottom:3px solid;border-radius:0 0 12px 0}
+    .scan-line-v4{position:absolute;left:7%;right:7%;top:50%;height:2px;background:#24dfc7;box-shadow:0 0 15px rgba(36,223,199,.95);animation:scanSweepV4 2.1s ease-in-out infinite}@keyframes scanSweepV4{0%,100%{transform:translateY(-45px);opacity:.55}50%{transform:translateY(45px);opacity:1}}
+    .scan-instruction-v4{display:block;position:absolute;z-index:530;left:20px;right:20px;bottom:110px;text-align:center;color:#fff;text-shadow:0 2px 8px #000}.scan-instruction-v4 strong{display:block;font-size:16px}.scan-instruction-v4 small{display:block;color:rgba(255,255,255,.7);margin-top:4px}
+    #barcodeScanStatus{position:absolute;z-index:531;left:20px;right:20px;bottom:64px;text-align:center;color:rgba(255,255,255,.78);font-size:12px}
+    #barcodeScanError{position:absolute;z-index:545;left:18px;right:18px;bottom:80px;background:rgba(70,10,8,.9);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:12px;backdrop-filter:blur(10px)}
+    #barcodePhotoFallback{position:absolute;z-index:544;left:18px;right:18px;bottom:18px}#barcodePhotoFallback .btn{background:rgba(0,0,0,.48);color:#fff;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(10px);width:100%}
+    .scan-torch-v58{display:none}.barcode-overlay .scan-torch-v58:not(.hidden){display:block;position:absolute;z-index:547;right:16px;top:max(78px,calc(env(safe-area-inset-top) + 64px));border:1px solid rgba(255,255,255,.30);background:rgba(0,0,0,.46);color:#fff;border-radius:999px;padding:10px 13px;font-weight:850;backdrop-filter:blur(10px)}
+    .scan-manual-open-v56{display:block;position:absolute;z-index:546;left:50%;bottom:78px;transform:translateX(-50%);border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.48);color:#fff;border-radius:999px;padding:11px 16px;font-weight:850;backdrop-filter:blur(10px);white-space:nowrap}
+    .scan-manual-box-v56{display:none}.barcode-overlay.manual-entry-v56 .scan-manual-box-v56{display:flex;position:absolute;z-index:580;inset:0;background:rgba(2,7,6,.82);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:22px}.barcode-overlay.manual-entry-v56 .scan-manual-open-v56,.barcode-overlay.manual-entry-v56 .scan-instruction-v4,.barcode-overlay.manual-entry-v56 .fullscreen-guide-v4,.barcode-overlay.manual-entry-v56 #barcodePhotoFallback,.barcode-overlay.manual-entry-v56 .scan-torch-v58{display:none!important}
+    .scan-manual-card-v56{position:relative;width:min(100%,390px);background:#fff;color:#15211e;border-radius:22px;padding:24px;box-shadow:0 18px 60px rgba(0,0,0,.35)}.scan-manual-card-v56>strong{display:block;font-size:19px;margin-bottom:3px}.scan-manual-card-v56>small{display:block;color:#73807c;margin-bottom:14px}.scan-manual-card-v56 input{width:100%;font-size:17px;padding:14px 15px;border:1px solid #d6e0dd;border-radius:14px;margin-bottom:12px;background:#fff;color:#15211e}.scan-manual-close-v56{position:absolute;right:13px;top:12px;width:36px;height:36px;border:0;border-radius:50%;background:#eef4f2;color:#38514a;font-size:23px;line-height:1}
+    .scan-processing-v4{display:none}.barcode-overlay.scan-processing .scan-processing-v4{display:flex;position:absolute;z-index:560;inset:0;background:rgba(3,9,8,.78);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;color:#fff}.barcode-overlay.scan-processing .fullscreen-guide-v4,.barcode-overlay.scan-processing .scan-instruction-v4,.barcode-overlay.scan-processing .scan-torch-v58,.barcode-overlay.scan-processing .scan-manual-open-v56{display:none!important}.processing-check-v4{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:#0b927f;font-size:34px;margin-bottom:14px;box-shadow:0 0 0 10px rgba(11,146,127,.16)}.scan-processing-v4 strong{font-size:20px}.scan-processing-v4 small{margin-top:4px;color:rgba(255,255,255,.7)}
+    @media(prefers-reduced-motion:reduce){.scan-line-v4{animation:none}}
+
   </style>
 </head>
 <body>
@@ -68,7 +96,16 @@
     </section>
 
     <section id="scan" class="view">
-      <div class="section-title"><h2>Bon scannen</h2></div>
+      
+      <div class="section-title"><h2>Produkt erfassen</h2></div>
+      <div class="scanner-launch">
+        <h3>▦ Produkt-Barcode scannen</h3>
+        <p>Hier steckt jetzt derselbe Scanner-Ablauf wie bei E‑Kids drin: Autofokus, doppelte Bestätigung, automatischer zweiter Scanmodus und Licht, wenn dein Handy es unterstützt.</p>
+        <button id="startProductScannerBtn" class="btn">📷 Barcode-Scanner öffnen</button>
+      </div>
+      <div id="barcodeProductResult" class="card barcode-result-card" style="display:none"></div>
+
+      <div class="section-title"><h2>Kassenbon scannen</h2></div>
       <div class="scanbox">
         <div style="font-size:44px">📸</div>
         <h3 style="margin:8px 0 5px">Kassenbon fotografieren</h3>
@@ -136,6 +173,36 @@
       <div class="card" style="margin-top:12px"><h3 style="color:#0f172a;font-size:16px">Version</h3><div class="tiny">BonKlar 0.1 · kostenloser Prototyp über GitHub Pages</div></div>
     </section>
   </main>
+</div>
+
+
+<div id="barcodeScannerOverlay" class="barcode-overlay hidden">
+  <div class="scan-top-v4">
+    <button id="closeProductScannerBtn" class="scan-round-v4" aria-label="Scanner schließen">×</button>
+    <div><strong>Produkt scannen</strong><small>BonKlar · E‑Kids Scanner</small></div>
+    <span></span>
+  </div>
+  <div id="nativeWrap" class="hidden"><video id="nativeVideo" playsinline muted></video><div class="guide"></div></div>
+  <div id="reader" class="hidden"></div>
+  <div class="fullscreen-guide-v4" aria-hidden="true"><div class="scan-corner-v4 tl"></div><div class="scan-corner-v4 tr"></div><div class="scan-corner-v4 bl"></div><div class="scan-corner-v4 br"></div><div class="scan-line-v4"></div></div>
+  <button id="scanTorchBtn" class="scan-torch-v58 hidden" type="button">🔦 Licht an</button>
+  <div class="scan-instruction-v4"><strong>Barcode in den Rahmen halten</strong><small>Die Erkennung startet automatisch</small></div>
+  <button id="barcodeManualOpenBtn" class="scan-manual-open-v56" type="button">⌨️ Barcode eingeben</button>
+  <div class="scan-manual-box-v56">
+    <div class="scan-manual-card-v56">
+      <button id="barcodeManualCloseBtn" class="scan-manual-close-v56" type="button" aria-label="Manuelle Eingabe schließen">×</button>
+      <strong>Barcode manuell eingeben</strong><small>8 bis 14 Ziffern</small>
+      <input id="barcodeManualFullscreen" inputmode="numeric" autocomplete="off" placeholder="z. B. 3017624010701">
+      <button id="barcodeManualLookupBtn" class="btn green" type="button" style="width:100%">Produkt suchen</button>
+    </div>
+  </div>
+  <div class="scan-processing-v4"><div class="processing-check-v4">✓</div><strong>Barcode erkannt</strong><small>Produkt wird geladen …</small></div>
+  <div id="barcodeScanStatus"></div>
+  <div id="barcodeScanError" class="hidden"></div>
+  <div id="barcodePhotoFallback" class="hidden">
+    <input id="barcodePhoto" class="hidden" type="file" accept="image/*" capture="environment">
+    <button id="barcodePhotoBtn" class="btn" type="button">📸 Barcode fotografieren</button>
+  </div>
 </div>
 
 <nav class="nav">
@@ -266,6 +333,146 @@
   $('ocrBtn').onclick=async()=>{const f=$('receiptImage').files[0];if(!f)return;try{$('scanStatus').className='status working';$('scanStatus').textContent='Bon wird erkannt … das kann auf dem Handy kurz dauern.';$('ocrBtn').disabled=true;const res=await Tesseract.recognize(f,'deu',{logger:m=>{if(m.status==='recognizing text')$('scanStatus').textContent='Texterkennung '+Math.round((m.progress||0)*100)+' %'}});const parsed=parseReceipt(res.data.text);$('merchantInput').value=parsed.merchant;$('dateInput').value=parsed.date;$('totalInput').value=parsed.total?parsed.total.toFixed(2):'';scanItems=parsed.items;$('rawText').textContent=res.data.text;renderItemEditor();$('reviewCard').style.display='block';$('scanStatus').className='status good';$('scanStatus').textContent='Erkennung fertig. Bitte kurz prüfen und speichern.'}catch(err){$('scanStatus').className='status bad';$('scanStatus').textContent='Erkennung fehlgeschlagen. Du kannst den Einkauf trotzdem manuell eintragen.';console.error(err)}finally{$('ocrBtn').disabled=false}};
   $('manualReceiptBtn').onclick=()=>{$('merchantInput').value='';$('dateInput').value=new Date().toISOString().slice(0,10);$('totalInput').value='';scanItems=[];$('rawText').textContent='';renderItemEditor();$('reviewCard').style.display='block';$('reviewCard').scrollIntoView({behavior:'smooth'})};
   $('saveReceiptBtn').onclick=()=>{const merchant=$('merchantInput').value.trim()||'Unbekannter Laden',date=$('dateInput').value||new Date().toISOString().slice(0,10);let total=Number($('totalInput').value||0);scanItems=scanItems.filter(i=>i.name.trim()).map(i=>({...i,base:inferBase(i.name),category:inferCategory(i.name),qty:i.qty||1,unit:i.unit||'stk',price:Number(i.price||0)}));if(!total)total=scanItems.reduce((s,i)=>s+i.price,0);state.purchases.push({id:uid(),merchant,date,total,items:scanItems});save();$('reviewCard').style.display='none';$('receiptImage').value='';$('scanPreview').style.display='none';$('ocrBtn').style.display='none';$('scanStatus').textContent='Gespeichert.';toast('Einkauf gespeichert');go('dashboard')};
+
+  // --- E-Check Kids Scanner engine copied into BonKlar; E-Check itself is not modified. ---
+  let html5Scanner=null,nativeStream=null,nativeTimer=null,nativeFallbackTimer=null,scannerFallbackTimer=null,scanHintTimer=null,scannerRetryTimer=null,scannerPass=0,torchOn=false,scannerSessionId=0,scannerLocked=false,scannerLookupBusy=false,scanCandidate="",scanCandidateCount=0,scanCandidateAt=0;
+  function scannerSetStatus(msg){const e=$('barcodeScanStatus');if(e)e.textContent=msg}
+  function scannerError(msg){const e=$('barcodeScanError');if(e){e.textContent=msg;e.classList.remove('hidden')}}
+  function scannerClearError(){const e=$('barcodeScanError');if(e){e.textContent='';e.classList.add('hidden')}}
+  function validGtinChecksum(code){
+    code=String(code||'').replace(/\D/g,'');
+    if([8,12,13,14].indexOf(code.length)<0)return true;
+    let sum=0,posFromRight=0;
+    for(let i=code.length-2;i>=0;i--){posFromRight++;const n=Number(code.charAt(i));sum+=n*(posFromRight%2===1?3:1)}
+    const check=(10-(sum%10))%10;
+    return check===Number(code.charAt(code.length-1));
+  }
+  function scannerTrack(){return nativeStream&&nativeStream.getVideoTracks?nativeStream.getVideoTracks()[0]:null}
+  async function setupScannerTrack(track){
+    if(!track)return;
+    try{
+      const caps=track.getCapabilities?track.getCapabilities():{},adv={};
+      if(Array.isArray(caps.focusMode)&&caps.focusMode.indexOf('continuous')>=0)adv.focusMode='continuous';
+      if(Array.isArray(caps.exposureMode)&&caps.exposureMode.indexOf('continuous')>=0)adv.exposureMode='continuous';
+      if(Array.isArray(caps.whiteBalanceMode)&&caps.whiteBalanceMode.indexOf('continuous')>=0)adv.whiteBalanceMode='continuous';
+      if(caps.zoom&&Number.isFinite(Number(caps.zoom.min))&&Number.isFinite(Number(caps.zoom.max))){
+        const z=Math.min(Number(caps.zoom.max),Math.max(Number(caps.zoom.min),1.15));if(z>Number(caps.zoom.min))adv.zoom=z;
+      }
+      if(Object.keys(adv).length)await track.applyConstraints({advanced:[adv]});
+      const torch=$('scanTorchBtn');if(torch){const supported=!!caps.torch;torch.classList.toggle('hidden',!supported);torch.textContent=torchOn?'🔦 Licht aus':'🔦 Licht an'}
+    }catch(e){}
+  }
+  async function toggleScannerTorch(){
+    const track=scannerTrack(),btn=$('scanTorchBtn');if(!track||!track.getCapabilities)return;
+    try{const caps=track.getCapabilities();if(!caps.torch)return;torchOn=!torchOn;await track.applyConstraints({advanced:[{torch:torchOn}]});if(btn)btn.textContent=torchOn?'🔦 Licht aus':'🔦 Licht an';scannerSetStatus(torchOn?'Licht ist an – Barcode ruhig in den Rahmen halten.':'Licht ist aus – Barcode ruhig in den Rahmen halten.')}
+    catch(e){torchOn=false;if(btn)btn.classList.add('hidden')}
+  }
+  async function stopNative(){
+    if(nativeTimer){clearTimeout(nativeTimer);nativeTimer=null}if(nativeFallbackTimer){clearTimeout(nativeFallbackTimer);nativeFallbackTimer=null}
+    torchOn=false;const torch=$('scanTorchBtn');if(torch){torch.classList.add('hidden');torch.textContent='🔦 Licht an'}
+    if(nativeStream){nativeStream.getTracks().forEach(t=>t.stop());nativeStream=null}
+    const v=$('nativeVideo');try{v.pause();v.srcObject=null}catch(e){}$('nativeWrap').classList.add('hidden');
+  }
+  async function stopProductScannerEngine(){
+    if(scannerFallbackTimer){clearTimeout(scannerFallbackTimer);scannerFallbackTimer=null}if(scanHintTimer){clearTimeout(scanHintTimer);scanHintTimer=null}if(scannerRetryTimer){clearTimeout(scannerRetryTimer);scannerRetryTimer=null}
+    scannerPass=0;const hint=document.querySelector('#barcodeScannerOverlay .scan-instruction-v4 small');if(hint)hint.textContent='Die Erkennung startet automatisch';
+    await stopNative();if(html5Scanner){try{await html5Scanner.stop()}catch(e){}try{html5Scanner.clear()}catch(e){}html5Scanner=null}$('reader').classList.add('hidden');
+  }
+  async function clearHtml5Scanner(){
+    if(scannerRetryTimer){clearTimeout(scannerRetryTimer);scannerRetryTimer=null}
+    if(html5Scanner){try{await html5Scanner.stop()}catch(e){}try{html5Scanner.clear()}catch(e){}html5Scanner=null}$('reader').classList.add('hidden');
+  }
+  async function restartHtml5ScannerPass(session){
+    if(session!==scannerSessionId||scannerLocked||scannerLookupBusy||!html5Scanner)return;
+    scannerSetStatus('Barcode noch nicht erkannt – Kamera wird automatisch neu fokussiert …');await clearHtml5Scanner();
+    if(session!==scannerSessionId||scannerLocked||scannerLookupBusy)return;scannerPass=2;await startHtml5Scanner(session,true,2);
+  }
+  async function startHtml5Scanner(session,switched,pass){
+    if(session!==scannerSessionId||scannerLocked||scannerLookupBusy)return;if(!window.Html5Qrcode){scannerError('Scanner konnte nicht geladen werden. Seite bitte neu laden.');return}
+    pass=pass||1;scannerPass=pass;
+    try{
+      $('reader').classList.remove('hidden');const f=window.Html5QrcodeSupportedFormats;const formats=f?[f.EAN_13,f.EAN_8,f.UPC_A,f.UPC_E,f.CODE_128]:undefined;
+      html5Scanner=new Html5Qrcode('reader',formats?{formatsToSupport:formats,verbose:false}:{verbose:false});
+      await html5Scanner.start({facingMode:'environment'},{fps:pass===1?26:30,qrbox:function(w,h){const qw=Math.floor(Math.min(w*.98,660));const qh=pass===1?Math.floor(Math.max(125,Math.min(h*.36,230))):Math.floor(Math.max(180,Math.min(h*.55,360)));return{width:qw,height:qh}},disableFlip:true},
+        decoded=>{if(session===scannerSessionId)foundProductCode(decoded)},()=>{});
+      if(session!==scannerSessionId)return;
+      scannerSetStatus(pass===2?'Erkennung erweitert – Barcode einfach weiter im Rahmen halten.':(switched?'Erkennung optimiert – Barcode ruhig in den Rahmen halten.':'Kamera läuft – Barcode groß und ruhig in den Rahmen halten.'));
+      if(pass===1){scannerRetryTimer=setTimeout(()=>{if(session===scannerSessionId&&!scannerLocked&&!scannerLookupBusy)restartHtml5ScannerPass(session)},4800)}
+      else{scannerRetryTimer=setTimeout(()=>{if(session!==scannerSessionId||scannerLocked||scannerLookupBusy)return;scannerSetStatus('Scanner läuft weiter – bei dunkler Umgebung Licht einschalten oder Barcode 10–20 cm entfernt halten.');$('barcodePhotoFallback').classList.remove('hidden')},6500)}
+    }catch(e){if(session!==scannerSessionId)return;await stopProductScannerEngine();scannerError('Kamera konnte nicht gestartet werden. Prüfe die Kamera-Berechtigung für diese Webseite.')}
+  }
+  async function switchScannerEngine(session){
+    if(session!==scannerSessionId||scannerLocked||scannerLookupBusy||!nativeStream)return;scannerSetStatus('Noch kein Treffer – Erkennung wird automatisch optimiert …');await stopNative();if(session!==scannerSessionId)return;await startHtml5Scanner(session,true);
+  }
+  async function startProductScannerEngine(session){
+    session=session||scannerSessionId;await stopProductScannerEngine();if(session!==scannerSessionId)return;
+    scanCandidate='';scanCandidateCount=0;scanCandidateAt=0;scannerClearError();scannerLocked=false;torchOn=false;scannerPass=0;
+    const torch=$('scanTorchBtn');if(torch){torch.classList.add('hidden');torch.textContent='🔦 Licht an'}
+    if(!window.isSecureContext&&location.hostname!=='localhost'){scannerError('Live-Scan braucht eine HTTPS-Verbindung.');return}
+    scannerSetStatus('Kamera wird gestartet …');$('barcodePhotoFallback').classList.add('hidden');
+    scannerFallbackTimer=setTimeout(()=>{if(session!==scannerSessionId||scannerLocked)return;$('barcodePhotoFallback').classList.remove('hidden')},8500);
+    scanHintTimer=setTimeout(()=>{if(session!==scannerSessionId||scannerLocked)return;const hint=document.querySelector('#barcodeScannerOverlay .scan-instruction-v4 small');if(hint)hint.textContent='Noch nichts? Einfach draufhalten – die Erkennung optimiert sich automatisch. Mehr Licht und 10–20 cm Abstand helfen.'},2500);
+    if('BarcodeDetector' in window){
+      try{
+        const supported=BarcodeDetector.getSupportedFormats?await BarcodeDetector.getSupportedFormats():[];const wanted=['ean_13','ean_8','upc_a','upc_e','code_128'].filter(x=>!supported.length||supported.indexOf(x)>=0);const detector=new BarcodeDetector({formats:wanted.length?wanted:['ean_13','ean_8','upc_a','upc_e']});
+        nativeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30,max:30}},audio:false});
+        if(session!==scannerSessionId){await stopNative();return}
+        const video=$('nativeVideo');video.srcObject=nativeStream;$('nativeWrap').classList.remove('hidden');await video.play();await setupScannerTrack(scannerTrack());scannerSetStatus('Kamera läuft – Barcode groß und ruhig in den Rahmen halten.');
+        nativeFallbackTimer=setTimeout(()=>switchScannerEngine(session),3200);
+        const loop=async()=>{if(!nativeStream||session!==scannerSessionId||scannerLocked)return;try{const codes=await detector.detect(video);if(codes&&codes[0]&&codes[0].rawValue)foundProductCode(codes[0].rawValue)}catch(e){}nativeTimer=setTimeout(loop,70)};setTimeout(()=>{if(session===scannerSessionId)loop()},180);return;
+      }catch(e){await stopNative();if(session!==scannerSessionId)return}
+    }
+    if(session!==scannerSessionId)return;await startHtml5Scanner(session,false);
+  }
+  async function openProductScanner(){
+    scannerSessionId++;const session=scannerSessionId;scannerLookupBusy=false;scannerLocked=false;const ov=$('barcodeScannerOverlay');ov.classList.remove('hidden','scan-processing','manual-entry-v56');document.body.style.overflow='hidden';setTimeout(()=>{if(session===scannerSessionId)startProductScannerEngine(session)},100)
+  }
+  async function closeProductScanner(){
+    scannerSessionId++;scannerLookupBusy=false;scannerLocked=false;await stopProductScannerEngine();const ov=$('barcodeScannerOverlay');ov.classList.add('hidden');ov.classList.remove('scan-processing','manual-entry-v56');document.body.style.overflow='';
+  }
+  async function toggleManualBarcode(open){
+    const ov=$('barcodeScannerOverlay'),on=open!==false;ov.classList.toggle('manual-entry-v56',on);
+    if(on){scannerLocked=true;await stopProductScannerEngine();const input=$('barcodeManualFullscreen');if(input){input.value='';setTimeout(()=>input.focus(),60)}}
+    else{scannerLocked=false;const input=$('barcodeManualFullscreen');if(input)input.value='';if(!ov.classList.contains('hidden'))startProductScannerEngine(scannerSessionId)}
+  }
+  function foundProductCode(raw){
+    if(scannerLocked||scannerLookupBusy)return;const code=String(raw||'').replace(/\D/g,'');if(code.length<8||code.length>14)return;
+    if(!validGtinChecksum(code)){scannerSetStatus('Barcode noch nicht eindeutig erkannt – bitte kurz ruhig halten …');return}
+    const now=Date.now();if(code!==scanCandidate||now-scanCandidateAt>1200){scanCandidate=code;scanCandidateCount=1;scanCandidateAt=now;scannerSetStatus('Barcode erkannt – bitte kurz ruhig halten zur Bestätigung …');return}
+    scanCandidateCount++;scanCandidateAt=now;if(scanCandidateCount<2){scannerSetStatus('Barcode wird bestätigt …');return}
+    scannerLocked=true;scannerLookupBusy=true;scannerSetStatus('✓ Barcode sicher erkannt: '+code);$('barcodeScannerOverlay').classList.add('scan-processing');try{if(navigator.vibrate)navigator.vibrate([80,40,80])}catch(e){}
+    stopProductScannerEngine().then(()=>lookupScannedProduct(code)).finally(()=>{setTimeout(()=>{scannerLocked=false;scannerLookupBusy=false},700)});
+  }
+  async function lookupManualBarcode(){
+    if(scannerLookupBusy)return;const code=String($('barcodeManualFullscreen').value||'').replace(/\D/g,'');if(code.length<8||code.length>14){scannerSetStatus('Bitte einen gültigen Barcode mit 8 bis 14 Ziffern eingeben.');return}
+    scannerLookupBusy=true;scannerLocked=true;$('barcodeScannerOverlay').classList.remove('manual-entry-v56');$('barcodeScannerOverlay').classList.add('scan-processing');scannerSetStatus('🔎 Produkt wird gesucht …');await stopProductScannerEngine();try{await lookupScannedProduct(code)}finally{scannerLookupBusy=false;scannerLocked=false}
+  }
+  async function scanBarcodePhoto(file){
+    if(!file||!window.Html5Qrcode)return;scannerSetStatus('Barcode-Foto wird ausgewertet …');await stopProductScannerEngine();const div=document.createElement('div');div.id='tmpReaderBonKlar';div.style.display='none';document.body.appendChild(div);const f=window.Html5QrcodeSupportedFormats,formats=f?[f.EAN_13,f.EAN_8,f.UPC_A,f.UPC_E,f.CODE_128]:undefined;const s=new Html5Qrcode('tmpReaderBonKlar',formats?{formatsToSupport:formats,verbose:false}:{verbose:false});
+    try{const x=await s.scanFile(file,true);foundProductCode(x);if(scanCandidateCount===1){scanCandidateCount=2;foundProductCode(x)}}catch(e){scannerError('Barcode auf dem Foto nicht erkannt. Bitte näher, gerade und ohne Spiegelung fotografieren.')}finally{try{s.clear()}catch(e){}div.remove()}
+  }
+  async function lookupScannedProduct(code){
+    try{
+      scannerSetStatus('Produkt wird geladen …');
+      const fields='code,product_name,product_name_de,brands,image_front_url,image_front_small_url,quantity';
+      const url='https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json?fields='+encodeURIComponent(fields);
+      const r=await fetch(url,{headers:{Accept:'application/json'}});const d=await r.json();const p=d&&d.product;
+      await closeProductScanner();
+      showBarcodeProduct(code,p||null);
+    }catch(e){await closeProductScanner();showBarcodeProduct(code,null)}
+  }
+  function showBarcodeProduct(code,p){
+    const name=p?(p.product_name_de||p.product_name||'Produkt'):'Produkt nicht in Open Food Facts gefunden';const brand=p&&p.brands?p.brands:'';const img=p&&(p.image_front_small_url||p.image_front_url)?(p.image_front_small_url||p.image_front_url):'';
+    const box=$('barcodeProductResult');box.style.display='block';
+    box.innerHTML='<h3 style="color:#0f172a;font-size:16px">Produkt erkannt</h3><div class="barcode-product">'+(img?'<img src="'+esc(img)+'" alt="">':'<div class="icon" style="width:70px;height:70px">📦</div>')+'<div><div class="row-title">'+esc(name)+'</div><div class="row-sub">'+esc(brand)+(brand?' · ':'')+esc(code)+'</div></div></div><div class="form"><div class="split"><div class="field"><label>Laden</label><input id="quickMerchant" placeholder="z. B. Lidl"></div><div class="field"><label>Preis</label><input id="quickPrice" type="number" inputmode="decimal" step="0.01" placeholder="0,00"></div></div><div class="split"><div class="field"><label>Menge</label><input id="quickQty" type="number" step="0.01" value="1"></div><div class="field"><label>Einheit</label><select id="quickUnit"><option value="stk">Stück</option><option value="l">Liter</option><option value="kg">kg</option></select></div></div><button id="saveBarcodeProductBtn" class="btn green">Produkt als Einkauf speichern</button><button id="scanAnotherProductBtn" class="btn secondary">Noch ein Produkt scannen</button></div>';
+    $('saveBarcodeProductBtn').onclick=()=>{const merchant=$('quickMerchant').value.trim()||'Unbekannter Laden',price=Number($('quickPrice').value||0),qty=Math.max(.001,Number($('quickQty').value||1)),unit=$('quickUnit').value;if(price<=0){toast('Bitte Preis eintragen');return}const item={name:name,base:inferBase(name),category:inferCategory(name),qty,unit,price,barcode:code};state.purchases.push({id:uid(),merchant,date:new Date().toISOString().slice(0,10),total:price,items:[item]});save();box.style.display='none';toast('Produkt gespeichert');go('dashboard')};
+    $('scanAnotherProductBtn').onclick=openProductScanner;box.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  $('startProductScannerBtn').onclick=openProductScanner;$('closeProductScannerBtn').onclick=closeProductScanner;$('scanTorchBtn').onclick=toggleScannerTorch;
+  $('barcodeManualOpenBtn').onclick=()=>toggleManualBarcode(true);$('barcodeManualCloseBtn').onclick=()=>toggleManualBarcode(false);$('barcodeManualLookupBtn').onclick=lookupManualBarcode;
+  $('barcodePhotoBtn').onclick=()=>$('barcodePhoto').click();$('barcodePhoto').onchange=function(){if(this.files&&this.files[0])scanBarcodePhoto(this.files[0]);this.value=''};
+
   renderAll();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
