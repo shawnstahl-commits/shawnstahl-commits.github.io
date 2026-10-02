@@ -123,7 +123,7 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 <div class="toast" id="toast"></div>
 
 <script>
-var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,pvKwp:12.15,pvStart:"2026-04-14",dark:false},heatLogs:[{date:"2026-03-31",kwh:1884,note:"App-Verbrauch bis März"}],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
+var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,pvKwp:12.15,pvStart:"2026-04-14",dark:false},heatLogs:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
 {date:"2026-03-10",imp:8239,feed:null,note:""},
@@ -138,7 +138,7 @@ var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feed
 ]};
 function clone(x){return JSON.parse(JSON.stringify(x))}
 var state;try{state=JSON.parse(localStorage.getItem("stromtagebuch_v2"))||clone(DEFAULTS)}catch(e){state=clone(DEFAULTS)}
-function ensureState(){if(!state.settings)state.settings=clone(DEFAULTS.settings);if(!Array.isArray(state.entries))state.entries=clone(DEFAULTS.entries);if(!Array.isArray(state.heatLogs))state.heatLogs=clone(DEFAULTS.heatLogs);if(!Array.isArray(state.evLogs))state.evLogs=[];if(!Array.isArray(state.events))state.events=clone(DEFAULTS.events);state.entries.forEach(function(e){if(!("pvProd" in e))e.pvProd=null})}
+function ensureState(){if(!state.settings)state.settings=clone(DEFAULTS.settings);if(!Array.isArray(state.entries))state.entries=clone(DEFAULTS.entries);if(!Array.isArray(state.heatLogs))state.heatLogs=[];if(!state.meta)state.meta={};if(!state.meta.seedHeatRemoved){state.heatLogs=state.heatLogs.filter(function(x){return !(x&&x.date==="2026-03-31"&&Number(x.kwh)===1884&&x.note==="App-Verbrauch bis März")});state.meta.seedHeatRemoved=true}if(!Array.isArray(state.evLogs))state.evLogs=[];if(!Array.isArray(state.events))state.events=clone(DEFAULTS.events);state.entries.forEach(function(e){if(!("pvProd" in e))e.pvProd=null})}
 ensureState();
 function save(){ensureState();localStorage.setItem("stromtagebuch_v2",JSON.stringify(state));render()}
 function sorted(){return state.entries.slice().sort(function(a,b){return a.date.localeCompare(b.date)})}
