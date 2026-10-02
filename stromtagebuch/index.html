@@ -73,6 +73,36 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   opacity:0;
   cursor:pointer;
 }
+
+.dateField{position:relative}
+.dateField input[type="date"]{padding-right:64px!important;background-image:none!important}
+.dateField input[type="date"]::-webkit-calendar-picker-indicator{
+  opacity:0!important;
+  width:64px!important;
+  height:100%!important;
+  position:absolute!important;
+  right:0!important;
+  top:0!important;
+}
+.calendarBtn{
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  width:44px;
+  height:44px;
+  border:0;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  background:var(--card);
+  color:var(--text);
+  cursor:pointer;
+  z-index:4;
+  box-shadow:0 0 0 1px var(--line) inset;
+}
+.calendarBtn svg{width:22px;height:22px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+[data-theme="dark"] .calendarBtn{background:#14222c;color:#fff}
 @media print{.nav,.top .icon,.actions,.noPrint,.primary,.secondary,.danger,.mini{display:none!important}body{background:white;color:#111;padding:0}.top{position:static;background:white}.view{display:none!important}.view.active{display:block!important}.card,.form,.hero{box-shadow:none;break-inside:avoid}.hero{color:#111;background:white;border:1px solid #ccc}.heroBox{background:#f4f4f4}.wrap{max-width:none}}
 @media(max-width:520px){.big{font-size:34px}.row{grid-template-columns:1fr}.value{font-size:21px}.kpi3{grid-template-columns:1fr 1fr}.kpi3 .wideMobile{grid-column:1/-1}}
 </style>
@@ -440,6 +470,27 @@ var today=new Date().toISOString().slice(0,10);["heatDate","evDate","eventDate",
 var photoFile=null;document.getElementById("meterPhoto").onchange=function(e){photoFile=e.target.files[0]||null;var img=document.getElementById("photoPreview");if(photoFile){img.src=URL.createObjectURL(photoFile);img.style.display="block";document.getElementById("ocrHint").textContent="Foto bereit. Jetzt „Zahl aus Foto erkennen“ tippen."}};
 function loadOCR(){return new Promise(function(resolve,reject){if(window.Tesseract){resolve();return}var sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc)})}
 document.getElementById("ocrButton").onclick=async function(){if(!photoFile){toast("Erst ein Foto aufnehmen");return}var hint=document.getElementById("ocrHint"),btn=this;btn.disabled=true;hint.textContent="Erkennung läuft…";try{await loadOCR();var res=await Tesseract.recognize(photoFile,"eng",{logger:function(m){if(m.status==="recognizing text")hint.textContent="Erkennung "+Math.round((m.progress||0)*100)+" %"}});var txt=res.data.text.replace(/,/g,".");var matches=txt.match(/\d{2,7}(?:\.\d{1,3})?/g)||[];var nums=matches.map(function(x){return parseFloat(x)}).filter(function(x){return isFinite(x)});if(!nums.length)throw new Error("no number");nums.sort(function(a,b){return b-a});var val=nums[0],target=document.getElementById("ocrTarget").value;document.getElementById(target).value=val;hint.textContent="Erkannt: "+n(val,3)+" · bitte am Zähler prüfen.";validate();toast("Zahl übernommen")}catch(err){hint.textContent="Keine sichere Zahl erkannt. Foto möglichst gerade, nah und ohne Spiegelung aufnehmen.";toast("Erkennung nicht sicher")}finally{btn.disabled=false}};
+
+function enhanceDateInputs(){
+  document.querySelectorAll('input[type="date"]').forEach(function(input){
+    if(input.parentElement&&input.parentElement.classList.contains("dateField"))return;
+    var wrap=document.createElement("div");
+    wrap.className="dateField";
+    input.parentNode.insertBefore(wrap,input);
+    wrap.appendChild(input);
+    var btn=document.createElement("button");
+    btn.type="button";
+    btn.className="calendarBtn";
+    btn.setAttribute("aria-label","Kalender öffnen");
+    btn.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 11h18"></path></svg>';
+    btn.onclick=function(){
+      try{ if(typeof input.showPicker==="function") input.showPicker(); else { input.focus(); input.click(); } }
+      catch(e){ input.focus(); input.click(); }
+    };
+    wrap.appendChild(btn);
+  });
+}
+enhanceDateInputs();
 if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(function(){});
 render();
 </script>
