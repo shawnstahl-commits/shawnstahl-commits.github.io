@@ -7,7 +7,8 @@
   <meta name="description" content="BonKlar – Kassenbons, Einkäufe und Preise vergleichen." />
   <link rel="manifest" href="./manifest.webmanifest" />
   <title>BonKlar</title>
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>\n  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root{--bg:#f6f7fb;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#16a34a;--brand2:#22c55e;--warn:#f59e0b;--danger:#dc2626;--shadow:0 10px 30px rgba(15,23,42,.08)}
     *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
@@ -148,8 +149,22 @@
         </div>
       </div>
 
-      <div class="section-title"><h2>Oder schnell manuell</h2></div>
-      <button id="manualReceiptBtn" class="btn secondary" style="width:100%">Leeren Einkauf anlegen</button>
+      <div class="section-title"><h2>Oder manuell eintragen</h2></div>
+      <div class="card" id="manualSimpleCard">
+        <div class="form">
+          <div class="split">
+            <div class="field"><label>Laden</label><input id="manualShop" placeholder="z. B. HOL’AB!"></div>
+            <div class="field"><label>Datum</label><input id="manualDate" type="date"></div>
+          </div>
+          <div class="field"><label>Gesamtsumme</label><input id="manualTotal" type="number" inputmode="decimal" step="0.01" placeholder="0,00"></div>
+          <div class="split">
+            <div class="field"><label>Produkt (optional)</label><input id="manualProduct" placeholder="z. B. Milch"></div>
+            <div class="field"><label>Preis (optional)</label><input id="manualProductPrice" type="number" inputmode="decimal" step="0.01" placeholder="0,00"></div>
+          </div>
+          <button id="manualQuickSaveBtn" class="btn green" type="button">Manuellen Einkauf speichern</button>
+        </div>
+      </div>
+      <button id="manualReceiptBtn" class="btn secondary" style="width:100%;margin-top:10px">Erweiterte manuelle Eingabe öffnen</button>
     </section>
 
     <section id="products" class="view">
@@ -258,7 +273,28 @@
   function seed(){
     return {budget:800,purchases:[]};
   }
-  let state=JSON.parse(localStorage.getItem(KEY)||'null')||seed();
+  function sanitizeState(raw){
+    const s=(raw&&typeof raw==='object')?raw:seed();
+    const purchases=Array.isArray(s.purchases)?s.purchases:[];
+    s.purchases=purchases.map(p=>({
+      id:p&&p.id?p.id:uid(),
+      merchant:p&&p.merchant?String(p.merchant):'Unbekannter Laden',
+      date:p&&p.date?String(p.date):new Date().toISOString().slice(0,10),
+      total:Number(p&&p.total||0),
+      items:Array.isArray(p&&p.items)?p.items.map(i=>({
+        name:i&&i.name?String(i.name):'Produkt',
+        base:i&&i.base?String(i.base):(i&&i.name?String(i.name):'Produkt'),
+        category:i&&i.category?String(i.category):'Sonstiges',
+        qty:Number(i&&i.qty||1),
+        unit:i&&i.unit?String(i.unit):'stk',
+        price:Number(i&&i.price||0),
+        barcode:i&&i.barcode?String(i.barcode):undefined
+      })):[]
+    }));
+    s.budget=Number(s.budget||800);
+    return s;
+  }
+  let state=sanitizeState(JSON.parse(localStorage.getItem(KEY)||'null')||seed());
   let categoryFilter='Alle';
   let scanItems=[];
   const $=id=>document.getElementById(id);
@@ -306,7 +342,7 @@
     $('purchaseDetail').innerHTML='<h2 style="margin:0">'+esc(p.merchant)+'</h2><div class="tiny">'+formatDate(p.date)+'</div><div class="hero" style="margin-top:14px"><small>Gesamtsumme</small><div class="amount" style="font-size:34px">'+euro(p.total)+'</div></div><div class="list">'+p.items.map(i=>'<div class="row"><div><div class="row-title">'+esc(i.name)+'</div><div class="row-sub">'+esc(i.category)+' · '+esc(i.qty)+' '+esc(i.unit)+'</div></div><div class="row-price">'+euro(i.price)+'</div></div>').join('')+'</div><button class="btn danger" id="deletePurchaseBtn" style="width:100%;margin-top:14px">Einkauf löschen</button>';
     $('purchaseModal').classList.add('open');$('deletePurchaseBtn').onclick=()=>{if(confirm('Diesen Einkauf wirklich löschen?')){state.purchases=state.purchases.filter(x=>x.id!==id);save();$('purchaseModal').classList.remove('open');toast('Einkauf gelöscht')}}
   }
-  function renderAll(){renderDashboard();renderProducts();renderPurchases();$('budgetInput').value=state.budget}
+  function renderAll(){renderDashboard();renderProducts();renderPurchases();$('budgetInput').value=state.budget;if($('manualDate')&&!$('manualDate').value)$('manualDate').value=new Date().toISOString().slice(0,10)}
   function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
   function go(view){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));scrollTo({top:0,behavior:'smooth'});if(view==='products')renderProducts();if(view==='purchases')renderPurchases()}
   document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.view));document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
@@ -642,6 +678,72 @@
 
   renderAll();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
+</script>
+<script>
+(function(){
+  const KEY='bonklar_v1';
+  const byId=id=>document.getElementById(id);
+  const today=()=>new Date().toISOString().slice(0,10);
+  function safeState(){
+    try{
+      const x=JSON.parse(localStorage.getItem(KEY)||'null');
+      if(x&&typeof x==='object')return {budget:Number(x.budget||800),purchases:Array.isArray(x.purchases)?x.purchases:[]};
+    }catch(e){}
+    return {budget:800,purchases:[]};
+  }
+  function quickToast(msg){
+    const t=byId('toast');if(t){t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+    else alert(msg);
+  }
+  const date=byId('manualDate');if(date&&!date.value)date.value=today();
+  const quick=byId('manualQuickSaveBtn');
+  if(quick){
+    quick.addEventListener('click',function(){
+      const shop=(byId('manualShop')?.value||'').trim()||'Unbekannter Laden';
+      const dateVal=byId('manualDate')?.value||today();
+      const total=Number(byId('manualTotal')?.value||0);
+      const product=(byId('manualProduct')?.value||'').trim();
+      const productPrice=Number(byId('manualProductPrice')?.value||0);
+      if(total<=0&&productPrice<=0){quickToast('Bitte Gesamtsumme oder Produktpreis eintragen.');return}
+      const s=safeState();
+      const items=product?[{name:product,base:product,category:'Sonstiges',qty:1,unit:'stk',price:productPrice>0?productPrice:total}]:[];
+      s.purchases.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),merchant:shop,date:dateVal,total:total>0?total:productPrice,items});
+      localStorage.setItem(KEY,JSON.stringify(s));
+      if(byId('manualShop'))byId('manualShop').value='';
+      if(byId('manualTotal'))byId('manualTotal').value='';
+      if(byId('manualProduct'))byId('manualProduct').value='';
+      if(byId('manualProductPrice'))byId('manualProductPrice').value='';
+      quickToast('Einkauf gespeichert');
+      setTimeout(()=>location.reload(),350);
+    });
+  }
+
+  // Independent fallback for manual product barcode input.
+  const lookup=byId('barcodeManualLookupBtn');
+  if(lookup){
+    lookup.addEventListener('click',async function(){
+      const input=byId('barcodeManualFullscreen');
+      const code=String(input?.value||'').replace(/\D/g,'');
+      if(code.length<8||code.length>14){const st=byId('barcodeScanStatus');if(st)st.textContent='Bitte 8 bis 14 Ziffern eingeben.';return}
+      const st=byId('barcodeScanStatus');if(st)st.textContent='Produkt wird gesucht …';
+      let name='Produkt '+code,brand='';
+      try{
+        const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),7000);
+        const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json?fields=product_name,product_name_de,brands',{signal:ctrl.signal});
+        clearTimeout(timer);const d=await r.json();const p=d&&d.product;
+        if(p){name=p.product_name_de||p.product_name||name;brand=p.brands||''}
+      }catch(e){}
+      const ov=byId('barcodeScannerOverlay');if(ov)ov.classList.add('hidden');
+      document.body.style.overflow='';
+      const box=byId('barcodeProductResult');
+      if(box){
+        box.style.display='block';
+        box.innerHTML='<h3 style="color:#0f172a;font-size:16px">Produkt manuell erkannt</h3><div class="row"><div><div class="row-title">'+name.replace(/[&<>"]/g,'')+'</div><div class="row-sub">'+brand.replace(/[&<>"]/g,'')+' · '+code+'</div></div></div><p class="tiny">Barcode ist angekommen. Laden und Preis kannst du jetzt unten manuell als Einkauf eintragen.</p>';
+        box.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    },true);
+  }
 })();
 </script>
 </body>
