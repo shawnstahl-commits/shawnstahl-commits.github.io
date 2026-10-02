@@ -1,4 +1,4 @@
-const CACHE="stromtagebuch-v19";
+const CACHE="stromtagebuch-v20";
 const ASSETS=["./manifest.webmanifest","./icon.svg"];
 self.addEventListener("install",event=>{
   self.skipWaiting();
