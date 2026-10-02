@@ -368,7 +368,7 @@
   }
   $('openReceiptCameraBtn').onclick=openReceiptCamera;$('closeReceiptCameraBtn').onclick=()=>closeReceiptCamera(true);$('receiptTorchBtn').onclick=toggleReceiptTorch;$('captureReceiptBtn').onclick=captureReceiptFromVideo;
 
-  $('receiptImage').onchange=e=>{const f=e.target.files[0];if(!f)return;const url=URL.createObjectURL(f);$('scanPreview').src=url;$('scanPreview').style.display='block';$('ocrBtn').style.display='inline-block';$('scanStatus').className='status';$('scanStatus').textContent='Bild bereit – Bon wird automatisch erkannt …';setTimeout(()=>{$('ocrBtn').click()},120)};
+  $('receiptImage').onchange=e=>{const f=e.target.files[0];if(!f)return;receiptCapturedFile=null;const url=URL.createObjectURL(f);$('scanPreview').src=url;$('scanPreview').style.display='block';$('ocrBtn').style.display='inline-block';$('scanStatus').className='status';$('scanStatus').textContent='Bild bereit – Bon wird automatisch erkannt …';setTimeout(()=>{$('ocrBtn').click()},120)};
   function inferBase(name){const n=name.toLowerCase();if(n.includes('milch'))return'Milch';if(n.includes('butter'))return'Butter';if(n.includes('gouda')||n.includes('käse'))return'Gouda';if(n.includes('wasser'))return'Mineralwasser';if(n.includes('cola'))return'Cola';if(n.includes('kaffee'))return'Kaffee';return name.trim()}
   function inferCategory(name){const n=name.toLowerCase();if(/cola|wasser|saft|bier|limo|getränk/.test(n))return'Getränke';if(/spül|wasch|reiniger|papier|seife|haushalt/.test(n))return'Haushalt';if(/milch|brot|butter|käse|gouda|banan|apfel|kaffee|joghurt|fleisch|nudel|reis|ei/.test(n))return'Lebensmittel';return'Sonstiges'}
   function parseReceipt(text){
