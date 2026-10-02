@@ -198,9 +198,13 @@ function setView(view, push=true){
   }
   window.scrollTo({top:0,behavior:"smooth"});
 }
-document.querySelectorAll("[data-view-jump]").forEach(btn=>btn.addEventListener("click",()=>setView(btn.dataset.viewJump)));
-document.querySelectorAll(".appNavBtn").forEach(btn=>btn.addEventListener("click",()=>setView(btn.dataset.view)));
-setView((location.hash||"#overview").slice(1),false);
+document.addEventListener("click",e=>{
+  const jump=e.target.closest("[data-view-jump]");
+  if(jump){setView(jump.dataset.viewJump);return;}
+  const nav=e.target.closest(".appNavBtn");
+  if(nav){setView(nav.dataset.view);}
+});
+window.addEventListener("DOMContentLoaded",()=>setView((location.hash||"#overview").slice(1),false));
 </script>
 
 <nav class="appBottom" aria-label="App-Navigation">
