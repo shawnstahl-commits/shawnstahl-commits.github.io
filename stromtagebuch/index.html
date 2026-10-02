@@ -585,7 +585,7 @@ function enhanceDateInputs(){
 }
 enhanceDateInputs();
 if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(function(){});
-render();setTimeout(function(){var sp=document.getElementById("splash");if(sp)sp.classList.add("hide")},180);setTimeout(function(){var sp=document.getElementById("splash");if(sp)sp.remove()},500);
+render();latestIdbBackup().then(function(rec){if(!rec)return idbBackup();return null}).then(function(){backupStatus()}).catch(function(){});setTimeout(function(){var sp=document.getElementById("splash");if(sp)sp.classList.add("hide")},180);setTimeout(function(){var sp=document.getElementById("splash");if(sp)sp.remove()},500);
 </script>
 </body>
 </html>
