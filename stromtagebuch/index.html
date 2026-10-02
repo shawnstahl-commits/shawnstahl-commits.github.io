@@ -29,13 +29,49 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 .dashHero{background:linear-gradient(145deg,#087d66,#0a604f);color:#fff;border-radius:24px;padding:22px;box-shadow:0 16px 38px rgba(7,92,75,.22);position:relative;overflow:hidden}.dashHero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08);right:-65px;top:-75px}.dashHero .label{color:rgba(255,255,255,.78)}.dashMoney{font-size:38px;font-weight:900;letter-spacing:-1.5px;margin:4px 0 6px}.dashHero .hint{color:rgba(255,255,255,.76);max-width:620px}.dashActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;position:relative;z-index:1}.dashAction{border:0;border-radius:13px;padding:11px 14px;font-weight:800;cursor:pointer;background:#fff;color:#075d4d}.dashAction.ghost{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.22)}.focusGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.focusCard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:var(--shadow);min-height:122px;display:flex;flex-direction:column;justify-content:space-between}.focusIcon{font-size:20px;margin-bottom:8px}.focusCard .value{font-size:23px}.focusCard .hint{margin-top:5px}.readingStrip{display:grid;grid-template-columns:2fr 1fr 1fr;gap:9px}.readingBox{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px}.readingBox .value{font-size:20px}.quickTitle{display:flex;align-items:center;justify-content:space-between;gap:10px}.quickTitle h2{margin-bottom:10px}.statusLine{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.statusLine i{width:8px;height:8px;border-radius:50%;background:var(--green);display:block}.miniStat{font-weight:850;font-size:17px;margin-top:4px}
 @media(max-width:620px){.dashMoney{font-size:33px}.readingStrip{grid-template-columns:1fr 1fr}.readingStrip .readingBox:first-child{grid-column:1/-1}.focusGrid{grid-template-columns:1fr 1fr}.focusCard{min-height:116px}.focusCard .value{font-size:20px}}
 @media(max-width:390px){.focusGrid{grid-template-columns:1fr}.dashMoney{font-size:30px}}
+
+.drawerBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:80;opacity:0;pointer-events:none;transition:.2s}
+.drawerBackdrop.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;left:0;top:0;bottom:0;width:min(86vw,330px);background:var(--card);z-index:90;transform:translateX(-105%);transition:.22s ease;box-shadow:18px 0 50px rgba(0,0,0,.18);padding:max(18px,env(safe-area-inset-top)) 14px 22px;overflow:auto}
+.drawer.open{transform:translateX(0)}
+.drawerHead{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 16px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.drawerBrand{font-weight:900;font-size:18px}
+.drawerNav{display:grid;gap:6px}
+.drawerNav button{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;color:var(--text);padding:13px 12px;border-radius:14px;text-align:left;font:inherit;font-weight:750;cursor:pointer}
+.drawerNav button:hover,.drawerNav button.active{background:var(--bg);color:var(--green)}
+.drawerNav .ico{width:28px;text-align:center;font-size:19px}
+.menuBtn{width:42px;height:42px;border-radius:13px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:20px;cursor:pointer;display:grid;place-items:center}
+.toprow{gap:10px}.toprow .brandBlock{flex:1;min-width:0}
+.viewTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.viewTitle h2{margin:0}
+.homeDetails{margin-top:14px}
+.homeDetails summary{cursor:pointer;font-weight:850;padding:14px 4px;color:var(--text)}
+.homeDetails[open] summary{margin-bottom:4px}
+.nav{display:none!important}
+body{padding-bottom:24px}
+@media(max-width:520px){.top{padding-left:8px;padding-right:8px}.brand{font-size:17px}.sub{font-size:11px}}
 @media print{.nav,.top .icon,.actions,.noPrint,.primary,.secondary,.danger,.mini{display:none!important}body{background:white;color:#111;padding:0}.top{position:static;background:white}.view{display:none!important}.view.active{display:block!important}.card,.form,.hero{box-shadow:none;break-inside:avoid}.hero{color:#111;background:white;border:1px solid #ccc}.heroBox{background:#f4f4f4}.wrap{max-width:none}}
 @media(max-width:520px){.big{font-size:34px}.row{grid-template-columns:1fr}.value{font-size:21px}.kpi3{grid-template-columns:1fr 1fr}.kpi3 .wideMobile{grid-column:1/-1}}
 </style>
 </head>
 <body>
+<div class="drawerBackdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawerHead"><div><div class="drawerBrand">⚡ Stromtagebuch</div><div class="hint">Bereiche</div></div><button class="icon" id="menuClose">✕</button></div>
+  <div class="drawerNav">
+    <button class="active" data-go="home"><span class="ico">⌂</span>Übersicht</button>
+    <button data-go="add"><span class="ico">＋</span>Neue Ablesung</button>
+    <button data-go="ewe"><span class="ico">💶</span>EWE-Vergütung</button>
+    <button data-go="pv"><span class="ico">☀️</span>PV-Anlage</button>
+    <button data-go="heat"><span class="ico">🔥</span>Wärmepumpe</button>
+    <button data-go="ev"><span class="ico">🚗</span>BYD-Laden</button>
+    <button data-go="history"><span class="ico">▥</span>Verlauf</button>
+    <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
+    <button data-go="settings"><span class="ico">⚙</span>Einstellungen</button>
+  </div>
+</aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><div><div class="brand">⚡ Stromtagebuch</div><div class="sub">Strom · PV · Kosten</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch</div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <section class="view active" data-view="home">
 <div class="dashHero">
@@ -70,7 +106,7 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 <div class="card"><div class="label">PV-Vergütung</div><div class="value good" id="periodRevenue">–</div><div class="hint">aus Einspeisung</div></div>
 </div>
 
-<h2>Kontrolle & Prognose</h2><div class="grid">
+<details class="homeDetails"><summary>Weitere Details & Prognosen anzeigen</summary><h2>Kontrolle & Prognose</h2><div class="grid">
 <div class="card"><div class="label">30-Tage-Stromkosten</div><div class="value" id="forecastCost">–</div><div class="hint">inkl. anteiligem Grundpreis</div></div>
 <div class="card"><div class="label">Abschlags-Ampel</div><div class="traffic"><span class="dot" id="paymentDot"></span><div><div class="value" style="font-size:19px" id="paymentStatus">–</div><div class="hint" id="paymentHint">–</div></div></div></div>
 <div class="card"><div class="label">Monatsvergleich</div><div class="value" id="monthCompare">–</div><div class="hint" id="monthCompareHint">–</div></div>
@@ -86,6 +122,7 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 
 <div class="card" style="margin-top:10px"><div class="label">Netzbezug ↔ Einspeisung · letzter Zeitraum</div><div class="meter"><i id="flowMeter" style="width:50%"></i></div><div class="hint" id="flowHint">–</div></div>
 <h2>Monate</h2><div class="card"><div class="monthbars" id="monthBars"></div><div class="hint">Blau = Netzbezug · Grün = Einspeisung (auf Kalendermonate verteilt)</div></div>
+</details>
 </section>
 
 <section class="view" data-view="add">
@@ -119,16 +156,9 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 
 <section class="view" data-view="history"><h2>Verlauf</h2><div class="card chart"><canvas id="chart"></canvas></div><h2>Alle Einträge</h2><div class="table"><table><thead><tr><th>Datum</th><th>1.8.0</th><th>Δ</th><th>2.8.0</th><th>Δ</th><th>PV Erzeugung</th><th>Notiz</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
 
-<section class="view" data-view="pv">
-<div class="sectionTitle"><h2>Energie-Zentrale</h2><span class="pill">Haus · PV · Wärme · Auto</span></div>
-<div class="grid">
-<div class="card"><div class="label">PV-Anlage</div><div class="value" id="pvPower">–</div><div class="hint">ohne Batteriespeicher</div></div>
-<div class="card"><div class="label">Einspeisevergütung</div><div class="value good" id="pvRate">–</div><div class="hint">pro kWh</div></div>
-<div class="card"><div class="label">Arbeitspreis</div><div class="value" id="workRate">–</div></div>
-<div class="card"><div class="label">Grundpreis</div><div class="value" id="baseRate">–</div><div class="hint">pro Jahr</div></div>
-<div class="card wide"><div class="label">Aktueller Abschlag</div><div class="value" id="payment">–</div><div class="hint">bis 30.04.2026: 240 €/Monat · seit 01.05.2026: aktuell hinterlegter Abschlag</div></div>
-</div>
 
+<section class="view" data-view="ewe">
+<div class="viewTitle"><h2>💶 EWE-Vergütung</h2><span class="pill">Einspeisung</span></div>
 <h2>EWE · Einspeisevergütung</h2>
 <div class="grid">
 <div class="card"><div class="label">Berechnete Vergütung</div><div class="value good" id="eweExpected">–</div><div class="hint" id="eweExpectedHint">2.8.0 × Vergütungssatz</div></div>
@@ -144,6 +174,20 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 </div>
 <div class="card" style="margin-top:10px"><div class="label">Auszahlungsverlauf</div><div class="loglist" id="ewePaymentLogs" style="margin-top:10px"></div></div>
 
+
+</section>
+
+<section class="view" data-view="pv">
+<div class="viewTitle"><h2>☀️ PV-Anlage</h2><span class="pill">12,15 kWp</span></div>
+<div class="grid">
+<div class="card"><div class="label">PV-Anlage</div><div class="value" id="pvPower">–</div><div class="hint">ohne Batteriespeicher</div></div>
+<div class="card"><div class="label">Einspeisevergütung</div><div class="value good" id="pvRate">–</div><div class="hint">pro kWh</div></div>
+<div class="card"><div class="label">Arbeitspreis</div><div class="value" id="workRate">–</div></div>
+<div class="card"><div class="label">Grundpreis</div><div class="value" id="baseRate">–</div><div class="hint">pro Jahr</div></div>
+<div class="card wide"><div class="label">Aktueller Abschlag</div><div class="value" id="payment">–</div><div class="hint">bis 30.04.2026: 240 €/Monat · seit 01.05.2026: aktuell hinterlegter Abschlag</div></div>
+</div>
+
+
 <h2>PV-Auswertung</h2><div class="grid">
 <div class="card"><div class="label">Voraussichtliche Einspeisevergütung</div><div class="value good" id="pvRevenueTotal">–</div><div class="hint" id="pvRevenueHint">aus offiziellem 2.8.0-Zähler</div></div>
 <div class="card"><div class="label">Eigenverbrauch</div><div class="value" id="selfConsumption">–</div><div class="hint" id="selfConsumptionHint">PV-Erzeugungsstand nötig</div></div>
@@ -151,6 +195,7 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 <div class="card"><div class="label">PV-Wert / Ersparnis</div><div class="value good" id="pvValue">–</div><div class="hint" id="pvValueHint">Eigenverbrauch + Einspeisung</div></div>
 <div class="card wide"><div class="label">Geschätzte Stromkosten ohne PV</div><div class="value" id="withoutPv">–</div><div class="hint" id="withoutPvHint">Für diese Berechnung brauchen wir mindestens zwei PV-Erzeugungsstände.</div></div>
 </div>
+
 
 <h2 id="pvSnapshotTitle">PV-App · letzter Stand</h2><div class="grid">
 <div class="card"><div class="label">PV-Erzeugung seit Inbetriebnahme</div><div class="value good" id="snapGeneration">9,15 MWh</div><div class="hint">PV-App Lebensdauer / 2026</div></div>
@@ -163,13 +208,30 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 <div class="card wide"><div class="label">Aktueller Monat in der PV-App</div><div class="value" id="snapMonth">25,59 kWh</div><div class="hint">wird bei neuen PV-App-Werten aktualisiert</div></div>
 </div>
 
+
 <h2>Monatsübersicht</h2><div class="table"><table><thead><tr><th>Monat</th><th>Netz</th><th>Einspeisung</th><th>Stromkosten*</th><th>PV €</th></tr></thead><tbody id="monthRows"></tbody></table></div><div class="hint" style="margin:8px 2px">* inkl. anteiligem Grundpreis; Zwischenstände werden tageweise auf Monate verteilt.</div>
 
-<h2>Wärmepumpe · Zählerschrank</h2><div class="form noPrint"><div class="row"><div><label>Datum</label><input class="input" type="date" id="heatDate"></div><div><label>Zählerstand gesamt (kWh)</label><input class="input" type="number" id="heatKwh" step="0.01" inputmode="decimal"></div></div><label>Notiz</label><input class="input" id="heatNote" placeholder="z. B. Zählerschrank abgelesen"><button class="primary" id="addHeat" style="width:100%;margin-top:12px">Zählerstand speichern</button></div><div class="grid" style="margin-top:10px"><div class="card"><div class="label">Aktueller WP-Zählerstand</div><div class="value" id="heatMeterCurrent">–</div><div class="hint" id="heatMeterDate">–</div></div><div class="card"><div class="label">Verbrauch seit Startwert</div><div class="value" id="heatTotal">–</div><div class="hint" id="heatAverage">Ab dem zweiten Wert berechenbar</div></div></div><div class="card" style="margin-top:10px"><div class="label">Zählerstände</div><div class="loglist" id="heatLogs" style="margin-top:10px"></div></div>
 
-<h2>BYD-Laden</h2><div class="form noPrint"><div class="row"><div><label>Datum</label><input class="input" type="date" id="evDate"></div><div><label>Geladen (kWh)</label><input class="input" type="number" id="evKwh" step="0.1" inputmode="decimal"></div></div><div class="row"><div><label>Kosten (€)</label><input class="input" type="number" id="evCost" step="0.01" inputmode="decimal"></div><div><label>Ort</label><input class="input" id="evPlace" placeholder="Zuhause / EnBW / ..."></div></div><button class="primary" id="addEv" style="width:100%;margin-top:12px">Ladung hinzufügen</button></div><div class="card" style="margin-top:10px"><div class="label">Erfasste Ladungen</div><div class="value" id="evTotal">–</div><div class="hint" id="evCostTotal">–</div><div class="loglist" id="evLogs" style="margin-top:10px"></div></div>
+</section>
 
-<h2>Ereignisse & Notizen</h2><div class="form noPrint"><div class="row"><div><label>Datum</label><input class="input" type="date" id="eventDate"></div><div><label>Ereignis</label><input class="input" id="eventText" placeholder="z. B. Heizung eingeschaltet"></div></div><button class="primary" id="addEvent" style="width:100%;margin-top:12px">Ereignis speichern</button></div><div class="card" style="margin-top:10px"><div class="loglist" id="eventLogs"></div></div>
+<section class="view" data-view="heat">
+<div class="viewTitle"><h2>🔥 Wärmepumpe</h2><span class="pill">Zählerschrank</span></div>
+<div class="form noPrint"><div class="row"><div><label>Datum</label><input class="input" type="date" id="heatDate"></div><div><label>Zählerstand gesamt (kWh)</label><input class="input" type="number" id="heatKwh" step="0.01" inputmode="decimal"></div></div><label>Notiz</label><input class="input" id="heatNote" placeholder="z. B. Zählerschrank abgelesen"><button class="primary" id="addHeat" style="width:100%;margin-top:12px">Zählerstand speichern</button></div><div class="grid" style="margin-top:10px"><div class="card"><div class="label">Aktueller WP-Zählerstand</div><div class="value" id="heatMeterCurrent">–</div><div class="hint" id="heatMeterDate">–</div></div><div class="card"><div class="label">Verbrauch seit Startwert</div><div class="value" id="heatTotal">–</div><div class="hint" id="heatAverage">Ab dem zweiten Wert berechenbar</div></div></div><div class="card" style="margin-top:10px"><div class="label">Zählerstände</div><div class="loglist" id="heatLogs" style="margin-top:10px"></div></div>
+
+
+</section>
+
+<section class="view" data-view="ev">
+<div class="viewTitle"><h2>🚗 BYD-Laden</h2><span class="pill">Ladebuch</span></div>
+<div class="form noPrint"><div class="row"><div><label>Datum</label><input class="input" type="date" id="evDate"></div><div><label>Geladen (kWh)</label><input class="input" type="number" id="evKwh" step="0.1" inputmode="decimal"></div></div><div class="row"><div><label>Kosten (€)</label><input class="input" type="number" id="evCost" step="0.01" inputmode="decimal"></div><div><label>Ort</label><input class="input" id="evPlace" placeholder="Zuhause / EnBW / ..."></div></div><button class="primary" id="addEv" style="width:100%;margin-top:12px">Ladung hinzufügen</button></div><div class="card" style="margin-top:10px"><div class="label">Erfasste Ladungen</div><div class="value" id="evTotal">–</div><div class="hint" id="evCostTotal">–</div><div class="loglist" id="evLogs" style="margin-top:10px"></div></div>
+
+
+</section>
+
+<section class="view" data-view="notes">
+<div class="viewTitle"><h2>📝 Ereignisse</h2><span class="pill">Notizen</span></div>
+<div class="form noPrint"><div class="row"><div><label>Datum</label><input class="input" type="date" id="eventDate"></div><div><label>Ereignis</label><input class="input" id="eventText" placeholder="z. B. Heizung eingeschaltet"></div></div><button class="primary" id="addEvent" style="width:100%;margin-top:12px">Ereignis speichern</button></div><div class="card" style="margin-top:10px"><div class="loglist" id="eventLogs"></div></div>
+
 </section>
 
 <section class="view" data-view="settings"><h2>Einstellungen</h2><div class="form">
@@ -184,13 +246,6 @@ h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:
 </main>
 </div>
 
-<nav class="nav">
-<button class="active" data-go="home"><b>⌂</b>Übersicht</button>
-<button data-go="add"><b>＋</b>Ablesen</button>
-<button data-go="history"><b>▥</b>Verlauf</button>
-<button data-go="pv"><b>☀</b>Energie</button>
-<button data-go="settings"><b>⚙</b>Einstellungen</button>
-</nav>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -239,8 +294,13 @@ function heatStats(){var a=heatReadings();if(!a.length)return null;var first=a[0
 function heatLastDelta(){var a=heatReadings();if(a.length<2)return null;var p=a[a.length-2],q=a[a.length-1],d=days(p.date,q.date),v=Number(q.reading)-Number(p.reading);return{v:v,d:d,day:d?v/d:0}}
 function evTotals(){return state.evLogs.reduce(function(t,x){t.kwh+=Number(x.kwh)||0;t.cost+=Number(x.cost)||0;return t},{kwh:0,cost:0})}
 function toast(t){var e=document.getElementById("toast");e.textContent=t;e.classList.add("show");setTimeout(function(){e.classList.remove("show")},2000)}
-function go(name){document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("active",v.dataset.view===name)});document.querySelectorAll("[data-go]").forEach(function(b){b.classList.toggle("active",b.dataset.go===name)});if(name==="history")setTimeout(draw,50);if(name==="add")prepAdd();if(name==="pv")renderEnergy();scrollTo({top:0,behavior:"smooth"})}
+function closeMenu(){document.getElementById("drawer").classList.remove("open");document.getElementById("drawerBackdrop").classList.remove("open")}
+function go(name){document.querySelectorAll(".view").forEach(function(v){v.classList.toggle("active",v.dataset.view===name)});document.querySelectorAll("[data-go]").forEach(function(b){b.classList.toggle("active",b.dataset.go===name)});if(name==="history")setTimeout(draw,50);if(name==="add")prepAdd();if(["ewe","pv","heat","ev","notes"].indexOf(name)>=0)renderEnergy();var labels={home:"Auf einen Blick",add:"Neue Ablesung",ewe:"EWE-Vergütung",pv:"PV-Anlage",heat:"Wärmepumpe",ev:"BYD-Laden",history:"Verlauf",notes:"Ereignisse",settings:"Einstellungen"};var ps=document.getElementById("pageSub");if(ps)ps.textContent=labels[name]||"Strom · PV · Kosten";closeMenu();scrollTo({top:0,behavior:"smooth"})}
 document.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(b)go(b.dataset.go)})
+document.getElementById("menuOpen").onclick=function(){document.getElementById("drawer").classList.add("open");document.getElementById("drawerBackdrop").classList.add("open")}
+document.getElementById("menuClose").onclick=closeMenu;
+document.getElementById("drawerBackdrop").onclick=closeMenu;
+
 function render(){
  state.entries.sort(function(a,b){return a.date.localeCompare(b.date)});
  document.documentElement.dataset.theme=state.settings.dark?"dark":"";
