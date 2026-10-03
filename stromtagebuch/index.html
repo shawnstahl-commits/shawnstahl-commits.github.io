@@ -120,6 +120,25 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 .splashInner{text-align:center;font-weight:900}.splashIcon{font-size:54px;margin-bottom:10px}.splashName{font-size:24px}
 .pvMonthList{display:grid;gap:8px;margin-top:10px}
 @media(max-width:520px){.balanceExplain{grid-template-columns:1fr 1fr}.balanceExplain>div:last-child{grid-column:1/-1}.reportGrid{grid-template-columns:1fr 1fr}}
+
+.drawerSection{padding:11px 14px 5px;font-size:10px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.versionBadge{font-size:10px;font-weight:900;padding:4px 8px;border-radius:999px;background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+.wizardProgress{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 16px}
+.wizardProgress i{height:6px;border-radius:999px;background:var(--line)}
+.wizardProgress i.active{background:var(--green)}
+.wizardStep{display:none}.wizardStep.active{display:block}
+.wizardValue{padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--soft);margin:8px 0}
+.wizardNav{display:flex;gap:8px;margin-top:14px}.wizardNav button{flex:1}
+.chartGrid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+.miniChart{height:220px}.miniChart canvas{width:100%;height:170px}
+.compareGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.comparePill{border:1px solid var(--line);border-radius:15px;padding:12px;background:var(--card)}
+.comparePill b{display:block;font-size:18px;margin-top:3px}
+.pvEditTable input{min-width:92px;width:100%;padding:8px 7px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text)}
+.auditItem{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+.auditItem:last-child{border-bottom:0}.auditItem small{color:var(--muted)}
+.appFooter{text-align:center;color:var(--muted);font-size:11px;padding:22px 0 8px}
+@media(min-width:760px){.chartGrid{grid-template-columns:repeat(2,1fr)}.chartGrid .wideChart{grid-column:1/-1}}
 @media print{.nav,.top .icon,.actions,.noPrint,.primary,.secondary,.danger,.mini{display:none!important}body{background:white;color:#111;padding:0}.top{position:static;background:white}.view{display:none!important}.view.active{display:block!important}.splash,.drawer,.drawerBackdrop{display:none!important}.card,.form,.hero{box-shadow:none;break-inside:avoid}.hero{color:#111;background:white;border:1px solid #ccc}.heroBox{background:#f4f4f4}.wrap{max-width:none}}
 @media(max-width:520px){.big{font-size:34px}.row{grid-template-columns:1fr}.value{font-size:21px}.kpi3{grid-template-columns:1fr 1fr}.kpi3 .wideMobile{grid-column:1/-1}}
 </style>
@@ -130,20 +149,24 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <aside class="drawer" id="drawer">
   <div class="drawerHead"><div><div class="drawerBrand">⚡ Stromtagebuch</div><div class="hint">Bereiche</div></div><button class="icon" id="menuClose">✕</button></div>
   <div class="drawerNav">
-    <button class="active" data-go="home"><span class="ico">⌂</span>Übersicht</button>
-    <button data-go="add"><span class="ico">＋</span>Neue Ablesung</button>
+    <button class="active" data-go="home"><span class="ico">🏠</span>Übersicht</button>
+    <button data-go="read"><span class="ico">📟</span>Heute ablesen</button>
+    <button data-go="report"><span class="ico">📊</span>Monatsbericht</button>
+    <div class="drawerSection">Energie-Zentrale</div>
     <button data-go="ewe"><span class="ico">💶</span>EWE-Vergütung</button>
     <button data-go="pv"><span class="ico">☀️</span>PV-Anlage</button>
     <button data-go="heat"><span class="ico">🔥</span>Wärmepumpe</button>
     <button data-go="ev"><span class="ico">🚗</span>BYD-Laden</button>
-    <button data-go="history"><span class="ico">▥</span>Verlauf</button>
-    <button data-go="report"><span class="ico">📊</span>Monatsbericht</button>
+    <div class="drawerSection">Daten</div>
+    <button data-go="history"><span class="ico">📈</span>Verlauf</button>
+    <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
-    <button data-go="settings"><span class="ico">⚙</span>Einstellungen</button>
+    <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.0</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch</div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.0</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <section class="view active" data-view="home">
 <div class="dashHero">
@@ -151,11 +174,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   <div class="dashMoney" id="balance">–</div>
   <div class="hint" id="balanceHint">Abschläge minus Stromkosten inkl. Grundpreis · PV-Vergütung separat</div>
   <div class="dashActions">
-    <button class="dashAction" data-go="add">＋ Neue Ablesung</button>
+    <button class="dashAction" data-go="read">📟 Heute ablesen</button>
     <button class="dashAction ghost" data-go="pv">☀ Energie-Zentrale</button>
   </div>
 </div>
-<div class="reminderBanner" id="reminderBanner"><b id="reminderTitle">Erinnerung</b><div class="hint" id="reminderText" style="margin-top:4px">–</div><div class="actions" style="margin-top:8px"><button class="secondary" data-go="add">Jetzt ablesen</button><button class="mini" id="dismissReminder">Heute ausblenden</button></div></div>
+<div class="reminderBanner" id="reminderBanner"><b id="reminderTitle">Erinnerung</b><div class="hint" id="reminderText" style="margin-top:4px">–</div><div class="actions" style="margin-top:8px"><button class="secondary" data-go="read">Jetzt ablesen</button><button class="mini" id="dismissReminder">Heute ausblenden</button></div></div>
 <div class="balanceExplain">
   <div><div class="label">Abschläge bis heute</div><b id="balancePaid">–</b></div>
   <div><div class="label">Stromkosten bis Zählerstand</div><b id="balanceCost">–</b></div>
@@ -175,14 +198,14 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   <div class="readingBox"><div class="label">Seit davor</div><div class="miniStat" id="lastDelta">–</div></div>
 </div>
 
+<details class="homeDetails"><summary>Weitere Details & Prognosen anzeigen</summary>
 <h2>Seit der letzten Ablesung</h2><div class="grid">
 <div class="card"><div class="label">Netzbezug</div><div class="value" id="periodImp">–</div><div class="hint" id="periodImpDay">–</div></div>
 <div class="card"><div class="label">Einspeisung</div><div class="value good" id="periodFeed">–</div><div class="hint" id="periodFeedDay">–</div></div>
 <div class="card"><div class="label">Stromkosten</div><div class="value" id="periodCost">–</div><div class="hint">Arbeitspreis</div></div>
 <div class="card"><div class="label">PV-Vergütung</div><div class="value good" id="periodRevenue">–</div><div class="hint">aus Einspeisung</div></div>
 </div>
-
-<details class="homeDetails"><summary>Weitere Details & Prognosen anzeigen</summary><h2>Kontrolle & Prognose</h2><div class="grid">
+<h2>Kontrolle & Prognose</h2><div class="grid">
 <div class="card"><div class="label">30-Tage-Stromkosten</div><div class="value" id="forecastCost">–</div><div class="hint">inkl. anteiligem Grundpreis</div></div>
 <div class="card"><div class="label">Abschlags-Ampel</div><div class="traffic"><span class="dot" id="paymentDot"></span><div><div class="value" style="font-size:19px" id="paymentStatus">–</div><div class="hint" id="paymentHint">–</div></div></div></div>
 <div class="card"><div class="label">Monatsvergleich</div><div class="value" id="monthCompare">–</div><div class="hint" id="monthCompareHint">–</div></div>
@@ -200,6 +223,40 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="card" style="margin-top:10px"><div class="label">Netzbezug ↔ Einspeisung · letzter Zeitraum</div><div class="meter"><i id="flowMeter" style="width:50%"></i></div><div class="hint" id="flowHint">–</div></div>
 <h2>Monate</h2><div class="card"><div class="monthbars" id="monthBars"></div><div class="hint">Blau = Netzbezug · Grün = Einspeisung (auf Kalendermonate verteilt)</div></div>
 </details>
+</section>
+
+
+<section class="view" data-view="read">
+<div class="viewTitle"><h2>📟 Heute ablesen</h2><span class="pill">Assistent</span></div>
+<div class="card">
+  <div class="label">SCHRITT <span id="wizardStepNo">1</span> VON 4</div>
+  <div class="wizardProgress"><i class="active"></i><i></i><i></i><i></i></div>
+  <div class="wizardStep active" data-wstep="0">
+    <h2 style="margin-top:4px">⚡ Strombezug</h2>
+    <label>Datum</label><input class="input" type="date" id="wizDate">
+    <label style="margin-top:10px">1.8.0 Netzbezug (kWh)</label><input class="input" type="number" step="0.001" id="wizImp" inputmode="decimal">
+    <div class="hint" id="wizImpHint" style="margin-top:7px">–</div>
+  </div>
+  <div class="wizardStep" data-wstep="1">
+    <h2 style="margin-top:4px">☀️ Einspeisezähler</h2>
+    <label>2.8.0 Einspeisung (kWh)</label><input class="input" type="number" step="0.001" id="wizFeed" inputmode="decimal">
+    <div class="hint" id="wizFeedHint" style="margin-top:7px">–</div>
+  </div>
+  <div class="wizardStep" data-wstep="2">
+    <h2 style="margin-top:4px">🔥 Wärmepumpe</h2>
+    <label>WP-Zählerstand gesamt (kWh)</label><input class="input" type="number" step="0.01" id="wizHeat" inputmode="decimal">
+    <div class="hint" id="wizHeatHint" style="margin-top:7px">Optional · leer lassen, wenn heute nicht abgelesen.</div>
+  </div>
+  <div class="wizardStep" data-wstep="3">
+    <h2 style="margin-top:4px">☀️ PV-App</h2>
+    <div class="row"><div><label>PV-Erzeugung gesamt</label><input class="input" type="number" step="0.01" id="wizPvProd" inputmode="decimal"></div><div><label>Eigenverbrauch gesamt</label><input class="input" type="number" step="0.01" id="wizPvOwn" inputmode="decimal"></div></div>
+    <label style="margin-top:8px">Einspeisung laut PV-App</label><input class="input" type="number" step="0.01" id="wizPvExport" inputmode="decimal">
+    <label style="margin-top:8px">Notiz</label><input class="input" id="wizNote" placeholder="optional">
+    <div class="hint" style="margin-top:7px">PV-App-Werte sind optional. Der offizielle EWE-Wert bleibt immer dein 2.8.0-Zähler.</div>
+  </div>
+  <div class="notice" id="wizardCheck">Der Assistent prüft die Werte vor dem Speichern.</div>
+  <div class="wizardNav"><button class="secondary" id="wizBack">Zurück</button><button class="primary" id="wizNext">Weiter</button><button class="primary" id="wizSave" style="display:none">Alles speichern</button></div>
+</div>
 </section>
 
 <section class="view" data-view="add">
@@ -231,7 +288,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <h2>Letzte bekannte Werte</h2><div class="card" id="prev">–</div>
 </section>
 
-<section class="view" data-view="history"><h2>Verlauf</h2><div class="card chart"><canvas id="chart"></canvas></div><h2>Alle Einträge</h2><div class="table"><table><thead><tr><th>Datum</th><th>1.8.0</th><th>Δ</th><th>2.8.0</th><th>Δ</th><th>PV Erzeugung</th><th>Notiz</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<section class="view" data-view="history"><div class="viewTitle"><h2>📈 Verlauf</h2><span class="pill">Daten & Änderungen</span></div><div class="card chart"><canvas id="chart"></canvas></div><h2>Alle Einträge</h2><div class="table"><table><thead><tr><th>Datum</th><th>1.8.0</th><th>Δ</th><th>2.8.0</th><th>Δ</th><th>PV Erzeugung</th><th>Notiz</th><th></th></tr></thead><tbody id="rows"></tbody></table></div><h2>Änderungsverlauf</h2><div class="card"><div id="auditLogs"></div><div class="hint" style="margin-top:8px">Die letzten Änderungen können komplett auf den vorherigen Stand zurückgesetzt werden.</div></div></section>
 
 
 <section class="view" data-view="ewe">
@@ -244,7 +301,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 </div>
 <div class="form noPrint" style="margin-top:10px">
 <div class="sectionTitle"><b>EWE-Auszahlung eintragen</b><span class="pill">optional</span></div>
-<div class="row" style="margin-top:10px"><div><label>Datum</label><input class="input" type="date" id="ewePayDate"></div><div><label>Betrag (€)</label><input class="input" type="number" step="0.01" id="ewePayAmount" inputmode="decimal" placeholder="z. B. 250,00"></div></div>
+<div class="row" style="margin-top:10px"><div><label>Auszahlungsdatum</label><input class="input" type="date" id="ewePayDate"></div><div><label>Betrag (€)</label><input class="input" type="number" step="0.01" id="ewePayAmount" inputmode="decimal" placeholder="z. B. 250,00"></div></div>
+<div class="row" style="margin-top:8px"><div><label>Abrechnungszeitraum von</label><input class="input" type="date" id="ewePayFrom"></div><div><label>bis</label><input class="input" type="date" id="ewePayTo"></div></div>
 <label>Notiz</label><input class="input" id="ewePayNote" placeholder="z. B. Abschlagszahlung / Jahresabrechnung">
 <button class="primary" id="addEwePayment" style="width:100%;margin-top:12px">Auszahlung speichern</button>
 </div>
@@ -286,12 +344,16 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <h2>PV-Monatswerte</h2>
-<div class="form noPrint">
+<div class="card noPrint"><div class="sectionTitle"><b>2026 kompakt eintragen</b><span class="pill">echte PV-App-Werte</span></div>
+<div class="table pvEditTable" style="margin-top:10px"><table><thead><tr><th>Monat</th><th>Erzeugung</th><th>Eigenverbrauch</th><th>Einspeisung</th></tr></thead><tbody id="pvYearRows"></tbody></table></div>
+<button class="primary" id="savePvYearTable" style="width:100%;margin-top:10px">Alle Monatswerte speichern</button>
+<div class="hint" style="margin-top:8px">Leere Felder bleiben unangetastet. Es werden keine fehlenden PV-Werte geschätzt.</div></div>
+<details class="homeDetails noPrint" style="margin-top:10px"><summary>Einzelnen PV-Monat bearbeiten</summary><div class="form" style="margin-top:10px">
   <div class="row"><div><label>Monat</label><input class="input" type="month" id="pvMonthKey"></div><div><label>Erzeugung (kWh)</label><input class="input" type="number" step="0.01" id="pvMonthGen" inputmode="decimal"></div></div>
   <div class="row" style="margin-top:8px"><div><label>Eigenverbrauch (kWh)</label><input class="input" type="number" step="0.01" id="pvMonthOwn" inputmode="decimal"></div><div><label>Einspeisung (kWh)</label><input class="input" type="number" step="0.01" id="pvMonthExport" inputmode="decimal"></div></div>
   <button class="primary" id="savePvMonth" style="width:100%;margin-top:12px">PV-Monat speichern</button>
   <div class="hint" style="margin-top:8px">Hier kommen die echten Monatswerte aus deiner PV-App hinein. Fehlende Monate werden nicht geschätzt.</div>
-</div>
+</div></details>
 <div class="card" style="margin-top:10px"><div class="label">Gespeicherte PV-Monate</div><div class="pvMonthList" id="pvMonthList"></div></div>
 
 <h2>Monatsübersicht</h2><div class="table"><table><thead><tr><th>Monat</th><th>Netz</th><th>Einspeisung</th><th>Stromkosten*</th><th>PV €</th></tr></thead><tbody id="monthRows"></tbody></table></div><div class="hint" style="margin:8px 2px">* inkl. anteiligem Grundpreis; Zwischenstände werden tageweise auf Monate verteilt.</div>
@@ -335,7 +397,19 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <div class="reportCard"><div class="label">Wärmepumpe</div><b id="reportHeat">–</b></div>
     <div class="reportCard"><div class="label">BYD geladen</div><b id="reportEv">–</b></div>
   </div>
-  <div class="card" style="margin-top:10px"><div class="label">Vergleich zum Vormonat</div><div class="value" id="reportCompare">–</div><div class="hint" id="reportCompareHint">–</div></div>
+  <h2>Vergleich zum Vormonat</h2>
+  <div class="compareGrid">
+    <div class="comparePill"><div class="label">Netzbezug</div><b id="reportCompare">–</b><div class="hint" id="reportCompareHint">–</div></div>
+    <div class="comparePill"><div class="label">Einspeisung</div><b id="reportFeedCompare">–</b><div class="hint" id="reportFeedCompareHint">–</div></div>
+    <div class="comparePill"><div class="label">Stromkosten</div><b id="reportCostCompare">–</b><div class="hint" id="reportCostCompareHint">–</div></div>
+    <div class="comparePill"><div class="label">PV-Erzeugung</div><b id="reportPvCompare">–</b><div class="hint" id="reportPvCompareHint">–</div></div>
+  </div>
+  <h2>Diagramme</h2>
+  <div class="chartGrid">
+    <div class="card miniChart"><div class="label">NETZBEZUG & EINSPEISUNG</div><canvas id="reportFlowChart"></canvas></div>
+    <div class="card miniChart"><div class="label">PV-ERZEUGUNG</div><canvas id="reportPvChart"></canvas></div>
+    <div class="card miniChart wideChart"><div class="label">STROMKOSTEN & VERGÜTUNG</div><canvas id="reportMoneyChart"></canvas></div>
+  </div>
 </div>
 <div class="actions noPrint" style="margin-top:12px"><button class="primary" id="printCurrentReport">Bericht drucken / als PDF</button></div>
 </section>
@@ -349,6 +423,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 </div>
 <h2>Erinnerungen</h2><div class="form">
 <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="sReminder" style="width:20px;height:20px"> Beim Öffnen am Monatsanfang an Zählerstände erinnern</label>
+<label style="display:flex;align-items:center;gap:10px;margin-top:10px"><input type="checkbox" id="sBackupReminder" style="width:20px;height:20px"> Einmal pro Monat an externes Backup erinnern</label>
 <div class="hint" style="margin-top:8px">Die Erinnerung erscheint in der App, solange für den laufenden Monat noch keine Ablesung gespeichert wurde.</div>
 <div class="actions" style="margin-top:10px"><button class="secondary" id="enableNotifications">System-Benachrichtigungen aktivieren</button></div>
 <div class="hint" id="notificationStatus" style="margin-top:8px">System-Benachrichtigungen sind optional.</div>
@@ -358,7 +433,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="actions" style="margin-top:12px"><button class="secondary" id="restoreAutoBackup">Letzte Gerätesicherung wiederherstellen</button><button class="secondary" id="installApp" style="display:none">App installieren</button></div>
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Für Handywechsel oder komplett gelöschte Browserdaten bleibt der Backup-Export als Datei wichtig.</div>
 </div>
-<h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><button class="secondary" id="backup">Backup speichern</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div></div>
+<h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><button class="secondary" id="backup">Komplettes Backup erstellen</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div></div>
+<div class="appFooter">Stromtagebuch <b>v1.0.0</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
