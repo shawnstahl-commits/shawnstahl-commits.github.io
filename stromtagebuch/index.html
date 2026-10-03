@@ -157,6 +157,22 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 .editActions{display:flex;gap:8px;margin-top:14px}.editActions button{flex:1}
 .importPreview{margin-top:10px;padding:12px;border:1px dashed var(--line);border-radius:14px;background:var(--soft)}
 @media(max-width:520px){.healthGrid{grid-template-columns:1fr}.yearMetricGrid{grid-template-columns:1fr 1fr}}
+
+.smartCard{margin:12px 0;border-radius:19px;padding:14px;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.smartCard.good{border-color:color-mix(in srgb,var(--green) 45%,var(--line))}
+.smartCard.warn{border-color:color-mix(in srgb,var(--orange) 55%,var(--line));background:color-mix(in srgb,var(--orange) 7%,var(--card))}
+.smartCard.bad{border-color:#d84b4b}.smartIcon{font-size:27px}.smartText{flex:1}.smartText b{display:block;font-size:15px;margin-bottom:3px}
+.statusBadge{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:900;border:1px solid var(--line);white-space:nowrap}
+.statusBadge.exact{background:color-mix(in srgb,var(--green) 12%,var(--card));color:var(--green)}
+.statusBadge.estimated{background:color-mix(in srgb,var(--orange) 12%,var(--card));color:var(--orange)}
+.statusBadge.closed{background:color-mix(in srgb,var(--blue) 12%,var(--card));color:var(--blue)}
+.statusBadge.running{background:var(--soft);color:var(--muted)}
+.closePanel{margin-top:10px;border:1px solid var(--line);border-radius:18px;padding:14px;background:var(--card)}
+.alertList{display:grid;gap:8px}.alertItem{border:1px solid var(--line);border-radius:15px;padding:11px;background:var(--card)}.alertItem.warn{border-color:color-mix(in srgb,var(--orange) 45%,var(--line))}.alertItem.bad{border-color:#d84b4b}
+.statementResult{border-radius:18px;padding:14px;border:1px solid var(--line);background:var(--card);margin-top:10px}.statementResult .big{font-size:27px;font-weight:950;margin:4px 0}
+.evStats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}.evStat{border:1px solid var(--line);border-radius:15px;padding:12px;background:var(--card)}.evStat b{display:block;font-size:19px;margin-top:3px}
+.ocrPrep{display:none;width:100%;max-height:230px;object-fit:contain;border-radius:14px;border:1px solid var(--line);margin-top:8px;background:#fff}
+@media(max-width:520px){.smartCard{align-items:center}.evStats{grid-template-columns:1fr 1fr}}
 @media print{.nav,.top .icon,.actions,.noPrint,.primary,.secondary,.danger,.mini{display:none!important}body{background:white;color:#111;padding:0}.top{position:static;background:white}.view{display:none!important}.view.active{display:block!important}.splash,.drawer,.drawerBackdrop{display:none!important}.card,.form,.hero{box-shadow:none;break-inside:avoid}.hero{color:#111;background:white;border:1px solid #ccc}.heroBox{background:#f4f4f4}.wrap{max-width:none}}
 @media(max-width:520px){.big{font-size:34px}.row{grid-template-columns:1fr}.value{font-size:21px}.kpi3{grid-template-columns:1fr 1fr}.kpi3 .wideMobile{grid-column:1/-1}}
 </style>
@@ -173,6 +189,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="year"><span class="ico">🗓️</span>Jahresübersicht</button>
     <div class="drawerSection">Energie-Zentrale</div>
     <button data-go="ewe"><span class="ico">💶</span>EWE-Vergütung</button>
+    <button data-go="billing"><span class="ico">🧾</span>Abrechnungscheck</button>
     <button data-go="pv"><span class="ico">☀️</span>PV-Anlage</button>
     <button data-go="heat"><span class="ico">🔥</span>Wärmepumpe</button>
     <button data-go="ev"><span class="ico">🚗</span>BYD-Laden</button>
@@ -182,11 +199,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.1</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.2</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.1</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.2</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
@@ -200,6 +217,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   </div>
 </div>
 <div class="reminderBanner" id="reminderBanner"><b id="reminderTitle">Erinnerung</b><div class="hint" id="reminderText" style="margin-top:4px">–</div><div class="actions" style="margin-top:8px"><button class="secondary" id="reminderPrimary" data-go="read">Jetzt ablesen</button><button class="mini" id="dismissReminder">Heute ausblenden</button></div></div>
+<div class="smartCard good" id="smartCard"><div class="smartIcon" id="smartIcon">✅</div><div class="smartText"><b id="smartTitle">Alles im grünen Bereich</b><div class="hint" id="smartText">Die App prüft automatisch, was gerade wichtig ist.</div></div><button class="mini" id="smartAction" data-go="health">Ansehen</button></div>
 <div class="balanceExplain">
   <div><div class="label">Abschläge bis heute</div><b id="balancePaid">–</b></div>
   <div><div class="label">Stromkosten bis Zählerstand</div><b id="balanceCost">–</b></div>
@@ -227,7 +245,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="card"><div class="label">PV-Vergütung</div><div class="value good" id="periodRevenue">–</div><div class="hint">aus Einspeisung</div></div>
 </div>
 <h2>Kontrolle & Prognose</h2><div class="grid">
-<div class="card"><div class="label">30-Tage-Stromkosten</div><div class="value" id="forecastCost">–</div><div class="hint">inkl. anteiligem Grundpreis</div></div>
+<div class="card"><div class="label">30-Tage-Stromkosten</div><div class="value" id="forecastCost">–</div><div class="hint" id="forecast30Hint">Trend aus aktuellen Zählerdaten</div></div>
+<div class="card"><div class="label">90-Tage-Stromkosten</div><div class="value" id="forecast90Cost">–</div><div class="hint" id="forecast90Hint">stabilerer Langzeittrend</div></div>
 <div class="card"><div class="label">Abschlags-Ampel</div><div class="traffic"><span class="dot" id="paymentDot"></span><div><div class="value" style="font-size:19px" id="paymentStatus">–</div><div class="hint" id="paymentHint">–</div></div></div></div>
 <div class="card"><div class="label">Monatsvergleich</div><div class="value" id="monthCompare">–</div><div class="hint" id="monthCompareHint">–</div></div>
 <div class="card"><div class="label">Niedrigster / höchster Netzbezug</div><div class="value" style="font-size:17px" id="bestWorst">–</div><div class="hint">nur abgeschlossene Monate</div></div>
@@ -239,6 +258,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="card"><div class="label">Einspeisung seit Aufzeichnung</div><div class="value good" id="totalFeed">–</div></div>
 <div class="card"><div class="label">EWE-Vergütung berechnet</div><div class="value good" id="totalRevenue">–</div><div class="hint">laut 2.8.0</div></div>
 <div class="card"><div class="label">BYD-Ladung erfasst</div><div class="value" id="evTotalHome">–</div></div>
+<div class="card"><div class="label">BYD zuhause geladen</div><div class="value" id="evHomeTotal">–</div><div class="hint" id="evHomeShare">Anteil am Netzbezug</div></div>
 </div>
 
 <div class="card" style="margin-top:10px"><div class="label">Netzbezug ↔ Einspeisung · letzter Zeitraum</div><div class="meter"><i id="flowMeter" style="width:50%"></i></div><div class="hint" id="flowHint">–</div></div>
@@ -300,7 +320,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <label style="margin-top:8px">PV-Erzeugung aktueller Monat (kWh)</label><input class="input" type="number" step="0.01" id="pvMonthCentral" inputmode="decimal">
 </details>
 
-<div class="noPrint" style="margin-top:16px"><label>Zählerfoto auslesen (Beta)</label><div class="row"><select class="input" id="ocrTarget"><option value="imp">1.8.0 Netzbezug</option><option value="feed">2.8.0 Einspeisung</option><option value="heatCentral">Wärmepumpe</option><option value="pvProd">PV-Erzeugung</option></select><label class="secondary" style="display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer">📷 Foto aufnehmen<input type="file" id="meterPhoto" accept="image/*" capture="environment" hidden></label></div><img id="photoPreview" class="photoPreview"><button class="secondary" id="ocrButton" style="width:100%;margin-top:8px" type="button">Zahl aus Foto erkennen</button><div class="hint" id="ocrHint">Gefundene Zahl bitte immer am Zähler gegenprüfen.</div></div>
+<div class="noPrint" style="margin-top:16px"><label>Zählerfoto auslesen (Beta)</label><div class="row"><select class="input" id="ocrTarget"><option value="imp">1.8.0 Netzbezug</option><option value="feed">2.8.0 Einspeisung</option><option value="heatCentral">Wärmepumpe</option><option value="pvProd">PV-Erzeugung</option></select><label class="secondary" style="display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer">📷 Foto aufnehmen<input type="file" id="meterPhoto" accept="image/*" capture="environment" hidden></label></div><img id="photoPreview" class="photoPreview"><canvas id="ocrCanvas" class="ocrPrep"></canvas><button class="secondary" id="ocrButton" style="width:100%;margin-top:8px" type="button">Zahl aus Foto erkennen</button><div class="hint" id="ocrHint">Gefundene Zahl bitte immer am Zähler gegenprüfen.</div></div>
 
 <label style="margin-top:14px">Notiz (optional)</label><input class="input" id="note" placeholder="z. B. Heizung wieder eingeschaltet">
 <div class="notice" id="check">Du kannst auch nur einen Bereich ausfüllen. Leere Felder bleiben unverändert.</div>
@@ -377,7 +397,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 </div></details>
 <div class="card" style="margin-top:10px"><div class="label">Gespeicherte PV-Monate</div><div class="pvMonthList" id="pvMonthList"></div></div>
 
-<h2>Monatsübersicht</h2><div class="table"><table><thead><tr><th>Monat</th><th>Netz</th><th>Einspeisung</th><th>Stromkosten*</th><th>PV €</th></tr></thead><tbody id="monthRows"></tbody></table></div><div class="hint" style="margin:8px 2px">* inkl. anteiligem Grundpreis; Zwischenstände werden tageweise auf Monate verteilt.</div>
+<h2>Monatsübersicht</h2><div class="table"><table><thead><tr><th>Monat</th><th>Status</th><th>Netz</th><th>Einspeisung</th><th>Stromkosten*</th><th>PV €</th></tr></thead><tbody id="monthRows"></tbody></table></div><div class="hint" style="margin:8px 2px">* inkl. anteiligem Grundpreis; Zwischenstände werden tageweise auf Monate verteilt.</div>
 
 
 </section>
@@ -391,7 +411,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 <section class="view" data-view="ev">
 <div class="viewTitle"><h2>🚗 BYD-Laden</h2><span class="pill">Ladebuch</span></div>
-<div class="form noPrint"><div class="row"><div><label>Datum</label><input class="input" type="date" id="evDate"></div><div><label>Geladen (kWh)</label><input class="input" type="number" id="evKwh" step="0.1" inputmode="decimal"></div></div><div class="row"><div><label>Kosten (€)</label><input class="input" type="number" id="evCost" step="0.01" inputmode="decimal"></div><div><label>Ort</label><input class="input" id="evPlace" placeholder="Zuhause / EnBW / ..."></div></div><button class="primary" id="addEv" style="width:100%;margin-top:12px">Ladung hinzufügen</button></div><div class="card" style="margin-top:10px"><div class="label">Erfasste Ladungen</div><div class="value" id="evTotal">–</div><div class="hint" id="evCostTotal">–</div><div class="loglist" id="evLogs" style="margin-top:10px"></div></div>
+<div class="form noPrint"><div class="row"><div><label>Datum</label><input class="input" type="date" id="evDate"></div><div><label>Geladen (kWh)</label><input class="input" type="number" id="evKwh" step="0.1" inputmode="decimal"></div></div><div class="row"><div><label>Kosten (€)</label><input class="input" type="number" id="evCost" step="0.01" inputmode="decimal"></div><div><label>Ladeart</label><select class="input" id="evType"><option value="home">Zuhause</option><option value="public">Öffentlich</option><option value="other">Sonstiges</option></select></div></div><label>Ort</label><input class="input" id="evPlace" placeholder="Wallbox / EnBW / ..."><button class="primary" id="addEv" style="width:100%;margin-top:12px">Ladung hinzufügen</button></div>
+<div class="evStats"><div class="evStat"><div class="label">Gesamt geladen</div><b id="evTotal">–</b></div><div class="evStat"><div class="label">Gesamtkosten</div><b id="evCostValue">–</b></div><div class="evStat"><div class="label">Zuhause</div><b id="evHome">–</b><div class="hint" id="evHomeHint">–</div></div><div class="evStat"><div class="label">Öffentlich</div><b id="evPublic">–</b></div></div>
+<div class="card" style="margin-top:10px"><div class="label">Erfasste Ladungen</div><div class="hint" id="evCostTotal">–</div><div class="loglist" id="evLogs" style="margin-top:10px"></div></div>
 
 
 </section>
@@ -407,7 +429,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="viewTitle"><h2>📊 Monatsbericht</h2><span class="pill" id="reportStatePill">Monat</span></div>
 <div class="form noPrint"><label>Monat auswählen</label><input class="input" type="month" id="reportMonth"></div>
 <div id="reportContent" style="margin-top:10px">
-  <div class="reportHero"><div class="label">MONATSERGEBNIS</div><div class="value" id="reportTitle">–</div><div class="hint" id="reportHint">–</div></div>
+  <div class="reportHero"><div class="label">MONATSERGEBNIS <span class="statusBadge estimated" id="reportAccuracy">geschätzt</span></div><div class="value" id="reportTitle">–</div><div class="hint" id="reportHint">–</div></div>
+<div class="closePanel noPrint"><div class="sectionTitle"><div><b id="closeMonthTitle">Monat abschließen</b><div class="hint" id="closeMonthHint">Ein Abschluss friert die aktuellen Monatswerte als festen Bericht ein.</div></div><span class="statusBadge running" id="closeStatus">offen</span></div><div class="actions" style="margin-top:10px"><button class="primary" id="closeMonthBtn">Monat abschließen</button><button class="secondary" id="reopenMonthBtn" style="display:none">Abschluss aufheben</button></div></div>
   <div class="reportGrid">
     <div class="reportCard"><div class="label">Netzbezug</div><b id="reportImp">–</b></div>
     <div class="reportCard"><div class="label">Einspeisung</div><b class="good" id="reportFeed">–</b></div>
@@ -437,7 +460,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.1</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.2</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -460,6 +483,31 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   <div class="comparePill"><div class="label">PV-Erzeugung</div><b id="yearCmpPv">–</b><div class="hint" id="yearCmpPvHint">–</div></div>
 </div>
 <div class="card miniChart" style="margin-top:10px"><div class="label">MONATE IM JAHR</div><canvas id="yearChart"></canvas><div class="hint">Blau = Netzbezug · Grün = Einspeisung</div></div>
+<div class="actions noPrint" style="margin-top:12px"><button class="primary" id="printYearReport">Jahresbericht als PDF</button></div>
+</section>
+
+
+<section class="view" data-view="billing">
+<div class="viewTitle"><h2>🧾 Abrechnungscheck</h2><span class="pill">Anbieter ↔ Tagebuch</span></div>
+<h2>Stromrechnung prüfen</h2>
+<div class="form noPrint">
+  <div class="row"><div><label>Zeitraum von</label><input class="input" type="date" id="billFrom"></div><div><label>bis</label><input class="input" type="date" id="billTo"></div></div>
+  <div class="row" style="margin-top:8px"><div><label>Verbrauch laut Anbieter (kWh)</label><input class="input" type="number" step="0.01" id="billKwh"></div><div><label>Kosten laut Rechnung (€)</label><input class="input" type="number" step="0.01" id="billCost"></div></div>
+  <label style="margin-top:8px">Berücksichtigte Abschläge (€)</label><input class="input" type="number" step="0.01" id="billPaid">
+  <button class="primary" id="checkBill" style="width:100%;margin-top:12px">Stromrechnung vergleichen</button>
+</div>
+<div class="statementResult" id="billResult"><div class="label">ERGEBNIS</div><div class="big">Noch keine Rechnung geprüft</div><div class="hint">Zeitraum und Rechnungswerte oben eintragen.</div></div>
+
+<h2>EWE-Abrechnung prüfen</h2>
+<div class="form noPrint">
+  <div class="row"><div><label>Zeitraum von</label><input class="input" type="date" id="eweBillFrom"></div><div><label>bis</label><input class="input" type="date" id="eweBillTo"></div></div>
+  <div class="row" style="margin-top:8px"><div><label>Einspeisung laut EWE (kWh)</label><input class="input" type="number" step="0.01" id="eweBillKwh"></div><div><label>Vergütung laut EWE (€)</label><input class="input" type="number" step="0.01" id="eweBillAmount"></div></div>
+  <button class="primary" id="checkEweBill" style="width:100%;margin-top:12px">EWE-Abrechnung vergleichen</button>
+</div>
+<div class="statementResult" id="eweBillResult"><div class="label">ERGEBNIS</div><div class="big">Noch keine EWE-Abrechnung geprüft</div><div class="hint">Offizielle Werte oben eintragen.</div></div>
+
+<h2>Gespeicherte Prüfungen</h2>
+<div class="card"><div class="loglist" id="billingHistory"></div></div>
 </section>
 
 <section class="view" data-view="health">
@@ -499,7 +547,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Für Handywechsel oder komplett gelöschte Browserdaten bleibt der Backup-Export als Datei wichtig.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Komplettes Backup erstellen</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.1.0</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.2.0</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
