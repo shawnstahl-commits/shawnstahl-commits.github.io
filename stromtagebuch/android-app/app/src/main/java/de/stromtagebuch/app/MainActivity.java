@@ -21,6 +21,7 @@ import android.util.Base64;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -39,6 +40,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -200,14 +203,14 @@ public class MainActivity extends Activity {
                 }
                 fileCallback = newCallback;
 
-                String[] accepts = fileChooserParams.getAcceptTypes();
+                String[] accepts = normalizeAcceptTypes(fileChooserParams.getAcceptTypes());
                 boolean wantsImage = acceptsImage(accepts);
                 boolean capture = fileChooserParams.isCaptureEnabled() && wantsImage;
 
                 Intent fileIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 fileIntent.addCategory(Intent.CATEGORY_OPENABLE);
                 fileIntent.setType(resolveMimeType(accepts));
-                if (accepts != null && accepts.length > 1) {
+                if (accepts.length > 1) {
                     fileIntent.putExtra(Intent.EXTRA_MIME_TYPES, accepts);
                 }
 
@@ -298,6 +301,38 @@ public class MainActivity extends Activity {
                 "}catch(e){}" +
                 "})();";
         webView.evaluateJavascript(js, null);
+    }
+
+    private String[] normalizeAcceptTypes(String[] accepts) {
+        LinkedHashSet<String> normalized = new LinkedHashSet<>();
+        if (accepts != null) {
+            for (String raw : accepts) {
+                if (raw == null) continue;
+                String[] parts = raw.split(",");
+                for (String part : parts) {
+                    String type = normalizeAcceptType(part);
+                    if (type != null && !type.isEmpty()) normalized.add(type);
+                }
+            }
+        }
+        if (normalized.isEmpty()) normalized.add("*/*");
+        return new ArrayList<>(normalized).toArray(new String[0]);
+    }
+
+    private String normalizeAcceptType(String raw) {
+        if (raw == null) return null;
+        String type = raw.trim().toLowerCase(Locale.ROOT);
+        if (type.isEmpty()) return null;
+        if (type.equals(".json")) return "application/json";
+        if (type.equals(".csv")) return "text/csv";
+        if (type.equals(".pdf")) return "application/pdf";
+        if (type.startsWith(".")) {
+            String ext = type.substring(1);
+            String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext);
+            return mime == null ? "*/*" : mime;
+        }
+        if (type.contains("/")) return type;
+        return "*/*";
     }
 
     private boolean acceptsImage(String[] accepts) {
