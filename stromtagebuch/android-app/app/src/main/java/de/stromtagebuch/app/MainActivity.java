@@ -39,6 +39,9 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MainActivity extends Activity {
 
@@ -51,6 +54,8 @@ public class MainActivity extends Activity {
     private WebView webView;
     private ValueCallback<Uri[]> fileCallback;
     private Uri cameraUri;
+    private final Map<String, OutputStream> textTransfers = new ConcurrentHashMap<>();
+    private final Map<String, Uri> textTransferUris = new ConcurrentHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -288,6 +293,8 @@ public class MainActivity extends Activity {
                 "try{" +
                 "window.__STROM_ANDROID_APP__=true;" +
                 "window.print=function(){AndroidApp.printPage(document.title||'Stromtagebuch');};" +
+                "try{notificationState();}catch(_e){}" +
+                "try{updateReminder();}catch(_e2){}" +
                 "}catch(e){}" +
                 "})();";
         webView.evaluateJavascript(js, null);
@@ -442,6 +449,80 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
+        public String beginTextFile(String fileName, String hintedMime) {
+            try {
+                String token = UUID.randomUUID().toString();
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.MediaColumns.DISPLAY_NAME, sanitizeFilename(fileName));
+                values.put(MediaStore.MediaColumns.MIME_TYPE, normalizeMime(hintedMime));
+                values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Stromtagebuch");
+
+                Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                if (uri == null) return "";
+
+                OutputStream out = getContentResolver().openOutputStream(uri);
+                if (out == null) {
+                    getContentResolver().delete(uri, null, null);
+                    return "";
+                }
+
+                textTransfers.put(token, out);
+                textTransferUris.put(token, uri);
+                return token;
+            } catch (Exception ex) {
+                return "";
+            }
+        }
+
+        @JavascriptInterface
+        public boolean appendTextFile(String token, String chunk) {
+            OutputStream out = textTransfers.get(token);
+            if (out == null) return false;
+            try {
+                out.write((chunk == null ? "" : chunk).getBytes(StandardCharsets.UTF_8));
+                return true;
+            } catch (Exception ex) {
+                return false;
+            }
+        }
+
+        @JavascriptInterface
+        public void finishTextFile(String token) {
+            OutputStream out = textTransfers.remove(token);
+            textTransferUris.remove(token);
+            if (out == null) return;
+            try {
+                out.flush();
+                out.close();
+                runOnUiThread(() ->
+                        Toast.makeText(MainActivity.this, "Gespeichert unter Downloads/Stromtagebuch.", Toast.LENGTH_LONG).show()
+                );
+            } catch (Exception ex) {
+                runOnUiThread(() ->
+                        Toast.makeText(MainActivity.this, "Datei konnte nicht abgeschlossen werden.", Toast.LENGTH_SHORT).show()
+                );
+            }
+        }
+
+        @JavascriptInterface
+        public void abortTextFile(String token) {
+            OutputStream out = textTransfers.remove(token);
+            Uri uri = textTransferUris.remove(token);
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception ignored) {
+                }
+            }
+            if (uri != null) {
+                try {
+                    getContentResolver().delete(uri, null, null);
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        @JavascriptInterface
         public void saveTextFile(String fileName, String content, String hintedMime) {
             new Thread(() -> {
                 try {
@@ -565,7 +646,7 @@ public class MainActivity extends Activity {
                     Toast.LENGTH_SHORT
             ).show();
             if (webView != null) {
-                webView.evaluateJavascript("try{notificationState();}catch(e){}", null);
+                webView.evaluateJavascript("try{notificationState();updateReminder();}catch(e){}", null);
             }
         }
     }
@@ -587,6 +668,16 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        for (String token : textTransfers.keySet()) {
+            OutputStream out = textTransfers.remove(token);
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception ignored) {
+                }
+            }
+        }
+        textTransferUris.clear();
         if (webView != null) {
             webView.removeJavascriptInterface("AndroidApp");
             webView.destroy();
