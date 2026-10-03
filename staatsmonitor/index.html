@@ -58,7 +58,7 @@ main{padding-bottom:108px}
   <div class="eyebrow">Öffentliche Finanzen · Quellenprüfbar</div>
   <h1>Deutschlands Staatsfinanzen auf einen Blick</h1>
   <div class="tickerLabel">Trend-Hochrechnung auf Basis der letzten amtlichen Quartalsveränderung</div>
-  <div class="debt" id="debt">2.753.500.000.000 €</div>
+  <div class="debt" id="debt">− 2.753.500.000.000 €</div>
   <div class="approx"><b>HOCHRECHNUNG</b> kein sekundengenauer amtlicher Schuldenstand</div>
   <div class="quick">
     <div class="metric"><span>Amtlicher Stand Q2</span><strong>2,7535 Bio. €</strong></div>
@@ -149,7 +149,7 @@ main{padding-bottom:108px}
 <script>
 const BASE_DEBT=2753500000000,BASE_DATE=new Date("2026-06-30T23:59:59+02:00").getTime(),Q2_CHANGE=26300000000,Q2_SECONDS=91*24*60*60,PER_SECOND=Q2_CHANGE/Q2_SECONDS;
 const fmt=new Intl.NumberFormat("de-DE",{maximumFractionDigits:0});
-function updateDebt(){const e=Math.max(0,(Date.now()-BASE_DATE)/1000);document.getElementById("debt").textContent=fmt.format(BASE_DEBT+e*PER_SECOND)+" €"}updateDebt();setInterval(updateDebt,1000);
+function updateDebt(){const e=Math.max(0,(Date.now()-BASE_DATE)/1000);document.getElementById("debt").textContent="− "+fmt.format(BASE_DEBT+e*PER_SECOND)+" €"}updateDebt();setInterval(updateDebt,1000);
 
 const cases=[
 {type:"confirmed",amountNum:35000000,amount:"35 Mio. €",badge:"Fehlinvestition laut BRH",ressort:"BMF",date:"2025-12-10",title:"„Sichere“ Smartphones für den Zoll",text:"Der Bundesrechnungshof bezeichnet 35 Mio. € für mehr als 17.000 Smartphones als Fehlinvestition. Die Geräte konnten nicht wie vorgesehen verschlüsselt kommunizieren und waren laut BRH nur begrenzt einsetzbar.",meta:"Bemerkungen 2025 Nr. 3",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
