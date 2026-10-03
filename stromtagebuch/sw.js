@@ -1,4 +1,4 @@
-const CACHE="stromtagebuch-v24";
+const CACHE="stromtagebuch-v25";
 const OCR_CACHE="stromtagebuch-ocr-v1";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg"];
 
