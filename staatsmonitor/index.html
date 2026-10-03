@@ -45,6 +45,27 @@ main{padding-bottom:108px}
 .appNavBtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .appNavBtn span{font-size:9px;font-weight:800;white-space:nowrap}
 .appNavBtn.active{color:#fff;background:#142435;box-shadow:inset 0 0 0 1px rgba(106,169,255,.18)}
+
+.euBlock{margin-top:18px}
+.euHero{background:linear-gradient(135deg,#102949,#0b1a2a 58%,#111d2a);border:1px solid rgba(106,169,255,.22);border-radius:22px;padding:20px;box-shadow:0 14px 38px rgba(0,0,0,.2);position:relative;overflow:hidden}
+.euHero:after{content:"🇪🇺";position:absolute;right:14px;top:8px;font-size:72px;opacity:.08}
+.euKickerLabel{font-size:10px;color:#91a8bd;text-transform:uppercase;letter-spacing:.1em;font-weight:900}
+.euDebt{font-size:clamp(29px,5.2vw,54px);font-weight:950;letter-spacing:-.05em;font-variant-numeric:tabular-nums;margin:7px 0;color:#ff8d8d;position:relative;z-index:1}
+.euMeta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.euMeta span{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);border-radius:999px;padding:6px 9px;font-size:10px;color:#c1d0df;font-weight:800}
+.euControls{display:grid;grid-template-columns:1fr 190px;gap:9px;margin:14px 0 11px}
+.euGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.euCard{background:linear-gradient(180deg,#0e1b28,#09131d);border:1px solid var(--line);border-radius:16px;padding:14px;min-height:145px}
+.euCardTop{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.euCountry{font-weight:900;font-size:13px;display:flex;gap:7px;align-items:center}
+.euPct{font-size:10px;color:#9eb2c4;background:#102236;border:1px solid #203b55;border-radius:999px;padding:4px 7px;white-space:nowrap}
+.euAmount{font-size:20px;font-weight:950;letter-spacing:-.035em;margin:14px 0 7px;font-variant-numeric:tabular-nums;color:#ff9292}
+.euTrend{font-size:10px;line-height:1.35;color:#7f96aa}
+.euTrend.up{color:#ff8888}.euTrend.down{color:#54dda7}
+.euNote{font-size:10px;line-height:1.5;color:#788fa4;margin-top:10px}
+@media(max-width:900px){.euGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.euGrid{grid-template-columns:1fr}.euControls{grid-template-columns:1fr}.euCard{min-height:132px}.euDebt{font-size:28px}}
+
 .viewTitle{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:4px 2px 18px}
 .viewTitle h1{margin:0;font-size:28px;letter-spacing:-.045em}.viewTitle p{margin:4px 0 0;color:var(--muted);font-size:12px}
 @media(max-width:760px){.homeGrid{grid-template-columns:repeat(2,1fr)}.sourcesGrid{grid-template-columns:1fr}.appBottom{bottom:max(6px,env(safe-area-inset-bottom));border-radius:19px}.appNavBtn span{font-size:8px}}
@@ -104,6 +125,22 @@ main{padding-bottom:108px}
       <div class="sub">Destatis weist den Öffentlichen Gesamthaushalt gegenüber dem nicht-öffentlichen Bereich aus. Kreditbeziehungen innerhalb des Staatssektors werden dadurch nicht einfach doppelt als Gesamtschuld gezählt.</div>
     </div>
   </div>
+
+  <div class="euBlock">
+    <div class="sectionHead" style="margin-top:24px"><div><h2>🇪🇺 EU-Schulden live</h2><p>Alle 27 Mitgliedstaaten · amtliche Basis Eurostat Q1 2026 · laufende Werte sind Hochrechnungen.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://ec.europa.eu/eurostat/web/products-euro-indicators/w/2-21072026-ap">Quelle: Eurostat ↗</a></div>
+    <div class="euHero">
+      <div class="euKickerLabel">EU27 · Live-Hochrechnung der Staatsschulden</div>
+      <div class="euDebt" id="euDebt">− 15.704.593.000.000 €</div>
+      <div class="approx"><b>HOCHRECHNUNG</b> Basis: 31.03.2026 · Q4→Q1-Trend wird fortgeschrieben</div>
+      <div class="euMeta"><span>Amtlich Q1: − 15,7046 Bio. €</span><span>82,9 % des BIP</span><span>Nächste Eurostat-Veröffentlichung: 21.10.2026</span></div>
+    </div>
+    <div class="euControls">
+      <input class="input" id="euSearch" type="search" placeholder="EU-Land suchen …">
+      <select class="select" id="euSort"><option value="ratio">Schuldenquote absteigend</option><option value="name">Alphabetisch</option><option value="trend">Stärkster Schuldenanstieg</option></select>
+    </div>
+    <div class="euGrid" id="euGrid"></div>
+    <div class="euNote">Eurostat veröffentlicht die Beträge für Nicht-Euro-Länder in der jeweiligen nationalen Währung. Deshalb bleiben Tschechien, Dänemark, Ungarn, Polen, Rumänien und Schweden hier in CZK, DKK, HUF, PLN, RON bzw. SEK. Jeder Kartenwert ist eine gekennzeichnete Hochrechnung aus der Veränderung von Q4 2025 zu Q1 2026 – kein amtlicher Sekundenstand.</div>
+  </div>
 </section>
 
 <section class="section" id="faelle">
@@ -151,6 +188,69 @@ const BASE_DEBT=2753500000000,BASE_DATE=new Date("2026-06-30T23:59:59+02:00").ge
 const fmt=new Intl.NumberFormat("de-DE",{maximumFractionDigits:0});
 function updateDebt(){const e=Math.max(0,(Date.now()-BASE_DATE)/1000);document.getElementById("debt").textContent="− "+fmt.format(BASE_DEBT+e*PER_SECOND)+" €"}updateDebt();setInterval(updateDebt,1000);
 
+
+const EU_BASE_DATE=new Date("2026-03-31T23:59:59+02:00").getTime();
+const EU_Q_SECONDS=90*24*60*60;
+const EU_Q4=15377325,EU_Q1=15704593;
+const euCountries=[
+["🇧🇪","Belgien","EUR",692460,706581,109.1],["🇧🇬","Bulgarien","EUR",34635,34233,28.5],["🇨🇿","Tschechien","CZK",3786250,3827885,44.1],
+["🇩🇰","Dänemark","DKK",848580,840418,26.8],["🇩🇪","Deutschland","EUR",2838239,2902035,64.4],["🇪🇪","Estland","EUR",10035,10646,25.2],
+["🇮🇪","Irland","EUR",209895,215411,37.0],["🇬🇷","Griechenland","EUR",362925,360106,143.5],["🇪🇸","Spanien","EUR",1698225,1739501,101.6],
+["🇫🇷","Frankreich","EUR",3460465,3536068,117.6],["🇭🇷","Kroatien","EUR",52371,55216,58.4],["🇮🇹","Italien","EUR",3095888,3158191,138.9],
+["🇨🇾","Zypern","EUR",20078,20089,54.6],["🇱🇻","Lettland","EUR",20174,20436,46.9],["🇱🇹","Litauen","EUR",33259,36260,42.3],
+["🇱🇺","Luxemburg","EUR",23695,26402,29.2],["🇭🇺","Ungarn","HUF",64913039,68969989,77.7],["🇲🇹","Malta","EUR",11397,11458,45.9],
+["🇳🇱","Niederlande","EUR",523720,517377,43.8],["🇦🇹","Österreich","EUR",418079,431411,83.3],["🇵🇱","Polen","PLN",2335148,2444256,61.6],
+["🇵🇹","Portugal","EUR",275063,283106,91.0],["🇷🇴","Rumänien","RON",1137324,1169870,60.1],["🇸🇮","Slowenien","EUR",46324,46315,64.8],
+["🇸🇰","Slowakei","EUR",83957,86803,62.5],["🇫🇮","Finnland","EUR",249147,255139,89.7],["🇸🇪","Schweden","SEK",2337779,2341046,34.9]
+];
+function currencyLabel(code){return code==="EUR"?"€":code}
+function liveMillions(q4,q1){
+ const elapsed=Math.max(0,(Date.now()-EU_BASE_DATE)/1000);
+ return q1 + elapsed*((q1-q4)/EU_Q_SECONDS);
+}
+function formatDebtBillions(million,code){
+ const billions=million/1000;
+ return "− "+new Intl.NumberFormat("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1}).format(billions)+" Mrd. "+currencyLabel(code);
+}
+function trendText(q4,q1,code){
+ const perSec=Math.abs((q1-q4)*1000000/EU_Q_SECONDS);
+ const rising=q1>q4;
+ const n=new Intl.NumberFormat("de-DE",{maximumFractionDigits:0}).format(perSec);
+ return {text:(rising?"Schulden steigen: ":"Schulden sinken: ")+n+" "+currencyLabel(code)+"/Sek.",cls:rising?"up":"down"};
+}
+function updateEuTotal(){
+ const elapsed=Math.max(0,(Date.now()-EU_BASE_DATE)/1000);
+ const m=EU_Q1+elapsed*((EU_Q1-EU_Q4)/EU_Q_SECONDS);
+ const el=document.getElementById("euDebt");
+ if(el) el.textContent="− "+fmt.format(m*1000000)+" €";
+}
+function renderEU(){
+ const root=document.getElementById("euGrid"); if(!root) return;
+ const q=(document.getElementById("euSearch")?.value||"").trim().toLowerCase();
+ const sort=document.getElementById("euSort")?.value||"ratio";
+ let arr=euCountries.filter(x=>!q||x[1].toLowerCase().includes(q)||x[2].toLowerCase().includes(q));
+ if(sort==="name") arr.sort((a,b)=>a[1].localeCompare(b[1],"de"));
+ else if(sort==="trend") arr.sort((a,b)=>(b[4]-b[3])-(a[4]-a[3]));
+ else arr.sort((a,b)=>b[5]-a[5]);
+ root.innerHTML="";
+ arr.forEach(x=>{
+   const tr=trendText(x[3],x[4],x[2]);
+   const d=document.createElement("div"); d.className="euCard";
+   d.innerHTML='<div class="euCardTop"><div class="euCountry"><span>'+x[0]+'</span>'+x[1]+'</div><div class="euPct">'+x[5].toFixed(1).replace(".",",")+' % BIP</div></div><div class="euAmount" data-eu-country="'+x[1]+'">'+formatDebtBillions(liveMillions(x[3],x[4]),x[2])+'</div><div class="euTrend '+tr.cls+'">'+tr.text+'</div>';
+   root.appendChild(d);
+ });
+}
+function tickEU(){
+ updateEuTotal();
+ document.querySelectorAll("[data-eu-country]").forEach(el=>{
+   const x=euCountries.find(c=>c[1]===el.dataset.euCountry);
+   if(x) el.textContent=formatDebtBillions(liveMillions(x[3],x[4]),x[2]);
+ });
+}
+document.addEventListener("input",e=>{if(e.target.id==="euSearch") renderEU()});
+document.addEventListener("change",e=>{if(e.target.id==="euSort") renderEU()});
+renderEU();updateEuTotal();setInterval(tickEU,1000);
+
 const cases=[
 {type:"confirmed",amountNum:35000000,amount:"− 35 Mio. €",badge:"Fehlinvestition laut BRH",ressort:"BMF",date:"2025-12-10",title:"„Sichere“ Smartphones für den Zoll",text:"Der Bundesrechnungshof bezeichnet 35 Mio. € für mehr als 17.000 Smartphones als Fehlinvestition. Die Geräte konnten nicht wie vorgesehen verschlüsselt kommunizieren und waren laut BRH nur begrenzt einsetzbar.",meta:"Bemerkungen 2025 Nr. 3",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
 {type:"confirmed",amountNum:20000000,amount:"− ≥ 20 Mio. €",badge:"Mehrkosten laut BRH",ressort:"BMVg",date:"2025-12-10",title:"Unterbringung von Fregattenbesatzungen",text:"Bei der Unterbringung der Besatzungen von vier Fregatten während deren Modernisierung entstanden laut Bundesrechnungshof Mehrkosten von mindestens 20 Mio. €.",meta:"Bemerkungen 2025 Nr. 13",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
@@ -174,7 +274,7 @@ document.querySelectorAll(".filter").forEach(b=>b.addEventListener("click",()=>{
 const states=[
 ["Baden-Württemberg",6081],["Bayern",3496],["Berlin",18293],["Brandenburg",9616],["Bremen",35757],["Hamburg",19278],["Hessen",11167],["Mecklenburg-Vorpommern",7079],["Niedersachsen",10683],["Nordrhein-Westfalen",13969],["Rheinland-Pfalz",9891],["Saarland",16766],["Sachsen",2829],["Sachsen-Anhalt",14177],["Schleswig-Holstein",13270],["Thüringen",8078]
 ];
-const sr=document.getElementById("states");states.forEach(s=>{const d=document.createElement("div");d.className="state";d.innerHTML="<span>"+s[0]+"</span><strong>"+fmt.format(s[1])+" €</strong><small>je Einwohner</small>";sr.appendChild(d)});
+const sr=document.getElementById("states");states.forEach(s=>{const d=document.createElement("div");d.className="state";d.innerHTML="<span>"+s[0]+"</span><strong>− "+fmt.format(s[1])+" €</strong><small>je Einwohner</small>";sr.appendChild(d)});
 
 // App navigation
 const viewMap={
