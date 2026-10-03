@@ -61,9 +61,9 @@ main{padding-bottom:108px}
   <div class="debt" id="debt">− 2.753.500.000.000 €</div>
   <div class="approx"><b>HOCHRECHNUNG</b> kein sekundengenauer amtlicher Schuldenstand</div>
   <div class="quick">
-    <div class="metric"><span>Amtlicher Stand Q2</span><strong>2,7535 Bio. €</strong></div>
-    <div class="metric"><span>Veränderung Q2</span><strong class="red">+26,3 Mrd. €</strong></div>
-    <div class="metric"><span>Trend/Sekunde*</span><strong class="amber">+3.345 €</strong></div>
+    <div class="metric"><span>Amtlicher Stand Q2</span><strong class="red">− 2,7535 Bio. €</strong></div>
+    <div class="metric"><span>Mehr Schulden Q2</span><strong class="red">− 26,3 Mrd. €</strong></div>
+    <div class="metric"><span>Schulden-Trend/Sek.*</span><strong class="red">− 3.345 €</strong></div>
     <div class="metric"><span>Veröffentlicht</span><strong>29.09.2026</strong></div>
   </div>
   <div class="sourceLine"><strong>Amtliche Basis:</strong> Öffentlicher Gesamthaushalt zum 30.06.2026. <a href="https://www.destatis.de/DE/Themen/Staat/Oeffentliche-Finanzen/Schulden-Finanzvermoegen/_inhalt.html" target="_blank" rel="noopener">Destatis öffnen ↗</a></div>
@@ -79,12 +79,12 @@ main{padding-bottom:108px}
 <section class="section" id="haushalt">
   <div class="sectionHead"><div><h2>Bundeshaushalt 2026</h2><p>Planwerte und gebuchte Entwicklung bis Juli 2026.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Oeffentliche_Finanzen/Wirtschafts_und_Finanzdaten/Kurzuebersicht_Haushalts_und_Finanzdaten/2026-08-20-kurzuebersicht-august-2026.html">Quelle: BMF ↗</a></div>
   <div class="panel">
-    <div class="budgetBig">524,5 Mrd. €</div><div class="sub">Geplante Ausgaben des Bundes im Haushaltsjahr 2026.</div>
-    <div class="progress"><i></i></div><div class="legend">289,3 Mrd. € gebuchte Ausgaben bis Ende Juli 2026 · entspricht 55,2 % des Jahres-Sollwerts. Der Jahresverlauf ist nicht gleichmäßig.</div>
+    <div class="budgetBig red">− 524,5 Mrd. €</div><div class="sub">Geplante Ausgaben des Bundes im Haushaltsjahr 2026.</div>
+    <div class="progress"><i></i></div><div class="legend">− 289,3 Mrd. € gebuchte Ausgaben bis Ende Juli 2026 · entspricht 55,2 % des Jahres-Sollwerts. Der Jahresverlauf ist nicht gleichmäßig.</div>
     <div class="budgetStats">
-      <div class="stat"><span>Einnahmen bis Juli</span><strong>237,3 Mrd. €</strong></div>
+      <div class="stat"><span>Einnahmen bis Juli</span><strong class="green">+ 237,3 Mrd. €</strong></div>
       <div class="stat"><span>Finanzierungssaldo</span><strong class="red">−52,0 Mrd. €</strong></div>
-      <div class="stat"><span>Nettokreditaufnahme Soll</span><strong>98,0 Mrd. €</strong></div>
+      <div class="stat"><span>Nettokreditaufnahme Soll</span><strong class="red">− 98,0 Mrd. €</strong></div>
     </div>
   </div>
 </section>
@@ -93,10 +93,10 @@ main{padding-bottom:108px}
   <div class="sectionHead"><div><h2>Wo liegen die Schulden?</h2><p>Vorläufiger Stand zum 30.06.2026.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://www.destatis.de/DE/Themen/Staat/Oeffentliche-Finanzen/Schulden-Finanzvermoegen/_inhalt.html">Quelle: Destatis ↗</a></div>
   <div class="two">
     <div class="panel levels">
-      <div class="barRow"><div class="barLabel">Bund</div><div class="bar"><i style="width:69.3%"></i></div><div class="barVal">1.907,1 Mrd. €</div></div>
-      <div class="barRow"><div class="barLabel">Länder</div><div class="bar"><i style="width:23.5%"></i></div><div class="barVal">646,2 Mrd. €</div></div>
-      <div class="barRow"><div class="barLabel">Kommunen</div><div class="bar"><i style="width:7.3%"></i></div><div class="barVal">200,2 Mrd. €</div></div>
-      <div class="barRow"><div class="barLabel">Sozialvers.</div><div class="bar"><i style="width:.34%"></i></div><div class="barVal">9,1 Mrd. €</div></div>
+      <div class="barRow"><div class="barLabel">Bund</div><div class="bar"><i style="width:69.3%"></i></div><div class="barVal">− 1.907,1 Mrd. €</div></div>
+      <div class="barRow"><div class="barLabel">Länder</div><div class="bar"><i style="width:23.5%"></i></div><div class="barVal">− 646,2 Mrd. €</div></div>
+      <div class="barRow"><div class="barLabel">Kommunen</div><div class="bar"><i style="width:7.3%"></i></div><div class="barVal">− 200,2 Mrd. €</div></div>
+      <div class="barRow"><div class="barLabel">Sozialvers.</div><div class="bar"><i style="width:.34%"></i></div><div class="barVal">− 9,1 Mrd. €</div></div>
     </div>
     <div class="panel">
       <div class="eyebrow">Einordnung</div>
@@ -152,12 +152,12 @@ const fmt=new Intl.NumberFormat("de-DE",{maximumFractionDigits:0});
 function updateDebt(){const e=Math.max(0,(Date.now()-BASE_DATE)/1000);document.getElementById("debt").textContent="− "+fmt.format(BASE_DEBT+e*PER_SECOND)+" €"}updateDebt();setInterval(updateDebt,1000);
 
 const cases=[
-{type:"confirmed",amountNum:35000000,amount:"35 Mio. €",badge:"Fehlinvestition laut BRH",ressort:"BMF",date:"2025-12-10",title:"„Sichere“ Smartphones für den Zoll",text:"Der Bundesrechnungshof bezeichnet 35 Mio. € für mehr als 17.000 Smartphones als Fehlinvestition. Die Geräte konnten nicht wie vorgesehen verschlüsselt kommunizieren und waren laut BRH nur begrenzt einsetzbar.",meta:"Bemerkungen 2025 Nr. 3",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
-{type:"confirmed",amountNum:20000000,amount:"≥ 20 Mio. €",badge:"Mehrkosten laut BRH",ressort:"BMVg",date:"2025-12-10",title:"Unterbringung von Fregattenbesatzungen",text:"Bei der Unterbringung der Besatzungen von vier Fregatten während deren Modernisierung entstanden laut Bundesrechnungshof Mehrkosten von mindestens 20 Mio. €.",meta:"Bemerkungen 2025 Nr. 13",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
-{type:"planned",amountNum:855000000,amount:"855 Mio. €",badge:"Geplante Kosten",ressort:"BMV",date:"2025-12-10",title:"Ausbau von sieben Moselschleusen",text:"Für den Ausbau waren 855 Mio. € vorgesehen. Der Bundesrechnungshof bewertet das Vorhaben als weder notwendig noch wirtschaftlich und empfiehlt, den Ausbau zu stoppen.",meta:"Bemerkungen 2025 Nr. 9",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
-{type:"potential",amountNum:2400000000,amount:"2,4 Mrd. €/Jahr",badge:"Steuervergünstigung",ressort:"BMF",date:"2025-12-10",title:"Steuerermäßigung für Handwerkerleistungen",text:"Nach Angaben des Bundesrechnungshofes verzichtete der Fiskus 2024 dadurch auf 2,4 Mrd. € Einnahmen. Der BRH bewertet die Subvention als unwirksam und kritisiert überwiegende Mitnahmeeffekte.",meta:"Bemerkungen 2025 Nr. 22 · Wert für 2024",url:"https://bundesrechnungshof.de/presse/pressemitteilungen/verkehr-bundeswehr-buergergeld-steuern-zollverwaltung-it-wirtschaftsfoerderung"},
-{type:"potential",amountNum:35000000000,amount:"> 35 Mrd. €",badge:"Einsparpotenzial laut BRH",ressort:"Bundesregierung",date:"2026-07-15",title:"Finanzhilfen des Bundes",text:"Der Bundesrechnungshof beziffert ein Einsparpotenzial von mehr als 35 Mrd. €, falls Finanzhilfen auf das Niveau vor der Corona-Pandemie zurückgeführt werden. Dies ist ein Potenzial, keine bereits verlorene Summe.",meta:"Beratungsbericht „Subventionen verdreifacht“",url:"https://bundesrechnungshof.de/berichte/subventionen-verdreifacht-enormes-einsparpotenzial-noch-nicht-genutzt"},
-{type:"potential",amountNum:17000000000,amount:"≈ 17 Mrd. €/Jahr",badge:"Steuervergünstigungen laut BRH",ressort:"Bundesregierung",date:"2026-07-15",title:"Unwirksame oder klimaschädliche Steuervergünstigungen",text:"Der Bundesrechnungshof schreibt, dass nachweislich unwirksame oder klimaschädliche Steuervergünstigungen sich jährlich auf rund 17 Mrd. € summieren.",meta:"Beratungsbericht „Subventionen verdreifacht“",url:"https://bundesrechnungshof.de/berichte/subventionen-verdreifacht-enormes-einsparpotenzial-noch-nicht-genutzt"}
+{type:"confirmed",amountNum:35000000,amount:"− 35 Mio. €",badge:"Fehlinvestition laut BRH",ressort:"BMF",date:"2025-12-10",title:"„Sichere“ Smartphones für den Zoll",text:"Der Bundesrechnungshof bezeichnet 35 Mio. € für mehr als 17.000 Smartphones als Fehlinvestition. Die Geräte konnten nicht wie vorgesehen verschlüsselt kommunizieren und waren laut BRH nur begrenzt einsetzbar.",meta:"Bemerkungen 2025 Nr. 3",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
+{type:"confirmed",amountNum:20000000,amount:"− ≥ 20 Mio. €",badge:"Mehrkosten laut BRH",ressort:"BMVg",date:"2025-12-10",title:"Unterbringung von Fregattenbesatzungen",text:"Bei der Unterbringung der Besatzungen von vier Fregatten während deren Modernisierung entstanden laut Bundesrechnungshof Mehrkosten von mindestens 20 Mio. €.",meta:"Bemerkungen 2025 Nr. 13",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
+{type:"planned",amountNum:855000000,amount:"− 855 Mio. €",badge:"Geplante Kosten",ressort:"BMV",date:"2025-12-10",title:"Ausbau von sieben Moselschleusen",text:"Für den Ausbau waren 855 Mio. € vorgesehen. Der Bundesrechnungshof bewertet das Vorhaben als weder notwendig noch wirtschaftlich und empfiehlt, den Ausbau zu stoppen.",meta:"Bemerkungen 2025 Nr. 9",url:"https://bundesrechnungshof.de/berichte/bemerkungen-2025-zur-haushalts-und-wirtschaftsfuehrung-des-bundes-1"},
+{type:"potential",amountNum:2400000000,amount:"− 2,4 Mrd. €/Jahr",badge:"Steuervergünstigung",ressort:"BMF",date:"2025-12-10",title:"Steuerermäßigung für Handwerkerleistungen",text:"Nach Angaben des Bundesrechnungshofes verzichtete der Fiskus 2024 dadurch auf 2,4 Mrd. € Einnahmen. Der BRH bewertet die Subvention als unwirksam und kritisiert überwiegende Mitnahmeeffekte.",meta:"Bemerkungen 2025 Nr. 22 · Wert für 2024",url:"https://bundesrechnungshof.de/presse/pressemitteilungen/verkehr-bundeswehr-buergergeld-steuern-zollverwaltung-it-wirtschaftsfoerderung"},
+{type:"potential",amountNum:35000000000,amount:"+ > 35 Mrd. €",badge:"Einsparpotenzial laut BRH",ressort:"Bundesregierung",date:"2026-07-15",title:"Finanzhilfen des Bundes",text:"Der Bundesrechnungshof beziffert ein Einsparpotenzial von mehr als 35 Mrd. €, falls Finanzhilfen auf das Niveau vor der Corona-Pandemie zurückgeführt werden. Dies ist ein Potenzial, keine bereits verlorene Summe.",meta:"Beratungsbericht „Subventionen verdreifacht“",url:"https://bundesrechnungshof.de/berichte/subventionen-verdreifacht-enormes-einsparpotenzial-noch-nicht-genutzt"},
+{type:"potential",amountNum:17000000000,amount:"+ ≈ 17 Mrd. €/Jahr",badge:"Steuervergünstigungen laut BRH",ressort:"Bundesregierung",date:"2026-07-15",title:"Unwirksame oder klimaschädliche Steuervergünstigungen",text:"Der Bundesrechnungshof schreibt, dass nachweislich unwirksame oder klimaschädliche Steuervergünstigungen sich jährlich auf rund 17 Mrd. € summieren.",meta:"Beratungsbericht „Subventionen verdreifacht“",url:"https://bundesrechnungshof.de/berichte/subventionen-verdreifacht-enormes-einsparpotenzial-noch-nicht-genutzt"}
 ];
 let activeType="all";
 function renderCases(){
