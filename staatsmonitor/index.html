@@ -133,6 +133,14 @@ main{padding-bottom:108px}
     <div class="euNote">Die Platzierung nutzt die Schuldenquote, damit Länder unterschiedlicher Größe vergleichbar bleiben. Der amtliche Q1-Wert je Land stammt von Eurostat; die laufende Bewegung ist eine rechnerische Hochrechnung aus Q4 2025 → Q1 2026. Nicht-Euro-Länder bleiben beim Schuldenbetrag in ihrer amtlichen Landeswährung.</div>
   </div>
 
+  <div class="sectionHead" style="margin-top:28px"><div><h2>🇩🇪 Deutschland LIVE</h2><p>Eigener Deutschland-Ticker · unabhängig von der EU-Rangliste.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://www.destatis.de/DE/Themen/Staat/Oeffentliche-Finanzen/Schulden-Finanzvermoegen/_inhalt.html">Quelle: Destatis ↗</a></div>
+  <div class="euHero" style="background:linear-gradient(135deg,#171d24,#111923 58%,#22160f)">
+    <div class="euKickerLabel">🇩🇪 Deutschland · Live-Hochrechnung der öffentlichen Schulden</div>
+    <div class="euDebt" id="germanyDebt">− 2.753.500.000.000 €</div>
+    <div class="approx"><b>HOCHRECHNUNG</b> Basis: amtlicher Stand 30.06.2026 · letzter Quartalstrend wird fortgeschrieben</div>
+    <div class="euMeta"><span>Amtlich: − 2,7535 Bio. €</span><span>Q2: − 26,3 Mrd. € mehr Schulden</span><span>Trend: − 3.345 €/Sek.</span></div>
+  </div>
+
   <div class="sectionHead" style="margin-top:28px"><div><h2>🇩🇪 Deutschland im Detail</h2><p>Öffentlicher Gesamthaushalt · Stand 30.06.2026.</p></div><a class="sourceMini" target="_blank" rel="noopener" href="https://www.destatis.de/DE/Themen/Staat/Oeffentliche-Finanzen/Schulden-Finanzvermoegen/_inhalt.html">Destatis ↗</a></div>
   <div class="two">
     <div class="panel levels">
@@ -192,7 +200,7 @@ main{padding-bottom:108px}
 <script>
 const BASE_DEBT=2753500000000,BASE_DATE=new Date("2026-06-30T23:59:59+02:00").getTime(),Q2_CHANGE=26300000000,Q2_SECONDS=91*24*60*60,PER_SECOND=Q2_CHANGE/Q2_SECONDS;
 const fmt=new Intl.NumberFormat("de-DE",{maximumFractionDigits:0});
-function updateDebt(){const e=Math.max(0,(Date.now()-BASE_DATE)/1000);document.getElementById("debt").textContent="− "+fmt.format(BASE_DEBT+e*PER_SECOND)+" €"}updateDebt();setInterval(updateDebt,1000);
+function updateDebt(){const e=Math.max(0,(Date.now()-BASE_DATE)/1000),v="− "+fmt.format(BASE_DEBT+e*PER_SECOND)+" €";const home=document.getElementById("debt"),de=document.getElementById("germanyDebt");if(home)home.textContent=v;if(de)de.textContent=v}updateDebt();setInterval(updateDebt,1000);
 
 
 const EU_BASE_DATE=new Date("2026-03-31T23:59:59+02:00").getTime();
