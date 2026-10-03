@@ -2,19 +2,42 @@
   "id": "./",
   "name": "Stromtagebuch",
   "short_name": "Strom",
+  "lang": "de-DE",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait-primary",
   "background_color": "#0b6b57",
   "theme_color": "#0b6b57",
   "description": "Persönliches Strom-, PV-, Wärmepumpen- und Kosten-Tagebuch",
+  "categories": ["utilities", "finance", "productivity"],
   "icons": [
     {
       "src": "./icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Heute ablesen",
+      "short_name": "Ablesen",
+      "url": "./?view=read",
+      "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]
+    },
+    {
+      "name": "Monatsbericht",
+      "short_name": "Monat",
+      "url": "./?view=report",
+      "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]
+    },
+    {
+      "name": "Jahresübersicht",
+      "short_name": "Jahr",
+      "url": "./?view=year",
+      "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]
     }
   ]
 }
