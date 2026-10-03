@@ -1,12 +1,19 @@
 package de.stromtagebuch.app;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.print.PrintManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -28,6 +35,7 @@ import org.json.JSONObject;
 
 import java.io.OutputStream;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -37,6 +45,8 @@ public class MainActivity extends Activity {
     private static final String APP_URL = "https://shawnstahl-commits.github.io/stromtagebuch/";
     private static final String APP_HOST = "shawnstahl-commits.github.io";
     private static final int FILE_CHOOSER_REQUEST = 1101;
+    private static final int NOTIFICATION_PERMISSION_REQUEST = 1102;
+    private static final String NOTIFICATION_CHANNEL = "stromtagebuch_reminders";
 
     private WebView webView;
     private ValueCallback<Uri[]> fileCallback;
@@ -54,6 +64,7 @@ public class MainActivity extends Activity {
         ));
         setContentView(root);
 
+        createNotificationChannel();
         configureWebView();
 
         if (savedInstanceState == null) {
@@ -61,6 +72,79 @@ public class MainActivity extends Activity {
         } else {
             webView.restoreState(savedInstanceState);
         }
+    }
+
+    private void createNotificationChannel() {
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (manager == null) return;
+        NotificationChannel channel = new NotificationChannel(
+                NOTIFICATION_CHANNEL,
+                "Stromtagebuch Erinnerungen",
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+        channel.setDescription("Monatsablesung, Backup und Stromtagebuch-Hinweise");
+        manager.createNotificationChannel(channel);
+    }
+
+    private boolean hasNotificationPermission() {
+        return Build.VERSION.SDK_INT < 33 ||
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private String notificationPermissionState() {
+        if (hasNotificationPermission()) return "granted";
+        boolean requested = getSharedPreferences("stromtagebuch_native", MODE_PRIVATE)
+                .getBoolean("notifications_requested", false);
+        if (!requested || shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+            return "prompt";
+        }
+        return "denied";
+    }
+
+    private void requestNativeNotificationPermission() {
+        if (Build.VERSION.SDK_INT < 33) {
+            Toast.makeText(this, "Benachrichtigungen sind aktiviert.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (hasNotificationPermission()) {
+            Toast.makeText(this, "Benachrichtigungen sind bereits aktiviert.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        getSharedPreferences("stromtagebuch_native", MODE_PRIVATE)
+                .edit()
+                .putBoolean("notifications_requested", true)
+                .apply();
+        requestPermissions(
+                new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                NOTIFICATION_PERMISSION_REQUEST
+        );
+    }
+
+    private void showNativeNotification(String title, String body, String tag) {
+        if (!hasNotificationPermission()) return;
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (manager == null) return;
+
+        Intent openIntent = new Intent(this, MainActivity.class);
+        openIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                this,
+                0,
+                openIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        Notification notification = new Notification.Builder(this, NOTIFICATION_CHANNEL)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(title == null || title.isEmpty() ? "Stromtagebuch" : title)
+                .setContentText(body == null ? "" : body)
+                .setStyle(new Notification.BigTextStyle().bigText(body == null ? "" : body))
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true)
+                .setCategory(Notification.CATEGORY_REMINDER)
+                .build();
+
+        manager.notify(tag == null ? "stromtagebuch" : tag, 1001, notification);
     }
 
     private void configureWebView() {
@@ -343,6 +427,39 @@ public class MainActivity extends Activity {
 
     private class AndroidBridge {
         @JavascriptInterface
+        public String notificationPermission() {
+            return notificationPermissionState();
+        }
+
+        @JavascriptInterface
+        public void requestNotificationPermission() {
+            runOnUiThread(() -> requestNativeNotificationPermission());
+        }
+
+        @JavascriptInterface
+        public void showNotification(String title, String body, String tag) {
+            runOnUiThread(() -> showNativeNotification(title, body, tag));
+        }
+
+        @JavascriptInterface
+        public void saveTextFile(String fileName, String content, String hintedMime) {
+            new Thread(() -> {
+                try {
+                    String mime = normalizeMime(hintedMime);
+                    byte[] bytes = (content == null ? "" : content).getBytes(StandardCharsets.UTF_8);
+                    saveBytesToDownloads(fileName, mime, bytes);
+                    runOnUiThread(() ->
+                            Toast.makeText(MainActivity.this, "Gespeichert unter Downloads/Stromtagebuch.", Toast.LENGTH_LONG).show()
+                    );
+                } catch (Exception ex) {
+                    runOnUiThread(() ->
+                            Toast.makeText(MainActivity.this, "Datei konnte nicht gespeichert werden.", Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }).start();
+        }
+
+        @JavascriptInterface
         public void showToast(String message) {
             runOnUiThread(() ->
                     Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show()
@@ -371,19 +488,7 @@ public class MainActivity extends Activity {
 
                     byte[] bytes = Base64.decode(base64, Base64.DEFAULT);
 
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.MediaColumns.DISPLAY_NAME, sanitizeFilename(fileName));
-                    values.put(MediaStore.MediaColumns.MIME_TYPE, mime);
-                    values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Stromtagebuch");
-
-                    Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-                    if (uri == null) throw new IllegalStateException("Download konnte nicht angelegt werden");
-
-                    try (OutputStream out = getContentResolver().openOutputStream(uri)) {
-                        if (out == null) throw new IllegalStateException("Download konnte nicht geöffnet werden");
-                        out.write(bytes);
-                        out.flush();
-                    }
+                    saveBytesToDownloads(fileName, mime, bytes);
 
                     runOnUiThread(() ->
                             Toast.makeText(MainActivity.this, "Gespeichert unter Downloads/Stromtagebuch.", Toast.LENGTH_LONG).show()
@@ -414,11 +519,55 @@ public class MainActivity extends Activity {
         }
     }
 
+    private String normalizeMime(String mime) {
+        if (mime == null || mime.trim().isEmpty()) return "application/octet-stream";
+        int semicolon = mime.indexOf(';');
+        return semicolon >= 0 ? mime.substring(0, semicolon).trim() : mime.trim();
+    }
+
+    private void saveBytesToDownloads(String fileName, String mime, byte[] bytes) throws Exception {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, sanitizeFilename(fileName));
+        values.put(MediaStore.MediaColumns.MIME_TYPE, normalizeMime(mime));
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Stromtagebuch");
+
+        Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+        if (uri == null) throw new IllegalStateException("Download konnte nicht angelegt werden");
+
+        try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+            if (out == null) throw new IllegalStateException("Download konnte nicht geöffnet werden");
+            out.write(bytes);
+            out.flush();
+        } catch (Exception ex) {
+            try {
+                getContentResolver().delete(uri, null, null);
+            } catch (Exception ignored) {
+            }
+            throw ex;
+        }
+    }
+
     private String sanitizeFilename(String name) {
         if (name == null || name.trim().isEmpty()) {
             return "Stromtagebuch_" + System.currentTimeMillis() + ".bin";
         }
         return name.replaceAll("[\\/:*?\"<>|]", "_");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST) {
+            boolean granted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            Toast.makeText(
+                    this,
+                    granted ? "Benachrichtigungen aktiviert." : "Benachrichtigungen nicht aktiviert.",
+                    Toast.LENGTH_SHORT
+            ).show();
+            if (webView != null) {
+                webView.evaluateJavascript("try{notificationState();}catch(e){}", null);
+            }
+        }
     }
 
     @Override
