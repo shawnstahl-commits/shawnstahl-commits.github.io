@@ -139,6 +139,24 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 .auditItem:last-child{border-bottom:0}.auditItem small{color:var(--muted)}
 .appFooter{text-align:center;color:var(--muted);font-size:11px;padding:22px 0 8px}
 @media(min-width:760px){.chartGrid{grid-template-columns:repeat(2,1fr)}.chartGrid .wideChart{grid-column:1/-1}}
+
+.updateBanner{display:none;position:sticky;top:8px;z-index:40;margin:8px 0 12px;padding:12px 13px;border-radius:16px;background:var(--card);border:1px solid var(--green);box-shadow:var(--shadow);align-items:center;justify-content:space-between;gap:10px}
+.updateBanner.show{display:flex}.updateBanner b{font-size:13px}.updateBanner .hint{margin-top:2px}
+.healthGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.healthItem{border:1px solid var(--line);border-radius:16px;padding:13px;background:var(--card)}
+.healthItem .healthTop{display:flex;align-items:center;gap:8px;font-weight:900}
+.healthDot{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}.healthDot.ok{background:var(--green)}.healthDot.warn{background:var(--orange)}.healthDot.bad{background:#d84b4b}
+.healthScore{font-size:42px;font-weight:950;letter-spacing:-.04em}
+.yearHero{background:linear-gradient(135deg,var(--green),#094b3e);color:#fff;border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+.yearHero .hint{color:rgba(255,255,255,.75)}
+.yearMetricGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}
+.yearMetric{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:13px}.yearMetric b{display:block;font-size:20px;margin-top:4px}
+.tariffRow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.tariffRow:last-child{border-bottom:0}
+.modalOverlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);padding:18px;align-items:center;justify-content:center}.modalOverlay.open{display:flex}
+.modalCard{width:min(560px,100%);max-height:90vh;overflow:auto;border-radius:22px;background:var(--bg);border:1px solid var(--line);padding:17px;box-shadow:0 20px 70px rgba(0,0,0,.35)}
+.editActions{display:flex;gap:8px;margin-top:14px}.editActions button{flex:1}
+.importPreview{margin-top:10px;padding:12px;border:1px dashed var(--line);border-radius:14px;background:var(--soft)}
+@media(max-width:520px){.healthGrid{grid-template-columns:1fr}.yearMetricGrid{grid-template-columns:1fr 1fr}}
 @media print{.nav,.top .icon,.actions,.noPrint,.primary,.secondary,.danger,.mini{display:none!important}body{background:white;color:#111;padding:0}.top{position:static;background:white}.view{display:none!important}.view.active{display:block!important}.splash,.drawer,.drawerBackdrop{display:none!important}.card,.form,.hero{box-shadow:none;break-inside:avoid}.hero{color:#111;background:white;border:1px solid #ccc}.heroBox{background:#f4f4f4}.wrap{max-width:none}}
 @media(max-width:520px){.big{font-size:34px}.row{grid-template-columns:1fr}.value{font-size:21px}.kpi3{grid-template-columns:1fr 1fr}.kpi3 .wideMobile{grid-column:1/-1}}
 </style>
@@ -152,6 +170,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button class="active" data-go="home"><span class="ico">🏠</span>Übersicht</button>
     <button data-go="read"><span class="ico">📟</span>Heute ablesen</button>
     <button data-go="report"><span class="ico">📊</span>Monatsbericht</button>
+    <button data-go="year"><span class="ico">🗓️</span>Jahresübersicht</button>
     <div class="drawerSection">Energie-Zentrale</div>
     <button data-go="ewe"><span class="ico">💶</span>EWE-Vergütung</button>
     <button data-go="pv"><span class="ico">☀️</span>PV-Anlage</button>
@@ -159,15 +178,17 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="ev"><span class="ico">🚗</span>BYD-Laden</button>
     <div class="drawerSection">Daten</div>
     <button data-go="history"><span class="ico">📈</span>Verlauf</button>
+    <button data-go="health"><span class="ico">✅</span>Systemcheck</button>
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.0</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.1</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.0</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.1</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
+<div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
 <div class="dashHero">
   <div class="label">DEIN STROMKONTO</div>
@@ -414,6 +435,40 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="actions noPrint" style="margin-top:12px"><button class="primary" id="printCurrentReport">Bericht drucken / als PDF</button></div>
 </section>
 
+
+<section class="view" data-view="year">
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.1</span></div>
+<div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
+<div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
+<div class="yearMetricGrid">
+  <div class="yearMetric"><div class="label">Netzbezug</div><b id="yearImp">–</b></div>
+  <div class="yearMetric"><div class="label">Einspeisung</div><b class="good" id="yearFeed">–</b></div>
+  <div class="yearMetric"><div class="label">Stromkosten</div><b id="yearCost">–</b></div>
+  <div class="yearMetric"><div class="label">Abschläge</div><b id="yearPaid">–</b></div>
+  <div class="yearMetric"><div class="label">Einspeisevergütung</div><b class="good" id="yearRevenue">–</b></div>
+  <div class="yearMetric"><div class="label">EWE erhalten</div><b id="yearEwePaid">–</b></div>
+  <div class="yearMetric"><div class="label">PV-Erzeugung</div><b id="yearPv">–</b></div>
+  <div class="yearMetric"><div class="label">PV-Eigenverbrauch</div><b id="yearPvOwn">–</b></div>
+  <div class="yearMetric"><div class="label">Wärmepumpe</div><b id="yearHeat">–</b></div>
+  <div class="yearMetric"><div class="label">BYD geladen</div><b id="yearEv">–</b></div>
+</div>
+<h2>Vergleich zum Vorjahr</h2>
+<div class="compareGrid">
+  <div class="comparePill"><div class="label">Netzbezug</div><b id="yearCmpImp">–</b><div class="hint" id="yearCmpImpHint">–</div></div>
+  <div class="comparePill"><div class="label">Einspeisung</div><b id="yearCmpFeed">–</b><div class="hint" id="yearCmpFeedHint">–</div></div>
+  <div class="comparePill"><div class="label">Stromkosten</div><b id="yearCmpCost">–</b><div class="hint" id="yearCmpCostHint">–</div></div>
+  <div class="comparePill"><div class="label">PV-Erzeugung</div><b id="yearCmpPv">–</b><div class="hint" id="yearCmpPvHint">–</div></div>
+</div>
+<div class="card miniChart" style="margin-top:10px"><div class="label">MONATE IM JAHR</div><canvas id="yearChart"></canvas><div class="hint">Blau = Netzbezug · Grün = Einspeisung</div></div>
+</section>
+
+<section class="view" data-view="health">
+<div class="viewTitle"><h2>✅ Systemcheck</h2><span class="pill" id="healthPill">prüft Daten</span></div>
+<div class="yearHero"><div class="label" style="color:rgba(255,255,255,.7)">DATENQUALITÄT</div><div class="healthScore" id="healthScore">–</div><div class="hint" id="healthSummary">–</div></div>
+<div class="healthGrid" id="healthGrid" style="margin-top:10px"></div>
+<div class="card" style="margin-top:10px"><div class="label">Empfehlungen</div><div id="healthAdvice" class="loglist" style="margin-top:8px"></div></div>
+</section>
+
 <section class="view" data-view="settings"><h2>Einstellungen</h2><div class="form">
 <div class="row"><div><label>Arbeitspreis €/kWh</label><input class="input" id="sWork" type="number" step="0.0001"></div><div><label>Grundpreis €/Jahr</label><input class="input" id="sBase" type="number" step="0.01"></div></div>
 <div class="row"><div><label>Abschlag €/Monat</label><input class="input" id="sPay" type="number" step="0.01"></div><div><label>Vergütung €/kWh</label><input class="input" id="sFeed" type="number" step="0.0001"></div></div>
@@ -421,6 +476,16 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="row"><div><label>PV-Leistung kWp</label><input class="input" id="sPv" type="number" step="0.01"></div><div><label>PV-Inbetriebnahme</label><input class="input" id="sStart" type="date"></div></div>
 <button class="primary" style="width:100%;margin-top:14px" id="saveSettings">Einstellungen speichern</button>
 </div>
+<h2>Tarif-Historie</h2>
+<div class="form noPrint">
+  <div class="row"><div><label>Gültig ab</label><input class="input" type="date" id="tariffFrom"></div><div><label>Arbeitspreis €/kWh</label><input class="input" type="number" step="0.0001" id="tariffWork"></div></div>
+  <div class="row" style="margin-top:8px"><div><label>Grundpreis €/Jahr</label><input class="input" type="number" step="0.01" id="tariffBase"></div><div><label>Abschlag €/Monat</label><input class="input" type="number" step="0.01" id="tariffPay"></div></div>
+  <div class="row" style="margin-top:8px"><div><label>Einspeisevergütung €/kWh</label><input class="input" type="number" step="0.0001" id="tariffFeed"></div><div><label>Notiz</label><input class="input" id="tariffNote" placeholder="z. B. neuer Stromtarif"></div></div>
+  <button class="primary" id="saveTariff" style="width:100%;margin-top:12px">Tarifperiode speichern</button>
+  <div class="hint" style="margin-top:8px">Alte Zeiträume bleiben mit ihren damaligen Preisen erhalten. Neue Berechnungen verwenden automatisch den Tarif des jeweiligen Datums.</div>
+</div>
+<div class="card" style="margin-top:10px"><div class="label">Gespeicherte Tarifperioden</div><div id="tariffList" style="margin-top:8px"></div></div>
+
 <h2>Erinnerungen</h2><div class="form">
 <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="sReminder" style="width:20px;height:20px"> Beim Öffnen am Monatsanfang an Zählerstände erinnern</label>
 <label style="display:flex;align-items:center;gap:10px;margin-top:10px"><input type="checkbox" id="sBackupReminder" style="width:20px;height:20px"> Einmal pro Monat an externes Backup erinnern</label>
@@ -433,11 +498,23 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="actions" style="margin-top:12px"><button class="secondary" id="restoreAutoBackup">Letzte Gerätesicherung wiederherstellen</button><button class="secondary" id="installApp" style="display:none">App installieren</button></div>
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Für Handywechsel oder komplett gelöschte Browserdaten bleibt der Backup-Export als Datei wichtig.</div>
 </div>
-<h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><button class="secondary" id="backup">Komplettes Backup erstellen</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div></div>
-<div class="appFooter">Stromtagebuch <b>v1.0.0</b> · lokal & kostenlos</div>
+<h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Komplettes Backup erstellen</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
+<div class="appFooter">Stromtagebuch <b>v1.1.0</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
+
+
+<div class="modalOverlay" id="editModal" aria-hidden="true"><div class="modalCard">
+  <div class="sectionTitle"><h2 style="margin:0">✏️ Zählerstand bearbeiten</h2><button class="icon" id="editClose">✕</button></div>
+  <input type="hidden" id="editOriginalDate">
+  <label>Datum</label><input class="input" type="date" id="editDate">
+  <div class="row" style="margin-top:8px"><div><label>1.8.0 Netzbezug</label><input class="input" type="number" step="0.001" id="editImp"></div><div><label>2.8.0 Einspeisung</label><input class="input" type="number" step="0.001" id="editFeed"></div></div>
+  <label style="margin-top:8px">PV-Erzeugung gesamt</label><input class="input" type="number" step="0.01" id="editPv">
+  <label style="margin-top:8px">Notiz</label><input class="input" id="editNote">
+  <div class="notice" id="editCheck">Änderungen werden im Änderungsverlauf protokolliert.</div>
+  <div class="editActions"><button class="secondary" id="editCancel">Abbrechen</button><button class="primary" id="editSave">Änderung speichern</button></div>
+</div></div>
 
 <div class="toast" id="toast"></div>
 
