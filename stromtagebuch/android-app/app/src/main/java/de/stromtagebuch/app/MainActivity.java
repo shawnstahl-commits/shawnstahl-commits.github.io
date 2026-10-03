@@ -2,7 +2,7 @@ package de.stromtagebuch.app;
 
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.app.PrintManager;
+import android.print.PrintManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
