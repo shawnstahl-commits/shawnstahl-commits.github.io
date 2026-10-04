@@ -1,4 +1,4 @@
-const CACHE="stromtagebuch-v30";
+const CACHE="stromtagebuch-v31";
 const OCR_CACHE="stromtagebuch-ocr-v1";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg"];
 
@@ -22,6 +22,7 @@ self.addEventListener("fetch",event=>{
   const isOcrAsset=
     (url.hostname==="cdn.jsdelivr.net" && url.pathname.toLowerCase().includes("tesseract")) ||
     url.hostname==="tessdata.projectnaptha.com" ||
+    (url.hostname==="raw.githubusercontent.com" && url.pathname.toLowerCase().includes("tessdata_ssd")) ||
     (url.hostname==="unpkg.com" && url.pathname.toLowerCase().includes("tesseract"));
 
   if(isPage){
