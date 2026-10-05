@@ -226,11 +226,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.3.4</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.3.5</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.3.4</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.3.5</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
@@ -490,7 +490,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.3.4</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.3.5</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -579,7 +579,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Das <b>Komplett-Backup enthält ab v1.3 auch deine Zählerfotos</b>, damit sie auf ein neues Gerät übernommen werden können.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Vollbackup inkl. Fotos</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.3.4</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.3.5</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
@@ -624,7 +624,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="toast" id="toast"></div>
 
 <script>
-var APP_VERSION="1.3.4";
+var APP_VERSION="1.3.5";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
@@ -1042,25 +1042,215 @@ function loadOCR(){return new Promise(function(resolve,reject){if(window.Tessera
 function ocrPrevious(target){if(target==="imp"){var a=sorted().filter(function(x){return x.imp!=null}).slice(-1)[0];return a?Number(a.imp):null}if(target==="feed"){var f=sorted().filter(function(x){return x.feed!=null}).slice(-1)[0];return f?Number(f.feed):null}if(target==="heatCentral"){var h=heatCurrent();return h?Number(h.reading):null}if(target==="pvProd"){return state.pvSnapshot?Number(state.pvSnapshot.generation):null}return null}
 function detectMeterTarget(text,fallback){var raw=String(text||"").toLowerCase(),compact=raw.replace(/\s/g,"");if(/1[.,:]?8[.,:]?0/.test(compact)||compact.indexOf("1.8.0")>=0)return"imp";if(/2[.,:]?8[.,:]?0/.test(compact)||compact.indexOf("2.8.0")>=0)return"feed";return fallback}
 function cleanMeterToken(raw){var x=String(raw||"").trim().replace(/,/g,".");x=x.replace(/[^0-9.]/g,"");if(!x)return null;var parts=x.split(".");if(parts.length>2){var last=parts.pop(),head=parts.join("");if(last.length<=3)x=head+"."+last;else x=head+last}if(/^0+\d/.test(x)&&x.indexOf(".")<0)x=String(parseInt(x,10));var v=parseFloat(x);return isFinite(v)?v:null}
-function meterNumbersFromText(text,target){var prev=ocrPrevious(target),raw=String(text||"").replace(/,/g,"."),out=[],prevDigits=prev!=null?String(Math.floor(Math.abs(prev))).length:0;function add(v){if(v==null||!isFinite(v)||v<0)return;if((target==="imp"||target==="feed"||target==="heatCentral")&&prev!=null&&prev>=100&&v<100)return;if((target==="imp"||target==="feed")&&(Math.abs(v-1.8)<.01||Math.abs(v-2.8)<.01||v===18||v===28||v===180||v===280))return;if(!out.some(function(x){return Math.abs(x-v)<.0001}))out.push(v)}
- function suffixes(digits){if(!digits||digits.length<4)return;var lens=[];if(prevDigits){for(var z=-1;z<=2;z++){var l=prevDigits+z;if(l>=4&&l<=8&&lens.indexOf(l)<0)lens.push(l)}}else lens=[4,5,6,7];lens.forEach(function(l){if(digits.length>=l)add(parseFloat(digits.slice(-l)))})}
- raw.split(/\n+/).forEach(function(line){var compact=line.trim();if(!compact)return;var direct=cleanMeterToken(compact);add(direct);var chunks=compact.match(/\d+(?:[.,]\d+)?/g)||[];chunks.forEach(function(c){add(cleanMeterToken(c));var d=String(c).replace(/\D/g,"");suffixes(d)});var digitJoin=compact.replace(/[^0-9]/g,"");if(digitJoin.length>=4){if(digitJoin.length<=9)add(cleanMeterToken(digitJoin));suffixes(digitJoin)}});
- return out}
+function meterNumbersFromText(text,target){
+ var prev=ocrPrevious(target),raw=String(text||"").replace(/,/g,"."),out=[],prevDigits=prev!=null?String(Math.floor(Math.abs(prev))).length:0;
+ function add(v){
+   if(v==null||!isFinite(v)||v<0||v>99999999)return;
+   if((target==="imp"||target==="feed"||target==="heatCentral")&&prev!=null&&prev>=100&&v<100)return;
+   if((target==="imp"||target==="feed")&&(Math.abs(v-1.8)<.01||Math.abs(v-2.8)<.01||v===18||v===28||v===180||v===280))return;
+   v=Math.round(v*1000)/1000;
+   if(!out.some(function(x){return Math.abs(x-v)<.0001}))out.push(v)
+ }
+ function suffixes(digits){
+   digits=String(digits||"").replace(/\D/g,"");
+   if(!digits||digits.length<3)return;
+   var lens=[];
+   if(prevDigits){
+     for(var z=-1;z<=2;z++){var l=prevDigits+z;if(l>=3&&l<=9&&lens.indexOf(l)<0)lens.push(l)}
+   }else lens=[4,5,6,7];
+   lens.forEach(function(l){if(digits.length>=l)add(parseFloat(digits.slice(-l)))});
+   if(prevDigits>=3){
+     if(digits.length>=prevDigits+1)add(parseFloat(digits.slice(-(prevDigits+1)))/10);
+     if(digits.length>=prevDigits+2)add(parseFloat(digits.slice(-(prevDigits+2)))/100)
+   }
+ }
+ var code=target==="imp"?"1":target==="feed"?"2":null,m;
+ if(code){
+   var re=new RegExp(code+"[.:]?8[.:]?0[^0-9]{0,10}([0-9][0-9.]{2,16})","g");
+   while((m=re.exec(raw))){var token=m[1]||"";add(cleanMeterToken(token));suffixes(token)}
+ }
+ raw.split(/\n+/).forEach(function(line){
+   var compact=line.trim();if(!compact)return;
+   var direct=cleanMeterToken(compact);add(direct);
+   var chunks=compact.match(/\d+(?:[.]\d+)?/g)||[];
+   chunks.forEach(function(ch){add(cleanMeterToken(ch));suffixes(ch)});
+   var digitJoin=compact.replace(/[^0-9]/g,"");
+   if(digitJoin.length>=3){if(digitJoin.length<=10)add(cleanMeterToken(digitJoin));suffixes(digitJoin)}
+ });
+ return out
+}
 function ocrCheckAtDate(target,val,date){var vals={imp:null,feed:null,pvProd:null,heat:null,own:null,pex:null};if(target==="imp")vals.imp=val;if(target==="feed")vals.feed=val;if(target==="pvProd")vals.pvProd=val;if(target==="heatCentral")vals.heat=val;return readingIssues(date||localToday(),vals)}
-function rankedOcrCandidates(nums,target,date){var prev=ocrPrevious(target),arr=nums.map(function(v){var c=ocrCheckAtDate(target,v,date),distance=prev==null?0:Math.abs(v-prev),rel=prev&&prev>0?Math.abs(v-prev)/prev:0,score=0;if(c.errors.length)score+=100000;if(c.warnings.length)score+=10000;if(prev!=null){if(v<prev)score+=50000;score+=distance;if(rel>.5)score+=20000}else score-=Math.min(v,100000)/1000;return{value:v,check:c,distance:distance,score:score}});arr.sort(function(a,b){return a.score-b.score});return arr.slice(0,2)}
-function confidenceInfo(ocrConfidence,candidate){var conf=Number(ocrConfidence)||0;if(candidate&&candidate.check.errors.length)return{cls:"low",label:"Nicht plausibel · bitte Wert am Zähler prüfen"};if(conf>=70&&candidate&&!candidate.check.warnings.length)return{cls:"high",label:"Hohe Sicherheit · OCR "+n(conf,0)+" % · Zählerverlauf passt"};if(conf>=45&&candidate&&!candidate.check.errors.length)return{cls:"medium",label:"Mittlere Sicherheit · OCR "+n(conf,0)+" % · bitte kurz vergleichen"};return{cls:"low",label:"Unsichere Erkennung · bitte Wert manuell prüfen"}}
-function renderOcrChoices(box,candidates,bestTarget,onPick){box.innerHTML="";candidates.forEach(function(c,i){var b=document.createElement("button");b.type="button";b.className="ocrChoice"+(i===0?" best":"");b.textContent=n(c.value,3)+" kWh"+(i===0?" · bester Treffer":"");b.onclick=function(){onPick(c.value,c);box.querySelectorAll(".ocrChoice").forEach(function(x){x.classList.remove("best")});b.classList.add("best")};box.appendChild(b)})}
+function rankedOcrCandidates(nums,target,date){
+ var prev=ocrPrevious(target),arr=nums.map(function(v){
+   var c=ocrCheckAtDate(target,v,date),distance=prev==null?0:Math.abs(v-prev),rel=prev&&prev>0?distance/prev:0,score=0;
+   if(c.errors.length)score+=1000000;
+   if(c.warnings.length)score+=200000;
+   if(prev!=null){if(v<prev)score+=500000;score+=distance;if(rel>.5)score+=100000}
+   else score-=Math.min(v,100000)/1000;
+   return{value:v,check:c,distance:distance,score:score,votes:1,confidence:0,targetVotes:0,wrongTargetVotes:0}
+ });
+ arr.sort(function(a,b){return a.score-b.score});
+ return arr.slice(0,2)
+}
+function rankedOcrCandidatesFromResult(res,target,date){
+ var passes=res&&Array.isArray(res.passes)&&res.passes.length?res.passes:[{text:res&&res.text||"",confidence:res&&res.confidence||0,label:"ocr"}],bucket={};
+ passes.forEach(function(p){
+   var vals=meterNumbersFromText(p.text,target),local={},detected=detectMeterTarget(p.text,null);
+   vals.forEach(function(v,idx){
+     var rounded=Math.round(v*1000)/1000,key=rounded.toFixed(3);
+     if(local[key])return;local[key]=true;
+     var x=bucket[key]||(bucket[key]={value:rounded,votes:0,confidence:0,targetVotes:0,wrongTargetVotes:0,rank:999});
+     x.votes++;x.confidence=Math.max(x.confidence,Number(p.confidence)||0);x.rank=Math.min(x.rank,idx);
+     if(detected===target)x.targetVotes++;else if(detected)x.wrongTargetVotes++
+   })
+ });
+ var prev=ocrPrevious(target),arr=Object.keys(bucket).map(function(k){
+   var x=bucket[k],c=ocrCheckAtDate(target,x.value,date),distance=prev==null?0:Math.abs(x.value-prev),rel=prev&&prev>0?distance/prev:0,score=0;
+   if(c.errors.length)score+=1000000;
+   if(c.warnings.length)score+=200000;
+   if(prev!=null){if(x.value<prev)score+=500000;score+=distance;if(rel>.5)score+=100000}
+   else score-=Math.min(x.value,100000)/1000;
+   score-=x.votes*8000;score-=x.targetVotes*2000;score+=x.wrongTargetVotes*20000;score+=x.rank*50;score-=x.confidence*10;
+   return{value:x.value,check:c,distance:distance,score:score,votes:x.votes,confidence:x.confidence,targetVotes:x.targetVotes,wrongTargetVotes:x.wrongTargetVotes}
+ });
+ arr.sort(function(a,b){return a.score-b.score});
+ return arr.slice(0,2)
+}
+function ocrAutoFillOkay(candidate){
+ return !!(candidate&&!candidate.check.errors.length&&!candidate.check.warnings.length&&(candidate.votes>=2||(candidate.targetVotes>=1&&candidate.confidence>=82)))
+}
+function confidenceInfo(ocrConfidence,candidate){
+ var conf=Math.max(Number(ocrConfidence)||0,candidate?Number(candidate.confidence)||0:0);
+ if(candidate&&candidate.check.errors.length)return{cls:"low",label:"Nicht plausibel · bitte Wert am Zähler prüfen"};
+ if(candidate&&candidate.votes>=2&&!candidate.check.warnings.length)return{cls:"high",label:"Mehrfach erkannt · "+candidate.votes+" OCR-Prüfungen stimmen überein"};
+ if(conf>=75&&candidate&&!candidate.check.warnings.length)return{cls:"high",label:"Hohe Sicherheit · OCR "+n(conf,0)+" % · Zählerverlauf passt"};
+ if(conf>=45&&candidate&&!candidate.check.errors.length)return{cls:"medium",label:"Mittlere Sicherheit · OCR "+n(conf,0)+" % · bitte kurz vergleichen"};
+ return{cls:"low",label:"Unsichere Erkennung · bitte Wert manuell prüfen"}
+}
+function renderOcrChoices(box,candidates,bestTarget,onPick){
+ box.innerHTML="";
+ candidates.forEach(function(c,i){
+   var b=document.createElement("button");b.type="button";b.className="ocrChoice"+(i===0?" best":"");
+   b.textContent=n(c.value,3)+" kWh"+(c.votes>=2?" · mehrfach erkannt":i===0?" · bester Vorschlag":"");
+   b.onclick=function(){onPick(c.value,c);box.querySelectorAll(".ocrChoice").forEach(function(x){x.classList.remove("best")});b.classList.add("best")};
+   box.appendChild(b)
+ })
+}
 function makeAdaptiveLcdCanvas(source,offset){var w=source.width,h=source.height,out=document.createElement("canvas");out.width=w;out.height=h;var sx=source.getContext("2d",{willReadFrequently:true}),img=sx.getImageData(0,0,w,h),p=img.data,gray=new Uint8Array(w*h),integral=new Float64Array((w+1)*(h+1));for(var y=0;y<h;y++){var row=0;for(var x=0;x<w;x++){var i=(y*w+x)*4,g=Math.round(.299*p[i]+.587*p[i+1]+.114*p[i+2]);gray[y*w+x]=g;row+=g;integral[(y+1)*(w+1)+(x+1)]=integral[y*(w+1)+(x+1)]+row}}var r=Math.max(9,Math.min(28,Math.round(Math.min(w,h)/10))),c=Number(offset)||6,ctx=out.getContext("2d"),dst=ctx.createImageData(w,h),d=dst.data;for(var yy=0;yy<h;yy++){var y0=Math.max(0,yy-r),y1=Math.min(h-1,yy+r);for(var xx=0;xx<w;xx++){var x0=Math.max(0,xx-r),x1=Math.min(w-1,xx+r),a=y0*(w+1)+x0,b=y0*(w+1)+(x1+1),cc=(y1+1)*(w+1)+x0,dd=(y1+1)*(w+1)+(x1+1),sum=integral[dd]-integral[b]-integral[cc]+integral[a],count=(x1-x0+1)*(y1-y0+1),mean=sum/count,v=gray[yy*w+xx]<(mean-c)?0:255,di=(yy*w+xx)*4;d[di]=d[di+1]=d[di+2]=v;d[di+3]=255}}ctx.putImageData(dst,0,0);return out}
-async function recognizeWithWorker(worker,source,progress){var texts=[],confidence=0,adaptive=makeAdaptiveLcdCanvas(source,5);await worker.setParameters({tessedit_char_whitelist:"0123456789.,",tessedit_pageseg_mode:Tesseract.PSM.SINGLE_LINE,preserve_interword_spaces:"0",user_defined_dpi:"300"});var a=await worker.recognize(adaptive);texts.push(String(a.data.text||""));confidence=Math.max(confidence,Number(a.data.confidence)||0);if(!texts[0].trim()||confidence<72){var b=await worker.recognize(source);texts.push(String(b.data.text||""));confidence=Math.max(confidence,Number(b.data.confidence)||0)}if(!texts.join("").trim()||confidence<62){var adaptive2=makeAdaptiveLcdCanvas(source,10);await worker.setParameters({tessedit_char_whitelist:"0123456789.,",tessedit_pageseg_mode:Tesseract.PSM.RAW_LINE,preserve_interword_spaces:"0",user_defined_dpi:"300"});var c=await worker.recognize(adaptive2);texts.push(String(c.data.text||""));confidence=Math.max(confidence,Number(c.data.confidence)||0)}return{text:texts.join("\n"),confidence:confidence}}
-async function runMeterOcr(source,progress){await loadOCR();var worker=null;try{if(progress)progress(2);try{worker=await Tesseract.createWorker("7seg",1,{langPath:"https://raw.githubusercontent.com/Shreeshrii/tessdata_ssd/master",gzip:false,cacheMethod:"write",logger:function(m){if(progress&&m.status==="recognizing text")progress(Math.round((m.progress||0)*100))}});var special=await recognizeWithWorker(worker,source,progress);await worker.terminate().catch(function(){});worker=null;if(special.text.trim())return special}catch(modelErr){if(worker){await worker.terminate().catch(function(){});worker=null}}worker=await Tesseract.createWorker("eng",1,{logger:function(m){if(progress&&m.status==="recognizing text")progress(Math.round((m.progress||0)*100))}});return await recognizeWithWorker(worker,source,progress)}finally{if(worker)await worker.terminate().catch(function(){})}}
+function invertOcrCanvas(source){
+ var out=document.createElement("canvas");out.width=source.width;out.height=source.height;
+ var ctx=out.getContext("2d",{willReadFrequently:true});ctx.drawImage(source,0,0);
+ var img=ctx.getImageData(0,0,out.width,out.height),p=img.data;
+ for(var i=0;i<p.length;i+=4){p[i]=255-p[i];p[i+1]=255-p[i+1];p[i+2]=255-p[i+2]}
+ ctx.putImageData(img,0,0);return out
+}
+async function recognizeWithWorker(worker,source,progress,modelName){
+ var passes=[],confidence=0;
+ async function pass(label,img,psm){
+   await worker.setParameters({tessedit_char_whitelist:"0123456789.,",tessedit_pageseg_mode:psm,preserve_interword_spaces:"0",user_defined_dpi:"300"});
+   var r=await worker.recognize(img),t=String(r.data.text||""),cf=Number(r.data.confidence)||0;
+   if(t.trim())passes.push({text:t,confidence:cf,label:(modelName||"ocr")+"-"+label});
+   confidence=Math.max(confidence,cf)
+ }
+ var adaptive5=makeAdaptiveLcdCanvas(source,5);
+ await pass("adaptive",adaptive5,Tesseract.PSM.SINGLE_LINE);
+ await pass("gray",source,Tesseract.PSM.SINGLE_LINE);
+ var adaptive10=makeAdaptiveLcdCanvas(source,10);
+ await pass("strong",adaptive10,Tesseract.PSM.RAW_LINE);
+ await pass("invert",invertOcrCanvas(adaptive5),Tesseract.PSM.SINGLE_LINE);
+ return{text:passes.map(function(p){return p.text}).join("\n"),confidence:confidence,passes:passes}
+}
+async function runMeterOcr(source,progress,target,date){
+ await loadOCR();var worker=null,special=null;
+ try{
+   if(progress)progress(2);
+   try{
+     worker=await Tesseract.createWorker("7seg",1,{langPath:"https://raw.githubusercontent.com/Shreeshrii/tessdata_ssd/master",gzip:false,cacheMethod:"write",logger:function(m){if(progress&&m.status==="recognizing text")progress(Math.round((m.progress||0)*100))}});
+     special=await recognizeWithWorker(worker,source,progress,"7seg");
+     await worker.terminate().catch(function(){});worker=null;
+     var quick=rankedOcrCandidatesFromResult(special,target,date),q=quick[0];
+     if(q&&ocrAutoFillOkay(q))return special
+   }catch(modelErr){if(worker){await worker.terminate().catch(function(){});worker=null}}
+   worker=await Tesseract.createWorker("eng",1,{logger:function(m){if(progress&&m.status==="recognizing text")progress(Math.round((m.progress||0)*100))}});
+   var normal=await recognizeWithWorker(worker,source,progress,"eng");
+   if(special&&special.passes&&special.passes.length){
+     normal.passes=special.passes.concat(normal.passes||[]);
+     normal.text=normal.passes.map(function(p){return p.text}).join("\n");
+     normal.confidence=Math.max(Number(normal.confidence)||0,Number(special.confidence)||0)
+   }
+   return normal
+ }finally{if(worker)await worker.terminate().catch(function(){})}
+}
+
 var wizardPendingPhotos={imp:null,feed:null,heat:null},wizardPhotoMeta={imp:null,feed:null,heat:null};
 function wizardPhotoConfig(kind){if(kind==="imp")return{ocrTarget:"imp",storeTarget:"imp",input:"wizImp",file:"wizPhotoImp",preview:"wizPreviewImp",canvas:"wizCanvasImp",confidence:"wizConfidenceImp",choices:"wizChoicesImp",hint:"wizPhotoHintImp"};if(kind==="feed")return{ocrTarget:"feed",storeTarget:"feed",input:"wizFeed",file:"wizPhotoFeed",preview:"wizPreviewFeed",canvas:"wizCanvasFeed",confidence:"wizConfidenceFeed",choices:"wizChoicesFeed",hint:"wizPhotoHintFeed"};return{ocrTarget:"heatCentral",storeTarget:"heat",input:"wizHeat",file:"wizPhotoHeat",preview:"wizPreviewHeat",canvas:"wizCanvasHeat",confidence:"wizConfidenceHeat",choices:"wizChoicesHeat",hint:"wizPhotoHintHeat"}}
-async function processWizardPhoto(kind,file,evidenceFile){if(!file)return;var cfg=wizardPhotoConfig(kind),hint=document.getElementById(cfg.hint),preview=document.getElementById(cfg.preview),canvas=document.getElementById(cfg.canvas),confBox=document.getElementById(cfg.confidence),choices=document.getElementById(cfg.choices),date=document.getElementById("wizDate").value||localToday();wizardPendingPhotos[kind]=evidenceFile||file;wizardPhotoMeta[kind]=null;preview.src=URL.createObjectURL(file);preview.style.display="block";canvas.style.display="none";confBox.className="ocrConfidence";confBox.textContent="";choices.innerHTML="";hint.textContent="LCD-Anzeige wird kontrastiert …";try{var source=await preprocessMeterPhoto(file,canvas);hint.textContent="7-Segment-Zählererkennung wird geladen …";var res=await runMeterOcr(source,function(p){hint.textContent="Zählerdisplay prüfen "+p+" %"}),txt=String(res.text||""),nums=meterNumbersFromText(txt,cfg.ocrTarget),candidates=rankedOcrCandidates(nums,cfg.ocrTarget,date);if(!candidates.length)throw new Error("Kein plausibler Zählerstand erkannt");var best=candidates[0],ci=confidenceInfo(res.confidence,best),mismatch=false;confBox.className="ocrConfidence "+(mismatch?"low":ci.cls);confBox.textContent=mismatch?("Kennung passt nicht: erkannt wurde "+(detected==="imp"?"1.8.0":"2.8.0")+". Bitte im richtigen Schritt fotografieren."):ci.label;renderOcrChoices(choices,candidates,cfg.ocrTarget,function(v,c){document.getElementById(cfg.input).value=v;wizardPhotoMeta[kind]={value:v,confidence:Number(res.confidence)||0,mismatch:mismatch};var inf=confidenceInfo(res.confidence,c);confBox.className="ocrConfidence "+inf.cls;confBox.textContent=inf.label+" · ausgewählt"});if(!mismatch&&!best.check.errors.length){document.getElementById(cfg.input).value=best.value;wizardPhotoMeta[kind]={value:best.value,confidence:Number(res.confidence)||0,mismatch:false};hint.textContent="Bester Vorschlag wurde übernommen. Du kannst unten einen anderen Wert wählen."}else{if(mismatch)wizardPhotoMeta[kind]={value:null,confidence:Number(res.confidence)||0,mismatch:true};hint.textContent=mismatch?"Foto bleibt als Beleg vorgemerkt. Bitte richtige Anzeige fotografieren.":"Bitte einen Vorschlag prüfen und auswählen."}}catch(err){confBox.className="ocrConfidence low";confBox.textContent=navigator.onLine?"Keine sichere Zahl erkannt.":"OCR offline noch nicht vollständig verfügbar.";hint.textContent="Kein sicherer Zählerstand gefunden. Die App hat mehrere LCD-Bildvarianten geprüft. Das Originalfoto bleibt als Beleg."}}
+async function processWizardPhoto(kind,file,evidenceFile){
+ if(!file)return;
+ var cfg=wizardPhotoConfig(kind),hint=document.getElementById(cfg.hint),preview=document.getElementById(cfg.preview),canvas=document.getElementById(cfg.canvas),confBox=document.getElementById(cfg.confidence),choices=document.getElementById(cfg.choices),date=document.getElementById("wizDate").value||localToday();
+ wizardPendingPhotos[kind]=evidenceFile||file;wizardPhotoMeta[kind]=null;
+ preview.src=URL.createObjectURL(file);preview.style.display="block";canvas.style.display="none";confBox.className="ocrConfidence";confBox.textContent="";choices.innerHTML="";
+ hint.textContent="LCD-Anzeige wird für mehrere Prüfungen vorbereitet …";
+ try{
+   var source=await preprocessMeterPhoto(file,canvas);
+   hint.textContent="7-Segment-Zählererkennung wird geladen …";
+   var res=await runMeterOcr(source,function(p){hint.textContent="Zählerdisplay prüfen "+p+" %"},cfg.ocrTarget,date),txt=String(res.text||""),detected=detectMeterTarget(txt,null),mismatch=!!(detected&&(cfg.ocrTarget==="imp"||cfg.ocrTarget==="feed")&&detected!==cfg.ocrTarget),candidates=rankedOcrCandidatesFromResult(res,cfg.ocrTarget,date);
+   if(!candidates.length)throw new Error("Kein plausibler Zählerstand erkannt");
+   var best=candidates[0],ci=confidenceInfo(res.confidence,best);
+   confBox.className="ocrConfidence "+(mismatch?"low":ci.cls);
+   confBox.textContent=mismatch?("Kennung passt nicht: erkannt wurde "+(detected==="imp"?"1.8.0":"2.8.0")+". Bitte im richtigen Schritt fotografieren."):ci.label;
+   renderOcrChoices(choices,candidates,cfg.ocrTarget,function(v,c){
+     document.getElementById(cfg.input).value=v;
+     wizardPhotoMeta[kind]={value:v,confidence:Math.max(Number(res.confidence)||0,Number(c.confidence)||0),mismatch:mismatch};
+     var inf=confidenceInfo(res.confidence,c);confBox.className="ocrConfidence "+inf.cls;confBox.textContent=inf.label+" · bestätigt";
+     hint.textContent="Wert übernommen. Vor dem Speichern wird er noch einmal auf Plausibilität geprüft."
+   });
+   if(!mismatch&&ocrAutoFillOkay(best)){
+     document.getElementById(cfg.input).value=best.value;
+     wizardPhotoMeta[kind]={value:best.value,confidence:Math.max(Number(res.confidence)||0,Number(best.confidence)||0),mismatch:false};
+     hint.textContent="Mehrfach erkannt und automatisch übernommen. Bitte kurz mit dem Display vergleichen."
+   }else{
+     if(mismatch)wizardPhotoMeta[kind]={value:null,confidence:Number(res.confidence)||0,mismatch:true};
+     hint.textContent=mismatch?"Foto bleibt als Beleg vorgemerkt. Bitte richtige Anzeige fotografieren.":"Treffer gefunden, aber nicht sicher genug für Auto-Übernahme. Bitte den passenden Wert antippen."
+   }
+ }catch(err){
+   confBox.className="ocrConfidence low";confBox.textContent=navigator.onLine?"Keine sichere Zahl erkannt.":"OCR offline noch nicht vollständig verfügbar.";
+   hint.textContent="Kein sicherer Zählerstand gefunden. Bitte den Rahmen wirklich nur um die großen Ziffern ziehen; das Originalfoto bleibt als Beleg."
+ }
+}
+
 ["imp","feed","heat"].forEach(function(kind){var cfg=wizardPhotoConfig(kind);document.getElementById(cfg.file).onchange=function(e){var input=this,file=e.target.files[0]||null;if(file)openCrop(file,function(cropped,original){processWizardPhoto(kind,cropped,original)});input.value=""}});
 
 var photoFile=null,freeOcrFile=null,freePhotoMeta=null;
 document.getElementById("meterPhoto").onchange=function(e){var input=this,file=e.target.files[0]||null;if(!file)return;freePhotoMeta=null;openCrop(file,function(cropped,original){photoFile=original;freeOcrFile=cropped;var img=document.getElementById("photoPreview"),canvas=document.getElementById("ocrCanvas"),conf=document.getElementById("freeOcrConfidence"),choices=document.getElementById("freeOcrChoices");canvas.style.display="none";conf.className="ocrConfidence";choices.innerHTML="";img.src=URL.createObjectURL(cropped);img.style.display="block";document.getElementById("ocrHint").textContent="Ausschnitt bereit. Die OCR arbeitet nur mit dem markierten Display; das Original bleibt Foto-Beleg."});input.value=""};
-document.getElementById("ocrButton").onclick=async function(){if(!photoFile){toast("Erst ein Foto aufnehmen");return}var hint=document.getElementById("ocrHint"),btn=this,confBox=document.getElementById("freeOcrConfidence"),choices=document.getElementById("freeOcrChoices");btn.disabled=true;hint.textContent="Bild wird lokal verbessert …";choices.innerHTML="";confBox.className="ocrConfidence";try{var source=await preprocessMeterPhoto(freeOcrFile||photoFile);hint.textContent="Nur Ziffern werden erkannt …";var res=await runMeterOcr(source,function(p){hint.textContent="LCD prüfen "+p+" %"}),txt=String(res.text||""),selected=document.getElementById("ocrTarget"),target=selected.value,nums=meterNumbersFromText(txt,target),date=document.getElementById("date").value||localToday(),candidates=rankedOcrCandidates(nums,target,date);if(!candidates.length)throw new Error("Kein plausibler Zählerstand erkannt");var best=candidates[0],ci=confidenceInfo(res.confidence,best),field=document.getElementById(target);confBox.className="ocrConfidence "+ci.cls;confBox.textContent=ci.label;renderOcrChoices(choices,candidates,target,function(v,c){field.value=v;freePhotoMeta={target:target,value:v,confidence:Number(res.confidence)||0};var inf=confidenceInfo(res.confidence,c);confBox.className="ocrConfidence "+inf.cls;confBox.textContent=inf.label+" · ausgewählt";validate()});if(!best.check.errors.length){field.value=best.value;freePhotoMeta={target:target,value:best.value,confidence:Number(res.confidence)||0};hint.textContent=(target==="imp"?"1.8.0":target==="feed"?"2.8.0":photoTargetLabel(target))+" erkannt. Bester Vorschlag wurde übernommen.";validate()}else hint.textContent="Mehrere Zahlen erkannt. Bitte einen plausiblen Vorschlag auswählen."}catch(err){var offline=!navigator.onLine;confBox.className="ocrConfidence low";confBox.textContent=offline?"OCR offline noch nicht vollständig verfügbar.":"Keine sichere Zahl erkannt.";hint.textContent=offline?"OCR offline noch nicht vollständig verfügbar – Wert bitte manuell eingeben.":"Kein sicherer Treffer. Bitte nur die großen Ziffern eng ausschneiden, gerade fotografieren und Spiegelungen vermeiden.";toast(offline?"OCR offline nicht verfügbar":"Erkennung nicht sicher")}finally{btn.disabled=false}};
+document.getElementById("ocrButton").onclick=async function(){
+ if(!photoFile){toast("Erst ein Foto aufnehmen");return}
+ var hint=document.getElementById("ocrHint"),btn=this,confBox=document.getElementById("freeOcrConfidence"),choices=document.getElementById("freeOcrChoices"),selected=document.getElementById("ocrTarget"),target=selected.value,date=document.getElementById("date").value||localToday();
+ btn.disabled=true;hint.textContent="Bild wird lokal verbessert …";choices.innerHTML="";confBox.className="ocrConfidence";
+ try{
+   var source=await preprocessMeterPhoto(freeOcrFile||photoFile);
+   hint.textContent="Mehrere Ziffern-Prüfungen laufen …";
+   var res=await runMeterOcr(source,function(p){hint.textContent="LCD prüfen "+p+" %"},target,date),txt=String(res.text||""),detected=detectMeterTarget(txt,null),mismatch=!!(detected&&(target==="imp"||target==="feed")&&detected!==target),candidates=rankedOcrCandidatesFromResult(res,target,date);
+   if(!candidates.length)throw new Error("Kein plausibler Zählerstand erkannt");
+   var best=candidates[0],ci=confidenceInfo(res.confidence,best),field=document.getElementById(target);
+   confBox.className="ocrConfidence "+(mismatch?"low":ci.cls);
+   confBox.textContent=mismatch?("Kennung passt nicht: erkannt wurde "+(detected==="imp"?"1.8.0":"2.8.0")+"."):ci.label;
+   renderOcrChoices(choices,candidates,target,function(v,c){
+     field.value=v;freePhotoMeta={target:target,value:v,confidence:Math.max(Number(res.confidence)||0,Number(c.confidence)||0)};
+     var inf=confidenceInfo(res.confidence,c);confBox.className="ocrConfidence "+inf.cls;confBox.textContent=inf.label+" · bestätigt";validate()
+   });
+   if(!mismatch&&ocrAutoFillOkay(best)){
+     field.value=best.value;freePhotoMeta={target:target,value:best.value,confidence:Math.max(Number(res.confidence)||0,Number(best.confidence)||0)};
+     hint.textContent=(target==="imp"?"1.8.0":target==="feed"?"2.8.0":photoTargetLabel(target))+" wurde mehrfach gleich erkannt und übernommen.";validate()
+   }else{
+     hint.textContent=mismatch?"Bitte den richtigen Zählerbereich fotografieren.":"Treffer gefunden, aber nicht sicher genug. Bitte den passenden Wert antippen."
+   }
+ }catch(err){
+   var offline=!navigator.onLine;confBox.className="ocrConfidence low";confBox.textContent=offline?"OCR offline noch nicht vollständig verfügbar.":"Keine sichere Zahl erkannt.";
+   hint.textContent=offline?"OCR offline noch nicht vollständig verfügbar – Wert bitte manuell eingeben.":"Kein sicherer Treffer. Bitte nur die großen Ziffern eng ausschneiden, gerade fotografieren und Spiegelungen vermeiden.";
+   toast(offline?"OCR offline nicht verfügbar":"Erkennung nicht sicher")
+ }finally{btn.disabled=false}
+};
+
 function enhanceDateInputs(){
   document.querySelectorAll('input[type="date"]').forEach(function(input){
     if(input.parentElement&&input.parentElement.classList.contains("dateField"))return;
