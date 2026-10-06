@@ -1,4 +1,4 @@
-const VERSION = "kaufflow-2026-10-06-2";
+const VERSION = "kaufflow-2026-10-06-3";
 const CACHE = VERSION;
 const CORE = ["./index.html", "./manifest.webmanifest", "./icon.svg"];
 
