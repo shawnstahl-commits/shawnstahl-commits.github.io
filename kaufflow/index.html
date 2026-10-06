@@ -129,6 +129,75 @@ body[data-view="list"] .app{padding-bottom:84px}
   body[data-view="list"] .listpaper .empty{grid-column:1/-1}
 }
 
+
+/* KaufFlow compact mobile shopping mode */
+@media(max-width:520px){
+  body[data-view="shop"] .app{padding:6px 7px 76px}
+  body[data-view="shop"] .top{display:none}
+
+  body[data-view="shop"] .shopbar{
+    top:2px;
+    padding:7px 8px;
+    margin-bottom:6px;
+    border-radius:14px;
+  }
+  body[data-view="shop"] .shopstats{font-size:12px;align-items:center}
+  body[data-view="shop"] .shopstats b{font-size:13px}
+  body[data-view="shop"] .shopbar>div:nth-child(2){margin-top:5px!important}
+  body[data-view="shop"] .shop-target-meta{display:none}
+  body[data-view="shop"] .shop-store-select{display:none}
+  body[data-view="shop"] .store-switcher{
+    gap:4px;
+    padding:1px 0;
+  }
+  body[data-view="shop"] .store-choice{
+    padding:5px 8px;
+    border-radius:10px;
+    font-size:11px;
+  }
+  body[data-view="shop"] .progress{
+    height:5px;
+    margin-top:5px;
+  }
+  body[data-view="shop"] #routeNotice{display:none}
+
+  body[data-view="shop"] #shopList{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:5px;
+    margin-top:6px!important;
+  }
+  body[data-view="shop"] #shopList .shopitem{
+    min-width:0;
+    min-height:46px;
+    height:46px;
+    padding:5px 6px;
+    border-radius:11px;
+    gap:5px;
+  }
+  body[data-view="shop"] #shopList .shopitem .check{
+    width:25px;
+    height:25px;
+    border-radius:7px;
+    font-size:13px;
+  }
+  body[data-view="shop"] #shopList .shopitem .itemmain{min-width:0}
+  body[data-view="shop"] #shopList .shopitem .iname{
+    font-size:13px;
+    line-height:1.05;
+  }
+  body[data-view="shop"] #shopList .shopitem .isub{
+    font-size:9px;
+    line-height:1;
+    margin-top:2px;
+  }
+  body[data-view="shop"] #shopList .shopitem .price{
+    display:none;
+  }
+  body[data-view="shop"] #shopList .empty{grid-column:1/-1}
+  body[data-view="shop"] #finishWrap{margin-top:8px!important}
+}
+
 </style>
 </head>
 <body>
@@ -236,10 +305,10 @@ body[data-view="list"] .app{padding-bottom:84px}
       <div class="shopbar">
         <div class="shopstats"><b id="shopStore">🗺️ Mein Laden</b><span id="shopCount">0 / 0</span><span id="shopSum">0,00 €</span></div>
         <div style="margin-top:10px">
-          <div class="space" style="margin-bottom:7px"><small class="muted"><b>Einkaufsziel</b> – Laden spontan wechseln</small><span class="chip">↻ neu sortieren</span></div>
+          <div class="space shop-target-meta" style="margin-bottom:7px"><small class="muted"><b>Einkaufsziel</b> – Laden spontan wechseln</small><span class="chip">↻ neu sortieren</span></div>
           <div id="storeQuickSwitch" class="store-switcher"></div>
         </div>
-        <div class="field" style="margin:9px 0 0"><select id="storeSelectShop" onchange="selectStore(this.value)"></select></div>
+        <div class="field shop-store-select" style="margin:9px 0 0"><select id="storeSelectShop" onchange="selectStore(this.value)"></select></div>
         <div class="progress"><i id="shopProgress"></i></div>
       </div>
       <div class="notice" id="routeNotice">Beim Abhaken merkt sich KaufFlow für <b>genau diesen Laden</b> die Reihenfolge deiner Produkte. Beim nächsten Einkauf hier wird die Liste passend zu deinem gelernten Laufweg sortiert.</div>
@@ -894,4 +963,4 @@ importShared();render();setupPwa();
 </script>
 </body>
 </html>
-<!-- kaufflow-compact-list-20261006-v3 -->
+<!-- kaufflow-compact-shop-20261006-v4 -->
