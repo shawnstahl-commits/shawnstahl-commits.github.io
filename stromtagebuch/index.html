@@ -226,11 +226,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.0</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.1</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.0</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.1</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
@@ -490,7 +490,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.0</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.1</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -579,7 +579,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Das <b>Komplett-Backup enthält ab v1.3 auch deine Zählerfotos</b>, damit sie auf ein neues Gerät übernommen werden können.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Vollbackup inkl. Fotos</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.4.0</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.4.1</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
@@ -624,7 +624,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="toast" id="toast"></div>
 
 <script>
-var APP_VERSION="1.4.0";
+var APP_VERSION="1.4.1";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
@@ -1043,19 +1043,26 @@ function autoDisplayRectFromCanvas(source){
  }catch(e){return null}
 }
 function extractLikelyDisplayCanvas(source){
- var sw=source.width,sh=source.height,ratio=sw/sh,rect=null;
- // Für den verwendeten EFR-Zähler liegt das LCD mittig im oberen Teil des breiten Zählerfotos.
- // Ein enges LCD-Foto wird dagegen vollständig verwendet.
- if(ratio>=2.0&&ratio<=4.8){
-   rect={x:sw*.24,y:sh*.10,w:sw*.54,h:sh*.58};
- }else if(ratio>4.8){
-   rect={x:0,y:0,w:sw,h:sh};
- }else{
-   rect=autoDisplayRectFromCanvas(source);
-   if(!rect){var fw=sw*.72,fh=sh*.36;rect={x:(sw-fw)/2,y:sh*.25,w:fw,h:fh}}
+ var sw=source.width,sh=source.height,ratio=sw/sh,rect=autoDisplayRectFromCanvas(source);
+ if(rect){
+   var valid=rect.w/sw>.32&&rect.h/sh>.18&&rect.w/rect.h>1.8;
+   if(!valid)rect=null
  }
- var marginX=rect.w*.025,marginY=rect.h*.045,sx=Math.max(0,rect.x-marginX),sy=Math.max(0,rect.y-marginY),ex=Math.min(sw,rect.x+rect.w+marginX),ey=Math.min(sh,rect.y+rect.h+marginY),cw=Math.max(1,ex-sx),ch=Math.max(1,ey-sy),out=document.createElement("canvas"),targetW=Math.min(1800,Math.max(1000,Math.round(cw*3.2))),scl=targetW/cw;
- out.width=Math.max(1,Math.round(cw*scl));out.height=Math.max(1,Math.round(ch*scl));var ox=out.getContext("2d");ox.imageSmoothingEnabled=true;ox.imageSmoothingQuality="high";ox.drawImage(source,sx,sy,cw,ch,0,0,out.width,out.height);return out
+ if(!rect){
+   // Bei einem bereits eng zugeschnittenen, breiten Foto nichts links abschneiden.
+   if(ratio>2.0)rect={x:0,y:0,w:sw,h:sh};
+   else{var fw=sw*.82,fh=sh*.46;rect={x:(sw-fw)/2,y:sh*.20,w:fw,h:fh}}
+ }
+ // Etwas Reserve um das LCD lassen, damit keine erste/letzte Ziffer abgeschnitten wird.
+ var mx=rect.w*.10,my=rect.h*.10,
+     sx=Math.max(0,rect.x-mx),sy=Math.max(0,rect.y-my),
+     ex=Math.min(sw,rect.x+rect.w+mx),ey=Math.min(sh,rect.y+rect.h+my),
+     cw=Math.max(1,ex-sx),ch=Math.max(1,ey-sy),out=document.createElement("canvas"),
+     targetW=Math.min(1900,Math.max(1100,Math.round(cw*3.1))),scl=targetW/cw;
+ out.width=Math.max(1,Math.round(cw*scl));out.height=Math.max(1,Math.round(ch*scl));
+ var ox=out.getContext("2d");ox.imageSmoothingEnabled=true;ox.imageSmoothingQuality="high";
+ ox.drawImage(source,sx,sy,cw,ch,0,0,out.width,out.height);
+ return out
 }
 function showOcrSource(source,canvas){if(!source||!canvas)return;canvas.width=source.width;canvas.height=source.height;var x=canvas.getContext("2d");x.clearRect(0,0,canvas.width,canvas.height);x.drawImage(source,0,0);canvas.style.display="block"}
 function openCrop(file,callback){if(!file)return;var img=new Image(),url=URL.createObjectURL(file),modal=document.getElementById("cropModal"),canvas=document.getElementById("cropCanvas");cropState={img:img,url:url,rect:null,start:null,callback:callback,original:file};img.onload=function(){var maxW=1200,scale=Math.min(1,maxW/img.naturalWidth),w=Math.max(1,Math.round(img.naturalWidth*scale)),h=Math.max(1,Math.round(img.naturalHeight*scale));canvas.width=w;canvas.height=h;var x=canvas.getContext("2d");x.drawImage(img,0,0,w,h);var guess=autoDisplayRectFromCanvas(canvas);cropState.rect=guess||{x:0,y:0,w:w,h:h};drawCropCanvas();modal.classList.add("open");modal.setAttribute("aria-hidden","false");document.getElementById("cropHint").textContent=guess?"Das LCD-Display wurde automatisch markiert. Wenn der grüne Rahmen passt, einfach „Ausschnitt verwenden“ drücken.":"Display nicht eindeutig gefunden. Bitte den grünen Rahmen nur um die großen Ziffern ziehen."};img.onerror=function(){URL.revokeObjectURL(url);toast("Foto konnte nicht geöffnet werden")};img.src=url}
@@ -1177,9 +1184,10 @@ function confidenceInfo(ocrConfidence,candidate){
 }
 function renderOcrChoices(box,candidates,bestTarget,onPick){
  box.innerHTML="";
- candidates.forEach(function(c,i){
+ var shown=candidates.filter(function(c){return c.trendOk!==false&&!c.check.errors.length}).slice(0,2);
+ shown.forEach(function(c,i){
    var b=document.createElement("button");b.type="button";b.className="ocrChoice"+(i===0?" best":"");
-   b.textContent=n(c.value,3)+" kWh"+(c.trendOk===false?" · unplausibel":c.votes>=2?" · mehrfach erkannt":i===0?" · bester Vorschlag":"");
+   b.textContent=n(c.value,3)+" kWh"+(c.votes>=2?" · mehrfach erkannt":i===0?" · bester Vorschlag":"");
    b.onclick=function(){onPick(c.value,c);box.querySelectorAll(".ocrChoice").forEach(function(x){x.classList.remove("best")});b.classList.add("best")};
    box.appendChild(b)
  })
@@ -1195,11 +1203,14 @@ function invertOcrCanvas(source){
 function makeMainDigitsCanvas(source){
  var sw=source.width,sh=source.height,ratio=sw/sh,sx=0,sy=0,cw=sw,ch=sh;
  if(ratio>2){
-   sx=Math.round(sw*.055);sy=Math.round(sh*.03);cw=Math.round(sw*.70);ch=Math.round(sh*.90);
+   // EFR-Anzeige: links steht 1.8.0, rechts kWh. Die sechs großen Ziffern liegen dazwischen.
+   sx=Math.round(sw*.17);sy=Math.round(sh*.02);cw=Math.round(sw*.58);ch=Math.round(sh*.86);
  }
- var out=document.createElement("canvas"),targetW=Math.min(1700,Math.max(950,Math.round(cw*3.1))),scale=targetW/cw;
+ var out=document.createElement("canvas"),targetW=Math.min(1800,Math.max(1100,Math.round(cw*3.4))),scale=targetW/cw;
  out.width=Math.max(1,Math.round(cw*scale));out.height=Math.max(1,Math.round(ch*scale));
- var ctx=out.getContext("2d");ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.drawImage(source,sx,sy,cw,ch,0,0,out.width,out.height);return out
+ var ctx=out.getContext("2d");ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
+ ctx.drawImage(source,sx,sy,cw,ch,0,0,out.width,out.height);
+ return out
 }
 async function recognizeWithWorker(worker,source,progress,modelName){
  var passes=[],confidence=0;
@@ -1286,7 +1297,7 @@ async function processWizardPhoto(kind,file,evidenceFile){
      }
    }else{
      if(mismatch)wizardPhotoMeta[kind]={value:null,confidence:Number(res.confidence)||0,mismatch:true};
-     hint.textContent=mismatch?"Foto bleibt als Beleg vorgemerkt. Bitte richtige Anzeige fotografieren.":(best&&best.trendOk===false?"OCR-Zahl wurde verworfen: Sie passt nicht zu deinem bisherigen Zählerverlauf. Bitte Foto erneut versuchen oder den Wert oben manuell eintragen.":"Treffer gefunden, aber nicht plausibel. Bitte einen Vorschlag antippen oder den Wert oben korrigieren.")
+     hint.textContent=mismatch?"Foto bleibt als Beleg vorgemerkt. Bitte richtige Anzeige fotografieren.":(best&&best.trendOk===false?"Die OCR hat nur unplausible Zahlen gefunden und nichts ins Feld eingetragen. Das Foto bleibt als Beleg.":"Treffer gefunden, aber nicht plausibel. Bitte einen Vorschlag antippen oder den Wert oben korrigieren.")
    }
  }catch(err){
    confBox.className="ocrConfidence low";confBox.textContent=navigator.onLine?"Keine sichere Zahl erkannt.":"OCR offline noch nicht vollständig verfügbar.";
