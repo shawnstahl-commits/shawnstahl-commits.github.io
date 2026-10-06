@@ -198,6 +198,32 @@ body[data-view="list"] .app{padding-bottom:84px}
   body[data-view="shop"] #finishWrap{margin-top:8px!important}
 }
 
+
+/* KaufFlow receipt scanner + price history */
+.receipt-scan-row{display:flex;align-items:center;gap:9px;margin-top:9px}
+.receipt-scan-row .btn{flex:0 0 auto}
+.receipt-scan-row .muted{font-size:12px}
+.price{display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap}
+.pricechange{font-size:9px;line-height:1.05;margin-top:2px;font-weight:800}
+.pricechange.up{color:#ff9da6}.pricechange.down{color:#80e8ad}.pricechange.same{color:var(--muted)}
+.receipt-review-row{padding:10px 0;border-bottom:1px solid var(--line)}
+.receipt-review-row:last-child{border-bottom:0}
+.receipt-review-grid{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:7px;margin-top:7px}
+.receipt-review-grid select,.receipt-review-grid input{width:100%;background:#10141c;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:9px}
+.price-history{margin-top:12px;padding:11px;border:1px solid var(--line);background:#10141c;border-radius:14px}
+.price-history-row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #252c38;font-size:12px}
+.price-history-row:last-child{border-bottom:0}
+@media(max-width:520px){
+  body[data-view="list"] .listquick{grid-template-columns:1fr 36px}
+  body[data-view="list"] .listpaper .price{display:flex!important;font-size:10px;line-height:1}
+  body[data-view="list"] .listpaper .pricechange{font-size:8px}
+  body[data-view="list"] .listpaper .iconbtn{display:none}
+  body[data-view="shop"] .receipt-scan-row{margin-top:5px;justify-content:space-between}
+  body[data-view="shop"] .receipt-scan-row .btn{padding:5px 8px;border-radius:9px;font-size:11px}
+  body[data-view="shop"] .receipt-scan-row .muted{font-size:9px}
+  body[data-view="shop"] #receiptStatus{margin-top:5px;padding:8px;font-size:10px}
+}
+
 </style>
 </head>
 <body>
@@ -246,8 +272,6 @@ body[data-view="list"] .app{padding-bottom:84px}
       <div class="section">
         <div class="sectionhead"><h3>Schnell hinzufügen</h3><span class="muted">mehrere auf einmal</span></div>
         <div class="quickadd"><input id="quickInput" placeholder="z. B. Milch, Butter, 2x Toast"><button class="btn primary" onclick="quickAdd()">＋</button></div>
-        <div class="scanpaper"><button class="btn ghost" onclick="openPaperScanner()">📷 Einkaufszettel fotografieren</button></div>
-        <div id="ocrStatusHome" class="ocrstatus notice"><div class="space"><b id="ocrStatusTextHome">Foto wird gelesen …</b><button id="ocrUndoHome" class="btn small ghost" style="display:none;flex:0 0 auto" onclick="undoLastPhotoScan()">↶ Rückgängig</button></div><div class="ocrbar"><i id="ocrProgressHome"></i></div></div>
       </div>
 
       <div class="section">
@@ -289,14 +313,11 @@ body[data-view="list"] .app{padding-bottom:84px}
           <div class="progress"><i id="budgetProgress"></i></div>
           <div class="field"><input id="budgetInput" type="number" min="0" step=".01" placeholder="Budget festlegen" onchange="setBudget(this.value)"></div>
         </div>
-        <div class="scanpaper"><button class="btn ghost" onclick="openPaperScanner()">📷 Geschriebenen Zettel fotografieren</button></div>
-        <div id="ocrStatusList" class="ocrstatus notice"><div class="space"><b id="ocrStatusTextList">Foto wird gelesen …</b><button id="ocrUndoList" class="btn small ghost" style="display:none;flex:0 0 auto" onclick="undoLastPhotoScan()">↶ Rückgängig</button></div><div class="ocrbar"><i id="ocrProgressList"></i></div></div>
       </div>
 
       <div class="listquick">
         <input id="listQuickInput" placeholder="Milch, Brot, 2x Joghurt…">
         <button class="btn primary" onclick="quickAdd('listQuickInput')" aria-label="Hinzufügen">＋</button>
-        <button class="btn ghost" onclick="openPaperScanner()" aria-label="Zettel fotografieren">📷</button>
       </div>
       <div id="shoppingList" class="list listpaper"></div>
     </section>
@@ -310,6 +331,11 @@ body[data-view="list"] .app{padding-bottom:84px}
         </div>
         <div class="field shop-store-select" style="margin:9px 0 0"><select id="storeSelectShop" onchange="selectStore(this.value)"></select></div>
         <div class="progress"><i id="shopProgress"></i></div>
+        <div class="receipt-scan-row">
+          <button id="receiptScanBtn" class="btn small ghost" onclick="openReceiptScanner()">🧾 Bon scannen</button>
+          <span id="receiptScanHint" class="muted">Nach dem Einkauf Preise übernehmen</span>
+        </div>
+        <div id="receiptStatus" class="ocrstatus notice"><b id="receiptStatusText">Bon wird gelesen …</b><div class="ocrbar"><i id="receiptProgress"></i></div></div>
       </div>
       <div class="notice" id="routeNotice">Beim Abhaken merkt sich KaufFlow für <b>genau diesen Laden</b> die Reihenfolge deiner Produkte. Beim nächsten Einkauf hier wird die Liste passend zu deinem gelernten Laufweg sortiert.</div>
       <div id="shopList" class="list" style="margin-top:12px"></div>
@@ -370,6 +396,7 @@ body[data-view="list"] .app{padding-bottom:84px}
       <div class="field full"><label>Produkt / Marke / Sorte</label><input id="fPref" placeholder="z. B. 1,5 %, Marke egal"></div>
       <div class="field full"><label>Produktregel</label><select id="fExact"><option value="alt">Alternative erlaubt</option><option value="exact">Bitte genau diese</option></select></div>
     </div>
+    <div id="priceHistoryBox"></div>
     <div class="row" style="margin-top:12px"><button class="btn ghost" onclick="closeModal('itemModal')">Abbrechen</button><button class="btn primary" onclick="saveItem()">Speichern</button></div>
   </div>
 </div>
@@ -400,16 +427,16 @@ body[data-view="list"] .app{padding-bottom:84px}
   </div>
 </div>
 
-<div id="ocrReviewModal" class="modal" onclick="if(event.target===this)closeModal('ocrReviewModal')">
+<div id="receiptReviewModal" class="modal" onclick="if(event.target===this)closeModal('receiptReviewModal')">
   <div class="sheet">
-    <div class="space"><div><h3 style="margin-bottom:3px">Foto-Erkennung prüfen</h3><div class="muted">Unsichere Handschrift wird nicht ungeprüft übernommen.</div></div><button class="iconbtn" onclick="closeModal('ocrReviewModal')">✕</button></div>
-    <div id="ocrReviewList" style="margin-top:14px"></div>
-    <div class="notice" style="margin-top:12px">Du kannst jeden erkannten Artikel hier noch korrigieren. Leere oder deaktivierte Zeilen werden nicht übernommen.</div>
-    <div class="row" style="margin-top:14px"><button class="btn ghost" onclick="closeModal('ocrReviewModal')">Abbrechen</button><button class="btn primary" onclick="acceptOcrReview()">Auswahl übernehmen</button></div>
+    <div class="space"><div><h3 style="margin-bottom:3px">🧾 Bon prüfen</h3><div class="muted">KaufFlow ordnet erkannte Bon-Positionen deinen Produkten zu.</div></div><button class="iconbtn" onclick="closeModal('receiptReviewModal')">✕</button></div>
+    <div id="receiptReviewList" style="margin-top:12px"></div>
+    <div class="notice" style="margin-top:12px">Stimmt eine Zuordnung nicht, kannst du hier das richtige Produkt auswählen. Diese Korrektur merkt sich KaufFlow für den nächsten Bon.</div>
+    <div class="row" style="margin-top:14px"><button class="btn ghost" onclick="closeModal('receiptReviewModal')">Abbrechen</button><button class="btn primary" onclick="acceptReceiptReview()">Preise übernehmen</button></div>
   </div>
 </div>
 
-<input id="paperListPhoto" type="file" accept="image/*" capture="environment" hidden onchange="if(this.files&&this.files[0])scanPaperList(this.files[0])">
+<input id="receiptPhoto" type="file" accept="image/*" capture="environment" hidden onchange="if(this.files&&this.files[0])scanReceipt(this.files[0])">
 <div id="toast" class="toast">Gespeichert</div>
 
 <script>
@@ -418,7 +445,7 @@ let deferredInstallPrompt=null;
 let swRegistration=null;
 let reloadingForUpdate=false;
 let ocrBusy=false;
-const defaultState={onboarded:false,budget:0,people:['Ich','Partner/in','Kinder'],items:[],memory:{},trips:[],stores:[{id:'default',name:'Mein Laden',categoryOrder:[],productOrder:[]}],activeStoreId:'default',activeTrip:[]};
+const defaultState={onboarded:false,budget:0,people:['Ich','Partner/in','Kinder'],items:[],memory:{},trips:[],stores:[{id:'default',name:'Mein Laden',categoryOrder:[],productOrder:[]}],activeStoreId:'default',activeTrip:[],lastReceiptScan:null};
 let S=load();
 function load(){
   try{
@@ -827,10 +854,189 @@ async function scanPaperList(file){
     ocrBusy=false;const input=document.getElementById('paperListPhoto');if(input)input.value=''
   }
 }
+
+function openReceiptScanner(){
+  if(ocrBusy){toast('Bon wird noch verarbeitet');return}
+  const input=document.getElementById('receiptPhoto');if(!input)return;
+  input.value='';input.click()
+}
+function setReceiptStatus(show,text,progress=0){
+  const box=document.getElementById('receiptStatus'),txt=document.getElementById('receiptStatusText'),bar=document.getElementById('receiptProgress');
+  if(box)box.classList.toggle('show',show);
+  if(txt&&text)txt.textContent=text;
+  if(bar)bar.style.width=Math.max(0,Math.min(100,progress))+'%'
+}
+function receiptContext(){
+  if(S.items.length){
+    return {mode:'items',trip:null,targets:S.items.map(i=>({id:i.id,name:i.name,price:Number(i.price)||0}))}
+  }
+  const trip=S.trips&&S.trips[0];
+  if(trip&&Array.isArray(trip.items)&&trip.items.length){
+    return {mode:'trip',trip,targets:trip.items.map(i=>({id:i.id||i.name,name:i.name,price:Number(i.price)||0}))}
+  }
+  return {mode:'none',trip:null,targets:[]}
+}
+function receiptNorm(v){
+  return String(v||'').toLocaleLowerCase('de-DE')
+    .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+    .replace(/[^a-z0-9 ]/g,' ').replace(/\b(stk|stück|bio|ja|gut|günstig|kg|g|ml|l)\b/g,' ')
+    .replace(/\s+/g,' ').trim()
+}
+function receiptTokens(v){return receiptNorm(v).split(' ').filter(x=>x.length>1)}
+function receiptNameScore(raw,target){
+  const a=receiptNorm(raw),b=receiptNorm(target.name);if(!a||!b)return 0;
+  let score=dice(a,b);
+  if(a===b)score=1;
+  if(a.includes(b)||b.includes(a))score=Math.max(score,.88);
+  const ta=new Set(receiptTokens(a)),tb=new Set(receiptTokens(b));
+  let hit=0;ta.forEach(x=>{if(tb.has(x))hit++});
+  if(ta.size&&tb.size)score=Math.max(score,hit/Math.max(ta.size,tb.size));
+  const mem=findMem(target.name);
+  (mem?.receiptAliases||[]).forEach(alias=>{
+    const an=receiptNorm(alias);if(a===an)score=Math.max(score,1);else score=Math.max(score,dice(a,an))
+  });
+  return score
+}
+function parseReceiptPrice(v){
+  let s=String(v||'').replace(/\s/g,'').replace(/EUR|€/gi,'');
+  if(s.includes(',')&&s.includes('.')){
+    if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\./g,'').replace(',','.');
+    else s=s.replace(/,/g,'')
+  }else s=s.replace(',','.');
+  const n=Number(s);return Number.isFinite(n)?Math.abs(n):0
+}
+function parseReceiptText(text){
+  const lines=String(text||'').split(/\n+/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+  const skip=/summe|gesamt|total|zu zahlen|zahlbetrag|barzahlung|bar gegeben|rückgeld|rueckgeld|ec[- ]?karte|girocard|visa|mastercard|mwst|ust|steuer|netto|brutto|datum|uhrzeit|kasse|bon[- ]?nr|transaktion|terminal|kundenbeleg|zahlung|wechselgeld/i;
+  const out=[];
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i];
+    const matches=[...line.matchAll(/(-?\d{1,5}[.,]\d{2})\s*(?:[A-Z*])?(?=\s|$)/g)];
+    if(!matches.length)continue;
+    const m=matches[matches.length-1],price=parseReceiptPrice(m[1]);if(!price||price>9999)continue;
+    let name=line.slice(0,m.index).trim();
+    if((!/[A-Za-zÄÖÜäöüß]/.test(name)||name.length<2)&&i>0&&!/\d{1,5}[.,]\d{2}/.test(lines[i-1]))name=lines[i-1];
+    name=name
+      .replace(/^\s*\d+(?:[.,]\d+)?\s*[xX*×]\s*/,'')
+      .replace(/\b\d+(?:[.,]\d+)?\s*(?:kg|g|ml|l)\b/gi,' ')
+      .replace(/\s+/g,' ').trim();
+    if(!name||skip.test(name)||name.length<2)continue;
+    out.push({raw:line,receiptName:name,price})
+  }
+  const seen=new Set();
+  return out.filter(r=>{const k=receiptNorm(r.receiptName)+'|'+r.price.toFixed(2);if(seen.has(k))return false;seen.add(k);return true}).slice(0,80)
+}
+function matchReceiptRows(rows,targets){
+  return rows.map(r=>{
+    let best=null,bestScore=0;
+    for(const t of targets){
+      const sc=receiptNameScore(r.receiptName,t);
+      if(sc>bestScore){bestScore=sc;best=t}
+    }
+    return {...r,targetId:best&&bestScore>=.42?best.id:'',targetName:best?.name||'',score:bestScore}
+  })
+}
+function openReceiptReview(rows,ctx){
+  window.__receiptRows=rows;window.__receiptContext=ctx;
+  const box=document.getElementById('receiptReviewList');if(!box)return;
+  const opts='<option value="">Nicht zuordnen</option>'+ctx.targets.map(t=>'<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>').join('');
+  box.innerHTML=rows.map((r,i)=>{
+    return '<div class="receipt-review-row"><div class="space"><div style="min-width:0"><b>'+esc(r.receiptName)+'</b><div class="muted" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(r.raw)+'</div></div><span class="chip">'+euro(r.price)+'</span></div>'+
+      '<div class="receipt-review-grid"><select id="receiptTarget'+i+'">'+opts+'</select><input id="receiptPrice'+i+'" type="number" min="0" step=".01" value="'+r.price.toFixed(2)+'"></div></div>'
+  }).join('');
+  rows.forEach((r,i)=>{const el=document.getElementById('receiptTarget'+i);if(el)el.value=r.targetId||''});
+  document.getElementById('receiptReviewModal').classList.add('open')
+}
+function rememberReceiptPrice(name,price,receiptAlias,storeName,tripId){
+  const old=S.memory[name]||{},hist=Array.isArray(old.priceHistory)?old.priceHistory.slice():[];
+  const previous=Number(old.lastPrice)||0;
+  hist.push({date:Date.now(),price:Number(price)||0,store:storeName||activeStore().name,tripId:tripId||null});
+  const cleanHist=hist.filter(x=>x&&Number(x.price)>0).slice(-20);
+  const aliases=[...(old.receiptAliases||[])];
+  const alias=String(receiptAlias||'').trim();
+  if(alias&&!aliases.some(x=>receiptNorm(x)===receiptNorm(alias)))aliases.push(alias);
+  S.memory[name]={...old,previousPrice:previous||old.previousPrice||0,lastPrice:Number(price)||0,lastStore:storeName||activeStore().name,priceHistory:cleanHist,receiptAliases:aliases.slice(-12)}
+}
+function applyReceiptMapping(targetId,price,receiptAlias,ctx){
+  if(!targetId||!price)return false;
+  if(ctx.mode==='items'){
+    const it=S.items.find(x=>x.id===targetId);if(!it)return false;
+    it.price=price;rememberReceiptPrice(it.name,price,receiptAlias,activeStore().name,null);return true
+  }
+  if(ctx.mode==='trip'&&ctx.trip){
+    const it=(ctx.trip.items||[]).find(x=>(x.id||x.name)===targetId);if(!it)return false;
+    it.price=price;rememberReceiptPrice(it.name,price,receiptAlias,ctx.trip.store,ctx.trip.id);return true
+  }
+  return false
+}
+function acceptReceiptReview(){
+  const rows=window.__receiptRows||[],ctx=window.__receiptContext||receiptContext();let applied=0;
+  rows.forEach((r,i)=>{
+    const target=document.getElementById('receiptTarget'+i)?.value||'';
+    const price=Number(document.getElementById('receiptPrice'+i)?.value)||0;
+    if(applyReceiptMapping(target,price,r.receiptName,ctx))applied++
+  });
+  if(ctx.mode==='trip'&&ctx.trip){
+    ctx.trip.total=(ctx.trip.items||[]).reduce((a,b)=>a+(Number(b.price)||0),0)
+  }
+  S.lastReceiptScan={date:Date.now(),store:ctx.trip?.store||activeStore().name,count:applied};
+  closeModal('receiptReviewModal');persist();
+  setReceiptStatus(true,applied+' Preise vom Bon übernommen ✓',100);
+  toast(applied+' Preise gespeichert')
+}
+async function scanReceipt(file){
+  if(!file||ocrBusy)return;
+  const ctx=receiptContext();
+  if(!ctx.targets.length){toast('Kein aktueller oder letzter Einkauf zum Zuordnen');return}
+  ocrBusy=true;setReceiptStatus(true,'Bon wird vorbereitet …',5);
+  let worker=null;
+  try{
+    const T=await loadTesseract(),img=await loadPhotoBase(file),base=makeBaseCanvas(img),bin=buildBinaryCanvas(base);
+    worker=await T.createWorker('deu',1,{logger:m=>{
+      if(m.status==='recognizing text')setReceiptStatus(true,'Bon wird gelesen … '+Math.round((m.progress||0)*100)+' %',10+Math.round((m.progress||0)*75))
+    }});
+    await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});
+    const a=await worker.recognize(base),b=await worker.recognize(bin.canvas);
+    const ra=parseReceiptText(a?.data?.text||''),rb=parseReceiptText(b?.data?.text||'');
+    const rows=(rb.length>ra.length?rb:ra);
+    if(!rows.length){
+      setReceiptStatus(true,'Keine Produktpreise erkannt. Bon bitte gerade, vollständig und gut beleuchtet fotografieren.',100);
+      toast('Keine Preise erkannt');return
+    }
+    const matched=matchReceiptRows(rows,ctx.targets);
+    setReceiptStatus(true,matched.length+' Bon-Positionen erkannt – Zuordnung prüfen',100);
+    openReceiptReview(matched,ctx)
+  }catch(e){
+    console.error(e);setReceiptStatus(true,'Bon konnte nicht zuverlässig gelesen werden. Bitte erneut fotografieren.',100);toast('Bon-Erkennung fehlgeschlagen')
+  }finally{
+    if(worker)try{await worker.terminate()}catch(e){}
+    ocrBusy=false;const input=document.getElementById('receiptPhoto');if(input)input.value=''
+  }
+}
+function getPriceHistory(name){
+  const m=findMem(name);return Array.isArray(m?.priceHistory)?m.priceHistory:[]
+}
+function priceTrend(name,current){
+  const m=findMem(name),now=Number(current)||Number(m?.lastPrice)||0;
+  if(!now)return '';
+  let prev=Number(m?.previousPrice)||0;
+  const h=getPriceHistory(name);
+  if(!prev&&h.length>1)prev=Number(h[h.length-2]?.price)||0;
+  if(!prev)return '';
+  const d=now-prev;if(Math.abs(d)<.005)return '<small class="pricechange same">= gleich</small>';
+  return '<small class="pricechange '+(d>0?'up':'down')+'">'+(d>0?'▲ ':'▼ ')+(Math.abs(d)*100).toFixed(0)+' ct</small>'
+}
+function renderPriceHistory(name){
+  const box=document.getElementById('priceHistoryBox');if(!box)return;
+  const h=getPriceHistory(name).slice(-6).reverse();
+  if(!h.length){box.innerHTML='';return}
+  box.innerHTML='<div class="price-history"><div class="space"><b>💶 Preisverlauf</b><span class="muted">vom Bon</span></div>'+
+    h.map((x,i)=>'<div class="price-history-row"><span>'+new Date(x.date).toLocaleDateString('de-DE')+' · '+esc(x.store||'')+'</span><b>'+euro(x.price)+'</b></div>').join('')+'</div>'
+}
 function findMem(name){const key=Object.keys(S.memory).find(k=>k.toLowerCase()===name.toLowerCase());return key?S.memory[key]:null}
 function openItemModal(id){
   const it=S.items.find(x=>x.id===id);document.getElementById('editId').value=it?.id||'';document.getElementById('itemTitle').textContent=it?'Artikel bearbeiten':'Artikel hinzufügen';
-  document.getElementById('fName').value=it?.name||'';document.getElementById('fQty').value=it?.qty||'1';document.getElementById('fPrice').value=it?.price||'';document.getElementById('fCat').value=it?.cat||'Vorrat';document.getElementById('fPerson').value=it?.person||'Alle';document.getElementById('fPref').value=it?.pref||'';document.getElementById('fExact').value=it?.exact||'alt';document.getElementById('itemModal').classList.add('open')
+  document.getElementById('fName').value=it?.name||'';document.getElementById('fQty').value=it?.qty||'1';document.getElementById('fPrice').value=it?.price||'';document.getElementById('fCat').value=it?.cat||'Vorrat';document.getElementById('fPerson').value=it?.person||'Alle';document.getElementById('fPref').value=it?.pref||'';document.getElementById('fExact').value=it?.exact||'alt';renderPriceHistory(it?.name||'');document.getElementById('itemModal').classList.add('open')
 }
 function saveItem(){
   const id=document.getElementById('editId').value,name=document.getElementById('fName').value.trim();if(!name)return;
@@ -885,7 +1091,7 @@ function finishTrip(){
     if(purchases.length>=2){const gaps=[];for(let i=1;i<purchases.length;i++)gaps.push((purchases[i]-purchases[i-1])/86400000);avg=gaps.reduce((a,b)=>a+b,0)/gaps.length}
     S.memory[it.name]={...old,lastBought:now,lastPrice:it.price,lastQty:it.qty,cat:it.cat,pref:it.pref,exact:it.exact,purchases,avgDays:Math.max(1,avg)}
   });
-  S.trips.unshift({id:crypto.randomUUID(),date:now,store:store.name,storeId:store.id,total:done.reduce((a,b)=>a+(Number(b.price)||0),0),count:done.length});S.trips=S.trips.slice(0,30);
+  const tripId=crypto.randomUUID();S.trips.unshift({id:tripId,date:now,store:store.name,storeId:store.id,total:done.reduce((a,b)=>a+(Number(b.price)||0),0),count:done.length,items:done.map(i=>({id:i.id,name:i.name,qty:i.qty,price:Number(i.price)||0,cat:i.cat}))});S.trips=S.trips.slice(0,30);
   S.items=S.items.filter(i=>!i.done);S.activeTrip=[];persist();toast('Einkauf bei '+store.name+' gespeichert – Reihenfolge gelernt');go('home')
 }
 function makeMeals(){
@@ -930,13 +1136,13 @@ function render(){
   document.getElementById('shopCount').textContent=done+' / '+total;document.getElementById('shopSum').textContent=euro(sum);document.getElementById('shopProgress').style.width=(total?done/total*100:0)+'%';document.getElementById('finishWrap').style.display=done?'block':'none';
   const smart=smartCandidates();document.getElementById('smartPreview').innerHTML=smart.slice(0,3).map(s=>smartHTML(s)).join('')||'<div class="card muted">Sobald du erste Einkäufe abschließt, erkennt KaufFlow hier deinen Rhythmus.</div>';document.getElementById('smartAll').innerHTML=smart.map(s=>smartHTML(s)).join('')||'<div class="empty">Noch keine Vorschläge. Nach ein paar abgeschlossenen Einkäufen wird dieser Bereich richtig stark.</div>';
   const mem=Object.entries(S.memory).sort((a,b)=>(b[1].lastBought||0)-(a[1].lastBought||0));document.getElementById('memoryCount').textContent=mem.length+' Produkte';document.getElementById('memoryList').innerHTML=mem.slice(0,12).map(([n,m])=>`<div class="historyrow"><div><b>${esc(n)}</b><div class="muted">${esc(m.cat||'')} · Ø ${Math.round(m.avgDays||7)} Tage</div></div><div style="text-align:right"><b>${euro(m.lastPrice)}</b><div class="muted">letzter Preis</div></div></div>`).join('')||'<div class="empty">Noch leer.</div>';
-  document.getElementById('tripHistory').innerHTML=S.trips.map(t=>`<div class="historyrow"><div><b>${new Date(t.date).toLocaleDateString('de-DE')}</b><div class="muted">${esc(t.store)} · ${t.count} Artikel</div></div><b>${euro(t.total)}</b></div>`).join('')||'<div class="empty">Noch kein abgeschlossener Einkauf.</div>';
+  document.getElementById('tripHistory').innerHTML=S.trips.map((t,i)=>`<div class="historyrow"><div><b>${new Date(t.date).toLocaleDateString('de-DE')}</b><div class="muted">${esc(t.store)} · ${t.count} Artikel${Array.isArray(t.items)&&t.items.some(x=>x.price)?' · 🧾 Preise gespeichert':''}</div></div><b>${euro(t.total)}</b></div>`).join('')||'<div class="empty">Noch kein abgeschlossener Einkauf.</div>';
 }
 function itemHTML(it,shop){
   return `<div class="item ${it.done?'done':''} ${shop?'shopitem':''}">
     <button class="check" onclick="toggleItem('${it.id}',${shop})">${it.done?'✓':''}</button>
     <div class="itemmain" onclick="openItemModal('${it.id}')"><div class="iname">${esc(it.qty)}× ${esc(it.name)}</div><div class="isub">${esc(it.cat)}${it.pref?' · '+esc(it.pref):''}${it.exact==='exact'?' · genau diese':''}${it.person&&it.person!=='Alle'?' · '+esc(it.person):''}</div></div>
-    <div class="price">${it.price?euro(it.price):'–'}</div>
+    <div class="price">${it.price?euro(it.price):'–'}${it.price?priceTrend(it.name,it.price):''}</div>
     ${shop?'':`<button class="iconbtn" style="width:36px;height:36px" onclick="removeItem('${it.id}')">×</button>`}
   </div>`
 }
@@ -963,4 +1169,4 @@ importShared();render();setupPwa();
 </script>
 </body>
 </html>
-<!-- kaufflow-compact-shop-20261006-v4 -->
+<!-- kaufflow-receipt-prices-20261006-v5 -->
