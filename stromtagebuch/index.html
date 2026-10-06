@@ -226,11 +226,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.3.9</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.0</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.3.9</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.0</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
@@ -490,7 +490,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.3.9</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.0</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -579,7 +579,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Das <b>Komplett-Backup enthält ab v1.3 auch deine Zählerfotos</b>, damit sie auf ein neues Gerät übernommen werden können.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Vollbackup inkl. Fotos</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.3.9</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.4.0</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
@@ -624,7 +624,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="toast" id="toast"></div>
 
 <script>
-var APP_VERSION="1.3.9";
+var APP_VERSION="1.4.0";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
@@ -1124,6 +1124,21 @@ function rankedOcrCandidates(nums,target,date){
  arr.sort(function(a,b){return a.score-b.score});
  return arr.slice(0,2)
 }
+function ocrTrendInfo(target,value,date){
+ var prev=null,rates=[];
+ if(target==="imp"||target==="feed"){
+   var prop=target==="imp"?"imp":"feed",list=sorted().filter(function(x){return x&&x.date<date&&x[prop]!=null&&isFinite(Number(x[prop]))}).slice(-6);
+   if(list.length)prev=list[list.length-1];
+   for(var i=1;i<list.length;i++){var d=days(list[i-1].date,list[i].date),a=Number(list[i-1][prop]),b=Number(list[i][prop]);if(d>0&&b>=a)rates.push((b-a)/d)}
+ }
+ if(!prev||value==null)return{ok:true,rate:null,limit:null};
+ var d=days(prev.date,date);if(d<=0)return{ok:true,rate:null,limit:null};
+ var rate=(Number(value)-Number(prev[target==="imp"?"imp":"feed"]))/d;
+ rates.sort(function(a,b){return a-b});
+ var med=rates.length?rates[Math.floor(rates.length/2)]:(target==="imp"?8:25);
+ var floor=target==="imp"?18:55,limit=Math.max(floor,med*3+5);
+ return{ok:rate>=0&&rate<=limit,rate:rate,limit:limit}
+}
 function rankedOcrCandidatesFromResult(res,target,date){
  var passes=res&&Array.isArray(res.passes)&&res.passes.length?res.passes:[{text:res&&res.text||"",confidence:res&&res.confidence||0,label:"ocr"}],bucket={};
  passes.forEach(function(p){
@@ -1131,25 +1146,26 @@ function rankedOcrCandidatesFromResult(res,target,date){
    vals.forEach(function(v,idx){
      var rounded=Math.round(v*1000)/1000,key=rounded.toFixed(3);
      if(local[key])return;local[key]=true;
-     var x=bucket[key]||(bucket[key]={value:rounded,votes:0,confidence:0,targetVotes:0,wrongTargetVotes:0,rank:999});
-     x.votes++;x.confidence=Math.max(x.confidence,Number(p.confidence)||0);x.rank=Math.min(x.rank,idx);
+     var x=bucket[key]||(bucket[key]={value:rounded,votes:0,confidence:0,targetVotes:0,wrongTargetVotes:0,rank:999,labels:[]});
+     x.votes++;x.confidence=Math.max(x.confidence,Number(p.confidence)||0);x.rank=Math.min(x.rank,idx);x.labels.push(p.label||"ocr");
      if(detected===target)x.targetVotes++;else if(detected)x.wrongTargetVotes++
    })
  });
- var prev=ocrPrevious(target),arr=Object.keys(bucket).map(function(k){
-   var x=bucket[k],c=ocrCheckAtDate(target,x.value,date),distance=prev==null?0:Math.abs(x.value-prev),rel=prev&&prev>0?distance/prev:0,score=0;
-   if(c.errors.length)score+=1000000;
-   if(c.warnings.length)score+=200000;
-   if(prev!=null){if(x.value<prev)score+=500000;score+=distance;if(rel>.5)score+=100000}
+ var prev=ocrPrevious(target),prevDigits=prev!=null?String(Math.floor(Math.abs(prev))).length:0,arr=Object.keys(bucket).map(function(k){
+   var x=bucket[k],check=ocrCheckAtDate(target,x.value,date),distance=prev==null?0:Math.abs(x.value-prev),rel=prev&&prev>0?distance/prev:0,trend=ocrTrendInfo(target,x.value,date),score=0,digits=String(Math.floor(Math.abs(x.value))).length;
+   if(check.errors.length)score+=1000000;
+   if(check.warnings.length)score+=200000;
+   if(trend.ok===false)score+=700000;
+   if(prev!=null){if(x.value<prev)score+=500000;score+=distance;if(rel>.5)score+=100000;if(prevDigits&&digits!==prevDigits)score+=120000*Math.abs(digits-prevDigits)}
    else score-=Math.min(x.value,100000)/1000;
    score-=x.votes*8000;score-=x.targetVotes*2000;score+=x.wrongTargetVotes*20000;score+=x.rank*50;score-=x.confidence*10;
-   return{value:x.value,check:c,distance:distance,score:score,votes:x.votes,confidence:x.confidence,targetVotes:x.targetVotes,wrongTargetVotes:x.wrongTargetVotes}
+   return{value:x.value,check:check,distance:distance,score:score,votes:x.votes,confidence:x.confidence,targetVotes:x.targetVotes,wrongTargetVotes:x.wrongTargetVotes,trendOk:trend.ok,dailyRate:trend.rate,trendLimit:trend.limit,labels:x.labels}
  });
  arr.sort(function(a,b){return a.score-b.score});
- return arr.slice(0,2)
+ return arr.slice(0,4)
 }
 function ocrAutoFillOkay(candidate){
- return !!(candidate&&!candidate.check.errors.length&&!candidate.check.warnings.length&&(candidate.votes>=2||(candidate.targetVotes>=1&&candidate.confidence>=82)))
+ return !!(candidate&&candidate.trendOk!==false&&!candidate.check.errors.length&&!candidate.check.warnings.length&&(candidate.votes>=2||candidate.confidence>=70))
 }
 function confidenceInfo(ocrConfidence,candidate){
  var conf=Math.max(Number(ocrConfidence)||0,candidate?Number(candidate.confidence)||0:0);
@@ -1163,7 +1179,7 @@ function renderOcrChoices(box,candidates,bestTarget,onPick){
  box.innerHTML="";
  candidates.forEach(function(c,i){
    var b=document.createElement("button");b.type="button";b.className="ocrChoice"+(i===0?" best":"");
-   b.textContent=n(c.value,3)+" kWh"+(c.votes>=2?" · mehrfach erkannt":i===0?" · bester Vorschlag":"");
+   b.textContent=n(c.value,3)+" kWh"+(c.trendOk===false?" · unplausibel":c.votes>=2?" · mehrfach erkannt":i===0?" · bester Vorschlag":"");
    b.onclick=function(){onPick(c.value,c);box.querySelectorAll(".ocrChoice").forEach(function(x){x.classList.remove("best")});b.classList.add("best")};
    box.appendChild(b)
  })
@@ -1176,6 +1192,15 @@ function invertOcrCanvas(source){
  for(var i=0;i<p.length;i+=4){p[i]=255-p[i];p[i+1]=255-p[i+1];p[i+2]=255-p[i+2]}
  ctx.putImageData(img,0,0);return out
 }
+function makeMainDigitsCanvas(source){
+ var sw=source.width,sh=source.height,ratio=sw/sh,sx=0,sy=0,cw=sw,ch=sh;
+ if(ratio>2){
+   sx=Math.round(sw*.055);sy=Math.round(sh*.03);cw=Math.round(sw*.70);ch=Math.round(sh*.90);
+ }
+ var out=document.createElement("canvas"),targetW=Math.min(1700,Math.max(950,Math.round(cw*3.1))),scale=targetW/cw;
+ out.width=Math.max(1,Math.round(cw*scale));out.height=Math.max(1,Math.round(ch*scale));
+ var ctx=out.getContext("2d");ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.drawImage(source,sx,sy,cw,ch,0,0,out.width,out.height);return out
+}
 async function recognizeWithWorker(worker,source,progress,modelName){
  var passes=[],confidence=0;
  async function pass(label,img,psm){
@@ -1184,48 +1209,45 @@ async function recognizeWithWorker(worker,source,progress,modelName){
    if(t.trim())passes.push({text:t,confidence:cf,label:(modelName||"ocr")+"-"+label});
    confidence=Math.max(confidence,cf)
  }
+ var digits=makeMainDigitsCanvas(source),digits5=makeAdaptiveLcdCanvas(digits,5),digits10=makeAdaptiveLcdCanvas(digits,10);
+ await pass("digits-gray",digits,Tesseract.PSM.SINGLE_LINE);
+ await pass("digits-adaptive",digits5,Tesseract.PSM.SINGLE_LINE);
+ await pass("digits-strong",digits10,Tesseract.PSM.RAW_LINE);
+ await pass("digits-invert",invertOcrCanvas(digits5),Tesseract.PSM.SINGLE_LINE);
  var adaptive5=makeAdaptiveLcdCanvas(source,5);
- await pass("adaptive",adaptive5,Tesseract.PSM.SINGLE_LINE);
- await pass("gray",source,Tesseract.PSM.SINGLE_LINE);
- var adaptive10=makeAdaptiveLcdCanvas(source,10);
- await pass("strong",adaptive10,Tesseract.PSM.RAW_LINE);
- await pass("invert",invertOcrCanvas(adaptive5),Tesseract.PSM.SINGLE_LINE);
+ await pass("full-adaptive",adaptive5,Tesseract.PSM.SINGLE_LINE);
+ await pass("full-gray",source,Tesseract.PSM.SINGLE_LINE);
  return{text:passes.map(function(p){return p.text}).join("\n"),confidence:confidence,passes:passes}
 }
 async function runMeterOcr(source,progress,target,date){
- await loadOCR();var worker=null,special=null;
+ await loadOCR();var worker=null,allPasses=[],bestConfidence=0;
+ async function useModel(lang,label,langPath,gzip,startPct,endPct){
+   worker=await Tesseract.createWorker(lang,1,{
+     langPath:langPath||undefined,gzip:gzip,
+     cacheMethod:"write",
+     logger:function(m){if(progress&&m.status==="recognizing text")progress(Math.round(startPct+(m.progress||0)*(endPct-startPct)))}
+   });
+   var out=await recognizeWithWorker(worker,source,progress,label);
+   await worker.terminate().catch(function(){});worker=null;
+   allPasses=allPasses.concat(out.passes||[]);bestConfidence=Math.max(bestConfidence,Number(out.confidence)||0);
+   return out
+ }
  try{
-   if(progress)progress(4);
+   if(progress)progress(5);
    try{
-     worker=await Tesseract.createWorker("ssd_int",1,{
-       langPath:"https://raw.githubusercontent.com/Shreeshrii/tessdata_ssd/master",
-       gzip:false,
-       cacheMethod:"write",
-       logger:function(m){
-         if(!progress)return;
-         if(m.status==="loading tesseract core")progress(8);
-         else if(m.status==="initializing tesseract")progress(12);
-         else if(m.status==="loading language traineddata")progress(18);
-         else if(m.status==="initializing api")progress(28);
-         else if(m.status==="recognizing text")progress(30+Math.round((m.progress||0)*45))
-       }
-     });
-     special=await recognizeWithWorker(worker,source,progress,"ssd_int");
-     await worker.terminate().catch(function(){});worker=null;
-     var quick=rankedOcrCandidatesFromResult(special,target,date),q=quick[0];
-     if(q&&!q.check.errors.length)return special
+     var fast=await useModel("ssd_int","ssd_int","https://raw.githubusercontent.com/Shreeshrii/tessdata_ssd/master",false,10,45);
+     var q1=rankedOcrCandidatesFromResult({passes:allPasses,confidence:bestConfidence},target,date)[0];
+     if(q1&&ocrAutoFillOkay(q1))return{text:allPasses.map(function(p){return p.text}).join("\n"),confidence:bestConfidence,passes:allPasses}
    }catch(e){if(worker){await worker.terminate().catch(function(){});worker=null}}
-   if(progress)progress(78);
-   worker=await Tesseract.createWorker("eng",1,{logger:function(m){
-     if(progress&&m.status==="recognizing text")progress(80+Math.round((m.progress||0)*18))
-   }});
-   var normal=await recognizeWithWorker(worker,source,progress,"eng");
-   if(special&&special.passes&&special.passes.length){
-     normal.passes=special.passes.concat(normal.passes||[]);
-     normal.text=normal.passes.map(function(p){return p.text}).join("\n");
-     normal.confidence=Math.max(Number(normal.confidence)||0,Number(special.confidence)||0)
-   }
-   return normal
+   if(progress)progress(48);
+   try{
+     await useModel("7seg","7seg","https://raw.githubusercontent.com/Shreeshrii/tessdata_ssd/master",false,50,78);
+     var q2=rankedOcrCandidatesFromResult({passes:allPasses,confidence:bestConfidence},target,date)[0];
+     if(q2&&q2.trendOk!==false&&!q2.check.errors.length)return{text:allPasses.map(function(p){return p.text}).join("\n"),confidence:bestConfidence,passes:allPasses}
+   }catch(e){if(worker){await worker.terminate().catch(function(){});worker=null}}
+   if(progress)progress(80);
+   try{await useModel("eng","eng",null,undefined,82,98)}catch(e){if(worker){await worker.terminate().catch(function(){});worker=null}}
+   return{text:allPasses.map(function(p){return p.text}).join("\n"),confidence:bestConfidence,passes:allPasses}
  }finally{if(worker)await worker.terminate().catch(function(){})}
 }
 var wizardPendingPhotos={imp:null,feed:null,heat:null},wizardPhotoMeta={imp:null,feed:null,heat:null};
@@ -1250,7 +1272,7 @@ async function processWizardPhoto(kind,file,evidenceFile){
      var inf=confidenceInfo(res.confidence,c);confBox.className="ocrConfidence "+inf.cls;confBox.textContent=inf.label+" · bestätigt";
      hint.textContent="Wert übernommen. Vor dem Speichern wird er noch einmal auf Plausibilität geprüft."
    });
-   if(!mismatch&&!best.check.errors.length){
+   if(!mismatch&&best.trendOk!==false&&!best.check.errors.length){
      document.getElementById(cfg.input).value=best.value;
      wizardPhotoMeta[kind]={value:best.value,confidence:Math.max(Number(res.confidence)||0,Number(best.confidence)||0),mismatch:false};
      if(ocrAutoFillOkay(best)){
@@ -1264,7 +1286,7 @@ async function processWizardPhoto(kind,file,evidenceFile){
      }
    }else{
      if(mismatch)wizardPhotoMeta[kind]={value:null,confidence:Number(res.confidence)||0,mismatch:true};
-     hint.textContent=mismatch?"Foto bleibt als Beleg vorgemerkt. Bitte richtige Anzeige fotografieren.":"Treffer gefunden, aber nicht plausibel. Bitte einen Vorschlag antippen oder den Wert oben korrigieren."
+     hint.textContent=mismatch?"Foto bleibt als Beleg vorgemerkt. Bitte richtige Anzeige fotografieren.":(best&&best.trendOk===false?"OCR-Zahl wurde verworfen: Sie passt nicht zu deinem bisherigen Zählerverlauf. Bitte Foto erneut versuchen oder den Wert oben manuell eintragen.":"Treffer gefunden, aber nicht plausibel. Bitte einen Vorschlag antippen oder den Wert oben korrigieren.")
    }
  }catch(err){
    confBox.className="ocrConfidence low";confBox.textContent=navigator.onLine?"Keine sichere Zahl erkannt.":"OCR offline noch nicht vollständig verfügbar.";
@@ -1292,7 +1314,7 @@ document.getElementById("ocrButton").onclick=async function(){
      field.value=v;freePhotoMeta={target:target,value:v,confidence:Math.max(Number(res.confidence)||0,Number(c.confidence)||0)};
      var inf=confidenceInfo(res.confidence,c);confBox.className="ocrConfidence "+inf.cls;confBox.textContent=inf.label+" · bestätigt";validate()
    });
-   if(!mismatch&&!best.check.errors.length){
+   if(!mismatch&&best.trendOk!==false&&!best.check.errors.length){
      field.value=best.value;freePhotoMeta={target:target,value:best.value,confidence:Math.max(Number(res.confidence)||0,Number(best.confidence)||0)};
      confBox.className="ocrConfidence "+(ocrAutoFillOkay(best)?"high":"medium");
      confBox.textContent=ocrAutoFillOkay(best)?"Erkannt und direkt ins Feld eingetragen · bitte prüfen":"OCR-Vorschlag direkt ins Feld eingetragen · bitte prüfen";
