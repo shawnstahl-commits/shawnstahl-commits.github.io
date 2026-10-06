@@ -105,7 +105,7 @@ button,input,select{font:inherit} button{cursor:pointer}
         <div class="sectionhead"><h3>Schnell hinzufügen</h3><span class="muted">mehrere auf einmal</span></div>
         <div class="quickadd"><input id="quickInput" placeholder="z. B. Milch, Butter, 2x Toast"><button class="btn primary" onclick="quickAdd()">＋</button></div>
         <div class="scanpaper"><button class="btn ghost" onclick="openPaperScanner()">📷 Einkaufszettel fotografieren</button></div>
-        <div id="ocrStatusHome" class="ocrstatus notice"><b id="ocrStatusTextHome">Foto wird gelesen …</b><div class="ocrbar"><i id="ocrProgressHome"></i></div></div>
+        <div id="ocrStatusHome" class="ocrstatus notice"><div class="space"><b id="ocrStatusTextHome">Foto wird gelesen …</b><button id="ocrUndoHome" class="btn small ghost" style="display:none;flex:0 0 auto" onclick="undoLastPhotoScan()">↶ Rückgängig</button></div><div class="ocrbar"><i id="ocrProgressHome"></i></div></div>
       </div>
 
       <div class="section">
@@ -135,7 +135,7 @@ button,input,select{font:inherit} button{cursor:pointer}
       </div>
       <div class="quickadd" style="margin:14px 0 0"><input id="listQuickInput" placeholder="Milch, 2x Joghurt, Brot..."><button class="btn primary" onclick="quickAdd('listQuickInput')">＋</button></div>
       <div class="scanpaper"><button class="btn ghost" onclick="openPaperScanner()">📷 Zettel fotografieren & übernehmen</button></div>
-      <div id="ocrStatusList" class="ocrstatus notice"><b id="ocrStatusTextList">Foto wird gelesen …</b><div class="ocrbar"><i id="ocrProgressList"></i></div></div>
+      <div id="ocrStatusList" class="ocrstatus notice"><div class="space"><b id="ocrStatusTextList">Foto wird gelesen …</b><button id="ocrUndoList" class="btn small ghost" style="display:none;flex:0 0 auto" onclick="undoLastPhotoScan()">↶ Rückgängig</button></div><div class="ocrbar"><i id="ocrProgressList"></i></div></div>
       <div id="shoppingList" class="list" style="margin-top:14px"></div>
     </section>
 
@@ -235,6 +235,15 @@ button,input,select{font:inherit} button{cursor:pointer}
 
     <div class="notice">Jeder Laden speichert seine eigene Produktreihenfolge und seinen eigenen Laufweg. Alle Daten bleiben aktuell nur auf diesem Gerät im Browser – kostenlos und ohne neues Backend.</div>
     <div class="row" style="margin-top:14px"><button class="btn danger" onclick="resetAll()">Alles zurücksetzen</button><button class="btn primary" onclick="saveSettings()">Speichern</button></div>
+  </div>
+</div>
+
+<div id="ocrReviewModal" class="modal" onclick="if(event.target===this)closeModal('ocrReviewModal')">
+  <div class="sheet">
+    <div class="space"><div><h3 style="margin-bottom:3px">Foto-Erkennung prüfen</h3><div class="muted">Unsichere Handschrift wird nicht ungeprüft übernommen.</div></div><button class="iconbtn" onclick="closeModal('ocrReviewModal')">✕</button></div>
+    <div id="ocrReviewList" style="margin-top:14px"></div>
+    <div class="notice" style="margin-top:12px">Du kannst jeden erkannten Artikel hier noch korrigieren. Leere oder deaktivierte Zeilen werden nicht übernommen.</div>
+    <div class="row" style="margin-top:14px"><button class="btn ghost" onclick="closeModal('ocrReviewModal')">Abbrechen</button><button class="btn primary" onclick="acceptOcrReview()">Auswahl übernehmen</button></div>
   </div>
 </div>
 
@@ -417,20 +426,21 @@ function quickAdd(inputId='quickInput'){
   parts.forEach(p=>addParsedItem(p));
   inp.value='';persist();toast(parts.length+' Artikel hinzugefügt')
 }
-function addParsedItem(p){
+function addParsedItem(p,scanId=null){
   const mem=findMem(p.name);
-  S.items.push({id:crypto.randomUUID(),name:p.name,qty:p.qty||'1',price:mem?.lastPrice||0,cat:mem?.cat||guessCat(p.name),person:'Alle',pref:mem?.pref||'',exact:mem?.exact||'alt',done:false,created:Date.now()})
+  S.items.push({id:crypto.randomUUID(),name:p.name,qty:p.qty||'1',price:mem?.lastPrice||0,cat:mem?.cat||guessCat(p.name),person:'Alle',pref:mem?.pref||'',exact:mem?.exact||'alt',done:false,created:Date.now(),scanId:scanId||undefined})
 }
 function openPaperScanner(){
   if(ocrBusy){toast('Foto wird noch verarbeitet');return}
   const input=document.getElementById('paperListPhoto');input.value='';input.click()
 }
-function setOcrStatus(show,text,progress=0){
+function setOcrStatus(show,text,progress=0,undo=false){
   ['Home','List'].forEach(s=>{
-    const box=document.getElementById('ocrStatus'+s),txt=document.getElementById('ocrStatusText'+s),bar=document.getElementById('ocrProgress'+s);
+    const box=document.getElementById('ocrStatus'+s),txt=document.getElementById('ocrStatusText'+s),bar=document.getElementById('ocrProgress'+s),undoBtn=document.getElementById('ocrUndo'+s);
     if(box)box.classList.toggle('show',show);
     if(txt&&text)txt.textContent=text;
-    if(bar)bar.style.width=Math.max(0,Math.min(100,progress))+'%'
+    if(bar)bar.style.width=Math.max(0,Math.min(100,progress))+'%';
+    if(undoBtn)undoBtn.style.display=undo?'inline-flex':'none'
   })
 }
 async function loadTesseract(){
@@ -445,103 +455,196 @@ async function loadTesseract(){
 }
 function levenshtein(a,b){
   a=String(a).toLowerCase();b=String(b).toLowerCase();
-  const m=Array.from({length:b.length+1},(_,i)=>[i]);
-  m[0]=Array.from({length:a.length+1},(_,i)=>i);
-  for(let i=1;i<=b.length;i++)for(let j=1;j<=a.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[j-1]===b[i-1]?0:1));
-  return m[b.length][a.length]
+  const prev=Array.from({length:a.length+1},(_,i)=>i),cur=new Array(a.length+1);
+  for(let i=1;i<=b.length;i++){
+    cur[0]=i;
+    for(let j=1;j<=a.length;j++)cur[j]=Math.min(cur[j-1]+1,prev[j]+1,prev[j-1]+(a[j-1]===b[i-1]?0:1));
+    for(let j=0;j<=a.length;j++)prev[j]=cur[j]
+  }
+  return prev[a.length]
+}
+function normMatch(v){
+  return String(v||'').toLocaleLowerCase('de-DE')
+    .replace(/ä/g,'a').replace(/ö/g,'o').replace(/ü/g,'u').replace(/ß/g,'ss')
+    .replace(/0/g,'o').replace(/[1|!]/g,'l').replace(/5/g,'s').replace(/8/g,'b')
+    .replace(/[^a-z]/g,'')
+}
+function dice(a,b){
+  a=normMatch(a);b=normMatch(b);if(a===b)return 1;if(a.length<2||b.length<2)return 0;
+  const m=new Map();for(let i=0;i<a.length-1;i++){const x=a.slice(i,i+2);m.set(x,(m.get(x)||0)+1)}
+  let hits=0;for(let i=0;i<b.length-1;i++){const x=b.slice(i,i+2),n=m.get(x)||0;if(n){hits++;m.set(x,n-1)}}
+  return 2*hits/((a.length-1)+(b.length-1))
 }
 const SHOPPING_WORDS=[
-  'Milch','Butter','Joghurt','Käse','Quark','Sahne','Eier','Brot','Toast','Brötchen','Baguette',
-  'Äpfel','Bananen','Orangen','Zitronen','Tomaten','Gurke','Salat','Paprika','Kartoffeln','Zwiebeln',
-  'Karotten','Möhren','Knoblauch','Champignons','Brokkoli','Blumenkohl','Reis','Nudeln','Spaghetti',
-  'Mehl','Zucker','Salz','Pfeffer','Öl','Olivenöl','Essig','Ketchup','Mayonnaise','Senf','Marmelade',
-  'Nutella','Müsli','Cornflakes','Haferflocken','Kaffee','Tee','Wasser','Cola','Saft','Limonade',
-  'Hackfleisch','Hähnchen','Fleisch','Wurst','Schinken','Fisch','Pizza','Pommes','Tiefkühlgemüse',
-  'Toilettenpapier','Küchenrolle','Taschentücher','Spülmittel','Waschmittel','Weichspüler','Müllbeutel',
-  'Zahnpasta','Shampoo','Duschgel','Deo','Seife','Windeln','Katzenfutter','Hundefutter'
+  'Milch','H-Milch','Vollmilch','Fettarme Milch','Butter','Margarine','Joghurt','Naturjoghurt','Käse','Frischkäse','Quark','Sahne','Eier',
+  'Brot','Toast','Vollkorntoast','Brötchen','Baguette','Knäckebrot','Zwieback',
+  'Äpfel','Bananen','Orangen','Mandarinen','Zitronen','Trauben','Erdbeeren','Himbeeren','Blaubeeren','Birnen','Kiwi','Melone',
+  'Tomaten','Gurke','Salat','Paprika','Kartoffeln','Zwiebeln','Karotten','Möhren','Knoblauch','Champignons','Brokkoli','Blumenkohl','Zucchini','Mais','Erbsen','Spinat',
+  'Reis','Nudeln','Spaghetti','Penne','Mehl','Zucker','Salz','Pfeffer','Öl','Olivenöl','Essig','Ketchup','Mayonnaise','Senf','Marmelade','Honig','Nutella',
+  'Müsli','Cornflakes','Haferflocken','Kaffee','Tee','Kakao','Wasser','Mineralwasser','Cola','Saft','Apfelsaft','Orangensaft','Limonade',
+  'Hackfleisch','Hähnchen','Hähnchenbrust','Fleisch','Wurst','Salami','Schinken','Fisch','Lachs','Thunfisch','Pizza','Pommes','Tiefkühlgemüse',
+  'Toilettenpapier','Klopapier','Küchenrolle','Taschentücher','Spülmittel','Spülmaschinentabs','Waschmittel','Weichspüler','Müllbeutel','Alufolie','Backpapier',
+  'Zahnpasta','Zahnbürste','Shampoo','Duschgel','Deo','Seife','Windeln','Feuchttücher','Katzenfutter','Hundefutter',
+  'Passierte Tomaten','Tomatenmark','Dosentomaten','Brühe','Gemüsebrühe','Hühnerbrühe','Suppe','Pesto','Parmesan','Mozzarella','Feta',
+  'Schokolade','Chips','Kekse','Gummibärchen','Eis','Pudding','Nüsse','Mandeln'
 ];
-function bestCorrection(word){
-  const raw=word.trim();if(raw.length<4||/\d/.test(raw))return raw;
-  const learned=Object.keys(S.memory);
-  const candidates=[...new Set([...SHOPPING_WORDS,...learned])];
-  let best=raw,bestD=99;
-  for(const cand of candidates){
-    if(Math.abs(cand.length-raw.length)>2)continue;
-    const d=levenshtein(raw,cand);
-    if(d<bestD){bestD=d;best=cand}
-  }
-  const limit=raw.length<=5?1:raw.length<=9?2:3;
-  return bestD<=limit?best:raw
+function candidateCatalog(){
+  return [...new Set([...SHOPPING_WORDS,...Object.keys(S.memory),...S.items.map(i=>i.name)])].filter(Boolean)
 }
-function cleanOcrLine(line){
-  let s=String(line||'').replace(/[•·●■□✓✔]/g,' ').replace(/^\s*[-–—]+\s*/,'').trim();
+function extractQtyAndBody(line){
+  let s=String(line||'').replace(/[•·●■□✓✔☐☑]/g,' ').replace(/^\s*[-–—]+\s*/,'').trim();
   s=s.replace(/^\s*(\d+)\s*[.)-]\s*/,'$1x ');
   s=s.replace(/[^A-Za-zÄÖÜäöüß0-9.,%&+\- xX×]/g,' ').replace(/\s+/g,' ').trim();
-  if(!s||s.length<2)return '';
-  const qty=s.match(/^\s*(\d+(?:[.,]\d+)?)\s*[xX×]\s*(.+)$/);
-  let prefix='',body=s;
-  if(qty){prefix=qty[1]+'x ';body=qty[2]}
-  const words=body.split(' ').map(w=>{
-    if(w.length<2)return w;
-    const corrected=bestCorrection(w);
-    return corrected
-  });
-  body=words.join(' ').replace(/\s+/g,' ').trim();
-  if(!body)return '';
-  body=body.charAt(0).toLocaleUpperCase('de-DE')+body.slice(1);
-  return prefix+body
+  const m=s.match(/^\s*(\d+(?:[.,]\d+)?)\s*[xX×]\s*(.+)$/);
+  return m?{qty:m[1],body:m[2].trim()}:{qty:'1',body:s}
 }
-async function preprocessShoppingPhoto(file){
-  const img=await new Promise((resolve,reject)=>{
-    const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=URL.createObjectURL(file)
-  });
-  const max=1800,scale=Math.min(1,max/Math.max(img.width,img.height));
-  const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
-  const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,canvas.width,canvas.height);
-  const data=ctx.getImageData(0,0,canvas.width,canvas.height),p=data.data;
-  for(let i=0;i<p.length;i+=4){
-    const gray=.299*p[i]+.587*p[i+1]+.114*p[i+2];
-    const v=gray>190?255:gray<85?0:Math.max(0,Math.min(255,(gray-128)*1.65+128));
-    p[i]=p[i+1]=p[i+2]=v
+function matchShoppingProduct(raw,ocrConfidence=0){
+  const {qty,body}=extractQtyAndBody(raw);
+  const n=normMatch(body);
+  if(n.length<2)return {raw,qty,name:'',safe:false,score:0,confidence:ocrConfidence};
+  let best='',bestScore=0,bestDist=1;
+  for(const cand of candidateCatalog()){
+    const cn=normMatch(cand);if(!cn)continue;
+    const d=levenshtein(n,cn)/Math.max(n.length,cn.length);
+    const dc=dice(n,cn);
+    let score=Math.max(1-d,dc);
+    if(n===cn)score=1;
+    if(n.includes(cn)||cn.includes(n))score=Math.max(score,.82);
+    if(score>bestScore){bestScore=score;best=cand;bestDist=d}
   }
-  ctx.putImageData(data,0,0);return canvas
+  const normalWords=body.split(/\s+/).filter(Boolean);
+  const looksNatural=normalWords.length<=4&&normalWords.every(w=>w.length<=22)&&/[aeiouyäöü]/i.test(body)&&!/([A-Z]{2,}\s+){2,}/.test(body);
+  const knownSafe=bestScore>=.72||(bestScore>=.64&&ocrConfidence>=60)||(bestDist<=.28&&ocrConfidence>=45);
+  const unknownSafe=ocrConfidence>=86&&looksNatural&&body.length>=3;
+  let name=knownSafe?best:(unknownSafe?body:'');
+  if(name)name=name.charAt(0).toLocaleUpperCase('de-DE')+name.slice(1);
+  return {raw,qty,name,safe:!!name,score:bestScore,confidence:ocrConfidence,suggestion:best}
+}
+async function loadPhotoBase(file){
+  return await new Promise((resolve,reject)=>{
+    const img=new Image(),url=URL.createObjectURL(file);
+    img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};img.onerror=e=>{URL.revokeObjectURL(url);reject(e)};img.src=url
+  })
+}
+function makeBaseCanvas(img){
+  const max=1900,scale=Math.min(1,max/Math.max(img.width,img.height));
+  const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
+  canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);return canvas
+}
+function grayscaleData(canvas){
+  const ctx=canvas.getContext('2d',{willReadFrequently:true}),im=ctx.getImageData(0,0,canvas.width,canvas.height),p=im.data,g=new Uint8Array(canvas.width*canvas.height);
+  for(let i=0,j=0;i<p.length;i+=4,j++)g[j]=Math.round(.299*p[i]+.587*p[i+1]+.114*p[i+2]);
+  return g
+}
+function otsuThreshold(gray){
+  const hist=new Array(256).fill(0);gray.forEach(v=>hist[v]++);
+  const total=gray.length;let sum=0;for(let i=0;i<256;i++)sum+=i*hist[i];
+  let sumB=0,wB=0,maxVar=-1,thr=150;
+  for(let t=0;t<256;t++){wB+=hist[t];if(!wB)continue;const wF=total-wB;if(!wF)break;sumB+=t*hist[t];const mB=sumB/wB,mF=(sum-sumB)/wF,v=wB*wF*(mB-mF)*(mB-mF);if(v>maxVar){maxVar=v;thr=t}}
+  return Math.max(90,Math.min(210,thr))
+}
+function buildBinaryCanvas(base){
+  const gray=grayscaleData(base),thr=otsuThreshold(gray),out=document.createElement('canvas');out.width=base.width;out.height=base.height;
+  const ctx=out.getContext('2d'),im=ctx.createImageData(out.width,out.height),p=im.data;
+  for(let i=0;i<gray.length;i++){const v=gray[i]<thr?0:255,j=i*4;p[j]=p[j+1]=p[j+2]=v;p[j+3]=255}
+  ctx.putImageData(im,0,0);return {canvas:out,gray,threshold:thr}
+}
+function detectTextBands(gray,w,h,thr){
+  const active=new Array(h).fill(false);const minInk=Math.max(6,Math.floor(w*.0035));
+  for(let y=0;y<h;y++){let ink=0;for(let x=0;x<w;x+=2)if(gray[y*w+x]<thr)ink++;active[y]=ink>=Math.ceil(minInk/2)}
+  const bands=[];let start=-1,gap=0;
+  for(let y=0;y<h;y++){
+    if(active[y]){if(start<0)start=y;gap=0}
+    else if(start>=0){gap++;if(gap>5){const end=y-gap;if(end-start>=8)bands.push([Math.max(0,start-6),Math.min(h-1,end+6)]);start=-1;gap=0}}
+  }
+  if(start>=0){const end=h-1;if(end-start>=8)bands.push([Math.max(0,start-6),end])}
+  return bands.filter(([a,b])=>b-a<Math.max(180,h*.16)).slice(0,30)
+}
+function cropLineCanvas(src,y1,y2){
+  const h=Math.max(1,y2-y1+1),targetH=100,scale=Math.max(1,Math.min(3,targetH/h)),pad=18;
+  const out=document.createElement('canvas');out.width=Math.round(src.width*scale)+pad*2;out.height=Math.round(h*scale)+pad*2;
+  const ctx=out.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,out.width,out.height);ctx.imageSmoothingEnabled=true;
+  ctx.drawImage(src,0,y1,src.width,h,pad,pad,Math.round(src.width*scale),Math.round(h*scale));return out
+}
+function openOcrReview(rows){
+  window.__ocrReviewRows=rows;
+  const box=document.getElementById('ocrReviewList');
+  box.innerHTML=rows.map((r,i)=>{
+    const value=esc(r.name||r.suggestion||r.raw||'');
+    return '<div class="card" style="margin:8px 0"><div class="space"><label style="display:flex;gap:9px;align-items:center;min-width:0;flex:1"><input id="ocrUse'+i+'" type="checkbox" '+(r.safe?'checked':'')+' style="width:20px;height:20px"><span style="min-width:0;flex:1"><input id="ocrName'+i+'" value="'+value+'" style="width:100%;background:#10141c;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px"><small class="muted">OCR: '+esc(r.raw||'')+'</small></span></label><span class="chip">'+Math.round(r.confidence||0)+'%</span></div></div>'
+  }).join('');
+  document.getElementById('ocrReviewModal').classList.add('open')
+}
+function acceptOcrReview(){
+  const rows=window.__ocrReviewRows||[];let added=0,scanId='scan-'+Date.now();
+  rows.forEach((r,i)=>{
+    const use=document.getElementById('ocrUse'+i),inp=document.getElementById('ocrName'+i);
+    const name=(inp?.value||'').trim();if(!use?.checked||!name)return;
+    addParsedItem({name,qty:r.qty||'1'},scanId);added++
+  });
+  closeModal('ocrReviewModal');
+  if(added){persist();S.lastPhotoScanId=scanId;localStorage.setItem(KEY,JSON.stringify(S));setOcrStatus(true,added+' Artikel vom Foto übernommen ✓',100,true);toast(added+' Artikel übernommen')}
+  else{setOcrStatus(true,'Keine Artikel übernommen.',100,false);toast('Nichts übernommen')}
+}
+function undoLastPhotoScan(){
+  const id=S.lastPhotoScanId;if(!id){toast('Kein Foto-Scan zum Rückgängigmachen');return}
+  const before=S.items.length;S.items=S.items.filter(i=>i.scanId!==id);const removed=before-S.items.length;S.lastPhotoScanId=null;persist();setOcrStatus(false,'',0,false);toast(removed?removed+' Foto-Artikel entfernt':'Nichts zu entfernen')
 }
 async function scanPaperList(file){
   if(!file||ocrBusy)return;
-  ocrBusy=true;setOcrStatus(true,'Foto wird vorbereitet …',5);
+  ocrBusy=true;setOcrStatus(true,'Foto wird vorbereitet …',4,false);
+  let worker=null;
   try{
-    const T=await loadTesseract();
-    setOcrStatus(true,'Schrift wird erkannt …',12);
-    const canvas=await preprocessShoppingPhoto(file);
-    const result=await T.recognize(canvas,'deu',{
+    const T=await loadTesseract(),img=await loadPhotoBase(file),base=makeBaseCanvas(img),bin=buildBinaryCanvas(base);
+    const bands=detectTextBands(bin.gray,base.width,base.height,bin.threshold);
+    setOcrStatus(true,bands.length>=2?'Handschrift zeilenweise erkannt – lese '+bands.length+' Zeilen …':'Schrift wird analysiert …',10,false);
+
+    worker=await T.createWorker('deu',1,{
       logger:m=>{
-        if(m.status==='recognizing text'){
-          const pct=15+Math.round((m.progress||0)*80);
-          setOcrStatus(true,'Einkaufszettel wird gelesen … '+Math.round((m.progress||0)*100)+' %',pct)
-        }
+        if(m.status==='recognizing text'&&bands.length<2)setOcrStatus(true,'Schrift wird gelesen … '+Math.round((m.progress||0)*100)+' %',15+Math.round((m.progress||0)*70),false)
       }
     });
-    const raw=(result?.data?.text||'').trim();
-    const lines=raw.split(/\n+/).map(cleanOcrLine).filter(Boolean)
-      .filter(x=>/[A-Za-zÄÖÜäöüß]{2}/.test(x))
-      .filter((x,i,a)=>a.findIndex(y=>y.toLowerCase()===x.toLowerCase())===i);
-    if(!lines.length){
-      setOcrStatus(true,'Leider keine Artikel sicher erkannt. Foto bitte gerade und gut beleuchtet aufnehmen.',100);
-      toast('Keine Artikel erkannt');return
+
+    const rows=[];
+    if(bands.length>=2){
+      await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1'});
+      for(let i=0;i<bands.length;i++){
+        setOcrStatus(true,'Lese Zeile '+(i+1)+' von '+bands.length+' …',12+Math.round((i/bands.length)*76),false);
+        const lineCanvas=cropLineCanvas(bin.canvas,bands[i][0],bands[i][1]);
+        const res=await worker.recognize(lineCanvas),raw=(res?.data?.text||'').replace(/\n/g,' ').trim(),conf=Number(res?.data?.confidence)||0;
+        if(raw&&/[A-Za-zÄÖÜäöüß]/.test(raw))rows.push(matchShoppingProduct(raw,conf))
+      }
+    }else{
+      await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});
+      const passes=[base,bin.canvas];
+      const candidates=[];
+      for(let i=0;i<passes.length;i++){
+        setOcrStatus(true,'Einkaufszettel wird gelesen – Durchlauf '+(i+1)+'/2 …',18+i*35,false);
+        const res=await worker.recognize(passes[i]),conf=Number(res?.data?.confidence)||0;
+        (res?.data?.text||'').split(/\n+/).map(x=>x.trim()).filter(Boolean).forEach(raw=>candidates.push(matchShoppingProduct(raw,conf)))
+      }
+      const seen=new Set();for(const r of candidates){const k=normMatch(r.name||r.suggestion||r.raw);if(k&&!seen.has(k)){seen.add(k);rows.push(r)}}
     }
-    const parsed=lines.flatMap(x=>parseQuick(x));
-    parsed.forEach(addParsedItem);
-    persist();
-    setOcrStatus(true,parsed.length+' Artikel erkannt, korrigiert und hinzugefügt ✓',100);
-    toast(parsed.length+' Artikel vom Zettel übernommen');
-    setTimeout(()=>setOcrStatus(false,'',0),3500)
+
+    const plausible=rows.filter(r=>r.raw&&normMatch(r.raw).length>=2);
+    if(!plausible.length){
+      setOcrStatus(true,'Keine brauchbaren Artikel erkannt. Bitte Zettel möglichst gerade, nah und hell fotografieren.',100,false);
+      toast('Keine sicheren Artikel erkannt');return
+    }
+
+    const safe=plausible.filter(r=>r.safe),uncertain=plausible.filter(r=>!r.safe);
+    if(safe.length&&uncertain.length===0){
+      const scanId='scan-'+Date.now();safe.forEach(r=>addParsedItem({name:r.name,qty:r.qty},scanId));S.lastPhotoScanId=scanId;persist();
+      setOcrStatus(true,safe.length+' Artikel sicher erkannt und korrigiert ✓',100,true);toast(safe.length+' Artikel übernommen')
+    }else{
+      setOcrStatus(true,(safe.length?safe.length+' sichere Treffer · ':'')+uncertain.length+' unsichere Zeilen prüfen',100,false);
+      openOcrReview(plausible)
+    }
   }catch(e){
-    console.error(e);
-    setOcrStatus(true,'Erkennung fehlgeschlagen. Bitte Internetverbindung prüfen und Foto erneut aufnehmen.',100);
-    toast('Foto konnte nicht gelesen werden')
+    console.error(e);setOcrStatus(true,'Foto konnte nicht zuverlässig gelesen werden. Bitte erneut aufnehmen.',100,false);toast('Foto-Erkennung fehlgeschlagen')
   }finally{
-    ocrBusy=false;
-    const input=document.getElementById('paperListPhoto');if(input)input.value=''
+    if(worker)try{await worker.terminate()}catch(e){}
+    ocrBusy=false;const input=document.getElementById('paperListPhoto');if(input)input.value=''
   }
 }
 function findMem(name){const key=Object.keys(S.memory).find(k=>k.toLowerCase()===name.toLowerCase());return key?S.memory[key]:null}
