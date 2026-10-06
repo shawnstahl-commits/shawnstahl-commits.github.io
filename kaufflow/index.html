@@ -239,7 +239,8 @@ function load(){
 function activeStore(){return S.stores.find(s=>s.id===S.activeStoreId)||S.stores[0]}
 function productKey(name){return String(name||'').trim().toLocaleLowerCase('de-DE')}
 function selectStore(id){
-  if(!S.stores.some(s=>s.id===id))return;
+  if(!S.stores.some(s=>s.id===id)||id===S.activeStoreId)return;
+  if(S.activeTrip.length){renderStoreSelectors();toast('Einkauf erst abschließen, dann Laden wechseln');return}
   S.activeStoreId=id;S.activeTrip=[];
   persist();toast('Laden gewechselt: '+activeStore().name)
 }
