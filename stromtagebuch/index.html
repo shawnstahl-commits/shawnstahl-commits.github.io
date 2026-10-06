@@ -226,11 +226,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.3.6</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.3.7</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.3.6</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.3.7</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
@@ -490,7 +490,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.3.6</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.3.7</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -579,7 +579,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Das <b>Komplett-Backup enthält ab v1.3 auch deine Zählerfotos</b>, damit sie auf ein neues Gerät übernommen werden können.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Vollbackup inkl. Fotos</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.3.6</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.3.7</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
@@ -624,7 +624,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="toast" id="toast"></div>
 
 <script>
-var APP_VERSION="1.3.6";
+var APP_VERSION="1.3.7";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
@@ -1171,7 +1171,7 @@ function invertOcrCanvas(source){
 async function recognizeWithWorker(worker,source,progress,modelName){
  var passes=[],confidence=0;
  async function pass(label,img,psm){
-   await worker.setParameters({tessedit_char_whitelist:"0123456789.,",tessedit_pageseg_mode:psm,preserve_interword_spaces:"0",user_defined_dpi:"300"});
+   await worker.setParameters({tessedit_char_whitelist:"0123456789.,",tessedit_pageseg_mode:psm,preserve_interword_spaces:"0",user_defined_dpi:"300",classify_bln_numeric_mode:"1"});
    var r=await worker.recognize(img),t=String(r.data.text||""),cf=Number(r.data.confidence)||0;
    if(t.trim())passes.push({text:t,confidence:cf,label:(modelName||"ocr")+"-"+label});
    confidence=Math.max(confidence,cf)
@@ -1185,27 +1185,22 @@ async function recognizeWithWorker(worker,source,progress,modelName){
  return{text:passes.map(function(p){return p.text}).join("\n"),confidence:confidence,passes:passes}
 }
 async function runMeterOcr(source,progress,target,date){
- await loadOCR();var worker=null,special=null;
+ await loadOCR();var worker=null;
  try{
-   if(progress)progress(2);
-   try{
-     worker=await Tesseract.createWorker("7seg",1,{langPath:"https://raw.githubusercontent.com/Shreeshrii/tessdata_ssd/master",gzip:false,cacheMethod:"write",logger:function(m){if(progress&&m.status==="recognizing text")progress(Math.round((m.progress||0)*100))}});
-     special=await recognizeWithWorker(worker,source,progress,"7seg");
-     await worker.terminate().catch(function(){});worker=null;
-     var quick=rankedOcrCandidatesFromResult(special,target,date),q=quick[0];
-     if(q&&ocrAutoFillOkay(q))return special
-   }catch(modelErr){if(worker){await worker.terminate().catch(function(){});worker=null}}
-   worker=await Tesseract.createWorker("eng",1,{logger:function(m){if(progress&&m.status==="recognizing text")progress(Math.round((m.progress||0)*100))}});
-   var normal=await recognizeWithWorker(worker,source,progress,"eng");
-   if(special&&special.passes&&special.passes.length){
-     normal.passes=special.passes.concat(normal.passes||[]);
-     normal.text=normal.passes.map(function(p){return p.text}).join("\n");
-     normal.confidence=Math.max(Number(normal.confidence)||0,Number(special.confidence)||0)
-   }
-   return normal
+   if(progress)progress(8);
+   worker=await Tesseract.createWorker("eng",1,{logger:function(m){
+     if(!progress)return;
+     if(m.status==="loading tesseract core")progress(12);
+     else if(m.status==="initializing tesseract")progress(18);
+     else if(m.status==="loading language traineddata")progress(24);
+     else if(m.status==="initializing api")progress(32);
+     else if(m.status==="recognizing text")progress(35+Math.round((m.progress||0)*60))
+   }});
+   if(progress)progress(35);
+   var res=await recognizeWithWorker(worker,source,progress,"eng");
+   return res
  }finally{if(worker)await worker.terminate().catch(function(){})}
 }
-
 var wizardPendingPhotos={imp:null,feed:null,heat:null},wizardPhotoMeta={imp:null,feed:null,heat:null};
 function wizardPhotoConfig(kind){if(kind==="imp")return{ocrTarget:"imp",storeTarget:"imp",input:"wizImp",file:"wizPhotoImp",preview:"wizPreviewImp",canvas:"wizCanvasImp",confidence:"wizConfidenceImp",choices:"wizChoicesImp",hint:"wizPhotoHintImp"};if(kind==="feed")return{ocrTarget:"feed",storeTarget:"feed",input:"wizFeed",file:"wizPhotoFeed",preview:"wizPreviewFeed",canvas:"wizCanvasFeed",confidence:"wizConfidenceFeed",choices:"wizChoicesFeed",hint:"wizPhotoHintFeed"};return{ocrTarget:"heatCentral",storeTarget:"heat",input:"wizHeat",file:"wizPhotoHeat",preview:"wizPreviewHeat",canvas:"wizCanvasHeat",confidence:"wizConfidenceHeat",choices:"wizChoicesHeat",hint:"wizPhotoHintHeat"}}
 async function processWizardPhoto(kind,file,evidenceFile){
