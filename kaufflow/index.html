@@ -66,6 +66,69 @@ button,input,select{font:inherit} button{cursor:pointer}
 body[data-view="list"] .top{margin:3px 0 8px}body[data-view="list"] .top .logo{width:36px;height:36px;border-radius:12px;font-size:19px}body[data-view="list"] .brand h1{font-size:17px}body[data-view="list"] .brand small{display:none}body[data-view="list"] .iconbtn{width:38px;height:38px}
 body[data-view="list"] .app{padding-bottom:84px}
 }
+
+/* KaufFlow mobile compact shopping-note layout */
+@media(max-width:520px){
+  body[data-view="list"] .app{padding:7px 7px 76px}
+  body[data-view="list"] .top{margin:0 0 5px}
+  body[data-view="list"] .top .logo{width:32px;height:32px;border-radius:10px;font-size:17px}
+  body[data-view="list"] .brand{gap:8px}
+  body[data-view="list"] .brand h1{font-size:16px}
+  body[data-view="list"] .top>.iconbtn{width:34px;height:34px;border-radius:12px}
+
+  body[data-view="list"] .listhead{top:2px;padding:7px 8px;margin-bottom:5px;border-radius:14px}
+  body[data-view="list"] .listheadline h3{font-size:15px;line-height:1.05}
+  body[data-view="list"] #listSub{font-size:11px;line-height:1.15;margin-top:2px}
+  body[data-view="list"] .listheadline .btn.small{padding:5px 8px;border-radius:10px;font-size:12px}
+  body[data-view="list"] .listheadline .btn.primary.small{width:36px;height:32px;padding:0;font-size:22px}
+
+  body[data-view="list"] .listsummary{gap:4px;margin-top:4px;flex-wrap:nowrap;overflow:hidden}
+  body[data-view="list"] .listsummary .chip{padding:2px 6px;font-size:10px;white-space:nowrap}
+
+  body[data-view="list"] .listquick{grid-template-columns:1fr 36px 36px;gap:4px;margin:5px 0 6px}
+  body[data-view="list"] .listquick input{height:36px;padding:7px 9px;border-radius:10px;font-size:13px}
+  body[data-view="list"] .listquick .btn{height:36px;border-radius:10px;font-size:19px}
+
+  body[data-view="list"] .listpaper{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:4px;
+  }
+  body[data-view="list"] .listpaper .item{
+    min-width:0;
+    min-height:34px;
+    height:34px;
+    padding:3px 4px;
+    border-radius:10px;
+    gap:4px;
+  }
+  body[data-view="list"] .listpaper .check{
+    width:20px;
+    height:20px;
+    border-radius:6px;
+    font-size:12px;
+  }
+  body[data-view="list"] .listpaper .itemmain{min-width:0}
+  body[data-view="list"] .listpaper .iname{
+    font-size:12.5px;
+    line-height:1;
+    font-weight:750;
+  }
+  body[data-view="list"] .listpaper .isub{display:none}
+  body[data-view="list"] .listpaper .price{display:none}
+  body[data-view="list"] .listpaper .iconbtn{
+    width:22px!important;
+    height:22px!important;
+    min-width:22px;
+    border:0;
+    background:transparent;
+    border-radius:6px;
+    padding:0;
+    font-size:16px;
+  }
+  body[data-view="list"] .listpaper .empty{grid-column:1/-1}
+}
+
 </style>
 </head>
 <body>
@@ -831,4 +894,4 @@ importShared();render();setupPwa();
 </script>
 </body>
 </html>
-<!-- kaufflow-deploy-retry-20261006 -->
+<!-- kaufflow-compact-list-20261006-v3 -->
