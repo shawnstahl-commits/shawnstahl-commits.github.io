@@ -388,33 +388,46 @@ async function installApp(){
 }
 async function checkForUpdate(){
   const btn=document.getElementById('updateAppBtn'),status=document.getElementById('appStatusText');
-  if(btn){btn.disabled=true;btn.textContent='↻ Prüfe …'}
-  if(status)status.textContent='KaufFlow prüft GitHub auf die neueste Version …';
+  if(btn){btn.disabled=true;btn.textContent='↻ Aktualisiere …'}
+  if(status)status.textContent='Neueste KaufFlow-Version wird geladen …';
   try{
-    if('serviceWorker' in navigator){
-      swRegistration=swRegistration||await navigator.serviceWorker.getRegistration('./')||await navigator.serviceWorker.register('./sw.js',{scope:'./'});
-      await swRegistration.update();
-      if(swRegistration.waiting){
-        swRegistration.waiting.postMessage('SKIP_WAITING');
-        if(status)status.textContent='Neues Update gefunden – wird aktiviert …';
-        return
-      }
+    const stamp=Date.now();
+
+    // Frischen Stand wirklich vom Netz holen, nicht aus dem App-Cache.
+    const fresh=await fetch('./index.html?__kaufflow_update='+stamp,{cache:'no-store'});
+    if(!fresh.ok)throw new Error('HTTP '+fresh.status);
+
+    // Nur KaufFlow-Caches leeren – localStorage mit deinen Listen bleibt erhalten.
+    if('caches' in window){
+      const keys=await caches.keys();
+      await Promise.all(keys.filter(k=>k.startsWith('kaufflow-')).map(k=>caches.delete(k)))
     }
-    if(status)status.textContent='Neuester Stand wird geladen …';
-    toast('Update geprüft – neuester Stand wird geladen');
-    setTimeout(()=>location.reload(),450)
+
+    if('serviceWorker' in navigator){
+      swRegistration=await navigator.serviceWorker.getRegistration('./')||
+        await navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'});
+      await swRegistration.update();
+      if(swRegistration.waiting)swRegistration.waiting.postMessage('SKIP_WAITING')
+    }
+
+    if(status)status.textContent='Update geladen – KaufFlow startet neu …';
+    toast('Neueste Version geladen');
+    reloadingForUpdate=true;
+    const url=new URL('./',location.href);
+    url.searchParams.set('updated',String(stamp));
+    setTimeout(()=>location.replace(url.href),250)
   }catch(e){
-    if(status)status.textContent='Update-Prüfung fehlgeschlagen. Internetverbindung prüfen.';
-    toast('Update konnte nicht geprüft werden')
-  }finally{
-    setTimeout(()=>{if(btn){btn.disabled=false;btn.textContent='↻ Update prüfen'}},1200)
+    console.error(e);
+    if(status)status.textContent='Update fehlgeschlagen. Bitte Internetverbindung prüfen.';
+    toast('Update konnte nicht geladen werden');
+    if(btn){btn.disabled=false;btn.textContent='↻ Update prüfen'}
   }
 }
 async function setupPwa(){
   updateInstallUi();
   if(!('serviceWorker' in navigator))return;
   try{
-    swRegistration=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+    swRegistration=await navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'});
     await navigator.serviceWorker.ready;
     if(swRegistration.waiting)document.getElementById('appStatusText').textContent='Update verfügbar – tippe auf „Update prüfen“.';
     swRegistration.addEventListener('updatefound',()=>{
