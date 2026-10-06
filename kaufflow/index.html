@@ -100,15 +100,23 @@ button,input,select{font:inherit} button{cursor:pointer}
 
       <div class="section">
         <div class="sectionhead"><h3>Dein Laden</h3></div>
-        <div class="card space">
-          <div><b id="storeNameHome">Mein Laden</b><div class="muted" id="storeLearning">Noch keine gelernte Route</div></div>
-          <span class="chip">🗺️ lernt automatisch</span>
+        <div class="card">
+          <div class="space">
+            <div><b id="storeNameHome">Mein Laden</b><div class="muted" id="storeLearning">Noch keine gelernte Route</div></div>
+            <span class="chip">🗺️ eigenes Gedächtnis</span>
+          </div>
+          <div class="field" style="margin-bottom:6px"><label>Heute einkaufen bei</label><select id="storeSelectHome" onchange="selectStore(this.value)"></select></div>
+          <button class="btn small ghost" onclick="openSettings()">＋ Läden verwalten</button>
         </div>
       </div>
     </section>
 
     <section id="list" class="view">
       <div class="sectionhead"><div><h3>Einkauf vorbereiten</h3><div class="muted" id="listSub">0 offen</div></div><button class="btn primary small" onclick="openItemModal()">＋ Artikel</button></div>
+      <div class="card">
+        <div class="space"><div><b>Für welchen Laden?</b><div class="muted">Jeder Laden lernt seine eigene Reihenfolge.</div></div><span class="chip">🧠 separat</span></div>
+        <div class="field" style="margin-bottom:0"><select id="storeSelectList" onchange="selectStore(this.value)"></select></div>
+      </div>
       <div class="card">
         <div class="space"><div><b>Budget</b><div class="muted">Geplant vs. geschätzt</div></div><div><b id="budgetDisplay">0,00 €</b></div></div>
         <div class="progress"><i id="budgetProgress"></i></div>
@@ -122,9 +130,10 @@ button,input,select{font:inherit} button{cursor:pointer}
     <section id="shop" class="view">
       <div class="shopbar">
         <div class="shopstats"><b id="shopStore">🗺️ Mein Laden</b><span id="shopCount">0 / 0</span><span id="shopSum">0,00 €</span></div>
+        <div class="field" style="margin:9px 0 0"><select id="storeSelectShop" onchange="selectStore(this.value)"></select></div>
         <div class="progress"><i id="shopProgress"></i></div>
       </div>
-      <div class="notice" id="routeNotice">Beim Abhaken merkt sich KaufFlow deine Reihenfolge. Beim nächsten Einkauf wird die Liste automatisch passend zu deinem Laufweg sortiert.</div>
+      <div class="notice" id="routeNotice">Beim Abhaken merkt sich KaufFlow für <b>genau diesen Laden</b> die Reihenfolge deiner Produkte. Beim nächsten Einkauf hier wird die Liste passend zu deinem gelernten Laufweg sortiert.</div>
       <div id="shopList" class="list" style="margin-top:12px"></div>
       <div id="finishWrap" style="display:none;margin-top:18px"><button class="btn primary" style="width:100%" onclick="finishTrip()">✓ Einkauf abschließen & lernen</button></div>
     </section>
@@ -190,9 +199,13 @@ button,input,select{font:inherit} button{cursor:pointer}
 <div id="settingsModal" class="modal" onclick="if(event.target===this)closeModal('settingsModal')">
   <div class="sheet">
     <div class="space"><h3>Einstellungen</h3><button class="iconbtn" onclick="closeModal('settingsModal')">✕</button></div>
-    <div class="field"><label>Name deines Hauptladens</label><input id="storeInput" placeholder="z. B. EDEKA Spaden"></div>
+    <div class="field"><label>Deine Läden</label><div id="storesManager"></div></div>
+    <div class="row">
+      <div class="field" style="margin:0"><input id="newStoreInput" placeholder="z. B. EDEKA, Lidl oder Aldi"></div>
+      <button class="btn primary" style="flex:0 0 auto" onclick="addStore()">＋ Laden</button>
+    </div>
     <div class="field"><label>Haushaltsmitglieder, durch Komma getrennt</label><input id="peopleInput" placeholder="Ich, Partner/in, Kinder"></div>
-    <div class="notice">Alle Daten bleiben aktuell nur auf diesem Gerät im Browser. Das hält KaufFlow kostenlos und vermeidet ein weiteres Backend-Projekt.</div>
+    <div class="notice">Jeder Laden speichert seine eigene Produktreihenfolge und seinen eigenen Laufweg. Alle Daten bleiben aktuell nur auf diesem Gerät im Browser – kostenlos und ohne neues Backend.</div>
     <div class="row" style="margin-top:14px"><button class="btn danger" onclick="resetAll()">Alles zurücksetzen</button><button class="btn primary" onclick="saveSettings()">Speichern</button></div>
   </div>
 </div>
@@ -201,9 +214,70 @@ button,input,select{font:inherit} button{cursor:pointer}
 
 <script>
 const KEY='kaufflow_v1';
-const defaultState={onboarded:false,budget:0,store:'Mein Laden',people:['Ich','Partner/in','Kinder'],items:[],memory:{},trips:[],route:[],activeTrip:[]};
+const defaultState={onboarded:false,budget:0,people:['Ich','Partner/in','Kinder'],items:[],memory:{},trips:[],stores:[{id:'default',name:'Mein Laden',categoryOrder:[],productOrder:[]}],activeStoreId:'default',activeTrip:[]};
 let S=load();
-function load(){try{return {...structuredClone(defaultState),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return structuredClone(defaultState)}}
+function load(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(KEY)||'{}');
+    const out={...structuredClone(defaultState),...raw};
+    if(!Array.isArray(out.stores)||!out.stores.length){
+      const id='store-'+Date.now();
+      out.stores=[{id,name:raw.store||'Mein Laden',categoryOrder:Array.isArray(raw.route)?raw.route:[],productOrder:[]}];
+      out.activeStoreId=id;
+    }
+    out.stores=out.stores.map((s,i)=>({
+      id:s.id||('store-'+i+'-'+Date.now()),
+      name:s.name||('Laden '+(i+1)),
+      categoryOrder:Array.isArray(s.categoryOrder)?s.categoryOrder:[],
+      productOrder:Array.isArray(s.productOrder)?s.productOrder:[]
+    }));
+    if(!out.stores.some(s=>s.id===out.activeStoreId))out.activeStoreId=out.stores[0].id;
+    if(!Array.isArray(out.activeTrip))out.activeTrip=[];
+    return out
+  }catch(e){return structuredClone(defaultState)}
+}
+function activeStore(){return S.stores.find(s=>s.id===S.activeStoreId)||S.stores[0]}
+function productKey(name){return String(name||'').trim().toLocaleLowerCase('de-DE')}
+function selectStore(id){
+  if(!S.stores.some(s=>s.id===id))return;
+  S.activeStoreId=id;S.activeTrip=[];
+  persist();toast('Laden gewechselt: '+activeStore().name)
+}
+function renderStoreSelectors(){
+  const html=S.stores.map(s=>'<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>').join('');
+  ['storeSelectHome','storeSelectList','storeSelectShop'].forEach(id=>{
+    const el=document.getElementById(id);if(el){el.innerHTML=html;el.value=S.activeStoreId}
+  })
+}
+function renderStoresManager(){
+  const box=document.getElementById('storesManager');if(!box)return;
+  box.innerHTML=S.stores.map(s=>{
+    const active=s.id===S.activeStoreId;
+    const learned=(s.productOrder||[]).length;
+    return '<div class="historyrow"><div><b>'+esc(s.name)+'</b><div class="muted">'+(active?'Aktiver Laden · ':'')+(learned?learned+' Produkte gelernt':'noch keine Produktreihenfolge')+'</div></div><div style="display:flex;gap:6px;flex:0 0 auto">'+
+      (!active?'<button class="btn small ghost" onclick="selectStore(\''+s.id+'\');renderStoresManager()">Auswählen</button>':'<span class="chip">✓ aktiv</span>')+
+      '<button class="btn small ghost" onclick="renameStore(\''+s.id+'\')">✎</button>'+
+      '<button class="btn small danger" onclick="removeStore(\''+s.id+'\')">×</button></div></div>'
+  }).join('')
+}
+function addStore(){
+  const inp=document.getElementById('newStoreInput'),name=(inp?.value||'').trim();if(!name)return;
+  if(S.stores.some(s=>s.name.toLocaleLowerCase('de-DE')===name.toLocaleLowerCase('de-DE'))){toast('Diesen Laden gibt es schon');return}
+  const id=crypto.randomUUID();S.stores.push({id,name,categoryOrder:[],productOrder:[]});S.activeStoreId=id;S.activeTrip=[];
+  if(inp)inp.value='';persist();renderStoresManager();toast(name+' hinzugefügt')
+}
+function renameStore(id){
+  const s=S.stores.find(x=>x.id===id);if(!s)return;
+  const name=prompt('Neuer Name für den Laden:',s.name);if(!name||!name.trim())return;
+  s.name=name.trim();persist();renderStoresManager();toast('Laden umbenannt')
+}
+function removeStore(id){
+  if(S.stores.length<=1){toast('Mindestens ein Laden muss bleiben');return}
+  const s=S.stores.find(x=>x.id===id);if(!s)return;
+  if(!confirm(s.name+' wirklich löschen? Die gelernte Reihenfolge dieses Ladens geht verloren.'))return;
+  S.stores=S.stores.filter(x=>x.id!==id);if(S.activeStoreId===id)S.activeStoreId=S.stores[0].id;S.activeTrip=[];
+  persist();renderStoresManager()
+}
 function persist(){localStorage.setItem(KEY,JSON.stringify(S));render();syncTabs()}
 function euro(n){return (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}
 function esc(v=''){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
@@ -253,8 +327,9 @@ function toggleItem(id,fromShop=false){
   if(fromShop&&!it.done)S.activeTrip=S.activeTrip.filter(x=>x!==id);
   persist()
 }
-function catRank(cat){const i=S.route.indexOf(cat);return i<0?999:i}
-function sortedItems(){return [...S.items].sort((a,b)=>catRank(a.cat)-catRank(b.cat)||Number(a.done)-Number(b.done)||a.created-b.created)}
+function productRank(name){const i=(activeStore().productOrder||[]).indexOf(productKey(name));return i<0?9999:i}
+function catRank(cat){const i=(activeStore().categoryOrder||[]).indexOf(cat);return i<0?999:i}
+function sortedItems(){return [...S.items].sort((a,b)=>Number(a.done)-Number(b.done)||productRank(a.name)-productRank(b.name)||catRank(a.cat)-catRank(b.cat)||a.created-b.created)}
 function smartCandidates(){
   const now=Date.now(),out=[];
   Object.entries(S.memory).forEach(([name,m])=>{
@@ -273,19 +348,27 @@ function addSuggestion(name){
 }
 function finishTrip(){
   const done=S.items.filter(i=>i.done);if(!done.length)return;
-  const now=Date.now(),cats=[];
-  S.activeTrip.forEach(id=>{const it=S.items.find(x=>x.id===id);if(it&&!cats.includes(it.cat))cats.push(it.cat)});
-  if(cats.length>=2){
-    const merged=[...S.route];cats.forEach((c,idx)=>{if(!merged.includes(c))merged.push(c)});
-    merged.sort((a,b)=>{const ia=cats.indexOf(a),ib=cats.indexOf(b);if(ia>=0&&ib>=0)return ia-ib;if(ia>=0)return-1;if(ib>=0)return 1;return 0});S.route=merged
+  const now=Date.now(),store=activeStore(),cats=[],products=[];
+  S.activeTrip.forEach(id=>{
+    const it=S.items.find(x=>x.id===id);if(!it)return;
+    if(!cats.includes(it.cat))cats.push(it.cat);
+    const key=productKey(it.name);if(key&&!products.includes(key))products.push(key)
+  });
+  if(products.length){
+    const previous=(store.productOrder||[]).filter(k=>!products.includes(k));
+    store.productOrder=[...products,...previous]
+  }
+  if(cats.length){
+    const previousCats=(store.categoryOrder||[]).filter(k=>!cats.includes(k));
+    store.categoryOrder=[...cats,...previousCats]
   }
   done.forEach(it=>{
     const old=S.memory[it.name]||{},purchases=[...(old.purchases||[]),now].slice(-8);let avg=old.avgDays||7;
     if(purchases.length>=2){const gaps=[];for(let i=1;i<purchases.length;i++)gaps.push((purchases[i]-purchases[i-1])/86400000);avg=gaps.reduce((a,b)=>a+b,0)/gaps.length}
     S.memory[it.name]={...old,lastBought:now,lastPrice:it.price,lastQty:it.qty,cat:it.cat,pref:it.pref,exact:it.exact,purchases,avgDays:Math.max(1,avg)}
   });
-  S.trips.unshift({id:crypto.randomUUID(),date:now,store:S.store,total:done.reduce((a,b)=>a+(Number(b.price)||0),0),count:done.length});S.trips=S.trips.slice(0,30);
-  S.items=S.items.filter(i=>!i.done);S.activeTrip=[];persist();toast('Einkauf gespeichert – KaufFlow hat gelernt');go('home')
+  S.trips.unshift({id:crypto.randomUUID(),date:now,store:store.name,storeId:store.id,total:done.reduce((a,b)=>a+(Number(b.price)||0),0),count:done.length});S.trips=S.trips.slice(0,30);
+  S.items=S.items.filter(i=>!i.done);S.activeTrip=[];persist();toast('Einkauf bei '+store.name+' gespeichert – Reihenfolge gelernt');go('home')
 }
 function makeMeals(){
   const budget=Number(document.getElementById('mealBudget').value)||15,time=Number(document.getElementById('mealTime').value)||20;
@@ -299,8 +382,8 @@ function makeMeals(){
   document.getElementById('mealResults').innerHTML=pool.length?pool.map((m,i)=>`<div class="meal"><h4>${esc(m.name)}</h4><p>ca. ${m.time} Min · etwa ${euro(m.cost)}</p><div class="chips">${m.ings.map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div><button class="btn small primary" style="margin-top:12px" onclick='addMeal(${JSON.stringify(m.ings)})'>Fehlendes auf Liste</button></div>`).join(''):'<div class="empty">Für dieses Budget/Zeitfenster noch kein Vorschlag.</div>'
 }
 function addMeal(ings){let added=0;ings.forEach(name=>{const m=findMem(name);const likely=m?.lastBought&&((Date.now()-m.lastBought)/86400000)<(m.avgDays||7)*.65;if(!likely&&!S.items.some(i=>i.name.toLowerCase()===name.toLowerCase())){S.items.push({id:crypto.randomUUID(),name,qty:'1',price:m?.lastPrice||0,cat:m?.cat||guessCat(name),person:'Alle',pref:m?.pref||'',exact:m?.exact||'alt',done:false,created:Date.now()});added++}});persist();toast(added+' fehlende Zutaten hinzugefügt')}
-function openSettings(){document.getElementById('storeInput').value=S.store;document.getElementById('peopleInput').value=S.people.join(', ');document.getElementById('settingsModal').classList.add('open')}
-function saveSettings(){S.store=document.getElementById('storeInput').value.trim()||'Mein Laden';S.people=document.getElementById('peopleInput').value.split(',').map(s=>s.trim()).filter(Boolean);closeModal('settingsModal');persist();toast('Einstellungen gespeichert')}
+function openSettings(){document.getElementById('peopleInput').value=S.people.join(', ');renderStoresManager();document.getElementById('settingsModal').classList.add('open')}
+function saveSettings(){S.people=document.getElementById('peopleInput').value.split(',').map(s=>s.trim()).filter(Boolean);closeModal('settingsModal');persist();toast('Einstellungen gespeichert')}
 function resetAll(){if(confirm('Wirklich alle KaufFlow-Daten auf diesem Gerät löschen?')){localStorage.removeItem(KEY);S=structuredClone(defaultState);persist();location.reload()}}
 async function shareList(){
   const data=S.items.filter(i=>!i.done).map(i=>({n:i.name,q:i.qty,p:i.price,c:i.cat}));if(!data.length){toast('Liste ist leer');return}
@@ -314,7 +397,8 @@ function importShared(){
 function render(){
   const open=S.items.filter(i=>!i.done),sum=open.reduce((a,b)=>a+(Number(b.price)||0),0),done=S.items.filter(i=>i.done).length,total=S.items.length;
   document.getElementById('mNeed').textContent=open.length;document.getElementById('mBudget').textContent=euro(sum);document.getElementById('mHome').textContent=likelyHomeCount();
-  document.getElementById('storeNameHome').textContent=S.store;document.getElementById('shopStore').textContent='🗺️ '+S.store;document.getElementById('storeLearning').textContent=S.route.length?S.route.length+' Bereiche gelernt':'Noch keine gelernte Route';
+  const store=activeStore();renderStoreSelectors();
+  document.getElementById('storeNameHome').textContent=store.name;document.getElementById('shopStore').textContent='🗺️ '+store.name;document.getElementById('storeLearning').textContent=(store.productOrder||[]).length?(store.productOrder.length+' Produkte in Reihenfolge gelernt'):((store.categoryOrder||[]).length?store.categoryOrder.length+' Bereiche gelernt':'Noch keine gelernte Route');
   document.getElementById('budgetInput').value=S.budget||'';document.getElementById('budgetDisplay').textContent=euro(sum)+(S.budget?' / '+euro(S.budget):'');
   document.getElementById('budgetProgress').style.width=(S.budget?Math.min(100,sum/S.budget*100):0)+'%';
   document.getElementById('listSub').textContent=open.length+' offen · '+euro(sum);
