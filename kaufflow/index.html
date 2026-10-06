@@ -376,6 +376,14 @@ body[data-view="list"] .app{padding-bottom:84px}
     <section id="history" class="view">
       <div class="sectionhead"><div><h3>Einkäufe & Preise</h3><div class="muted">Was deine Einkäufe in jedem Laden wirklich gekostet haben</div></div></div>
 
+      <div id="lastReceiptCard" class="card">
+        <div class="space">
+          <div><b>🧾 Bon vom letzten Einkauf</b><div class="muted" id="lastReceiptInfo">Noch kein abgeschlossener Einkauf</div></div>
+          <button id="lastReceiptBtn" class="btn primary small" onclick="openReceiptScannerForTrip()">Bon scannen</button>
+        </div>
+        <div id="receiptHistoryStatus" class="ocrstatus notice"><b id="receiptHistoryStatusText">Bon wird gelesen …</b><div class="ocrbar"><i id="receiptHistoryProgress"></i></div></div>
+      </div>
+
       <div class="card">
         <div class="space"><b>🏪 Nach Laden</b><span class="chip" id="historyStoreLabel">Alle Läden</span></div>
         <div id="historyStoreFilters" class="store-switcher" style="margin-top:10px"></div>
@@ -470,6 +478,7 @@ let swRegistration=null;
 let reloadingForUpdate=false;
 let ocrBusy=false;
 let historyStoreFilter='all';
+let receiptTargetTripId=null;
 const defaultState={onboarded:false,budget:0,people:['Ich','Partner/in','Kinder'],items:[],memory:{},trips:[],stores:[{id:'default',name:'Mein Laden',categoryOrder:[],productOrder:[]}],activeStoreId:'default',activeTrip:[],lastReceiptScan:null};
 let S=load();
 function load(){
@@ -880,17 +889,37 @@ async function scanPaperList(file){
 }
 
 function openReceiptScanner(){
+  receiptTargetTripId=null;
+  if(ocrBusy){toast('Bon wird noch verarbeitet');return}
+  const input=document.getElementById('receiptPhoto');if(!input)return;
+  input.value='';input.click()
+}
+function openReceiptScannerForTrip(tripId){
+  const trip=tripId?S.trips.find(t=>t.id===tripId):(S.trips||[])[0];
+  if(!trip){toast('Noch kein abgeschlossener Einkauf');return}
+  receiptTargetTripId=trip.id;
   if(ocrBusy){toast('Bon wird noch verarbeitet');return}
   const input=document.getElementById('receiptPhoto');if(!input)return;
   input.value='';input.click()
 }
 function setReceiptStatus(show,text,progress=0){
-  const box=document.getElementById('receiptStatus'),txt=document.getElementById('receiptStatusText'),bar=document.getElementById('receiptProgress');
-  if(box)box.classList.toggle('show',show);
-  if(txt&&text)txt.textContent=text;
-  if(bar)bar.style.width=Math.max(0,Math.min(100,progress))+'%'
+  [
+    ['receiptStatus','receiptStatusText','receiptProgress'],
+    ['receiptHistoryStatus','receiptHistoryStatusText','receiptHistoryProgress']
+  ].forEach(([boxId,textId,barId])=>{
+    const box=document.getElementById(boxId),txt=document.getElementById(textId),bar=document.getElementById(barId);
+    if(box)box.classList.toggle('show',show);
+    if(txt&&text)txt.textContent=text;
+    if(bar)bar.style.width=Math.max(0,Math.min(100,progress))+'%'
+  })
 }
 function receiptContext(){
+  if(receiptTargetTripId){
+    const forced=(S.trips||[]).find(t=>t.id===receiptTargetTripId);
+    if(forced&&Array.isArray(forced.items)&&forced.items.length){
+      return {mode:'trip',trip:forced,targets:forced.items.map(i=>({id:i.id||i.name,name:i.name,price:Number(i.price)||0}))}
+    }
+  }
   if(S.items.length){
     return {mode:'items',trip:null,targets:S.items.map(i=>({id:i.id,name:i.name,price:Number(i.price)||0}))}
   }
@@ -1065,7 +1094,7 @@ async function scanReceipt(file){
     console.error(e);setReceiptStatus(true,'Bon konnte nicht zuverlässig gelesen werden. Bitte erneut fotografieren.',100);toast('Bon-Erkennung fehlgeschlagen')
   }finally{
     if(worker)try{await worker.terminate()}catch(e){}
-    ocrBusy=false;const input=document.getElementById('receiptPhoto');if(input)input.value=''
+    ocrBusy=false;receiptTargetTripId=null;const input=document.getElementById('receiptPhoto');if(input)input.value=''
   }
 }
 function getPriceHistory(name){
@@ -1231,7 +1260,7 @@ function finishTrip(){
   const receiptTotal=(S.pendingReceiptStoreId===store.id?Number(S.pendingReceiptTotal)||0:0);
   S.trips.unshift({id:tripId,date:now,store:store.name,storeId:store.id,total:receiptTotal||itemTotal,totalSource:receiptTotal?'receipt':'items',count:done.length,items:done.map(i=>({id:i.id,name:i.name,qty:i.qty,price:Number(i.price)||0,cat:i.cat}))});S.trips=S.trips.slice(0,30);
   S.pendingReceiptTotal=0;S.pendingReceiptStoreId=null;
-  S.items=S.items.filter(i=>!i.done);S.activeTrip=[];persist();toast('Einkauf bei '+store.name+' gespeichert – '+euro(receiptTotal||itemTotal));go('home')
+  S.items=S.items.filter(i=>!i.done);S.activeTrip=[];persist();go('history');setTimeout(()=>toast('Einkauf gespeichert – jetzt Bon scannen 🧾'),120)
 }
 function makeMeals(){
   const budget=Number(document.getElementById('mealBudget').value)||15,time=Number(document.getElementById('mealTime').value)||20;
@@ -1274,10 +1303,21 @@ function renderCostHistory(){
   document.getElementById('historySpent').textContent=euro(spent);
   document.getElementById('historyAvg').textContent=euro(avg);
   document.getElementById('historyCount').textContent=trips.length;
+
+  const latest=(S.trips||[])[0],lastInfo=document.getElementById('lastReceiptInfo'),lastBtn=document.getElementById('lastReceiptBtn');
+  if(latest){
+    const hasReceipt=latest.totalSource==='receipt';
+    if(lastInfo)lastInfo.textContent=(latest.store||'Laden')+' · '+new Date(latest.date).toLocaleDateString('de-DE')+(hasReceipt?' · Bon bereits gespeichert':' · Bon noch scannen');
+    if(lastBtn){lastBtn.disabled=false;lastBtn.textContent=hasReceipt?'🧾 Bon erneut scannen':'🧾 Bon scannen'}
+  }else{
+    if(lastInfo)lastInfo.textContent='Noch kein abgeschlossener Einkauf';
+    if(lastBtn){lastBtn.disabled=true;lastBtn.textContent='🧾 Bon scannen'}
+  }
+
   document.getElementById('tripHistory').innerHTML=trips.map(t=>{
-    const source=t.totalSource==='receipt'?'🧾 Bon':'';
+    const source=t.totalSource==='receipt'?'🧾 Bon':'Bon fehlt';
     const itemCount=t.count||((t.items||[]).length);
-    return '<div class="historyrow"><div><b>'+esc(t.store||'Laden')+'</b><div class="muted">'+new Date(t.date).toLocaleDateString('de-DE')+' · '+itemCount+' Artikel'+(source?' · '+source:'')+'</div></div><b>'+euro(t.total)+'</b></div>'
+    return '<div class="historyrow"><div><b>'+esc(t.store||'Laden')+'</b><div class="muted">'+new Date(t.date).toLocaleDateString('de-DE')+' · '+itemCount+' Artikel · '+source+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px"><b>'+euro(t.total)+'</b><button class="btn small ghost" onclick="openReceiptScannerForTrip(\''+t.id+'\')">🧾 scannen</button></div></div>'
   }).join('')||'<div class="empty">Noch kein Einkauf für diese Auswahl.</div>'
 }
 function render(){
