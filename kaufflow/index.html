@@ -377,9 +377,10 @@ body[data-view="list"] .app{padding-bottom:84px}
       <div class="sectionhead"><div><h3>Einkäufe & Preise</h3><div class="muted">Was deine Einkäufe in jedem Laden wirklich gekostet haben</div></div></div>
 
       <div id="lastReceiptCard" class="card">
-        <div class="space">
-          <div><b>🧾 Bon vom letzten Einkauf</b><div class="muted" id="lastReceiptInfo">Noch kein abgeschlossener Einkauf</div></div>
-          <button id="lastReceiptBtn" class="btn primary small" onclick="openReceiptScannerForTrip()">Bon scannen</button>
+        <div><b>Letzter Einkauf</b><div class="muted" id="lastReceiptInfo">Noch kein abgeschlossener Einkauf</div></div>
+        <div class="actions" style="margin-top:10px">
+          <button id="lastReceiptBtn" class="btn ghost small" onclick="openReceiptScannerForTrip()">🧾 Bon scannen</button>
+          <button id="lastManualTotalBtn" class="btn primary small" onclick="openManualTotal()">✍️ Gesamtbetrag eingeben</button>
         </div>
         <div id="receiptHistoryStatus" class="ocrstatus notice"><b id="receiptHistoryStatusText">Bon wird gelesen …</b><div class="ocrbar"><i id="receiptHistoryProgress"></i></div></div>
       </div>
@@ -456,6 +457,19 @@ body[data-view="list"] .app{padding-bottom:84px}
 
     <div class="notice">Jeder Laden speichert seine eigene Produktreihenfolge und seinen eigenen Laufweg. Alle Daten bleiben aktuell nur auf diesem Gerät im Browser – kostenlos und ohne neues Backend.</div>
     <div class="row" style="margin-top:14px"><button class="btn danger" onclick="resetAll()">Alles zurücksetzen</button><button class="btn primary" onclick="saveSettings()">Speichern</button></div>
+  </div>
+</div>
+
+<div id="manualTotalModal" class="modal" onclick="if(event.target===this)closeModal('manualTotalModal')">
+  <div class="sheet">
+    <div class="space"><div><h3 style="margin-bottom:3px">✍️ Gesamtbetrag eintragen</h3><div class="muted" id="manualTotalTripInfo">Einkauf</div></div><button class="iconbtn" onclick="closeModal('manualTotalModal')">✕</button></div>
+    <input id="manualTotalTripId" type="hidden">
+    <div class="field" style="margin-top:16px">
+      <label>Gesamtbetrag des Einkaufs in €</label>
+      <input id="manualTotalInput" type="text" inputmode="decimal" placeholder="z. B. 87,46">
+    </div>
+    <div class="notice">Trage einfach den Betrag ein, der unten auf deinem Bon bei „Gesamt / Summe / Zu zahlen“ steht.</div>
+    <div class="row" style="margin-top:14px"><button class="btn ghost" onclick="closeModal('manualTotalModal')">Abbrechen</button><button class="btn primary" onclick="saveManualTotal()">Speichern</button></div>
   </div>
 </div>
 
@@ -888,6 +902,27 @@ async function scanPaperList(file){
   }
 }
 
+function openManualTotal(tripId){
+  const trip=tripId?S.trips.find(t=>t.id===tripId):(S.trips||[])[0];
+  if(!trip){toast('Noch kein abgeschlossener Einkauf');return}
+  document.getElementById('manualTotalTripId').value=trip.id;
+  document.getElementById('manualTotalTripInfo').textContent=(trip.store||'Laden')+' · '+new Date(trip.date).toLocaleDateString('de-DE');
+  const input=document.getElementById('manualTotalInput');
+  input.value=Number(trip.total)>0?Number(trip.total).toFixed(2).replace('.',','):'';
+  document.getElementById('manualTotalModal').classList.add('open');
+  setTimeout(()=>{input.focus();input.select()},80)
+}
+function saveManualTotal(){
+  const id=document.getElementById('manualTotalTripId').value,trip=S.trips.find(t=>t.id===id);
+  if(!trip){toast('Einkauf nicht gefunden');return}
+  const raw=(document.getElementById('manualTotalInput').value||'').trim().replace(/\s/g,'').replace(',','.');
+  const amount=Number(raw);
+  if(!Number.isFinite(amount)||amount<=0){toast('Bitte einen gültigen Gesamtbetrag eingeben');return}
+  trip.total=Math.round(amount*100)/100;
+  trip.totalSource='manual';
+  trip.totalUpdatedAt=Date.now();
+  closeModal('manualTotalModal');persist();toast('Gesamtbetrag '+euro(trip.total)+' gespeichert')
+}
 function openReceiptScanner(){
   receiptTargetTripId=null;
   if(ocrBusy){toast('Bon wird noch verarbeitet');return}
@@ -1256,11 +1291,11 @@ function finishTrip(){
     if(purchases.length>=2){const gaps=[];for(let i=1;i<purchases.length;i++)gaps.push((purchases[i]-purchases[i-1])/86400000);avg=gaps.reduce((a,b)=>a+b,0)/gaps.length}
     S.memory[it.name]={...old,lastBought:now,lastPrice:it.price,lastQty:it.qty,cat:it.cat,pref:it.pref,exact:it.exact,purchases,avgDays:Math.max(1,avg)}
   });
-  const tripId=crypto.randomUUID(),itemTotal=done.reduce((a,b)=>a+(Number(b.price)||0),0);
+  const tripId=crypto.randomUUID();
   const receiptTotal=(S.pendingReceiptStoreId===store.id?Number(S.pendingReceiptTotal)||0:0);
-  S.trips.unshift({id:tripId,date:now,store:store.name,storeId:store.id,total:receiptTotal||itemTotal,totalSource:receiptTotal?'receipt':'items',count:done.length,items:done.map(i=>({id:i.id,name:i.name,qty:i.qty,price:Number(i.price)||0,cat:i.cat}))});S.trips=S.trips.slice(0,30);
+  S.trips.unshift({id:tripId,date:now,store:store.name,storeId:store.id,total:receiptTotal||0,totalSource:receiptTotal?'receipt':'missing',count:done.length,items:done.map(i=>({id:i.id,name:i.name,qty:i.qty,price:Number(i.price)||0,cat:i.cat}))});S.trips=S.trips.slice(0,30);
   S.pendingReceiptTotal=0;S.pendingReceiptStoreId=null;
-  S.items=S.items.filter(i=>!i.done);S.activeTrip=[];persist();go('history');setTimeout(()=>toast('Einkauf gespeichert – jetzt Bon scannen 🧾'),120)
+  S.items=S.items.filter(i=>!i.done);S.activeTrip=[];persist();go('history');setTimeout(()=>toast('Einkauf gespeichert – Bon scannen oder Betrag eingeben'),120)
 }
 function makeMeals(){
   const budget=Number(document.getElementById('mealBudget').value)||15,time=Number(document.getElementById('mealTime').value)||20;
@@ -1304,20 +1339,23 @@ function renderCostHistory(){
   document.getElementById('historyAvg').textContent=euro(avg);
   document.getElementById('historyCount').textContent=trips.length;
 
-  const latest=(S.trips||[])[0],lastInfo=document.getElementById('lastReceiptInfo'),lastBtn=document.getElementById('lastReceiptBtn');
+  const latest=(S.trips||[])[0],lastInfo=document.getElementById('lastReceiptInfo'),lastBtn=document.getElementById('lastReceiptBtn'),lastManual=document.getElementById('lastManualTotalBtn');
   if(latest){
-    const hasReceipt=latest.totalSource==='receipt';
-    if(lastInfo)lastInfo.textContent=(latest.store||'Laden')+' · '+new Date(latest.date).toLocaleDateString('de-DE')+(hasReceipt?' · Bon bereits gespeichert':' · Bon noch scannen');
+    const hasReceipt=latest.totalSource==='receipt',hasManual=latest.totalSource==='manual',amount=Number(latest.total)||0;
+    const source=hasReceipt?' · 🧾 Bon gespeichert':hasManual?' · ✍️ Betrag manuell gespeichert':' · Betrag fehlt';
+    if(lastInfo)lastInfo.textContent=(latest.store||'Laden')+' · '+new Date(latest.date).toLocaleDateString('de-DE')+source+(amount?' · '+euro(amount):'');
     if(lastBtn){lastBtn.disabled=false;lastBtn.textContent=hasReceipt?'🧾 Bon erneut scannen':'🧾 Bon scannen'}
+    if(lastManual){lastManual.disabled=false;lastManual.textContent=hasManual?'✍️ Betrag ändern':'✍️ Gesamtbetrag eingeben'}
   }else{
     if(lastInfo)lastInfo.textContent='Noch kein abgeschlossener Einkauf';
     if(lastBtn){lastBtn.disabled=true;lastBtn.textContent='🧾 Bon scannen'}
+    if(lastManual){lastManual.disabled=true;lastManual.textContent='✍️ Gesamtbetrag eingeben'}
   }
 
   document.getElementById('tripHistory').innerHTML=trips.map(t=>{
-    const source=t.totalSource==='receipt'?'🧾 Bon':'Bon fehlt';
-    const itemCount=t.count||((t.items||[]).length);
-    return '<div class="historyrow"><div><b>'+esc(t.store||'Laden')+'</b><div class="muted">'+new Date(t.date).toLocaleDateString('de-DE')+' · '+itemCount+' Artikel · '+source+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px"><b>'+euro(t.total)+'</b><button class="btn small ghost" onclick="openReceiptScannerForTrip(\''+t.id+'\')">🧾 scannen</button></div></div>'
+    const source=t.totalSource==='receipt'?'🧾 Bon':t.totalSource==='manual'?'✍️ manuell':'Betrag fehlt';
+    const itemCount=t.count||((t.items||[]).length),amount=Number(t.total)||0;
+    return '<div class="historyrow"><div><b>'+esc(t.store||'Laden')+'</b><div class="muted">'+new Date(t.date).toLocaleDateString('de-DE')+' · '+itemCount+' Artikel · '+source+'</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px"><b>'+(amount?euro(amount):'–')+'</b><div style="display:flex;gap:5px"><button class="btn small ghost" onclick="openManualTotal(\''+t.id+'\')">✍️ Betrag</button><button class="btn small ghost" onclick="openReceiptScannerForTrip(\''+t.id+'\')">🧾 Bon</button></div></div></div>'
   }).join('')||'<div class="empty">Noch kein Einkauf für diese Auswahl.</div>'
 }
 function render(){
