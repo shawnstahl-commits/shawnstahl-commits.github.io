@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KaufFlow">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
 <title>KaufFlow – Dein Shopping Copilot</title>
 <style>
 :root{
@@ -85,6 +92,20 @@ button,input,select{font:inherit} button{cursor:pointer}
         <div class="actions">
           <button class="btn primary" onclick="go('list')">＋ Einkauf vorbereiten</button>
           <button class="btn blue" onclick="go('shop')">🛍️ Jetzt einkaufen</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sectionhead"><h3>App & Updates</h3><span class="chip" id="appModeChip">🌐 Web</span></div>
+        <div class="card">
+          <div class="space">
+            <div><b>KaufFlow auf dem Startbildschirm</b><div class="muted" id="appStatusText">Installation wird geprüft …</div></div>
+            <span class="smarticon" style="width:40px;height:40px">📲</span>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button id="installAppBtn" class="btn primary" onclick="installApp()">⬇️ App installieren</button>
+            <button id="updateAppBtn" class="btn ghost" onclick="checkForUpdate()">↻ Update prüfen</button>
+          </div>
         </div>
       </div>
 
@@ -218,6 +239,9 @@ button,input,select{font:inherit} button{cursor:pointer}
 
 <script>
 const KEY='kaufflow_v1';
+let deferredInstallPrompt=null;
+let swRegistration=null;
+let reloadingForUpdate=false;
 const defaultState={onboarded:false,budget:0,people:['Ich','Partner/in','Kinder'],items:[],memory:{},trips:[],stores:[{id:'default',name:'Mein Laden',categoryOrder:[],productOrder:[]}],activeStoreId:'default',activeTrip:[]};
 let S=load();
 function load(){
@@ -297,6 +321,70 @@ function persist(){localStorage.setItem(KEY,JSON.stringify(S));render();syncTabs
 function euro(n){return (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}
 function esc(v=''){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1600)}
+function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}
+function updateInstallUi(){
+  const btn=document.getElementById('installAppBtn'),chip=document.getElementById('appModeChip'),status=document.getElementById('appStatusText');
+  if(!btn||!chip||!status)return;
+  if(isStandalone()){
+    btn.textContent='✓ Installiert';btn.disabled=true;btn.style.opacity='.65';chip.textContent='📱 App';status.textContent='KaufFlow ist auf deinem Startbildschirm installiert.'
+  }else{
+    btn.disabled=false;btn.style.opacity='1';btn.textContent='⬇️ App installieren';chip.textContent='🌐 Web';
+    status.textContent=deferredInstallPrompt?'Bereit zur Installation.':'Du kannst KaufFlow wie eine normale App zum Startbildschirm hinzufügen.'
+  }
+}
+async function installApp(){
+  if(isStandalone()){toast('KaufFlow ist bereits installiert');return}
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    const choice=await deferredInstallPrompt.userChoice;
+    if(choice.outcome==='accepted')toast('KaufFlow wird installiert');
+    deferredInstallPrompt=null;updateInstallUi();return
+  }
+  alert('Falls kein Installationsfenster erscheint: Öffne das Browser-Menü und wähle „App installieren“ oder „Zum Startbildschirm hinzufügen“. Danach startet KaufFlow direkt vom Startbildschirm.')
+}
+async function checkForUpdate(){
+  const btn=document.getElementById('updateAppBtn'),status=document.getElementById('appStatusText');
+  if(btn){btn.disabled=true;btn.textContent='↻ Prüfe …'}
+  if(status)status.textContent='KaufFlow prüft GitHub auf die neueste Version …';
+  try{
+    if('serviceWorker' in navigator){
+      swRegistration=swRegistration||await navigator.serviceWorker.getRegistration('./')||await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+      await swRegistration.update();
+      if(swRegistration.waiting){
+        swRegistration.waiting.postMessage('SKIP_WAITING');
+        if(status)status.textContent='Neues Update gefunden – wird aktiviert …';
+        return
+      }
+    }
+    if(status)status.textContent='Neuester Stand wird geladen …';
+    toast('Update geprüft – neuester Stand wird geladen');
+    setTimeout(()=>location.reload(),450)
+  }catch(e){
+    if(status)status.textContent='Update-Prüfung fehlgeschlagen. Internetverbindung prüfen.';
+    toast('Update konnte nicht geprüft werden')
+  }finally{
+    setTimeout(()=>{if(btn){btn.disabled=false;btn.textContent='↻ Update prüfen'}},1200)
+  }
+}
+async function setupPwa(){
+  updateInstallUi();
+  if(!('serviceWorker' in navigator))return;
+  try{
+    swRegistration=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+    await navigator.serviceWorker.ready;
+    if(swRegistration.waiting)document.getElementById('appStatusText').textContent='Update verfügbar – tippe auf „Update prüfen“.';
+    swRegistration.addEventListener('updatefound',()=>{
+      const worker=swRegistration.installing;if(!worker)return;
+      worker.addEventListener('statechange',()=>{
+        if(worker.state==='installed'&&navigator.serviceWorker.controller){
+          const status=document.getElementById('appStatusText');if(status)status.textContent='Update verfügbar – tippe auf „Update prüfen“.'
+        }
+      })
+    })
+  }catch(e){
+    const status=document.getElementById('appStatusText');if(status)status.textContent='Installation konnte noch nicht vorbereitet werden.'
+  }
+}
 function finishOnboarding(){S.onboarded=true;persist();document.getElementById('onboard').classList.remove('open')}
 function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===id));window.scrollTo({top:0,behavior:'smooth'});render()}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
@@ -438,11 +526,20 @@ function smartHTML(s){
   return `<div class="card smartcard"><div class="smarticon">${s.score>=1?'⚡':'⏳'}</div><div class="grow"><b>${esc(s.name)}</b><small>${label} · zuletzt vor ${Math.floor(s.days)} Tagen · Rhythmus ~${Math.round(s.interval)} Tage</small></div><button class="btn small primary" onclick="addSuggestion('${esc(s.name).replace(/'/g,"\\'")}')">＋</button></div>`
 }
 function syncTabs(){}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;updateInstallUi()});
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;updateInstallUi();toast('KaufFlow wurde installiert')});
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(reloadingForUpdate)return;
+    reloadingForUpdate=true;
+    location.reload()
+  })
+}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeElement?.id==='quickInput')quickAdd();if(e.key==='Enter'&&document.activeElement?.id==='listQuickInput')quickAdd('listQuickInput')});
 window.addEventListener('storage',e=>{if(e.key===KEY){S=load();render()}});
 if('BroadcastChannel'in window){const bc=new BroadcastChannel('kaufflow');const oldPersist=persist;persist=function(){localStorage.setItem(KEY,JSON.stringify(S));bc.postMessage('sync');render();syncTabs()};bc.onmessage=()=>{S=load();render()}}
 if(!S.onboarded)document.getElementById('onboard').classList.add('open');
-importShared();render();
+importShared();render();setupPwa();
 </script>
 </body>
 </html>
