@@ -39,7 +39,14 @@ button,input,select{font:inherit} button{cursor:pointer}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:10px 0}
 .smartcard{display:flex;gap:12px;align-items:center}.smarticon{width:44px;height:44px;border-radius:15px;background:var(--panel2);display:grid;place-items:center;font-size:21px;flex:0 0 auto}.smartcard .grow{flex:1}.smartcard b{display:block}.smartcard small{color:var(--muted)}
 .quickadd{display:flex;gap:8px}.scanpaper{display:flex;gap:8px;margin-top:9px}.scanpaper .btn{flex:1}.ocrstatus{display:none;margin-top:10px}.ocrstatus.show{display:block}.ocrbar{height:7px;background:#202633;border-radius:999px;overflow:hidden;margin-top:8px}.ocrbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}.quickadd input,.field input,.field select{width:100%;background:#10141c;border:1px solid var(--line);color:var(--text);border-radius:15px;padding:13px 14px;outline:none}.quickadd input:focus,.field input:focus,.field select:focus{border-color:#5b718e}
-.list{display:flex;flex-direction:column;gap:9px}.item{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:19px;padding:12px 13px}.check{width:29px;height:29px;border:1px solid #445064;border-radius:10px;background:#0f131a;color:#0f131a;display:grid;place-items:center;flex:0 0 auto}.item.done{opacity:.55}.item.done .check{background:var(--accent);color:#102117;border-color:var(--accent)}.item.done .iname{text-decoration:line-through}.itemmain{flex:1;min-width:0}.iname{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.isub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.price{font-weight:800}
+.list{display:flex;flex-direction:column;gap:9px}.item{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:19px;padding:12px 13px}
+.listpaper{gap:5px}.listpaper .item{padding:8px 9px;border-radius:13px;gap:8px;min-height:48px}.listpaper .check{width:25px;height:25px;border-radius:8px}.listpaper .iname{font-size:15px;line-height:1.18}.listpaper .isub{font-size:10px;margin-top:2px}.listpaper .price{font-size:13px}.listpaper .iconbtn{width:30px!important;height:30px!important;border-radius:10px;font-size:18px}
+.listhead{position:sticky;top:4px;z-index:7;background:rgba(13,16,22,.94);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:17px;padding:10px 11px;margin-bottom:8px}
+.listheadline{display:flex;align-items:center;justify-content:space-between;gap:8px}.listheadline h3{margin:0;font-size:17px}.listsummary{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:7px}.listsummary .chip{padding:4px 8px;font-size:11px}
+.listquick{display:grid;grid-template-columns:1fr 42px 42px;gap:6px;margin:8px 0}.listquick input{min-width:0;background:#10141c;border:1px solid var(--line);color:var(--text);border-radius:13px;padding:10px 11px;outline:none}.listquick .btn{padding:0;display:grid;place-items:center;border-radius:13px}
+.listtools{display:none;margin:0 0 9px}.listtools.open{display:block}.listtools .card{margin:6px 0;padding:11px;border-radius:15px}.listtools .field{margin:6px 0}.listtools .field input,.listtools .field select{padding:10px 11px;border-radius:12px}
+.listtools .progress{margin-top:7px}.listtools .scanpaper{margin-top:7px}
+.check{width:29px;height:29px;border:1px solid #445064;border-radius:10px;background:#0f131a;color:#0f131a;display:grid;place-items:center;flex:0 0 auto}.item.done{opacity:.55}.item.done .check{background:var(--accent);color:#102117;border-color:var(--accent)}.item.done .iname{text-decoration:line-through}.itemmain{flex:1;min-width:0}.iname{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.isub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.price{font-weight:800}
 .chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:5px 9px;font-size:12px;color:#ccd3df;gap:5px}.chips{display:flex;gap:7px;flex-wrap:wrap}
 .tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(12,15,21,.92);backdrop-filter:blur(18px);border-top:1px solid var(--line);z-index:20}.tabsin{max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 10px calc(8px + env(safe-area-inset-bottom))}.tab{border:0;background:transparent;color:#8892a2;padding:7px 2px;font-size:11px}.tab span{display:block;font-size:20px}.tab.active{color:var(--accent)}
 .view{display:none}.view.active{display:block}
@@ -55,7 +62,10 @@ button,input,select{font:inherit} button{cursor:pointer}
 .historyrow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.historyrow:last-child{border-bottom:0}
 .onboard{position:fixed;inset:0;background:#0d1016;z-index:100;display:none;place-items:center;padding:18px}.onboard.open{display:grid}.onbox{max-width:520px}.onbox h1{font-size:36px;margin:10px 0}.onbox p{color:var(--muted);font-size:16px}.steps{display:grid;gap:10px;margin:20px 0}.step{background:var(--panel);border:1px solid var(--line);padding:15px;border-radius:18px}
 .toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(20px);background:#eef7f1;color:#102018;padding:11px 15px;border-radius:14px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:90}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:520px){.app{padding-left:13px;padding-right:13px}.hero h2{font-size:25px}.grid3{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:1/-1}.fields{grid-template-columns:1fr}.full{grid-column:auto}.actions{grid-template-columns:1fr}.desktoponly{display:none}}
+@media(max-width:520px){.app{padding-left:10px;padding-right:10px}.hero h2{font-size:25px}.grid3{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:1/-1}.fields{grid-template-columns:1fr}.full{grid-column:auto}.actions{grid-template-columns:1fr}.desktoponly{display:none}
+body[data-view="list"] .top{margin:3px 0 8px}body[data-view="list"] .top .logo{width:36px;height:36px;border-radius:12px;font-size:19px}body[data-view="list"] .brand h1{font-size:17px}body[data-view="list"] .brand small{display:none}body[data-view="list"] .iconbtn{width:38px;height:38px}
+body[data-view="list"] .app{padding-bottom:84px}
+}
 </style>
 </head>
 <body>
@@ -122,21 +132,41 @@ button,input,select{font:inherit} button{cursor:pointer}
     </section>
 
     <section id="list" class="view">
-      <div class="sectionhead"><div><h3>Einkauf vorbereiten</h3><div class="muted" id="listSub">0 offen</div></div><button class="btn primary small" onclick="openItemModal()">＋ Artikel</button></div>
-      <div class="card">
-        <div class="space"><div><b>Für welchen Laden?</b><div class="muted">Jeder Laden lernt seine eigene Reihenfolge.</div></div><span class="chip">🧠 separat</span></div>
-        <div class="field" style="margin-bottom:0"><select id="storeSelectList" onchange="selectStore(this.value)"></select></div>
+      <div class="listhead">
+        <div class="listheadline">
+          <div><h3>📝 Einkaufszettel</h3><div class="muted" id="listSub">0 offen</div></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn small ghost" id="listToolsBtn" onclick="toggleListTools()">⚙️ Planung</button>
+            <button class="btn primary small" onclick="openItemModal()">＋</button>
+          </div>
+        </div>
+        <div class="listsummary">
+          <span class="chip" id="listStoreBadge">🏪 Mein Laden</span>
+          <span class="chip" id="listCountBadge">0 Artikel</span>
+          <span class="chip" id="listSumBadge">0,00 €</span>
+        </div>
       </div>
-      <div class="card">
-        <div class="space"><div><b>Budget</b><div class="muted">Geplant vs. geschätzt</div></div><div><b id="budgetDisplay">0,00 €</b></div></div>
-        <div class="progress"><i id="budgetProgress"></i></div>
-        <div style="height:10px"></div>
-        <div class="field"><input id="budgetInput" type="number" min="0" step=".01" placeholder="Budget festlegen" onchange="setBudget(this.value)"></div>
+
+      <div id="listTools" class="listtools">
+        <div class="card">
+          <div class="space"><b>🏪 Laden</b><span class="muted">für Sortierung</span></div>
+          <div class="field"><select id="storeSelectList" onchange="selectStore(this.value)"></select></div>
+        </div>
+        <div class="card">
+          <div class="space"><div><b>💶 Budget</b><div class="muted">Geplant vs. geschätzt</div></div><b id="budgetDisplay">0,00 €</b></div>
+          <div class="progress"><i id="budgetProgress"></i></div>
+          <div class="field"><input id="budgetInput" type="number" min="0" step=".01" placeholder="Budget festlegen" onchange="setBudget(this.value)"></div>
+        </div>
+        <div class="scanpaper"><button class="btn ghost" onclick="openPaperScanner()">📷 Geschriebenen Zettel fotografieren</button></div>
+        <div id="ocrStatusList" class="ocrstatus notice"><div class="space"><b id="ocrStatusTextList">Foto wird gelesen …</b><button id="ocrUndoList" class="btn small ghost" style="display:none;flex:0 0 auto" onclick="undoLastPhotoScan()">↶ Rückgängig</button></div><div class="ocrbar"><i id="ocrProgressList"></i></div></div>
       </div>
-      <div class="quickadd" style="margin:14px 0 0"><input id="listQuickInput" placeholder="Milch, 2x Joghurt, Brot..."><button class="btn primary" onclick="quickAdd('listQuickInput')">＋</button></div>
-      <div class="scanpaper"><button class="btn ghost" onclick="openPaperScanner()">📷 Zettel fotografieren & übernehmen</button></div>
-      <div id="ocrStatusList" class="ocrstatus notice"><div class="space"><b id="ocrStatusTextList">Foto wird gelesen …</b><button id="ocrUndoList" class="btn small ghost" style="display:none;flex:0 0 auto" onclick="undoLastPhotoScan()">↶ Rückgängig</button></div><div class="ocrbar"><i id="ocrProgressList"></i></div></div>
-      <div id="shoppingList" class="list" style="margin-top:14px"></div>
+
+      <div class="listquick">
+        <input id="listQuickInput" placeholder="Milch, Brot, 2x Joghurt…">
+        <button class="btn primary" onclick="quickAdd('listQuickInput')" aria-label="Hinzufügen">＋</button>
+        <button class="btn ghost" onclick="openPaperScanner()" aria-label="Zettel fotografieren">📷</button>
+      </div>
+      <div id="shoppingList" class="list listpaper"></div>
     </section>
 
     <section id="shop" class="view">
@@ -400,7 +430,12 @@ async function setupPwa(){
   }
 }
 function finishOnboarding(){S.onboarded=true;persist();document.getElementById('onboard').classList.remove('open')}
-function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===id));window.scrollTo({top:0,behavior:'smooth'});render()}
+function go(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===id));document.body.dataset.view=id;window.scrollTo({top:0,behavior:'smooth'});render()}
+function toggleListTools(force){
+  const box=document.getElementById('listTools'),btn=document.getElementById('listToolsBtn');if(!box)return;
+  const open=typeof force==='boolean'?force:!box.classList.contains('open');
+  box.classList.toggle('open',open);if(btn)btn.textContent=open?'✕ Schließen':'⚙️ Planung'
+}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 function setBudget(v){S.budget=Math.max(0,Number(v)||0);persist()}
 function parseQuick(raw){
@@ -740,6 +775,10 @@ function render(){
   document.getElementById('budgetInput').value=S.budget||'';document.getElementById('budgetDisplay').textContent=euro(sum)+(S.budget?' / '+euro(S.budget):'');
   document.getElementById('budgetProgress').style.width=(S.budget?Math.min(100,sum/S.budget*100):0)+'%';
   document.getElementById('listSub').textContent=open.length+' offen · '+euro(sum);
+  const listStoreBadge=document.getElementById('listStoreBadge'),listCountBadge=document.getElementById('listCountBadge'),listSumBadge=document.getElementById('listSumBadge');
+  if(listStoreBadge)listStoreBadge.textContent='🏪 '+store.name;
+  if(listCountBadge)listCountBadge.textContent=open.length+' '+(open.length===1?'Artikel':'Artikel');
+  if(listSumBadge)listSumBadge.textContent=euro(sum);
   const list=sortedItems();
   document.getElementById('shoppingList').innerHTML=list.length?list.map(it=>itemHTML(it,false)).join(''):'<div class="empty"><div class="emoji">🧺</div>Deine Liste ist leer.<br>Füge oben mehrere Dinge auf einmal hinzu.</div>';
   document.getElementById('shopList').innerHTML=list.length?list.map(it=>itemHTML(it,true)).join(''):'<div class="empty"><div class="emoji">✨</div>Nichts einzukaufen.</div>';
@@ -774,6 +813,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeEleme
 window.addEventListener('storage',e=>{if(e.key===KEY){S=load();render()}});
 if('BroadcastChannel'in window){const bc=new BroadcastChannel('kaufflow');const oldPersist=persist;persist=function(){localStorage.setItem(KEY,JSON.stringify(S));bc.postMessage('sync');render();syncTabs()};bc.onmessage=()=>{S=load();render()}}
 if(!S.onboarded)document.getElementById('onboard').classList.add('open');
+document.body.dataset.view='home';
 importShared();render();setupPwa();
 </script>
 </body>
