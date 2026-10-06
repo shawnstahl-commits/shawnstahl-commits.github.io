@@ -343,13 +343,30 @@ body[data-view="list"] .app{padding-bottom:84px}
     </section>
 
     <section id="smart" class="view">
-      <div class="sectionhead"><div><h3>KaufFlow Intelligence</h3><div class="muted">Vorschläge aus deinem echten Verhalten</div></div></div>
+      <div class="sectionhead"><div><h3>KaufFlow Intelligence</h3><div class="muted">Wird mit jedem abgeschlossenen Einkauf persönlicher</div></div></div>
       <div class="card">
-        <div class="chips"><span class="chip">🧠 Wiederkaufrhythmus</span><span class="chip">🏠 Vorratsschätzung</span><span class="chip">💶 Preisgedächtnis</span><span class="chip">🗺️ Ladenroute</span></div>
+        <div class="chips"><span class="chip">🧠 Wiederkaufrhythmus</span><span class="chip">🏠 Vorratsschätzung</span><span class="chip">🔗 Kaufmuster</span><span class="chip">🏪 Ladenwissen</span></div>
       </div>
-      <div class="sectionhead"><h3>Fehlt wahrscheinlich bald</h3></div>
-      <div id="smartAll"></div>
-      <div class="sectionhead" style="margin-top:22px"><h3>Was essen wir?</h3></div>
+
+      <div class="sectionhead" style="margin-top:18px"><div><h3>✨ Für den nächsten Einkauf</h3><div class="muted">Die stärksten KaufFlow-Treffer auf einen Blick</div></div><span class="chip" id="smartNextCount">0 Tipps</span></div>
+      <div id="smartNext"></div>
+
+      <div class="sectionhead" style="margin-top:22px"><h3>⚡ Wahrscheinlich leer</h3></div>
+      <div id="smartEmpty"></div>
+
+      <div class="sectionhead" style="margin-top:22px"><h3>⏳ Bald wieder nötig</h3></div>
+      <div id="smartSoon"></div>
+
+      <div class="sectionhead" style="margin-top:22px"><h3>🕰️ Lange nicht gekauft</h3></div>
+      <div id="smartForgotten"></div>
+
+      <div class="sectionhead" style="margin-top:22px"><h3>🔗 Kaufst du oft zusammen</h3></div>
+      <div id="smartTogether"></div>
+
+      <div class="sectionhead" style="margin-top:22px"><div><h3>🏪 Typisch für <span id="smartStoreName">deinen Laden</span></h3><div class="muted">Aus deinen bisherigen Einkäufen in genau diesem Laden</div></div></div>
+      <div id="smartStore"></div>
+
+      <div class="sectionhead" style="margin-top:26px"><h3>Was essen wir?</h3></div>
       <div class="card">
         <div class="fields">
           <div class="field"><label>Personen</label><input id="mealPeople" type="number" value="4" min="1"></div>
@@ -1054,21 +1071,102 @@ function toggleItem(id,fromShop=false){
 function productRank(name){const i=(activeStore().productOrder||[]).indexOf(productKey(name));return i<0?9999:i}
 function catRank(cat){const i=(activeStore().categoryOrder||[]).indexOf(cat);return i<0?999:i}
 function sortedItems(){return [...S.items].sort((a,b)=>Number(a.done)-Number(b.done)||productRank(a.name)-productRank(b.name)||catRank(a.cat)-catRank(b.cat)||a.created-b.created)}
-function smartCandidates(){
+function isAlreadyOpen(name){
+  return S.items.some(i=>!i.done&&productKey(i.name)===productKey(name))
+}
+function memoryEntry(name){return findMem(name)||{}}
+function baseSmartItem(name,m,extra={}){
+  return {name,lastPrice:Number(m?.lastPrice)||0,lastQty:m?.lastQty||'1',cat:m?.cat||'Vorrat',pref:m?.pref||'',exact:m?.exact||'alt',...extra}
+}
+function dueSmartGroups(){
+  const now=Date.now(),empty=[],soon=[];
+  Object.entries(S.memory).forEach(([name,m])=>{
+    if(!m.lastBought||isAlreadyOpen(name))return;
+    const days=(now-m.lastBought)/86400000,interval=Math.max(Number(m.avgDays)||7,1),ratio=days/interval;
+    const purchases=(m.purchases||[]).length;
+    const item=baseSmartItem(name,m,{days,interval,ratio,score:ratio,kind:ratio>=1?'empty':'soon'});
+    if(ratio>=1)empty.push(item);
+    else if(ratio>=.65)soon.push(item)
+  });
+  empty.sort((a,b)=>b.score-a.score);soon.sort((a,b)=>b.score-a.score);
+  return {empty,soon}
+}
+function forgottenCandidates(){
   const now=Date.now(),out=[];
   Object.entries(S.memory).forEach(([name,m])=>{
-    if(!m.lastBought)return;
-    const days=(now-m.lastBought)/86400000,interval=m.avgDays||7;
-    const ratio=days/Math.max(interval,1);
-    if(!S.items.some(i=>i.name.toLowerCase()===name.toLowerCase()&&!i.done) && ratio>=.65){
-      out.push({name,...m,days,interval,score:ratio})
+    if(!m.lastBought||isAlreadyOpen(name))return;
+    const days=(now-m.lastBought)/86400000,purchases=(m.purchases||[]).length;
+    const interval=Math.max(Number(m.avgDays)||7,1);
+    // "Lange nicht gekauft" ist vor allem für noch nicht zuverlässig gelernte Einzel-/Gelegenheitskäufe.
+    if((purchases<2&&days>=14)||(purchases>=2&&days>=Math.max(28,interval*2.2))){
+      out.push(baseSmartItem(name,m,{days,score:days/(purchases<2?14:Math.max(28,interval*2.2)),kind:'forgotten'}))
     }
   });
   return out.sort((a,b)=>b.score-a.score)
 }
+function togetherCandidates(){
+  const openNames=S.items.filter(i=>!i.done).map(i=>productKey(i.name));
+  if(!openNames.length)return [];
+  const stats=new Map();
+  (S.trips||[]).forEach(t=>{
+    const names=[...new Set((t.items||[]).map(i=>productKey(i.name)).filter(Boolean))];
+    if(!names.some(n=>openNames.includes(n)))return;
+    names.forEach(n=>{
+      if(openNames.includes(n))return;
+      const raw=(t.items||[]).find(i=>productKey(i.name)===n)?.name||n;
+      const s=stats.get(n)||{name:raw,count:0,links:new Set()};
+      s.count++;
+      openNames.forEach(o=>{if(names.includes(o))s.links.add(o)});
+      stats.set(n,s)
+    })
+  });
+  return [...stats.values()]
+    .filter(x=>x.count>=1&&!isAlreadyOpen(x.name))
+    .map(x=>{
+      const m=memoryEntry(x.name);
+      return baseSmartItem(x.name,m,{count:x.count,linkCount:x.links.size,score:x.count+x.links.size*.35,kind:'together'})
+    })
+    .sort((a,b)=>b.score-a.score)
+}
+function storeCandidates(){
+  const store=activeStore(),stats=new Map(),trips=(S.trips||[]).filter(t=>(t.storeId&&t.storeId===store.id)||(!t.storeId&&t.store===store.name));
+  trips.forEach(t=>(t.items||[]).forEach(it=>{
+    const k=productKey(it.name);if(!k)return;
+    const s=stats.get(k)||{name:it.name,count:0,last:0};
+    s.count++;s.last=Math.max(s.last,t.date||0);stats.set(k,s)
+  }));
+  return [...stats.values()]
+    .filter(x=>!isAlreadyOpen(x.name))
+    .map(x=>{
+      const m=memoryEntry(x.name);
+      const recency=x.last?Math.max(0,1-(Date.now()-x.last)/(86400000*45)):0;
+      return baseSmartItem(x.name,m,{count:x.count,score:x.count+recency,kind:'store'})
+    })
+    .sort((a,b)=>b.score-a.score)
+}
+function smartOverview(){
+  const due=dueSmartGroups(),forgotten=forgottenCandidates(),together=togetherCandidates(),store=storeCandidates();
+  const picked=[],seen=new Set();
+  const add=(arr,weight=0)=>{
+    arr.forEach(x=>{
+      const k=productKey(x.name);if(seen.has(k)||isAlreadyOpen(x.name))return;
+      seen.add(k);picked.push({...x,overviewScore:(x.score||0)+weight})
+    })
+  };
+  add(due.empty,4);add(due.soon,3);add(together,2);add(store,1);add(forgotten,.5);
+  const next=picked.sort((a,b)=>b.overviewScore-a.overviewScore).slice(0,5);
+  return {next,empty:due.empty.slice(0,6),soon:due.soon.slice(0,6),forgotten:forgotten.slice(0,6),together:together.slice(0,6),store:store.slice(0,6)}
+}
+function smartCandidates(){
+  const g=smartOverview();
+  return [...g.empty,...g.soon].sort((a,b)=>(b.score||0)-(a.score||0))
+}
 function likelyHomeCount(){return Object.values(S.memory).filter(m=>m.lastBought&&((Date.now()-m.lastBought)/86400000)<(m.avgDays||7)*.65).length}
 function addSuggestion(name){
-  const m=findMem(name);if(!m)return;S.items.push({id:crypto.randomUUID(),name,qty:m.lastQty||'1',price:m.lastPrice||0,cat:m.cat||'Vorrat',person:'Alle',pref:m.pref||'',exact:m.exact||'alt',done:false,created:Date.now()});persist();toast(name+' hinzugefügt')
+  if(isAlreadyOpen(name)){toast(name+' ist schon auf der Liste');return}
+  const m=findMem(name)||{};
+  S.items.push({id:crypto.randomUUID(),name,qty:m.lastQty||'1',price:m.lastPrice||0,cat:m.cat||guessCat(name),person:'Alle',pref:m.pref||'',exact:m.exact||'alt',done:false,created:Date.now()});
+  persist();toast(name+' hinzugefügt')
 }
 function finishTrip(){
   const done=S.items.filter(i=>i.done);if(!done.length)return;
@@ -1134,7 +1232,18 @@ function render(){
   document.getElementById('shoppingList').innerHTML=list.length?list.map(it=>itemHTML(it,false)).join(''):'<div class="empty"><div class="emoji">🧺</div>Deine Liste ist leer.<br>Füge oben mehrere Dinge auf einmal hinzu.</div>';
   document.getElementById('shopList').innerHTML=list.length?list.map(it=>itemHTML(it,true)).join(''):'<div class="empty"><div class="emoji">✨</div>Nichts einzukaufen.</div>';
   document.getElementById('shopCount').textContent=done+' / '+total;document.getElementById('shopSum').textContent=euro(sum);document.getElementById('shopProgress').style.width=(total?done/total*100:0)+'%';document.getElementById('finishWrap').style.display=done?'block':'none';
-  const smart=smartCandidates();document.getElementById('smartPreview').innerHTML=smart.slice(0,3).map(s=>smartHTML(s)).join('')||'<div class="card muted">Sobald du erste Einkäufe abschließt, erkennt KaufFlow hier deinen Rhythmus.</div>';document.getElementById('smartAll').innerHTML=smart.map(s=>smartHTML(s)).join('')||'<div class="empty">Noch keine Vorschläge. Nach ein paar abgeschlossenen Einkäufen wird dieser Bereich richtig stark.</div>';
+  const smart=smartCandidates(),smartGroups=smartOverview();
+  document.getElementById('smartPreview').innerHTML=smartGroups.next.slice(0,3).map(s=>smartHTML(s)).join('')||'<div class="card muted">Sobald du erste Einkäufe abschließt, erkennt KaufFlow hier deinen Rhythmus.</div>';
+  const smartNext=document.getElementById('smartNext'),smartEmpty=document.getElementById('smartEmpty'),smartSoon=document.getElementById('smartSoon'),smartForgotten=document.getElementById('smartForgotten'),smartTogether=document.getElementById('smartTogether'),smartStore=document.getElementById('smartStore');
+  if(smartNext)smartNext.innerHTML=smartGroups.next.map(s=>smartHTML(s)).join('')||smartEmptyHTML('Noch keine starken Treffer. Mit jedem abgeschlossenen Einkauf wird dieser Bereich genauer.');
+  if(smartEmpty)smartEmpty.innerHTML=smartGroups.empty.map(s=>smartHTML(s)).join('')||smartEmptyHTML('Aktuell sieht kein bekanntes Produkt eindeutig leer aus.');
+  if(smartSoon)smartSoon.innerHTML=smartGroups.soon.map(s=>smartHTML(s)).join('')||smartEmptyHTML('Im Moment ist noch nichts aus deinem Wiederkaufrhythmus bald fällig.');
+  if(smartForgotten)smartForgotten.innerHTML=smartGroups.forgotten.map(s=>smartHTML(s)).join('')||smartEmptyHTML('Noch keine passenden Langzeit-Treffer.');
+  if(smartTogether)smartTogether.innerHTML=smartGroups.together.map(s=>smartHTML(s)).join('')||smartEmptyHTML(S.items.some(i=>!i.done)?'Noch kein passendes Kombi-Muster gelernt.':'Lege erst ein paar Artikel auf die Liste – dann sucht KaufFlow nach Dingen, die du häufig dazu kaufst.');
+  if(smartStore)smartStore.innerHTML=smartGroups.store.map(s=>smartHTML(s)).join('')||smartEmptyHTML('Für diesen Laden fehlen noch abgeschlossene Einkäufe mit Produktdaten.');
+  const smartNextCount=document.getElementById('smartNextCount'),smartStoreName=document.getElementById('smartStoreName');
+  if(smartNextCount)smartNextCount.textContent=smartGroups.next.length+' '+(smartGroups.next.length===1?'Tipp':'Tipps');
+  if(smartStoreName)smartStoreName.textContent=store.name;
   const mem=Object.entries(S.memory).sort((a,b)=>(b[1].lastBought||0)-(a[1].lastBought||0));document.getElementById('memoryCount').textContent=mem.length+' Produkte';document.getElementById('memoryList').innerHTML=mem.slice(0,12).map(([n,m])=>`<div class="historyrow"><div><b>${esc(n)}</b><div class="muted">${esc(m.cat||'')} · Ø ${Math.round(m.avgDays||7)} Tage</div></div><div style="text-align:right"><b>${euro(m.lastPrice)}</b><div class="muted">letzter Preis</div></div></div>`).join('')||'<div class="empty">Noch leer.</div>';
   document.getElementById('tripHistory').innerHTML=S.trips.map((t,i)=>`<div class="historyrow"><div><b>${new Date(t.date).toLocaleDateString('de-DE')}</b><div class="muted">${esc(t.store)} · ${t.count} Artikel${Array.isArray(t.items)&&t.items.some(x=>x.price)?' · 🧾 Preise gespeichert':''}</div></div><b>${euro(t.total)}</b></div>`).join('')||'<div class="empty">Noch kein abgeschlossener Einkauf.</div>';
 }
@@ -1146,9 +1255,22 @@ function itemHTML(it,shop){
     ${shop?'':`<button class="iconbtn" style="width:36px;height:36px" onclick="removeItem('${it.id}')">×</button>`}
   </div>`
 }
+function smartReason(s){
+  if(s.kind==='empty')return 'wahrscheinlich leer · zuletzt vor '+Math.floor(s.days)+' Tagen · Rhythmus ~'+Math.round(s.interval)+' Tage';
+  if(s.kind==='soon')return 'bald fällig · zuletzt vor '+Math.floor(s.days)+' Tagen · Rhythmus ~'+Math.round(s.interval)+' Tage';
+  if(s.kind==='forgotten')return 'zuletzt vor '+Math.floor(s.days)+' Tagen gekauft';
+  if(s.kind==='together')return (s.count===1?'schon einmal':'schon '+s.count+'×')+' zusammen mit Artikeln deiner aktuellen Liste gekauft';
+  if(s.kind==='store')return s.count+'× bei '+activeStore().name+' gekauft';
+  return 'KaufFlow-Tipp aus deinem Einkaufsverhalten'
+}
+function smartIcon(s){
+  return s.kind==='empty'?'⚡':s.kind==='soon'?'⏳':s.kind==='forgotten'?'🕰️':s.kind==='together'?'🔗':s.kind==='store'?'🏪':'✦'
+}
 function smartHTML(s){
-  const pct=Math.round(s.score*100),label=s.score>=1?'wahrscheinlich leer':'bald fällig';
-  return `<div class="card smartcard"><div class="smarticon">${s.score>=1?'⚡':'⏳'}</div><div class="grow"><b>${esc(s.name)}</b><small>${label} · zuletzt vor ${Math.floor(s.days)} Tagen · Rhythmus ~${Math.round(s.interval)} Tage</small></div><button class="btn small primary" onclick="addSuggestion('${esc(s.name).replace(/'/g,"\\'")}')">＋</button></div>`
+  return `<div class="card smartcard"><div class="smarticon">${smartIcon(s)}</div><div class="grow"><b>${esc(s.name)}</b><small>${esc(smartReason(s))}</small></div><button class="btn small primary" onclick="addSuggestion('${esc(s.name).replace(/'/g,"\\'")}')">＋</button></div>`
+}
+function smartEmptyHTML(text){
+  return '<div class="card muted" style="padding:13px">'+esc(text)+'</div>'
 }
 function syncTabs(){}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;updateInstallUi()});
