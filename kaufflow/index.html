@@ -95,19 +95,6 @@ button,input,select{font:inherit} button{cursor:pointer}
         </div>
       </div>
 
-      <div class="section">
-        <div class="sectionhead"><h3>App & Updates</h3><span class="chip" id="appModeChip">🌐 Web</span></div>
-        <div class="card">
-          <div class="space">
-            <div><b>KaufFlow auf dem Startbildschirm</b><div class="muted" id="appStatusText">Installation wird geprüft …</div></div>
-            <span class="smarticon" style="width:40px;height:40px">📲</span>
-          </div>
-          <div class="actions" style="margin-top:12px">
-            <button id="installAppBtn" class="btn primary" onclick="installApp()">⬇️ App installieren</button>
-            <button id="updateAppBtn" class="btn ghost" onclick="checkForUpdate()">↻ Update prüfen</button>
-          </div>
-        </div>
-      </div>
 
       <div class="section">
         <div class="sectionhead"><h3>Fehlt bald?</h3><button class="btn small ghost" onclick="go('smart')">Alle</button></div>
@@ -230,6 +217,18 @@ button,input,select{font:inherit} button{cursor:pointer}
       <button class="btn primary" style="flex:0 0 auto" onclick="addStore()">＋ Laden</button>
     </div>
     <div class="field"><label>Haushaltsmitglieder, durch Komma getrennt</label><input id="peopleInput" placeholder="Ich, Partner/in, Kinder"></div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="space">
+        <div><b>App & Updates</b><div class="muted" id="appStatusText">Installation wird geprüft …</div></div>
+        <span class="chip" id="appModeChip">🌐 Web</span>
+      </div>
+      <div class="actions" style="margin-top:12px">
+        <button id="installAppBtn" class="btn primary" onclick="installApp()">⬇️ App installieren</button>
+        <button id="updateAppBtn" class="btn ghost" onclick="checkForUpdate()">↻ Update prüfen</button>
+      </div>
+    </div>
+
     <div class="notice">Jeder Laden speichert seine eigene Produktreihenfolge und seinen eigenen Laufweg. Alle Daten bleiben aktuell nur auf diesem Gerät im Browser – kostenlos und ohne neues Backend.</div>
     <div class="row" style="margin-top:14px"><button class="btn danger" onclick="resetAll()">Alles zurücksetzen</button><button class="btn primary" onclick="saveSettings()">Speichern</button></div>
   </div>
