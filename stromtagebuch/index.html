@@ -226,11 +226,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.1</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.2</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.1</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.2</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
@@ -490,7 +490,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.1</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.2</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -579,7 +579,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Das <b>Komplett-Backup enthält ab v1.3 auch deine Zählerfotos</b>, damit sie auf ein neues Gerät übernommen werden können.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Vollbackup inkl. Fotos</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.4.1</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.4.2</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
@@ -624,7 +624,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="toast" id="toast"></div>
 
 <script>
-var APP_VERSION="1.4.1";
+var APP_VERSION="1.4.2";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
@@ -1212,6 +1212,67 @@ function makeMainDigitsCanvas(source){
  ctx.drawImage(source,sx,sy,cw,ch,0,0,out.width,out.height);
  return out
 }
+function makeDirectDigitRegion(source){
+ var sw=source.width,sh=source.height,ratio=sw/sh,sx=0,sy=0,cw=sw,ch=sh;
+ if(ratio>2){
+   sx=Math.round(sw*.16);sy=Math.round(sh*.18);cw=Math.round(sw*.62);ch=Math.round(sh*.56);
+ }
+ var out=document.createElement("canvas"),targetW=Math.min(540,Math.max(320,Math.round(cw))),scale=targetW/cw;
+ out.width=Math.max(1,Math.round(cw*scale));out.height=Math.max(1,Math.round(ch*scale));
+ var x=out.getContext("2d",{willReadFrequently:true});x.imageSmoothingEnabled=true;x.imageSmoothingQuality="high";
+ x.drawImage(source,sx,sy,cw,ch,0,0,out.width,out.height);return out
+}
+function directSevenSegmentRead(source){
+ try{
+  var src=makeDirectDigitRegion(source),w=src.width,h=src.height;
+  if(w<120||h<35)return null;
+  var ctx=src.getContext("2d",{willReadFrequently:true}),pix=ctx.getImageData(0,0,w,h).data,gray=new Float32Array(w*h),iw=w+1,integral=new Float64Array((w+1)*(h+1));
+  for(var y=0;y<h;y++){var row=0;for(var x=0;x<w;x++){var i=(y*w+x)*4,g=.299*pix[i]+.587*pix[i+1]+.114*pix[i+2];gray[y*w+x]=g;row+=g;integral[(y+1)*iw+(x+1)]=integral[y*iw+(x+1)]+row}}
+  function meanBox(x,y,r){var x0=Math.max(0,x-r),y0=Math.max(0,y-r),x1=Math.min(w-1,x+r),y1=Math.min(h-1,y+r),a=y0*iw+x0,b=y0*iw+x1+1,cc=(y1+1)*iw+x0,d=(y1+1)*iw+x1+1;return(integral[d]-integral[b]-integral[cc]+integral[a])/((x1-x0+1)*(y1-y0+1))}
+  var rad=Math.max(5,Math.round(Math.min(w,h)*.075)),diff=new Float32Array(w*h),sample=[];
+  for(var yy=0;yy<h;yy++){for(var xx=0;xx<w;xx++){var di=yy*w+xx,v=Math.max(0,meanBox(xx,yy,rad)-gray[di]);diff[di]=v;if((di%Math.max(1,Math.floor(w*h/5000)))===0)sample.push(v)}}
+  sample.sort(function(a,b){return a-b});var t=sample[Math.floor(sample.length*.80)]||8;t=Math.max(7,Math.min(24,t));
+  var mask=new Uint8Array(w*h);for(var mi=0;mi<mask.length;mi++)mask[mi]=diff[mi]>t?1:0;
+  var scanY0=Math.round(h*.14),scanY1=Math.round(h*.82),scanH=Math.max(1,scanY1-scanY0),col=new Int32Array(w);
+  for(var xx2=0;xx2<w;xx2++){var s=0;for(var yy2=scanY0;yy2<scanY1;yy2++)s+=mask[yy2*w+xx2];col[xx2]=s}
+  var minCol=Math.max(3,Math.round(scanH*.06)),runs=[],rs=null;
+  for(var rx=0;rx<w;rx++){var on=col[rx]>minCol;if(on&&rs==null)rs=rx;if(!on&&rs!=null){runs.push([rs,rx-1]);rs=null}}if(rs!=null)runs.push([rs,w-1]);
+  var raw=[];
+  runs.forEach(function(rr){var ymin=h,ymax=-1;for(var x3=rr[0];x3<=rr[1];x3++)for(var y3=scanY0;y3<scanY1;y3++)if(mask[y3*w+x3]){if(y3<ymin)ymin=y3;if(y3>ymax)ymax=y3}if(ymax>=ymin)raw.push({x0:rr[0],x1:rr[1],c:(rr[0]+rr[1])/2,height:ymax-ymin+1,width:rr[1]-rr[0]+1})});
+  if(raw.length<6)return null;var maxH=Math.max.apply(null,raw.map(function(r){return r.height})),keep=raw.filter(function(r){return r.height>=maxH*.64&&r.width>=2});
+  var merged=[],gapMax=Math.max(2,Math.round(w*.009));
+  keep.forEach(function(q){var last=merged[merged.length-1];if(last&&q.x0-last.x1-1<=gapMax){last.x1=q.x1;last.c=(last.x0+last.x1)/2;last.height=Math.max(last.height,q.height);last.width=last.x1-last.x0+1}else merged.push({x0:q.x0,x1:q.x1,c:q.c,height:q.height,width:q.width})});
+  if(merged.length<6)return null;
+  function fitSix(list,start){var sx=0,si=0,sii=0,six=0;for(var i=0;i<6;i++){var v=list[start+i].c;sx+=v;si+=i;sii+=i*i;six+=i*v}var den=6*sii-si*si,b=(6*six-si*sx)/den,a=(sx-b*si)/6,mse=0;for(var j=0;j<6;j++){var e=list[start+j].c-(a+b*j);mse+=e*e}return{start:start,a:a,b:b,mse:mse/6}}
+  var fits=[];for(var fs=0;fs<=merged.length-6;fs++)fits.push(fitSix(merged,fs));fits.sort(function(a,b){return a.mse-b.mse});var fit=fits[0];
+  if(!fit||fit.b<w*.045||fit.b>w*.22||fit.mse>fit.b*fit.b*.08)return null;
+  var left=Math.max(0,Math.round(fit.a-fit.b*.52)),right=Math.min(w-1,Math.round(fit.a+fit.b*5+fit.b*.52)),spanW=Math.max(1,right-left+1),rowCounts=new Int32Array(h);
+  for(var ry=0;ry<h;ry++){var sum=0;for(var rx2=left;rx2<=right;rx2++)sum+=mask[ry*w+rx2];rowCounts[ry]=sum}
+  var minRow=Math.max(4,Math.round(spanW*.075)),rowRuns=[],rstart=null,ySearch0=Math.round(h*.12),ySearch1=Math.round(h*.88);
+  for(var ry2=ySearch0;ry2<ySearch1;ry2++){var ron=rowCounts[ry2]>minRow;if(ron&&rstart==null)rstart=ry2;if(!ron&&rstart!=null){rowRuns.push([rstart,ry2-1]);rstart=null}}if(rstart!=null)rowRuns.push([rstart,ySearch1-1]);
+  if(!rowRuns.length)return null;rowRuns.sort(function(a,b){return(b[1]-b[0])-(a[1]-a[0])});var yr=rowRuns[0],digitY0=Math.max(0,yr[0]-1),digitY1=Math.min(h,yr[1]+2),digitH=digitY1-digitY0;
+  if(digitH<h*.18)return null;
+  var patterns=[[1,1,1,1,1,1,0],[0,1,1,0,0,0,0],[1,1,0,1,1,0,1],[1,1,1,1,0,0,1],[0,1,1,0,0,1,1],[1,0,1,1,0,1,1],[1,0,1,1,1,1,1],[1,1,1,0,0,0,0],[1,1,1,1,1,1,1],[1,1,1,1,0,1,1]];
+  function fracRect(cellX0,cellX1,xa,xb,ya,yb,mode){var x0=Math.max(cellX0,Math.floor(cellX0+(cellX1-cellX0)*xa)),x1=Math.min(cellX1,Math.ceil(cellX0+(cellX1-cellX0)*xb)),y0=Math.max(digitY0,Math.floor(digitY0+digitH*ya)),y1=Math.min(digitY1,Math.ceil(digitY0+digitH*yb)),best=0;if(mode==="h"){for(var y=y0;y<y1;y++){var s=0,n=0;for(var x=x0;x<x1;x++){s+=mask[y*w+x];n++}if(n)best=Math.max(best,s/n)}}else{for(var x=x0;x<x1;x++){var s=0,n=0;for(var y=y0;y<y1;y++){s+=mask[y*w+x];n++}if(n)best=Math.max(best,s/n)}}return best}
+  var digits=[],totalHam=0,totalMargin=0;
+  for(var di2=0;di2<6;di2++){
+    var center=fit.a+fit.b*di2,cx0=Math.max(0,Math.round(center-fit.b*.46)),cx1=Math.min(w,Math.round(center+fit.b*.46));
+    var sc=[
+      fracRect(cx0,cx1,.28,.72,0,.23,"h"),fracRect(cx0,cx1,.68,.96,.12,.45,"v"),fracRect(cx0,cx1,.68,.96,.55,.88,"v"),
+      fracRect(cx0,cx1,.28,.72,.77,1,"h"),fracRect(cx0,cx1,.04,.32,.55,.88,"v"),fracRect(cx0,cx1,.04,.32,.12,.45,"v"),
+      fracRect(cx0,cx1,.28,.72,.39,.61,"h")
+    ];
+    var bits=sc.map(function(v){return v>=.5?1:0}),scores=[];
+    for(var dgt=0;dgt<10;dgt++){var ham=0,cost=0;for(var sg=0;sg<7;sg++){if(bits[sg]!==patterns[dgt][sg])ham++;cost+=patterns[dgt][sg]?(1-sc[sg]):sc[sg]}scores.push({digit:dgt,ham:ham,cost:cost})}
+    scores.sort(function(a,b){return a.ham-b.ham||a.cost-b.cost});var best=scores[0],second=scores[1];
+    if(best.ham>1)return null;if(second.ham===best.ham&&second.cost-best.cost<.18)return null;
+    digits.push(best.digit);totalHam+=best.ham;totalMargin+=Math.max(0,second.cost-best.cost)
+  }
+  var txt=digits.join(""),value=parseInt(txt,10);if(!isFinite(value))return null;
+  var confidence=Math.max(70,Math.min(98,96-totalHam*4+Math.min(8,totalMargin)));
+  return{value:value,digits:txt,confidence:confidence,method:"segments"}
+ }catch(e){return null}
+}
 async function recognizeWithWorker(worker,source,progress,modelName){
  var passes=[],confidence=0;
  async function pass(label,img,psm){
@@ -1271,7 +1332,16 @@ async function processWizardPhoto(kind,file,evidenceFile){
  hint.textContent="LCD-Anzeige wird für mehrere Prüfungen vorbereitet …";
  try{
    var source=await preprocessMeterPhoto(file,canvas),ocrSource=extractLikelyDisplayCanvas(source);showOcrSource(ocrSource,canvas);
-   hint.textContent="LCD erkannt · Spezial-Erkennung für Digitalziffern wird geladen …";
+   var direct=(cfg.ocrTarget==="imp"||cfg.ocrTarget==="feed")?directSevenSegmentRead(ocrSource):null;
+   if(direct){
+     var dc=ocrCheckAtDate(cfg.ocrTarget,direct.value,date),dt=ocrTrendInfo(cfg.ocrTarget,direct.value,date);
+     if(!dc.errors.length&&dt.ok!==false){
+       document.getElementById(cfg.input).value=direct.value;wizardPhotoMeta[kind]={value:direct.value,confidence:direct.confidence,mismatch:false};
+       confBox.className="ocrConfidence high";confBox.textContent="LCD direkt gelesen · "+n(direct.value,3)+" kWh · bitte prüfen";
+       choices.innerHTML="";hint.textContent="Der Zählerstand wurde direkt aus den 7 Segmenten gelesen und oben eingetragen. Wenn er stimmt, auf „Weiter“ tippen.";return
+     }
+   }
+   hint.textContent="Direkte Segment-Erkennung nicht eindeutig · OCR wird als Reserve geprüft …";
    var res=await runMeterOcr(ocrSource,function(p){hint.textContent="Zählerdisplay prüfen "+p+" %"},cfg.ocrTarget,date),txt=String(res.text||""),detected=detectMeterTarget(txt,null),mismatch=!!(detected&&(cfg.ocrTarget==="imp"||cfg.ocrTarget==="feed")&&detected!==cfg.ocrTarget),candidates=rankedOcrCandidatesFromResult(res,cfg.ocrTarget,date);
    if(!candidates.length)throw new Error("Kein plausibler Zählerstand erkannt");
    var best=candidates[0],ci=confidenceInfo(res.confidence,best);
@@ -1315,7 +1385,16 @@ document.getElementById("ocrButton").onclick=async function(){
  btn.disabled=true;hint.textContent="Bild wird lokal verbessert …";choices.innerHTML="";confBox.className="ocrConfidence";
  try{
    var source=await preprocessMeterPhoto(freeOcrFile||photoFile),ocrSource=extractLikelyDisplayCanvas(source);showOcrSource(ocrSource,document.getElementById("ocrCanvas"));
-   hint.textContent="LCD-Bereich automatisch gefunden · mehrere Ziffern-Prüfungen laufen …";
+   var direct=(target==="imp"||target==="feed")?directSevenSegmentRead(ocrSource):null;
+   if(direct){
+     var dc=ocrCheckAtDate(target,direct.value,date),dt=ocrTrendInfo(target,direct.value,date);
+     if(!dc.errors.length&&dt.ok!==false){
+       var df=document.getElementById(target);df.value=direct.value;freePhotoMeta={target:target,value:direct.value,confidence:direct.confidence};
+       confBox.className="ocrConfidence high";confBox.textContent="LCD direkt gelesen · "+n(direct.value,3)+" kWh · bitte prüfen";choices.innerHTML="";
+       hint.textContent="Der direkt gelesene Wert steht im Feld. Vor dem Speichern bitte kurz mit dem Display vergleichen.";validate();btn.disabled=false;return
+     }
+   }
+   hint.textContent="Direkte Segment-Erkennung nicht eindeutig · OCR wird als Reserve geprüft …";
    var res=await runMeterOcr(ocrSource,function(p){hint.textContent="LCD prüfen "+p+" %"},target,date),txt=String(res.text||""),detected=detectMeterTarget(txt,null),mismatch=!!(detected&&(target==="imp"||target==="feed")&&detected!==target),candidates=rankedOcrCandidatesFromResult(res,target,date);
    if(!candidates.length)throw new Error("Kein plausibler Zählerstand erkannt");
    var best=candidates[0],ci=confidenceInfo(res.confidence,best),field=document.getElementById(target);
