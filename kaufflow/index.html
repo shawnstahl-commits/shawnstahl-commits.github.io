@@ -255,7 +255,7 @@ body[data-view="list"] .app{padding-bottom:84px}
         <p>KaufFlow lernt aus deinen Einkäufen und macht dir nur Vorschläge – nichts landet ungefragt auf der Liste.</p>
         <div class="grid3">
           <div class="metric"><b id="mNeed">0</b><span>Artikel auf Liste</span></div>
-          <div class="metric"><b id="mBudget">0,00 €</b><span>geschätzter Einkauf</span></div>
+          <div class="metric"><b id="mLastTrip">–</b><span>letzter Einkauf</span></div>
           <div class="metric"><b id="mHome">0</b><span>vermutlich noch da</span></div>
         </div>
         <div class="actions">
@@ -300,7 +300,6 @@ body[data-view="list"] .app{padding-bottom:84px}
         <div class="listsummary">
           <span class="chip" id="listStoreBadge">🏪 Mein Laden</span>
           <span class="chip" id="listCountBadge">0 Artikel</span>
-          <span class="chip" id="listSumBadge">0,00 €</span>
         </div>
       </div>
 
@@ -308,11 +307,6 @@ body[data-view="list"] .app{padding-bottom:84px}
         <div class="card">
           <div class="space"><b>🏪 Laden</b><span class="muted">für Sortierung</span></div>
           <div class="field"><select id="storeSelectList" onchange="selectStore(this.value)"></select></div>
-        </div>
-        <div class="card">
-          <div class="space"><div><b>💶 Budget</b><div class="muted">Geplant vs. geschätzt</div></div><b id="budgetDisplay">0,00 €</b></div>
-          <div class="progress"><i id="budgetProgress"></i></div>
-          <div class="field"><input id="budgetInput" type="number" min="0" step=".01" placeholder="Budget festlegen" onchange="setBudget(this.value)"></div>
         </div>
       </div>
 
@@ -325,7 +319,7 @@ body[data-view="list"] .app{padding-bottom:84px}
 
     <section id="shop" class="view">
       <div class="shopbar">
-        <div class="shopstats"><b id="shopStore">🗺️ Mein Laden</b><span id="shopCount">0 / 0</span><span id="shopSum">0,00 €</span></div>
+        <div class="shopstats"><b id="shopStore">🗺️ Mein Laden</b><span id="shopCount">0 / 0</span><span class="muted">🧾 Preis per Bon</span></div>
         <div style="margin-top:10px">
           <div class="space shop-target-meta" style="margin-bottom:7px"><small class="muted"><b>Einkaufsziel</b> – Laden spontan wechseln</small><span class="chip">↻ neu sortieren</span></div>
           <div id="storeQuickSwitch" class="store-switcher"></div>
@@ -380,14 +374,26 @@ body[data-view="list"] .app{padding-bottom:84px}
     </section>
 
     <section id="history" class="view">
-      <div class="sectionhead"><div><h3>Gedächtnis</h3><div class="muted">Preise, Käufe und wiederkehrende Artikel</div></div></div>
+      <div class="sectionhead"><div><h3>Einkäufe & Preise</h3><div class="muted">Was deine Einkäufe in jedem Laden wirklich gekostet haben</div></div></div>
+
       <div class="card">
-        <div class="space"><b>Produktgedächtnis</b><span class="chip" id="memoryCount">0 Produkte</span></div>
-        <div id="memoryList"></div>
+        <div class="space"><b>🏪 Nach Laden</b><span class="chip" id="historyStoreLabel">Alle Läden</span></div>
+        <div id="historyStoreFilters" class="store-switcher" style="margin-top:10px"></div>
+        <div class="grid3" style="margin-bottom:0">
+          <div class="metric"><b id="historyTripCount">0</b><span>Einkäufe</span></div>
+          <div class="metric"><b id="historySpent">0,00 €</b><span>ausgegeben</span></div>
+          <div class="metric"><b id="historyAvg">0,00 €</b><span>Ø Einkauf</span></div>
+        </div>
       </div>
+
       <div class="card">
-        <div class="space"><b>Letzte Einkäufe</b><button class="btn small ghost" onclick="shareList()">Teilen</button></div>
+        <div class="space"><b>Einkaufsverlauf</b><span class="chip" id="historyCount">0</span></div>
         <div id="tripHistory"></div>
+      </div>
+
+      <div class="card">
+        <div class="space"><b>Produkt-Preisgedächtnis</b><span class="chip" id="memoryCount">0 Produkte</span></div>
+        <div id="memoryList"></div>
       </div>
     </section>
   </main>
@@ -463,6 +469,7 @@ let deferredInstallPrompt=null;
 let swRegistration=null;
 let reloadingForUpdate=false;
 let ocrBusy=false;
+let historyStoreFilter='all';
 const defaultState={onboarded:false,budget:0,people:['Ich','Partner/in','Kinder'],items:[],memory:{},trips:[],stores:[{id:'default',name:'Mein Laden',categoryOrder:[],productOrder:[]}],activeStoreId:'default',activeTrip:[],lastReceiptScan:null};
 let S=load();
 function load(){
@@ -627,7 +634,6 @@ function toggleListTools(force){
   box.classList.toggle('open',open);if(btn)btn.textContent=open?'✕ Schließen':'⚙️ Planung'
 }
 function closeModal(id){document.getElementById(id).classList.remove('open')}
-function setBudget(v){S.budget=Math.max(0,Number(v)||0);persist()}
 function parseQuick(raw){
   return raw.split(/,|\n|;/).map(s=>s.trim()).filter(Boolean).map(part=>{
     let qty='1',name=part;
@@ -794,7 +800,7 @@ function cropLineCanvas(src,y1,y2){
 function openOcrReview(rows){
   window.__ocrReviewRows=rows;
   const box=document.getElementById('ocrReviewList');
-  box.innerHTML=rows.map((r,i)=>{
+  box.innerHTML=(ctx.receiptTotal?'<div class="notice" style="margin-bottom:10px"><b>Bon-Gesamt: '+euro(ctx.receiptTotal)+'</b><br><span class="muted">Dieser Betrag wird als tatsächliche Einkaufssumme gespeichert.</span></div>':'')+rows.map((r,i)=>{
     const value=esc(r.name||r.suggestion||r.raw||'');
     return '<div class="card" style="margin:8px 0"><div class="space"><label style="display:flex;gap:9px;align-items:center;min-width:0;flex:1"><input id="ocrUse'+i+'" type="checkbox" '+(r.safe?'checked':'')+' style="width:20px;height:20px"><span style="min-width:0;flex:1"><input id="ocrName'+i+'" value="'+value+'" style="width:100%;background:#10141c;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px"><small class="muted">OCR: '+esc(r.raw||'')+'</small></span></label><span class="chip">'+Math.round(r.confidence||0)+'%</span></div></div>'
   }).join('');
@@ -923,6 +929,23 @@ function parseReceiptPrice(v){
   }else s=s.replace(',','.');
   const n=Number(s);return Number.isFinite(n)?Math.abs(n):0
 }
+function parseReceiptGrandTotal(text){
+  const lines=String(text||'').split(/\n+/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
+  const strong=/\b(summe|gesamt|gesamtsumme|zu zahlen|zahlbetrag|endbetrag|total)\b/i;
+  const avoid=/mwst|ust|steuer|netto|gegeben|rückgeld|rueckgeld|wechselgeld/i;
+  let best=0,bestScore=-1;
+  lines.forEach((line,i)=>{
+    if(!strong.test(line)||avoid.test(line))return;
+    const nums=[...line.matchAll(/(-?\d{1,5}[.,]\d{2})/g)].map(m=>parseReceiptPrice(m[1])).filter(n=>n>0&&n<10000);
+    if(!nums.length)return;
+    const val=nums[nums.length-1];
+    let score=5+i/Math.max(lines.length,1);
+    if(/zu zahlen|zahlbetrag|endbetrag/i.test(line))score+=3;
+    if(/gesamt|gesamtsumme|summe/i.test(line))score+=2;
+    if(score>bestScore){bestScore=score;best=val}
+  });
+  return best
+}
 function parseReceiptText(text){
   const lines=String(text||'').split(/\n+/).map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean);
   const skip=/summe|gesamt|total|zu zahlen|zahlbetrag|barzahlung|bar gegeben|rückgeld|rueckgeld|ec[- ]?karte|girocard|visa|mastercard|mwst|ust|steuer|netto|brutto|datum|uhrzeit|kasse|bon[- ]?nr|transaktion|terminal|kundenbeleg|zahlung|wechselgeld/i;
@@ -994,13 +1017,19 @@ function acceptReceiptReview(){
     const price=Number(document.getElementById('receiptPrice'+i)?.value)||0;
     if(applyReceiptMapping(target,price,r.receiptName,ctx))applied++
   });
+  const mappedTotal=ctx.mode==='trip'&&ctx.trip?(ctx.trip.items||[]).reduce((a,b)=>a+(Number(b.price)||0),0):S.items.reduce((a,b)=>a+(Number(b.price)||0),0);
+  const receiptTotal=Number(ctx.receiptTotal)||0;
   if(ctx.mode==='trip'&&ctx.trip){
-    ctx.trip.total=(ctx.trip.items||[]).reduce((a,b)=>a+(Number(b.price)||0),0)
+    ctx.trip.total=receiptTotal||mappedTotal;
+    ctx.trip.totalSource=receiptTotal?'receipt':'items';
+  }else if(ctx.mode==='items'){
+    S.pendingReceiptTotal=receiptTotal||mappedTotal||0;
+    S.pendingReceiptStoreId=activeStore().id;
   }
-  S.lastReceiptScan={date:Date.now(),store:ctx.trip?.store||activeStore().name,count:applied};
+  S.lastReceiptScan={date:Date.now(),store:ctx.trip?.store||activeStore().name,count:applied,total:receiptTotal||mappedTotal||0};
   closeModal('receiptReviewModal');persist();
-  setReceiptStatus(true,applied+' Preise vom Bon übernommen ✓',100);
-  toast(applied+' Preise gespeichert')
+  setReceiptStatus(true,(receiptTotal?'Bon-Gesamt '+euro(receiptTotal)+' · ':'')+applied+' Preise übernommen ✓',100);
+  toast(receiptTotal?'Einkaufssumme '+euro(receiptTotal)+' gespeichert':applied+' Preise gespeichert')
 }
 async function scanReceipt(file){
   if(!file||ocrBusy)return;
@@ -1015,11 +1044,19 @@ async function scanReceipt(file){
     }});
     await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});
     const a=await worker.recognize(base),b=await worker.recognize(bin.canvas);
-    const ra=parseReceiptText(a?.data?.text||''),rb=parseReceiptText(b?.data?.text||'');
+    const textA=a?.data?.text||'',textB=b?.data?.text||'';
+    const ra=parseReceiptText(textA),rb=parseReceiptText(textB);
     const rows=(rb.length>ra.length?rb:ra);
-    if(!rows.length){
+    ctx.receiptTotal=parseReceiptGrandTotal(textB)||parseReceiptGrandTotal(textA)||0;
+    if(!rows.length&& !ctx.receiptTotal){
       setReceiptStatus(true,'Keine Produktpreise erkannt. Bon bitte gerade, vollständig und gut beleuchtet fotografieren.',100);
       toast('Keine Preise erkannt');return
+    }
+    if(!rows.length&&ctx.receiptTotal){
+      if(ctx.mode==='trip'&&ctx.trip){ctx.trip.total=ctx.receiptTotal;ctx.trip.totalSource='receipt'}
+      else {S.pendingReceiptTotal=ctx.receiptTotal;S.pendingReceiptStoreId=activeStore().id}
+      S.lastReceiptScan={date:Date.now(),store:ctx.trip?.store||activeStore().name,count:0,total:ctx.receiptTotal};
+      persist();setReceiptStatus(true,'Bon-Gesamt '+euro(ctx.receiptTotal)+' gespeichert ✓',100);toast('Einkaufssumme gespeichert');return
     }
     const matched=matchReceiptRows(rows,ctx.targets);
     setReceiptStatus(true,matched.length+' Bon-Positionen erkannt – Zuordnung prüfen',100);
@@ -1190,8 +1227,11 @@ function finishTrip(){
     if(purchases.length>=2){const gaps=[];for(let i=1;i<purchases.length;i++)gaps.push((purchases[i]-purchases[i-1])/86400000);avg=gaps.reduce((a,b)=>a+b,0)/gaps.length}
     S.memory[it.name]={...old,lastBought:now,lastPrice:it.price,lastQty:it.qty,cat:it.cat,pref:it.pref,exact:it.exact,purchases,avgDays:Math.max(1,avg)}
   });
-  const tripId=crypto.randomUUID();S.trips.unshift({id:tripId,date:now,store:store.name,storeId:store.id,total:done.reduce((a,b)=>a+(Number(b.price)||0),0),count:done.length,items:done.map(i=>({id:i.id,name:i.name,qty:i.qty,price:Number(i.price)||0,cat:i.cat}))});S.trips=S.trips.slice(0,30);
-  S.items=S.items.filter(i=>!i.done);S.activeTrip=[];persist();toast('Einkauf bei '+store.name+' gespeichert – Reihenfolge gelernt');go('home')
+  const tripId=crypto.randomUUID(),itemTotal=done.reduce((a,b)=>a+(Number(b.price)||0),0);
+  const receiptTotal=(S.pendingReceiptStoreId===store.id?Number(S.pendingReceiptTotal)||0:0);
+  S.trips.unshift({id:tripId,date:now,store:store.name,storeId:store.id,total:receiptTotal||itemTotal,totalSource:receiptTotal?'receipt':'items',count:done.length,items:done.map(i=>({id:i.id,name:i.name,qty:i.qty,price:Number(i.price)||0,cat:i.cat}))});S.trips=S.trips.slice(0,30);
+  S.pendingReceiptTotal=0;S.pendingReceiptStoreId=null;
+  S.items=S.items.filter(i=>!i.done);S.activeTrip=[];persist();toast('Einkauf bei '+store.name+' gespeichert – '+euro(receiptTotal||itemTotal));go('home')
 }
 function makeMeals(){
   const budget=Number(document.getElementById('mealBudget').value)||15,time=Number(document.getElementById('mealTime').value)||20;
@@ -1217,22 +1257,43 @@ function importShared(){
   const p=new URLSearchParams(location.search).get('share');if(!p)return;
   try{const arr=JSON.parse(decodeURIComponent(escape(atob(p))));if(Array.isArray(arr)){arr.forEach(x=>S.items.push({id:crypto.randomUUID(),name:x.n,qty:x.q||'1',price:x.p||0,cat:x.c||guessCat(x.n),person:'Alle',pref:'',exact:'alt',done:false,created:Date.now()}));persist();history.replaceState({},'',location.pathname);toast('Geteilte Liste übernommen')}}catch(e){}
 }
+function setHistoryStoreFilter(id){
+  historyStoreFilter=id||'all';render()
+}
+function filteredTrips(){
+  return (S.trips||[]).filter(t=>historyStoreFilter==='all'||t.storeId===historyStoreFilter||(!t.storeId&&t.store===S.stores.find(s=>s.id===historyStoreFilter)?.name))
+}
+function renderCostHistory(){
+  const filters=document.getElementById('historyStoreFilters');if(!filters)return;
+  const allBtn='<button class="store-choice '+(historyStoreFilter==='all'?'active':'')+'" onclick="setHistoryStoreFilter(\'all\')">Alle</button>';
+  filters.innerHTML=allBtn+S.stores.map(s=>'<button class="store-choice '+(historyStoreFilter===s.id?'active':'')+'" onclick="setHistoryStoreFilter(\''+s.id+'\')">'+esc(s.name)+'</button>').join('');
+  const trips=filteredTrips(),priced=trips.filter(t=>Number(t.total)>0),spent=priced.reduce((a,t)=>a+(Number(t.total)||0),0),avg=priced.length?spent/priced.length:0;
+  const label=historyStoreFilter==='all'?'Alle Läden':(S.stores.find(s=>s.id===historyStoreFilter)?.name||'Laden');
+  document.getElementById('historyStoreLabel').textContent=label;
+  document.getElementById('historyTripCount').textContent=trips.length;
+  document.getElementById('historySpent').textContent=euro(spent);
+  document.getElementById('historyAvg').textContent=euro(avg);
+  document.getElementById('historyCount').textContent=trips.length;
+  document.getElementById('tripHistory').innerHTML=trips.map(t=>{
+    const source=t.totalSource==='receipt'?'🧾 Bon':'';
+    const itemCount=t.count||((t.items||[]).length);
+    return '<div class="historyrow"><div><b>'+esc(t.store||'Laden')+'</b><div class="muted">'+new Date(t.date).toLocaleDateString('de-DE')+' · '+itemCount+' Artikel'+(source?' · '+source:'')+'</div></div><b>'+euro(t.total)+'</b></div>'
+  }).join('')||'<div class="empty">Noch kein Einkauf für diese Auswahl.</div>'
+}
 function render(){
-  const open=S.items.filter(i=>!i.done),sum=open.reduce((a,b)=>a+(Number(b.price)||0),0),done=S.items.filter(i=>i.done).length,total=S.items.length;
-  document.getElementById('mNeed').textContent=open.length;document.getElementById('mBudget').textContent=euro(sum);document.getElementById('mHome').textContent=likelyHomeCount();
+  const open=S.items.filter(i=>!i.done),done=S.items.filter(i=>i.done).length,total=S.items.length;
+  const lastTrip=(S.trips||[])[0];
+  document.getElementById('mNeed').textContent=open.length;document.getElementById('mLastTrip').textContent=lastTrip&&Number(lastTrip.total)>0?euro(lastTrip.total):'–';document.getElementById('mHome').textContent=likelyHomeCount();
   const store=activeStore();renderStoreSelectors();renderQuickStoreSwitch();
   document.getElementById('storeNameHome').textContent=store.name;document.getElementById('shopStore').textContent='🗺️ '+store.name;document.getElementById('storeLearning').textContent=(store.productOrder||[]).length?(store.productOrder.length+' Produkte in Reihenfolge gelernt'):((store.categoryOrder||[]).length?store.categoryOrder.length+' Bereiche gelernt':'Noch keine gelernte Route');
-  document.getElementById('budgetInput').value=S.budget||'';document.getElementById('budgetDisplay').textContent=euro(sum)+(S.budget?' / '+euro(S.budget):'');
-  document.getElementById('budgetProgress').style.width=(S.budget?Math.min(100,sum/S.budget*100):0)+'%';
-  document.getElementById('listSub').textContent=open.length+' offen · '+euro(sum);
-  const listStoreBadge=document.getElementById('listStoreBadge'),listCountBadge=document.getElementById('listCountBadge'),listSumBadge=document.getElementById('listSumBadge');
+  document.getElementById('listSub').textContent=open.length+' offen';
+  const listStoreBadge=document.getElementById('listStoreBadge'),listCountBadge=document.getElementById('listCountBadge');
   if(listStoreBadge)listStoreBadge.textContent='🏪 '+store.name;
-  if(listCountBadge)listCountBadge.textContent=open.length+' '+(open.length===1?'Artikel':'Artikel');
-  if(listSumBadge)listSumBadge.textContent=euro(sum);
+  if(listCountBadge)listCountBadge.textContent=open.length+' Artikel';
   const list=sortedItems();
   document.getElementById('shoppingList').innerHTML=list.length?list.map(it=>itemHTML(it,false)).join(''):'<div class="empty"><div class="emoji">🧺</div>Deine Liste ist leer.<br>Füge oben mehrere Dinge auf einmal hinzu.</div>';
   document.getElementById('shopList').innerHTML=list.length?list.map(it=>itemHTML(it,true)).join(''):'<div class="empty"><div class="emoji">✨</div>Nichts einzukaufen.</div>';
-  document.getElementById('shopCount').textContent=done+' / '+total;document.getElementById('shopSum').textContent=euro(sum);document.getElementById('shopProgress').style.width=(total?done/total*100:0)+'%';document.getElementById('finishWrap').style.display=done?'block':'none';
+  document.getElementById('shopCount').textContent=done+' / '+total;document.getElementById('shopProgress').style.width=(total?done/total*100:0)+'%';document.getElementById('finishWrap').style.display=done?'block':'none';
   const smart=smartCandidates(),smartGroups=smartOverview();
   document.getElementById('smartPreview').innerHTML=smartGroups.next.slice(0,3).map(s=>smartHTML(s)).join('')||'<div class="card muted">Sobald du erste Einkäufe abschließt, erkennt KaufFlow hier deinen Rhythmus.</div>';
   const smartNext=document.getElementById('smartNext'),smartEmpty=document.getElementById('smartEmpty'),smartSoon=document.getElementById('smartSoon'),smartForgotten=document.getElementById('smartForgotten'),smartTogether=document.getElementById('smartTogether'),smartStore=document.getElementById('smartStore');
@@ -1246,7 +1307,7 @@ function render(){
   if(smartNextCount)smartNextCount.textContent=smartGroups.next.length+' '+(smartGroups.next.length===1?'Tipp':'Tipps');
   if(smartStoreName)smartStoreName.textContent=store.name;
   const mem=Object.entries(S.memory).sort((a,b)=>(b[1].lastBought||0)-(a[1].lastBought||0));document.getElementById('memoryCount').textContent=mem.length+' Produkte';document.getElementById('memoryList').innerHTML=mem.slice(0,12).map(([n,m])=>`<div class="historyrow"><div><b>${esc(n)}</b><div class="muted">${esc(m.cat||'')} · Ø ${Math.round(m.avgDays||7)} Tage</div></div><div style="text-align:right"><b>${euro(m.lastPrice)}</b><div class="muted">letzter Preis</div></div></div>`).join('')||'<div class="empty">Noch leer.</div>';
-  document.getElementById('tripHistory').innerHTML=S.trips.map((t,i)=>`<div class="historyrow"><div><b>${new Date(t.date).toLocaleDateString('de-DE')}</b><div class="muted">${esc(t.store)} · ${t.count} Artikel${Array.isArray(t.items)&&t.items.some(x=>x.price)?' · 🧾 Preise gespeichert':''}</div></div><b>${euro(t.total)}</b></div>`).join('')||'<div class="empty">Noch kein abgeschlossener Einkauf.</div>';
+  renderCostHistory();
 }
 function itemHTML(it,shop){
   const inner=`<div class="item ${it.done?'done':''} ${shop?'shopitem':''}">
