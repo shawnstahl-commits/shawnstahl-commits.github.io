@@ -40,7 +40,8 @@ button,input,select{font:inherit} button{cursor:pointer}
 .smartcard{display:flex;gap:12px;align-items:center}.smarticon{width:44px;height:44px;border-radius:15px;background:var(--panel2);display:grid;place-items:center;font-size:21px;flex:0 0 auto}.smartcard .grow{flex:1}.smartcard b{display:block}.smartcard small{color:var(--muted)}
 .quickadd{display:flex;gap:8px}.scanpaper{display:flex;gap:8px;margin-top:9px}.scanpaper .btn{flex:1}.ocrstatus{display:none;margin-top:10px}.ocrstatus.show{display:block}.ocrbar{height:7px;background:#202633;border-radius:999px;overflow:hidden;margin-top:8px}.ocrbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}.quickadd input,.field input,.field select{width:100%;background:#10141c;border:1px solid var(--line);color:var(--text);border-radius:15px;padding:13px 14px;outline:none}.quickadd input:focus,.field input:focus,.field select:focus{border-color:#5b718e}
 .list{display:flex;flex-direction:column;gap:9px}.item{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:19px;padding:12px 13px}
-.listpaper{gap:5px}.listpaper .item{padding:8px 9px;border-radius:13px;gap:8px;min-height:48px}.listpaper .check{width:25px;height:25px;border-radius:8px}.listpaper .iname{font-size:15px;line-height:1.18}.listpaper .isub{font-size:10px;margin-top:2px}.listpaper .price{font-size:13px}.listpaper .iconbtn{width:30px!important;height:30px!important;border-radius:10px;font-size:18px}
+.listpaper{gap:5px}.listpaper .item{padding:8px 9px;border-radius:13px;gap:8px;min-height:48px}.listpaper .check{width:25px;height:25px;border-radius:8px}.listpaper .iname{font-size:15px;line-height:1.18}.listpaper .isub{font-size:10px;margin-top:2px}.listpaper .price{font-size:13px}
+.swipe-row{position:relative;overflow:hidden;border-radius:13px;background:#4a151b}.swipe-row .item{position:relative;z-index:2;margin:0;touch-action:pan-y;will-change:transform;transition:transform .18s ease}.swipe-row.dragging .item{transition:none}.swipe-delete{position:absolute;z-index:1;right:0;top:0;bottom:0;width:104px;display:flex;align-items:center;justify-content:center;gap:5px;background:#7e202a;color:#fff;font-weight:800;font-size:13px}.swipe-row.ready-delete .swipe-delete{background:#a62634}
 .listhead{position:sticky;top:4px;z-index:7;background:rgba(13,16,22,.94);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:17px;padding:10px 11px;margin-bottom:8px}
 .listheadline{display:flex;align-items:center;justify-content:space-between;gap:8px}.listheadline h3{margin:0;font-size:17px}.listsummary{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:7px}.listsummary .chip{padding:4px 8px;font-size:11px}
 .listquick{display:grid;grid-template-columns:1fr 42px 42px;gap:6px;margin:8px 0}.listquick input{min-width:0;background:#10141c;border:1px solid var(--line);color:var(--text);border-radius:13px;padding:10px 11px;outline:none}.listquick .btn{padding:0;display:grid;place-items:center;border-radius:13px}
@@ -1248,12 +1249,13 @@ function render(){
   document.getElementById('tripHistory').innerHTML=S.trips.map((t,i)=>`<div class="historyrow"><div><b>${new Date(t.date).toLocaleDateString('de-DE')}</b><div class="muted">${esc(t.store)} · ${t.count} Artikel${Array.isArray(t.items)&&t.items.some(x=>x.price)?' · 🧾 Preise gespeichert':''}</div></div><b>${euro(t.total)}</b></div>`).join('')||'<div class="empty">Noch kein abgeschlossener Einkauf.</div>';
 }
 function itemHTML(it,shop){
-  return `<div class="item ${it.done?'done':''} ${shop?'shopitem':''}">
+  const inner=`<div class="item ${it.done?'done':''} ${shop?'shopitem':''}">
     <button class="check" onclick="toggleItem('${it.id}',${shop})">${it.done?'✓':''}</button>
     <div class="itemmain" onclick="openItemModal('${it.id}')"><div class="iname">${esc(it.qty)}× ${esc(it.name)}</div><div class="isub">${esc(it.cat)}${it.pref?' · '+esc(it.pref):''}${it.exact==='exact'?' · genau diese':''}${it.person&&it.person!=='Alle'?' · '+esc(it.person):''}</div></div>
     <div class="price">${it.price?euro(it.price):'–'}${it.price?priceTrend(it.name,it.price):''}</div>
-    ${shop?'':`<button class="iconbtn" style="width:36px;height:36px" onclick="removeItem('${it.id}')">×</button>`}
-  </div>`
+  </div>`;
+  if(shop)return inner;
+  return `<div class="swipe-row" data-swipe-id="${it.id}"><div class="swipe-delete">🗑️ Löschen</div>${inner}</div>`
 }
 function smartReason(s){
   if(s.kind==='empty')return 'wahrscheinlich leer · zuletzt vor '+Math.floor(s.days)+' Tagen · Rhythmus ~'+Math.round(s.interval)+' Tage';
@@ -1272,6 +1274,55 @@ function smartHTML(s){
 function smartEmptyHTML(text){
   return '<div class="card muted" style="padding:13px">'+esc(text)+'</div>'
 }
+let swipeState=null,swipeSuppressClickUntil=0;
+function setupSwipeDelete(){
+  const list=document.getElementById('shoppingList');if(!list)return;
+  const reset=row=>{
+    if(!row)return;
+    row.classList.remove('dragging','ready-delete');
+    const item=row.querySelector('.item');if(item)item.style.transform=''
+  };
+  list.addEventListener('pointerdown',e=>{
+    const row=e.target.closest('.swipe-row');if(!row)return;
+    const item=row.querySelector('.item');if(!item)return;
+    swipeState={row,item,id:row.dataset.swipeId,startX:e.clientX,startY:e.clientY,dx:0,active:false,pointerId:e.pointerId};
+  });
+  list.addEventListener('pointermove',e=>{
+    const s=swipeState;if(!s||s.pointerId!==e.pointerId)return;
+    const dx=e.clientX-s.startX,dy=e.clientY-s.startY;
+    if(!s.active){
+      if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){swipeState=null;return}
+      if(dx>-7)return;
+      if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){s.active=true;s.row.classList.add('dragging');try{s.row.setPointerCapture(e.pointerId)}catch(_){}}
+      else return
+    }
+    e.preventDefault();
+    s.dx=Math.max(-118,Math.min(0,dx));
+    s.item.style.transform='translateX('+s.dx+'px)';
+    s.row.classList.toggle('ready-delete',s.dx<=-78)
+  },{passive:false});
+  const endSwipe=e=>{
+    const s=swipeState;if(!s)return;swipeState=null;
+    if(!s.active){reset(s.row);return}
+    swipeSuppressClickUntil=Date.now()+350;
+    s.row.classList.remove('dragging');
+    if(s.dx<=-78){
+      s.row.classList.add('ready-delete');
+      s.item.style.transition='transform .18s ease';
+      s.item.style.transform='translateX(-115%)';
+      if(navigator.vibrate)navigator.vibrate(25);
+      const name=S.items.find(x=>x.id===s.id)?.name||'Artikel';
+      setTimeout(()=>{removeItem(s.id);toast(name+' gelöscht')},170)
+    }else{
+      reset(s.row)
+    }
+  };
+  list.addEventListener('pointerup',endSwipe);
+  list.addEventListener('pointercancel',endSwipe);
+  list.addEventListener('click',e=>{
+    if(Date.now()<swipeSuppressClickUntil){e.preventDefault();e.stopPropagation()}
+  },true)
+}
 function syncTabs(){}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;updateInstallUi()});
 window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;updateInstallUi();toast('KaufFlow wurde installiert')});
@@ -1287,7 +1338,7 @@ window.addEventListener('storage',e=>{if(e.key===KEY){S=load();render()}});
 if('BroadcastChannel'in window){const bc=new BroadcastChannel('kaufflow');const oldPersist=persist;persist=function(){localStorage.setItem(KEY,JSON.stringify(S));bc.postMessage('sync');render();syncTabs()};bc.onmessage=()=>{S=load();render()}}
 if(!S.onboarded)document.getElementById('onboard').classList.add('open');
 document.body.dataset.view='home';
-importShared();render();setupPwa();
+importShared();render();setupSwipeDelete();setupPwa();
 </script>
 </body>
 </html>
