@@ -38,7 +38,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 .section{margin-top:24px}.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.sectionhead h3{margin:0;font-size:17px}.muted{color:var(--muted)}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:10px 0}
 .smartcard{display:flex;gap:12px;align-items:center}.smarticon{width:44px;height:44px;border-radius:15px;background:var(--panel2);display:grid;place-items:center;font-size:21px;flex:0 0 auto}.smartcard .grow{flex:1}.smartcard b{display:block}.smartcard small{color:var(--muted)}
-.quickadd{display:flex;gap:8px}.quickadd input,.field input,.field select{width:100%;background:#10141c;border:1px solid var(--line);color:var(--text);border-radius:15px;padding:13px 14px;outline:none}.quickadd input:focus,.field input:focus,.field select:focus{border-color:#5b718e}
+.quickadd{display:flex;gap:8px}.scanpaper{display:flex;gap:8px;margin-top:9px}.scanpaper .btn{flex:1}.ocrstatus{display:none;margin-top:10px}.ocrstatus.show{display:block}.ocrbar{height:7px;background:#202633;border-radius:999px;overflow:hidden;margin-top:8px}.ocrbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}.quickadd input,.field input,.field select{width:100%;background:#10141c;border:1px solid var(--line);color:var(--text);border-radius:15px;padding:13px 14px;outline:none}.quickadd input:focus,.field input:focus,.field select:focus{border-color:#5b718e}
 .list{display:flex;flex-direction:column;gap:9px}.item{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:19px;padding:12px 13px}.check{width:29px;height:29px;border:1px solid #445064;border-radius:10px;background:#0f131a;color:#0f131a;display:grid;place-items:center;flex:0 0 auto}.item.done{opacity:.55}.item.done .check{background:var(--accent);color:#102117;border-color:var(--accent)}.item.done .iname{text-decoration:line-through}.itemmain{flex:1;min-width:0}.iname{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.isub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.price{font-weight:800}
 .chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:5px 9px;font-size:12px;color:#ccd3df;gap:5px}.chips{display:flex;gap:7px;flex-wrap:wrap}
 .tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(12,15,21,.92);backdrop-filter:blur(18px);border-top:1px solid var(--line);z-index:20}.tabsin{max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 10px calc(8px + env(safe-area-inset-bottom))}.tab{border:0;background:transparent;color:#8892a2;padding:7px 2px;font-size:11px}.tab span{display:block;font-size:20px}.tab.active{color:var(--accent)}
@@ -104,6 +104,8 @@ button,input,select{font:inherit} button{cursor:pointer}
       <div class="section">
         <div class="sectionhead"><h3>Schnell hinzufügen</h3><span class="muted">mehrere auf einmal</span></div>
         <div class="quickadd"><input id="quickInput" placeholder="z. B. Milch, Butter, 2x Toast"><button class="btn primary" onclick="quickAdd()">＋</button></div>
+        <div class="scanpaper"><button class="btn ghost" onclick="openPaperScanner()">📷 Einkaufszettel fotografieren</button></div>
+        <div id="ocrStatusHome" class="ocrstatus notice"><b id="ocrStatusTextHome">Foto wird gelesen …</b><div class="ocrbar"><i id="ocrProgressHome"></i></div></div>
       </div>
 
       <div class="section">
@@ -131,8 +133,10 @@ button,input,select{font:inherit} button{cursor:pointer}
         <div style="height:10px"></div>
         <div class="field"><input id="budgetInput" type="number" min="0" step=".01" placeholder="Budget festlegen" onchange="setBudget(this.value)"></div>
       </div>
-      <div class="quickadd" style="margin:14px 0"><input id="listQuickInput" placeholder="Milch, 2x Joghurt, Brot..."><button class="btn primary" onclick="quickAdd('listQuickInput')">＋</button></div>
-      <div id="shoppingList" class="list"></div>
+      <div class="quickadd" style="margin:14px 0 0"><input id="listQuickInput" placeholder="Milch, 2x Joghurt, Brot..."><button class="btn primary" onclick="quickAdd('listQuickInput')">＋</button></div>
+      <div class="scanpaper"><button class="btn ghost" onclick="openPaperScanner()">📷 Zettel fotografieren & übernehmen</button></div>
+      <div id="ocrStatusList" class="ocrstatus notice"><b id="ocrStatusTextList">Foto wird gelesen …</b><div class="ocrbar"><i id="ocrProgressList"></i></div></div>
+      <div id="shoppingList" class="list" style="margin-top:14px"></div>
     </section>
 
     <section id="shop" class="view">
@@ -234,6 +238,7 @@ button,input,select{font:inherit} button{cursor:pointer}
   </div>
 </div>
 
+<input id="paperListPhoto" type="file" accept="image/*" capture="environment" hidden onchange="if(this.files&&this.files[0])scanPaperList(this.files[0])">
 <div id="toast" class="toast">Gespeichert</div>
 
 <script>
@@ -241,6 +246,7 @@ const KEY='kaufflow_v1';
 let deferredInstallPrompt=null;
 let swRegistration=null;
 let reloadingForUpdate=false;
+let ocrBusy=false;
 const defaultState={onboarded:false,budget:0,people:['Ich','Partner/in','Kinder'],items:[],memory:{},trips:[],stores:[{id:'default',name:'Mein Laden',categoryOrder:[],productOrder:[]}],activeStoreId:'default',activeTrip:[]};
 let S=load();
 function load(){
@@ -408,8 +414,135 @@ function guessCat(name){
 }
 function quickAdd(inputId='quickInput'){
   const inp=document.getElementById(inputId),parts=parseQuick(inp.value);if(!parts.length)return;
-  parts.forEach(p=>{const mem=findMem(p.name);S.items.push({id:crypto.randomUUID(),name:p.name,qty:p.qty,price:mem?.lastPrice||0,cat:mem?.cat||guessCat(p.name),person:'Alle',pref:mem?.pref||'',exact:mem?.exact||'alt',done:false,created:Date.now()})});
+  parts.forEach(p=>addParsedItem(p));
   inp.value='';persist();toast(parts.length+' Artikel hinzugefügt')
+}
+function addParsedItem(p){
+  const mem=findMem(p.name);
+  S.items.push({id:crypto.randomUUID(),name:p.name,qty:p.qty||'1',price:mem?.lastPrice||0,cat:mem?.cat||guessCat(p.name),person:'Alle',pref:mem?.pref||'',exact:mem?.exact||'alt',done:false,created:Date.now()})
+}
+function openPaperScanner(){
+  if(ocrBusy){toast('Foto wird noch verarbeitet');return}
+  const input=document.getElementById('paperListPhoto');input.value='';input.click()
+}
+function setOcrStatus(show,text,progress=0){
+  ['Home','List'].forEach(s=>{
+    const box=document.getElementById('ocrStatus'+s),txt=document.getElementById('ocrStatusText'+s),bar=document.getElementById('ocrProgress'+s);
+    if(box)box.classList.toggle('show',show);
+    if(txt&&text)txt.textContent=text;
+    if(bar)bar.style.width=Math.max(0,Math.min(100,progress))+'%'
+  })
+}
+async function loadTesseract(){
+  if(window.Tesseract)return window.Tesseract;
+  await new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    s.onload=resolve;s.onerror=()=>reject(new Error('OCR konnte nicht geladen werden'));
+    document.head.appendChild(s)
+  });
+  return window.Tesseract
+}
+function levenshtein(a,b){
+  a=String(a).toLowerCase();b=String(b).toLowerCase();
+  const m=Array.from({length:b.length+1},(_,i)=>[i]);
+  m[0]=Array.from({length:a.length+1},(_,i)=>i);
+  for(let i=1;i<=b.length;i++)for(let j=1;j<=a.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[j-1]===b[i-1]?0:1));
+  return m[b.length][a.length]
+}
+const SHOPPING_WORDS=[
+  'Milch','Butter','Joghurt','Käse','Quark','Sahne','Eier','Brot','Toast','Brötchen','Baguette',
+  'Äpfel','Bananen','Orangen','Zitronen','Tomaten','Gurke','Salat','Paprika','Kartoffeln','Zwiebeln',
+  'Karotten','Möhren','Knoblauch','Champignons','Brokkoli','Blumenkohl','Reis','Nudeln','Spaghetti',
+  'Mehl','Zucker','Salz','Pfeffer','Öl','Olivenöl','Essig','Ketchup','Mayonnaise','Senf','Marmelade',
+  'Nutella','Müsli','Cornflakes','Haferflocken','Kaffee','Tee','Wasser','Cola','Saft','Limonade',
+  'Hackfleisch','Hähnchen','Fleisch','Wurst','Schinken','Fisch','Pizza','Pommes','Tiefkühlgemüse',
+  'Toilettenpapier','Küchenrolle','Taschentücher','Spülmittel','Waschmittel','Weichspüler','Müllbeutel',
+  'Zahnpasta','Shampoo','Duschgel','Deo','Seife','Windeln','Katzenfutter','Hundefutter'
+];
+function bestCorrection(word){
+  const raw=word.trim();if(raw.length<4||/\d/.test(raw))return raw;
+  const learned=Object.keys(S.memory);
+  const candidates=[...new Set([...SHOPPING_WORDS,...learned])];
+  let best=raw,bestD=99;
+  for(const cand of candidates){
+    if(Math.abs(cand.length-raw.length)>2)continue;
+    const d=levenshtein(raw,cand);
+    if(d<bestD){bestD=d;best=cand}
+  }
+  const limit=raw.length<=5?1:raw.length<=9?2:3;
+  return bestD<=limit?best:raw
+}
+function cleanOcrLine(line){
+  let s=String(line||'').replace(/[•·●■□✓✔]/g,' ').replace(/^\s*[-–—]+\s*/,'').trim();
+  s=s.replace(/^\s*(\d+)\s*[.)-]\s*/,'$1x ');
+  s=s.replace(/[^A-Za-zÄÖÜäöüß0-9.,%&+\- xX×]/g,' ').replace(/\s+/g,' ').trim();
+  if(!s||s.length<2)return '';
+  const qty=s.match(/^\s*(\d+(?:[.,]\d+)?)\s*[xX×]\s*(.+)$/);
+  let prefix='',body=s;
+  if(qty){prefix=qty[1]+'x ';body=qty[2]}
+  const words=body.split(' ').map(w=>{
+    if(w.length<2)return w;
+    const corrected=bestCorrection(w);
+    return corrected
+  });
+  body=words.join(' ').replace(/\s+/g,' ').trim();
+  if(!body)return '';
+  body=body.charAt(0).toLocaleUpperCase('de-DE')+body.slice(1);
+  return prefix+body
+}
+async function preprocessShoppingPhoto(file){
+  const img=await new Promise((resolve,reject)=>{
+    const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=URL.createObjectURL(file)
+  });
+  const max=1800,scale=Math.min(1,max/Math.max(img.width,img.height));
+  const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  const data=ctx.getImageData(0,0,canvas.width,canvas.height),p=data.data;
+  for(let i=0;i<p.length;i+=4){
+    const gray=.299*p[i]+.587*p[i+1]+.114*p[i+2];
+    const v=gray>190?255:gray<85?0:Math.max(0,Math.min(255,(gray-128)*1.65+128));
+    p[i]=p[i+1]=p[i+2]=v
+  }
+  ctx.putImageData(data,0,0);return canvas
+}
+async function scanPaperList(file){
+  if(!file||ocrBusy)return;
+  ocrBusy=true;setOcrStatus(true,'Foto wird vorbereitet …',5);
+  try{
+    const T=await loadTesseract();
+    setOcrStatus(true,'Schrift wird erkannt …',12);
+    const canvas=await preprocessShoppingPhoto(file);
+    const result=await T.recognize(canvas,'deu',{
+      logger:m=>{
+        if(m.status==='recognizing text'){
+          const pct=15+Math.round((m.progress||0)*80);
+          setOcrStatus(true,'Einkaufszettel wird gelesen … '+Math.round((m.progress||0)*100)+' %',pct)
+        }
+      }
+    });
+    const raw=(result?.data?.text||'').trim();
+    const lines=raw.split(/\n+/).map(cleanOcrLine).filter(Boolean)
+      .filter(x=>/[A-Za-zÄÖÜäöüß]{2}/.test(x))
+      .filter((x,i,a)=>a.findIndex(y=>y.toLowerCase()===x.toLowerCase())===i);
+    if(!lines.length){
+      setOcrStatus(true,'Leider keine Artikel sicher erkannt. Foto bitte gerade und gut beleuchtet aufnehmen.',100);
+      toast('Keine Artikel erkannt');return
+    }
+    const parsed=lines.flatMap(x=>parseQuick(x));
+    parsed.forEach(addParsedItem);
+    persist();
+    setOcrStatus(true,parsed.length+' Artikel erkannt, korrigiert und hinzugefügt ✓',100);
+    toast(parsed.length+' Artikel vom Zettel übernommen');
+    setTimeout(()=>setOcrStatus(false,'',0),3500)
+  }catch(e){
+    console.error(e);
+    setOcrStatus(true,'Erkennung fehlgeschlagen. Bitte Internetverbindung prüfen und Foto erneut aufnehmen.',100);
+    toast('Foto konnte nicht gelesen werden')
+  }finally{
+    ocrBusy=false;
+    const input=document.getElementById('paperListPhoto');if(input)input.value=''
+  }
 }
 function findMem(name){const key=Object.keys(S.memory).find(k=>k.toLowerCase()===name.toLowerCase());return key?S.memory[key]:null}
 function openItemModal(id){
