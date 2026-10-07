@@ -1,6 +1,6 @@
-const CACHE="stromtagebuch-v43";
-const OCR_CACHE="stromtagebuch-ocr-v13";
-const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg"];
+const CACHE="stromtagebuch-v44";
+const OCR_CACHE="stromtagebuch-ocr-v14";
+const ASSETS=["./","./index.html","./app.html","./manifest.webmanifest","./icon.svg"];
 
 self.addEventListener("install",event=>{
   self.skipWaiting();
@@ -18,7 +18,7 @@ self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET") return;
   const url=new URL(event.request.url);
   const sameOrigin=url.origin===self.location.origin;
-  const isPage=event.request.mode==="navigate" || url.pathname.endsWith("/stromtagebuch/") || url.pathname.endsWith("/stromtagebuch/index.html");
+  const isPage=event.request.mode==="navigate" || url.pathname.endsWith("/stromtagebuch/") || url.pathname.endsWith("/stromtagebuch/index.html") || url.pathname.endsWith("/stromtagebuch/app.html");
   const isOcrAsset=
     (url.hostname==="cdn.jsdelivr.net" && url.pathname.toLowerCase().includes("tesseract")) ||
     url.hostname==="tessdata.projectnaptha.com" ||
