@@ -185,6 +185,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 .ocrSuggestions{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
 .ocrChoice{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:8px 11px;font-weight:900;cursor:pointer}
 .ocrChoice.best{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset}
+.valueTrend{display:none;align-items:center;gap:5px;margin-top:6px;font-size:11px;font-weight:850;line-height:1.25}
+.valueTrend.show{display:flex}.valueTrend .trendArrow{font-size:12px;font-weight:950}
+.valueTrend.up{color:var(--green)}.valueTrend.up .trendArrow{color:var(--green)}
+.valueTrend.down{color:var(--red)}.valueTrend.down .trendArrow{color:var(--red)}
+.valueTrend.flat{color:var(--muted)}
+.dashHero .valueTrend{width:max-content;max-width:100%;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.11);color:rgba(255,255,255,.88)}
+.dashHero .valueTrend.up .trendArrow{color:#78f0b8}.dashHero .valueTrend.down .trendArrow{color:#ff8f8f}
 .photoGallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
 .photoEvidence{border:1px solid var(--line);border-radius:15px;padding:9px;background:var(--card)}
 .photoEvidence img{width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:10px;background:#111}
@@ -226,17 +233,17 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.2</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.3</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.2</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.3</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
 <div class="dashHero">
   <div class="label">DEIN STROMKONTO</div>
-  <div class="dashMoney" id="balance">–</div>
+  <div class="dashMoney" id="balance">–</div><div class="valueTrend" id="balanceTrend"></div>
   <div class="hint" id="balanceHint">Abschläge minus Stromkosten inkl. Grundpreis · PV-Vergütung separat</div>
   <div class="dashActions">
     <button class="dashAction" data-go="read">📟 Heute ablesen</button>
@@ -247,7 +254,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="smartCard good" id="smartCard"><div class="smartIcon" id="smartIcon">✅</div><div class="smartText"><b id="smartTitle">Alles im grünen Bereich</b><div class="hint" id="smartText">Die App prüft automatisch, was gerade wichtig ist.</div></div><button class="mini" id="smartAction" data-go="health">Ansehen</button></div>
 <div class="balanceExplain">
   <div><div class="label">Abschläge bis heute</div><b id="balancePaid">–</b></div>
-  <div><div class="label">Stromkosten bis Zählerstand</div><b id="balanceCost">–</b></div>
+  <div><div class="label">Stromkosten bis Zählerstand</div><b id="balanceCost">–</b><div class="valueTrend" id="balanceCostTrend"></div></div>
   <div><div class="label">Ergebnis</div><b id="balanceResult">–</b></div>
 </div>
 
@@ -268,8 +275,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <h2>Seit der letzten Ablesung</h2><div class="grid">
 <div class="card"><div class="label">Netzbezug</div><div class="value" id="periodImp">–</div><div class="hint" id="periodImpDay">–</div></div>
 <div class="card"><div class="label">Einspeisung</div><div class="value good" id="periodFeed">–</div><div class="hint" id="periodFeedDay">–</div></div>
-<div class="card"><div class="label">Stromkosten</div><div class="value" id="periodCost">–</div><div class="hint">Arbeitspreis</div></div>
-<div class="card"><div class="label">PV-Vergütung</div><div class="value good" id="periodRevenue">–</div><div class="hint">aus Einspeisung</div></div>
+<div class="card"><div class="label">Stromkosten</div><div class="value" id="periodCost">–</div><div class="valueTrend" id="periodCostTrend"></div><div class="hint">Arbeitspreis</div></div>
+<div class="card"><div class="label">PV-Vergütung</div><div class="value good" id="periodRevenue">–</div><div class="valueTrend" id="periodRevenueTrend"></div><div class="hint">aus Einspeisung</div></div>
 </div>
 <h2>Kontrolle & Prognose</h2><div class="grid">
 <div class="card"><div class="label">30-Tage-Stromkosten</div><div class="value" id="forecastCost">–</div><div class="hint" id="forecast30Hint">Trend aus aktuellen Zählerdaten</div></div>
@@ -397,7 +404,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="card"><div class="label">Voraussichtliche Einspeisevergütung</div><div class="value good" id="pvRevenueTotal">–</div><div class="hint" id="pvRevenueHint">aus offiziellem 2.8.0-Zähler</div></div>
 <div class="card"><div class="label">Eigenverbrauch</div><div class="value" id="selfConsumption">–</div><div class="hint" id="selfConsumptionHint">PV-Erzeugungsstand nötig</div></div>
 <div class="card"><div class="label">Autarkie-Schätzung</div><div class="value" id="autarky">–</div><div class="hint">nur mit PV-Erzeugungswert</div></div>
-<div class="card"><div class="label">PV-Wert / Ersparnis</div><div class="value good" id="pvValue">–</div><div class="hint" id="pvValueHint">Eigenverbrauch + Einspeisung</div></div>
+<div class="card"><div class="label">PV-Wert / Ersparnis</div><div class="value good" id="pvValue">–</div><div class="valueTrend" id="pvValueTrend"></div><div class="hint" id="pvValueHint">Eigenverbrauch + Einspeisung</div></div>
 <div class="card wide"><div class="label">Geschätzte Stromkosten ohne PV</div><div class="value" id="withoutPv">–</div><div class="hint" id="withoutPvHint">Für diese Berechnung brauchen wir mindestens zwei PV-Erzeugungsstände.</div></div>
 </div>
 
@@ -490,7 +497,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.2</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.3</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -579,7 +586,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Das <b>Komplett-Backup enthält ab v1.3 auch deine Zählerfotos</b>, damit sie auf ein neues Gerät übernommen werden können.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Vollbackup inkl. Fotos</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.4.2</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.4.3</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
@@ -624,7 +631,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="toast" id="toast"></div>
 
 <script>
-var APP_VERSION="1.4.2";
+var APP_VERSION="1.4.3";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
@@ -703,6 +710,38 @@ function ensureMonth(out,key){if(!out[key])out[key]={imp:0,feed:0,energyCost:0,b
 function distributeWithTariff(out,a,b,field,deltaVal){var total=days(a,b);if(total<=0||!isFinite(deltaVal))return;var per=Number(deltaVal)/total;dayLoop(a,b,function(ds){var x=ensureMonth(out,monthKey(ds)),t=tariffAt(ds);x[field]+=per;if(field==="imp")x.energyCost+=per*(Number(t.workRate)||0);if(field==="feed")x.revenue+=per*(Number(t.feedRate)||0)})}
 function monthlyStats(){var out={},a=sorted().filter(function(e){return e.imp!=null});for(var i=1;i<a.length;i++)distributeWithTariff(out,a[i-1].date,a[i].date,"imp",Number(a[i].imp)-Number(a[i-1].imp));if(a.length>=2)dayLoop(a[0].date,a[a.length-1].date,function(ds){ensureMonth(out,monthKey(ds)).baseCost+=(Number(tariffAt(ds).baseAnnual)||0)/365});var fd=sorted().filter(function(e){return e.feed!=null}).sort(function(a,b){return a.date.localeCompare(b.date)});if(fd.length){var fp={date:state.settings.pvStart||fd[0].date,feed:Number(state.settings.feedStart)||0};for(var j=0;j<fd.length;j++){if(fd[j].date>fp.date)distributeWithTariff(out,fp.date,fd[j].date,"feed",Number(fd[j].feed)-Number(fp.feed));fp=fd[j]}}return Object.keys(out).sort().map(function(k){var x=out[k];x.key=k;x.cost=x.energyCost+x.baseCost;return x})}
 function accountBalance(){var a=sorted().filter(function(e){return e.imp!=null});if(a.length<2)return null;var ms=monthlyStats(),energy=ms.reduce(function(t,x){return t+x.energyCost},0),base=ms.reduce(function(t,x){return t+x.baseCost},0),last=a[a.length-1],today=localToday(),paid=paidUntil(today);return{balance:paid-energy-base,paid:paid,paidThrough:today,energy:energy,base:base,totalCost:energy+base,date:last.date}}
+function accountBalanceAtReading(index){
+ var a=sorted().filter(function(e){return e.imp!=null});
+ if(index<0||index>=a.length)return null;
+ var first=a[0],last=a[index],energy=0;
+ for(var i=1;i<=index;i++)energy+=intervalEnergyCost(a[i-1].date,a[i].date,Number(a[i].imp)-Number(a[i-1].imp));
+ var base=index>0?baseCostBetween(first.date,last.date):0,paid=paidUntil(last.date);
+ return{balance:paid-energy-base,paid:paid,energy:energy,base:base,totalCost:energy+base,date:last.date}
+}
+function lastReadingMoneyTrend(){
+ var a=sorted().filter(function(e){return e.imp!=null});
+ if(a.length<2)return null;
+ var cur=accountBalanceAtReading(a.length-1),prev=accountBalanceAtReading(a.length-2);
+ if(!cur||!prev)return null;
+ return{balance:cur.balance-prev.balance,costImpact:-(cur.totalCost-prev.totalCost),costAdded:cur.totalCost-prev.totalCost,from:prev.date,to:cur.date}
+}
+function lastPvBenefit(){
+ var p=sorted().filter(function(e){return e.pvProd!=null});
+ if(p.length<2)return null;
+ var a=p[p.length-2],b=p[p.length-1],prod=Number(b.pvProd)-Number(a.pvProd);
+ if(!isFinite(prod)||prod<0)return null;
+ var feed=0;
+ if(a.feed!=null&&b.feed!=null)feed=Math.max(0,Number(b.feed)-Number(a.feed));
+ var own=Math.max(0,prod-feed),saved=intervalEnergyCost(a.date,b.date,own),revenue=intervalFeedRevenue(a.date,b.date,feed);
+ return{value:saved+revenue,saved:saved,revenue:revenue,from:a.date,to:b.date}
+}
+function setMoneyTrend(id,delta,label){
+ var el=document.getElementById(id);if(!el)return;
+ if(delta==null||!isFinite(Number(delta))){el.className="valueTrend";el.textContent="";return}
+ var v=Number(delta),eps=.005,cls=v>eps?"up":v<-eps?"down":"flat",arrow=v>eps?"▲":v<-eps?"▼":"•",sign=v>eps?"+":v<-eps?"−":"";
+ el.className="valueTrend show "+cls;
+ el.innerHTML="<span class='trendArrow'>"+arrow+"</span><b>"+sign+euro(Math.abs(v))+"</b><span>"+esc(label||"seit letzter Ablesung")+"</span>"
+}
 function yearProjection(){var a=sorted().filter(function(e){return e.imp!=null});if(a.length<2)return null;var last=a[a.length-1],year=Number(last.date.slice(0,4)),ms=monthlyStats().filter(function(x){return x.key.slice(0,4)===String(year)}),actual=ms.reduce(function(t,x){return t+Number(x.cost||0)},0),end=year+"-12-31",remain=days(last.date,end),trend=recentTrend(90)||recentTrend(30),projected=actual;if(remain>0&&trend){dayLoop(last.date,end,function(ds){var t=tariffAt(ds);projected+=trend.daily*(Number(t.workRate)||0)+(Number(t.baseAnnual)||0)/365})}var paid=paidForYear(year,end);return{balance:paid-projected,cost:projected,paid:paid,days:remain}}
 function pvAnalytics(){var p=sorted().filter(function(e){return e.pvProd!=null});if(p.length<2)return null;var first=p[0],last=p[p.length-1],prod=last.pvProd-first.pvProd;var feedEntries=sorted().filter(function(e){return e.feed!=null&&e.date>=first.date&&e.date<=last.date});if(feedEntries.length<2)return null;var feed=feedEntries[feedEntries.length-1].feed-feedEntries[0].feed;var own=Math.max(0,prod-feed);var impEntries=sorted().filter(function(e){return e.imp!=null&&e.date>=first.date&&e.date<=last.date});var imp=impEntries.length>=2?impEntries[impEntries.length-1].imp-impEntries[0].imp:0;var home=imp+own;var aut=home>0?own/home*100:0;var value=own*currentTariff().workRate+feed*currentTariff().feedRate;var without=(imp+own)*state.settings.workRate+days(first.date,last.date)*(state.settings.baseAnnual/365);return{prod:prod,feed:feed,own:own,ownPct:prod>0?own/prod*100:0,aut:aut,value:value,without:without,first:first,last:last}}
 function officialFeedPayout(){var f=sorted().filter(function(e){return e.feed!=null}).sort(function(a,b){return a.date.localeCompare(b.date)});if(!f.length)return null;var start=Number(state.settings.feedStart)||0,startDate=state.settings.pvStart||f[0].date,last=f[f.length-1],value=0,prev={date:startDate,feed:start};for(var i=0;i<f.length;i++){var cur=f[i];if(cur.date>prev.date)value+=intervalFeedRevenue(prev.date,cur.date,Number(cur.feed)-Number(prev.feed));prev=cur}var kwh=Math.max(0,Number(last.feed)-start);return{kwh:kwh,value:value,last:last,start:start,startDate:startDate}}
@@ -866,7 +905,17 @@ function render(){
  document.getElementById("periodRevenue").textContent=df?euro(intervalFeedRevenue(df.a.date,df.b.date,df.v)):"–";
  document.getElementById("totalImp").textContent=ti?n(ti.v)+" kWh":"–";
  var opTotal=officialFeedPayout();document.getElementById("totalFeed").textContent=opTotal?n(opTotal.kwh)+" kWh":(tf?n(tf.v)+" kWh":"–");
- var bal=accountBalance();var be=document.getElementById("balance");var bh=document.getElementById("balanceHint");if(bal){be.textContent=(bal.balance>=0?"+":"")+euro(bal.balance)+(bal.balance>=0?" im Plus":" im Minus");be.className="dashMoney "+(bal.balance>=0?"positive":"negative");bh.textContent="Abschläge bis "+dateDE(bal.paidThrough)+": "+euro(bal.paid)+" · Stromkosten bis "+dateDE(bal.date)+": "+euro(bal.totalCost)+" (inkl. "+euro(bal.base)+" Grundpreis) · PV-Vergütung separat";document.getElementById("balancePaid").textContent=euro(bal.paid);document.getElementById("balanceCost").textContent=euro(bal.totalCost);document.getElementById("balanceResult").textContent=(bal.balance>=0?"+":"")+euro(bal.balance)}else{be.textContent="–";be.className="dashMoney";bh.textContent="Abschläge minus Stromkosten inkl. Grundpreis · PV-Vergütung separat";document.getElementById("balancePaid").textContent="–";document.getElementById("balanceCost").textContent="–";document.getElementById("balanceResult").textContent="–"}var t30=recentTrend(30),t90=recentTrend(90);document.getElementById("forecastCost").textContent=t30?euro(t30.cost30):"–";document.getElementById("forecast30Hint").textContent=t30?n(t30.daily,1)+" kWh/Tag aus den letzten "+t30.days+" Tagen":"Noch nicht genug Daten";document.getElementById("forecast90Cost").textContent=t90?euro(t90.cost30):"–";document.getElementById("forecast90Hint").textContent=t90?n(t90.daily,1)+" kWh/Tag · hochgerechnet "+euro(t90.annual)+"/Jahr":"Noch nicht genug Daten";
+ var bal=accountBalance();var be=document.getElementById("balance");var bh=document.getElementById("balanceHint");if(bal){be.textContent=(bal.balance>=0?"+":"")+euro(bal.balance)+(bal.balance>=0?" im Plus":" im Minus");be.className="dashMoney "+(bal.balance>=0?"positive":"negative");bh.textContent="Abschläge bis "+dateDE(bal.paidThrough)+": "+euro(bal.paid)+" · Stromkosten bis "+dateDE(bal.date)+": "+euro(bal.totalCost)+" (inkl. "+euro(bal.base)+" Grundpreis) · PV-Vergütung separat";document.getElementById("balancePaid").textContent=euro(bal.paid);document.getElementById("balanceCost").textContent=euro(bal.totalCost);document.getElementById("balanceResult").textContent=(bal.balance>=0?"+":"")+euro(bal.balance)}else{be.textContent="–";be.className="dashMoney";bh.textContent="Abschläge minus Stromkosten inkl. Grundpreis · PV-Vergütung separat";document.getElementById("balancePaid").textContent="–";document.getElementById("balanceCost").textContent="–";document.getElementById("balanceResult").textContent="–"}
+ var moneyTrend=lastReadingMoneyTrend();
+ setMoneyTrend("balanceTrend",moneyTrend?moneyTrend.balance:null,"seit letzter Ablesung");
+ setMoneyTrend("balanceCostTrend",moneyTrend?moneyTrend.costImpact:null,"seit letzter Ablesung");
+ var intervalCostImpact=di?-intervalEnergyCost(di.a.date,di.b.date,di.v):null;
+ var intervalPvGain=df?intervalFeedRevenue(df.a.date,df.b.date,df.v):null;
+ setMoneyTrend("periodCostTrend",intervalCostImpact,"Auswirkung aufs Plus");
+ setMoneyTrend("periodRevenueTrend",intervalPvGain,"seit letzter Ablesung");
+ var pvBenefitTrend=lastPvBenefit();
+ setMoneyTrend("pvValueTrend",pvBenefitTrend?pvBenefitTrend.value:null,"seit letzter PV-Ablesung");
+ var t30=recentTrend(30),t90=recentTrend(90);document.getElementById("forecastCost").textContent=t30?euro(t30.cost30):"–";document.getElementById("forecast30Hint").textContent=t30?n(t30.daily,1)+" kWh/Tag aus den letzten "+t30.days+" Tagen":"Noch nicht genug Daten";document.getElementById("forecast90Cost").textContent=t90?euro(t90.cost30):"–";document.getElementById("forecast90Hint").textContent=t90?n(t90.daily,1)+" kWh/Tag · hochgerechnet "+euro(t90.annual)+"/Jahr":"Noch nicht genug Daten";
  document.getElementById("pvPower").textContent=n(state.settings.pvKwp,2)+" kWp";
  document.getElementById("pvRate").textContent=n(state.settings.feedRate*100,2)+" ct/kWh";
  document.getElementById("workRate").textContent=n(state.settings.workRate*100,2)+" ct/kWh";
