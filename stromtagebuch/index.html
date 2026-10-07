@@ -233,11 +233,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.3</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.4</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.3</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.4</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
@@ -327,6 +327,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
   </div>
   <div class="wizardStep" data-wstep="3">
     <h2 style="margin-top:4px">☀️ PV-App</h2>
+    <div class="notice" id="wizSummary" style="margin-bottom:12px">Ablesedaten werden hier vor dem Speichern zusammengefasst.</div>
     <div class="row"><div><label>PV-Erzeugung gesamt</label><input class="input" type="number" step="0.01" id="wizPvProd" inputmode="decimal"></div><div><label>Eigenverbrauch gesamt</label><input class="input" type="number" step="0.01" id="wizPvOwn" inputmode="decimal"></div></div>
     <label style="margin-top:8px">Einspeisung laut PV-App</label><input class="input" type="number" step="0.01" id="wizPvExport" inputmode="decimal">
     <label style="margin-top:8px">Notiz</label><input class="input" id="wizNote" placeholder="optional">
@@ -497,7 +498,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.3</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.4</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -586,7 +587,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Das <b>Komplett-Backup enthält ab v1.3 auch deine Zählerfotos</b>, damit sie auf ein neues Gerät übernommen werden können.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Vollbackup inkl. Fotos</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.4.3</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.4.4</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
@@ -631,7 +632,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="toast" id="toast"></div>
 
 <script>
-var APP_VERSION="1.4.3";
+var APP_VERSION="1.4.4";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
@@ -1050,13 +1051,102 @@ document.getElementById("restoreAutoBackup").onclick=async function(){try{var a=
 var deferredInstallPrompt=null;window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferredInstallPrompt=e;var b=document.getElementById("installApp");if(b)b.style.display="inline-block"});
 document.getElementById("installApp").onclick=async function(){if(!deferredInstallPrompt){toast("Im Browser-Menü „Zum Startbildschirm hinzufügen“ wählen");return}deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice}catch(e){}deferredInstallPrompt=null;this.style.display="none"};
 
-var wizardStep=0;
-function wizardValues(){function v(id){var e=document.getElementById(id),x=e&&e.value!==""?parseFloat(e.value):null;return isFinite(x)?x:null}return{imp:v("wizImp"),feed:v("wizFeed"),heat:v("wizHeat"),pvProd:v("wizPvProd"),own:v("wizPvOwn"),pex:v("wizPvExport")}}
-function prepWizard(){wizardStep=0;var d=document.getElementById("wizDate");if(d&&!d.value)d.value=localToday();var last=sorted().slice(-1)[0],feed=sorted().filter(function(e){return e.feed!=null}).slice(-1)[0],heat=heatCurrent(),snap=state.pvSnapshot;document.getElementById("wizImpHint").textContent=last?"Zuletzt: "+n(last.imp)+" kWh am "+dateDE(last.date):"Noch kein 1.8.0-Wert";document.getElementById("wizFeedHint").textContent=feed?"Zuletzt: "+n(feed.feed)+" kWh am "+dateDE(feed.date):"Noch kein 2.8.0-Wert";document.getElementById("wizHeatHint").textContent=heat?"Zuletzt: "+n(heat.reading,2)+" kWh am "+dateDE(heat.date)+" · optional":"Optional";if(last)document.getElementById("wizImp").placeholder=n(last.imp);if(feed)document.getElementById("wizFeed").placeholder=n(feed.feed);if(heat)document.getElementById("wizHeat").placeholder=n(heat.reading,2);if(snap){document.getElementById("wizPvProd").placeholder=n(snap.generation);document.getElementById("wizPvOwn").placeholder=n(snap.selfConsumed);document.getElementById("wizPvExport").placeholder=n(snap.exported)}showWizardStep()}
-function showWizardStep(){document.querySelectorAll(".wizardStep").forEach(function(x){x.classList.toggle("active",Number(x.dataset.wstep)===wizardStep)});document.querySelectorAll(".wizardProgress i").forEach(function(x,i){x.classList.toggle("active",i<=wizardStep)});document.getElementById("wizardStepNo").textContent=wizardStep+1;document.getElementById("wizBack").style.visibility=wizardStep===0?"hidden":"visible";document.getElementById("wizNext").style.display=wizardStep===3?"none":"block";document.getElementById("wizSave").style.display=wizardStep===3?"block":"none";var box=document.getElementById("wizardCheck");box.className="notice";box.textContent=wizardStep===0?"1.8.0 eintragen. Die App prüft automatisch gegen ältere und spätere Werte.":wizardStep===1?"2.8.0 ist dein offizieller Einspeisezähler für EWE.":wizardStep===2?"Wärmepumpe ist optional.":"PV-App-Werte sind optional. Danach alles gemeinsam speichern."}
-document.getElementById("wizBack").onclick=function(){if(wizardStep>0){wizardStep--;showWizardStep()}}
-document.getElementById("wizNext").onclick=function(){var date=document.getElementById("wizDate").value,v=wizardValues();if(wizardStep===0&&v.imp==null){toast("1.8.0 eintragen");return}if(wizardStep===1&&date>=state.settings.pvStart&&v.feed==null){toast("2.8.0 eintragen");return}var r=readingIssues(date,v);if(r.errors.length){document.getElementById("wizardCheck").className="notice warn";document.getElementById("wizardCheck").textContent=r.errors.join(" ");toast("Wert bitte prüfen");return}wizardStep++;showWizardStep()}
-document.getElementById("wizSave").onclick=function(){var date=document.getElementById("wizDate").value,v=wizardValues(),note=document.getElementById("wizNote").value.trim();if(!date||v.imp==null){toast("Datum und 1.8.0 fehlen");return}var r=readingIssues(date,v);if(r.errors.length){document.getElementById("wizardCheck").className="notice warn";document.getElementById("wizardCheck").textContent=r.errors.join(" ");return}if(r.warnings.length&&!confirm(r.warnings.join("\n")+"\n\nTrotzdem speichern?"))return;var same=state.entries.find(function(e){return e.date===date});if(same){same.imp=v.imp;if(v.feed!=null)same.feed=v.feed;if(v.pvProd!=null)same.pvProd=v.pvProd;if(note)same.note=note}else state.entries.push({date:date,imp:v.imp,feed:v.feed,pvProd:v.pvProd,note:note});if(v.heat!=null){var hs=state.heatMeter.find(function(x){return x.date===date});if(hs)hs.reading=v.heat;else state.heatMeter.push({date:date,reading:v.heat,note:"Ablese-Assistent"})}if(v.pvProd!=null||v.own!=null||v.pex!=null){var snap=state.pvSnapshot||{};snap.date=date;if(v.pvProd!=null)snap.generation=v.pvProd;if(v.own!=null)snap.selfConsumed=v.own;if(v.pex!=null)snap.exported=v.pex;if(Number(snap.generation)>0&&Number(snap.selfConsumed)>=0)snap.selfConsumptionPct=Number(snap.selfConsumed)/Number(snap.generation)*100;if(Number(snap.generation)>0&&Number(snap.exported)>=0)snap.exportPct=Number(snap.exported)/Number(snap.generation)*100;state.pvSnapshot=snap}var photoJobs=[];if(wizardPendingPhotos.imp&&!(wizardPhotoMeta.imp&&wizardPhotoMeta.imp.mismatch))photoJobs.push(saveMeterPhoto(date,"imp",wizardPendingPhotos.imp,v.imp,wizardPhotoMeta.imp&&wizardPhotoMeta.imp.confidence,wizardPhotoMeta.imp&&wizardPhotoMeta.imp.value));if(wizardPendingPhotos.feed&&!(wizardPhotoMeta.feed&&wizardPhotoMeta.feed.mismatch))photoJobs.push(saveMeterPhoto(date,"feed",wizardPendingPhotos.feed,v.feed,wizardPhotoMeta.feed&&wizardPhotoMeta.feed.confidence,wizardPhotoMeta.feed&&wizardPhotoMeta.feed.value));if(wizardPendingPhotos.heat&&!(wizardPhotoMeta.heat&&wizardPhotoMeta.heat.mismatch))photoJobs.push(saveMeterPhoto(date,"heat",wizardPendingPhotos.heat,v.heat,wizardPhotoMeta.heat&&wizardPhotoMeta.heat.confidence,wizardPhotoMeta.heat&&wizardPhotoMeta.heat.value));["wizImp","wizFeed","wizHeat","wizPvProd","wizPvOwn","wizPvExport","wizNote"].forEach(function(id){document.getElementById(id).value=""});save("Ablese-Assistent "+dateDE(date)+" gespeichert");if(photoJobs.length)Promise.allSettled(photoJobs).then(function(results){var failed=results.filter(function(x){return x.status==="rejected"}).length;renderPhotoStorage();renderProofBadges();toast(failed?("Ablesung gespeichert · "+failed+" Foto(s) nicht gespeichert"):"Ablesung + Zählerfoto(s) gespeichert")});wizardPendingPhotos={imp:null,feed:null,heat:null};wizardPhotoMeta={imp:null,feed:null,heat:null};["Imp","Feed","Heat"].forEach(function(k){var p=document.getElementById("wizPreview"+k),c=document.getElementById("wizCanvas"+k),cf=document.getElementById("wizConfidence"+k),ch=document.getElementById("wizChoices"+k);if(p){p.style.display="none";p.removeAttribute("src")}if(c)c.style.display="none";if(cf){cf.className="ocrConfidence";cf.textContent=""}if(ch)ch.innerHTML=""});toast("Alles gespeichert");go("home")}
+var wizardStep=0,wizardDraft=null;
+function loadWizardDraft(){
+ try{
+   var d=JSON.parse(localStorage.getItem("stromtagebuch_wizard_draft_v1")||"null");
+   if(!d||!d.savedAt)return null;
+   if(Date.now()-Number(d.savedAt)>24*60*60*1000){localStorage.removeItem("stromtagebuch_wizard_draft_v1");return null}
+   return d
+ }catch(e){return null}
+}
+function persistWizardDraft(){
+ var d={date:(document.getElementById("wizDate")||{}).value||"",imp:(document.getElementById("wizImp")||{}).value||"",feed:(document.getElementById("wizFeed")||{}).value||"",heat:(document.getElementById("wizHeat")||{}).value||"",pvProd:(document.getElementById("wizPvProd")||{}).value||"",own:(document.getElementById("wizPvOwn")||{}).value||"",pex:(document.getElementById("wizPvExport")||{}).value||"",note:(document.getElementById("wizNote")||{}).value||"",step:wizardStep,savedAt:Date.now()};
+ wizardDraft=d;try{localStorage.setItem("stromtagebuch_wizard_draft_v1",JSON.stringify(d))}catch(e){}return d
+}
+function clearWizardDraft(){wizardDraft=null;try{localStorage.removeItem("stromtagebuch_wizard_draft_v1")}catch(e){}}
+function wizardNumber(id,kind){
+ var e=document.getElementById(id),raw=e&&e.value!==""?String(e.value).trim():"";
+ if(!raw)return null;
+ var norm=raw.replace(/\s/g,"");
+ if(norm.indexOf(",")>=0)norm=norm.replace(/\./g,"").replace(",",".");
+ var x=parseFloat(norm);if(!isFinite(x))return null;
+ if((kind==="imp"||kind==="feed")&&/^\d{1,3}\.\d{3}$/.test(raw)){
+   var prev=ocrPrevious(kind),thousands=parseFloat(raw.replace(".",""));
+   if(prev!=null&&prev>1000&&x<prev*.2&&thousands>=prev)x=thousands
+ }
+ return x
+}
+function wizardValues(){
+ return{imp:wizardNumber("wizImp","imp"),feed:wizardNumber("wizFeed","feed"),heat:wizardNumber("wizHeat","heat"),pvProd:wizardNumber("wizPvProd","pv"),own:wizardNumber("wizPvOwn","pv"),pex:wizardNumber("wizPvExport","pv")}
+}
+function restoreWizardDraft(){
+ var d=loadWizardDraft();if(!d)return false;
+ [["wizDate","date"],["wizImp","imp"],["wizFeed","feed"],["wizHeat","heat"],["wizPvProd","pvProd"],["wizPvOwn","own"],["wizPvExport","pex"],["wizNote","note"]].forEach(function(p){var e=document.getElementById(p[0]);if(e&&d[p[1]]!==undefined&&d[p[1]]!==null&&d[p[1]]!=="")e.value=d[p[1]]});
+ wizardStep=Math.max(0,Math.min(3,Number(d.step)||0));wizardDraft=d;return true
+}
+function prepWizard(){
+ var restored=restoreWizardDraft();
+ if(!restored)wizardStep=0;
+ var d=document.getElementById("wizDate");if(d&&!d.value)d.value=localToday();
+ var last=sorted().slice(-1)[0],feed=sorted().filter(function(e){return e.feed!=null}).slice(-1)[0],heat=heatCurrent(),snap=state.pvSnapshot;
+ document.getElementById("wizImpHint").textContent=last?"Zuletzt: "+n(last.imp)+" kWh am "+dateDE(last.date):"Noch kein 1.8.0-Wert";
+ document.getElementById("wizFeedHint").textContent=feed?"Zuletzt: "+n(feed.feed)+" kWh am "+dateDE(feed.date):"Noch kein 2.8.0-Wert";
+ document.getElementById("wizHeatHint").textContent=heat?"Zuletzt: "+n(heat.reading,2)+" kWh am "+dateDE(heat.date)+" · optional":"Optional";
+ if(last)document.getElementById("wizImp").placeholder=n(last.imp);if(feed)document.getElementById("wizFeed").placeholder=n(feed.feed);if(heat)document.getElementById("wizHeat").placeholder=n(heat.reading,2);
+ if(snap){document.getElementById("wizPvProd").placeholder=n(snap.generation);document.getElementById("wizPvOwn").placeholder=n(snap.selfConsumed);document.getElementById("wizPvExport").placeholder=n(snap.exported)}
+ persistWizardDraft();showWizardStep()
+}
+function updateWizardSummary(){
+ var box=document.getElementById("wizSummary");if(!box)return;
+ var d=(document.getElementById("wizDate")||{}).value||"",v=wizardValues();
+ box.className="notice"+(!d||v.imp==null?" warn":"");
+ box.innerHTML="<b>Vor dem Speichern</b><br>Datum: "+esc(d?dateDE(d):"FEHLT")+" · 1.8.0: "+(v.imp==null?"FEHLT":n(v.imp,3)+" kWh")+" · 2.8.0: "+(v.feed==null?"–":n(v.feed,3)+" kWh");
+}
+function showWizardStep(){
+ document.querySelectorAll(".wizardStep").forEach(function(x){x.classList.toggle("active",Number(x.dataset.wstep)===wizardStep)});
+ document.querySelectorAll(".wizardProgress i").forEach(function(x,i){x.classList.toggle("active",i<=wizardStep)});
+ document.getElementById("wizardStepNo").textContent=wizardStep+1;
+ document.getElementById("wizBack").style.visibility=wizardStep===0?"hidden":"visible";
+ document.getElementById("wizNext").style.display=wizardStep===3?"none":"block";
+ document.getElementById("wizSave").style.display=wizardStep===3?"block":"none";
+ var box=document.getElementById("wizardCheck");box.className="notice";box.textContent=wizardStep===0?"1.8.0 eintragen. Die App prüft automatisch gegen ältere und spätere Werte.":wizardStep===1?"2.8.0 ist dein offizieller Einspeisezähler für EWE.":wizardStep===2?"Wärmepumpe ist optional.":"PV-App-Werte sind optional. Danach alles gemeinsam speichern.";
+ if(wizardStep===3)updateWizardSummary()
+}
+["wizDate","wizImp","wizFeed","wizHeat","wizPvProd","wizPvOwn","wizPvExport","wizNote"].forEach(function(id){var e=document.getElementById(id);if(e){e.addEventListener("input",function(){persistWizardDraft();if(wizardStep===3)updateWizardSummary()});e.addEventListener("change",function(){persistWizardDraft();if(wizardStep===3)updateWizardSummary()})}});
+document.getElementById("wizBack").onclick=function(){if(wizardStep>0){persistWizardDraft();wizardStep--;persistWizardDraft();showWizardStep()}}
+document.getElementById("wizNext").onclick=function(){
+ persistWizardDraft();
+ var date=(document.getElementById("wizDate")||{}).value||wizardDraft&&wizardDraft.date||"",v=wizardValues();
+ if(wizardStep===0&&v.imp==null){toast("1.8.0 eintragen");return}
+ if(wizardStep===1&&date>=state.settings.pvStart&&v.feed==null){toast("2.8.0 eintragen");return}
+ var r=readingIssues(date,v);if(r.errors.length){document.getElementById("wizardCheck").className="notice warn";document.getElementById("wizardCheck").textContent=r.errors.join(" ");toast("Wert bitte prüfen");return}
+ wizardStep++;persistWizardDraft();showWizardStep()
+}
+document.getElementById("wizSave").onclick=function(){
+ persistWizardDraft();
+ var date=(document.getElementById("wizDate")||{}).value||wizardDraft&&wizardDraft.date||"",v=wizardValues(),note=(document.getElementById("wizNote")||{}).value.trim();
+ if(!date){toast("Datum fehlt – bitte im ersten Schritt prüfen");wizardStep=0;showWizardStep();return}
+ if(v.imp==null&&wizardDraft&&wizardDraft.imp!==""){var tmp=document.getElementById("wizImp");if(tmp)tmp.value=wizardDraft.imp;v=wizardValues()}
+ if(v.imp==null){toast("1.8.0 fehlt – bitte im ersten Schritt prüfen");wizardStep=0;showWizardStep();return}
+ var r=readingIssues(date,v);if(r.errors.length){document.getElementById("wizardCheck").className="notice warn";document.getElementById("wizardCheck").textContent=r.errors.join(" ");toast("Wert bitte prüfen");return}
+ if(r.warnings.length&&!confirm(r.warnings.join("\n")+"\n\nTrotzdem speichern?"))return;
+ var same=state.entries.find(function(e){return e.date===date});
+ if(same){same.imp=v.imp;if(v.feed!=null)same.feed=v.feed;if(v.pvProd!=null)same.pvProd=v.pvProd;if(note)same.note=note}else state.entries.push({date:date,imp:v.imp,feed:v.feed,pvProd:v.pvProd,note:note});
+ if(v.heat!=null){var hs=state.heatMeter.find(function(x){return x.date===date});if(hs)hs.reading=v.heat;else state.heatMeter.push({date:date,reading:v.heat,note:"Ablese-Assistent"})}
+ if(v.pvProd!=null||v.own!=null||v.pex!=null){var snap=state.pvSnapshot||{};snap.date=date;if(v.pvProd!=null)snap.generation=v.pvProd;if(v.own!=null)snap.selfConsumed=v.own;if(v.pex!=null)snap.exported=v.pex;if(Number(snap.generation)>0&&Number(snap.selfConsumed)>=0)snap.selfConsumptionPct=Number(snap.selfConsumed)/Number(snap.generation)*100;if(Number(snap.generation)>0&&Number(snap.exported)>=0)snap.exportPct=Number(snap.exported)/Number(snap.generation)*100;state.pvSnapshot=snap}
+ var photoJobs=[];
+ if(wizardPendingPhotos.imp&&!(wizardPhotoMeta.imp&&wizardPhotoMeta.imp.mismatch))photoJobs.push(saveMeterPhoto(date,"imp",wizardPendingPhotos.imp,v.imp,wizardPhotoMeta.imp&&wizardPhotoMeta.imp.confidence,wizardPhotoMeta.imp&&wizardPhotoMeta.imp.value));
+ if(wizardPendingPhotos.feed&&!(wizardPhotoMeta.feed&&wizardPhotoMeta.feed.mismatch))photoJobs.push(saveMeterPhoto(date,"feed",wizardPendingPhotos.feed,v.feed,wizardPhotoMeta.feed&&wizardPhotoMeta.feed.confidence,wizardPhotoMeta.feed&&wizardPhotoMeta.feed.value));
+ if(wizardPendingPhotos.heat&&!(wizardPhotoMeta.heat&&wizardPhotoMeta.heat.mismatch))photoJobs.push(saveMeterPhoto(date,"heat",wizardPendingPhotos.heat,v.heat,wizardPhotoMeta.heat&&wizardPhotoMeta.heat.confidence,wizardPhotoMeta.heat&&wizardPhotoMeta.heat.value));
+ ["wizImp","wizFeed","wizHeat","wizPvProd","wizPvOwn","wizPvExport","wizNote"].forEach(function(id){document.getElementById(id).value=""});
+ clearWizardDraft();
+ save("Ablese-Assistent "+dateDE(date)+" gespeichert");
+ if(photoJobs.length)Promise.allSettled(photoJobs).then(function(results){var failed=results.filter(function(x){return x.status==="rejected"}).length;renderPhotoStorage();renderProofBadges();toast(failed?("Ablesung gespeichert · "+failed+" Foto(s) nicht gespeichert"):"Ablesung + Zählerfoto(s) gespeichert")});
+ wizardPendingPhotos={imp:null,feed:null,heat:null};wizardPhotoMeta={imp:null,feed:null,heat:null};
+ ["Imp","Feed","Heat"].forEach(function(k){var p=document.getElementById("wizPreview"+k),cv=document.getElementById("wizCanvas"+k),cf=document.getElementById("wizConfidence"+k),ch=document.getElementById("wizChoices"+k);if(p){p.style.display="none";p.removeAttribute("src")}if(cv)cv.style.display="none";if(cf){cf.className="ocrConfidence";cf.textContent=""}if(ch)ch.innerHTML=""});
+ toast("Alles gespeichert");go("home")
+}
 
 function parseCsvText(text){var sep=(text.split("\n")[0].match(/;/g)||[]).length>=(text.split("\n")[0].match(/,/g)||[]).length?";":",",rows=[],row=[],cell="",q=false;for(var i=0;i<text.length;i++){var c=text[i];if(c==='"'){if(q&&text[i+1]==='"'){cell+='"';i++}else q=!q}else if(c===sep&&!q){row.push(cell);cell=""}else if((c==="\n"||c==="\r")&&!q){if(c==="\r"&&text[i+1]==="\n")i++;row.push(cell);cell="";if(row.some(function(x){return x.trim()!==""}))rows.push(row);row=[]}else cell+=c}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
 function csvNumber(v){v=String(v==null?"":v).trim();if(!v)return null;if(v.indexOf(",")>=0)v=v.replace(/\./g,"").replace(",",".");var x=parseFloat(v);return isFinite(x)?x:null}
@@ -1385,7 +1475,7 @@ async function processWizardPhoto(kind,file,evidenceFile){
    if(direct){
      var dc=ocrCheckAtDate(cfg.ocrTarget,direct.value,date),dt=ocrTrendInfo(cfg.ocrTarget,direct.value,date);
      if(!dc.errors.length&&dt.ok!==false){
-       document.getElementById(cfg.input).value=direct.value;wizardPhotoMeta[kind]={value:direct.value,confidence:direct.confidence,mismatch:false};
+       document.getElementById(cfg.input).value=direct.value;persistWizardDraft();wizardPhotoMeta[kind]={value:direct.value,confidence:direct.confidence,mismatch:false};
        confBox.className="ocrConfidence high";confBox.textContent="LCD direkt gelesen · "+n(direct.value,3)+" kWh · bitte prüfen";
        choices.innerHTML="";hint.textContent="Der Zählerstand wurde direkt aus den 7 Segmenten gelesen und oben eingetragen. Wenn er stimmt, auf „Weiter“ tippen.";return
      }
@@ -1397,13 +1487,13 @@ async function processWizardPhoto(kind,file,evidenceFile){
    confBox.className="ocrConfidence "+(mismatch?"low":ci.cls);
    confBox.textContent=mismatch?("Kennung passt nicht: erkannt wurde "+(detected==="imp"?"1.8.0":"2.8.0")+". Bitte im richtigen Schritt fotografieren."):ci.label;
    renderOcrChoices(choices,candidates,cfg.ocrTarget,function(v,c){
-     document.getElementById(cfg.input).value=v;
+     document.getElementById(cfg.input).value=v;persistWizardDraft();
      wizardPhotoMeta[kind]={value:v,confidence:Math.max(Number(res.confidence)||0,Number(c.confidence)||0),mismatch:mismatch};
      var inf=confidenceInfo(res.confidence,c);confBox.className="ocrConfidence "+inf.cls;confBox.textContent=inf.label+" · bestätigt";
      hint.textContent="Wert übernommen. Vor dem Speichern wird er noch einmal auf Plausibilität geprüft."
    });
    if(!mismatch&&best.trendOk!==false&&!best.check.errors.length){
-     document.getElementById(cfg.input).value=best.value;
+     document.getElementById(cfg.input).value=best.value;persistWizardDraft();
      wizardPhotoMeta[kind]={value:best.value,confidence:Math.max(Number(res.confidence)||0,Number(best.confidence)||0),mismatch:false};
      if(ocrAutoFillOkay(best)){
        confBox.className="ocrConfidence high";
