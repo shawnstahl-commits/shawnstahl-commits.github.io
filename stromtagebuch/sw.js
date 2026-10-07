@@ -1,5 +1,5 @@
-const CACHE="stromtagebuch-v42";
-const OCR_CACHE="stromtagebuch-ocr-v12";
+const CACHE="stromtagebuch-v43";
+const OCR_CACHE="stromtagebuch-ocr-v13";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg"];
 
 self.addEventListener("install",event=>{
@@ -27,7 +27,7 @@ self.addEventListener("fetch",event=>{
 
   if(isPage){
     event.respondWith(
-      fetch(event.request,{cache:"no-store"}).then(response=>{
+      fetch(new Request(event.request,{cache:"reload"}),{cache:"no-store"}).then(response=>{
         const copy=response.clone();
         caches.open(CACHE).then(cache=>cache.put("./index.html",copy));
         return response;
