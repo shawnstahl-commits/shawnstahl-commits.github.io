@@ -3,7 +3,7 @@
   "name": "Stromtagebuch",
   "short_name": "Strom",
   "lang": "de-DE",
-  "start_url": "./app.html?v=146",
+  "start_url": "./app.html?v=147",
   "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
@@ -24,19 +24,19 @@
     {
       "name": "Heute ablesen",
       "short_name": "Ablesen",
-      "url": "./app.html?v=146&view=read",
+      "url": "./app.html?v=147&view=read",
       "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]
     },
     {
       "name": "Monatsbericht",
       "short_name": "Monat",
-      "url": "./app.html?v=146&view=report",
+      "url": "./app.html?v=147&view=report",
       "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]
     },
     {
       "name": "Jahresübersicht",
       "short_name": "Jahr",
-      "url": "./app.html?v=146&view=year",
+      "url": "./app.html?v=147&view=year",
       "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]
     }
   ]
