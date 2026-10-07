@@ -234,11 +234,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.11</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.12</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.11</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.12</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
@@ -499,7 +499,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.11</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.12</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -588,7 +588,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Das <b>Komplett-Backup enthält ab v1.3 auch deine Zählerfotos</b>, damit sie auf ein neues Gerät übernommen werden können.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Vollbackup inkl. Fotos</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.4.11</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.4.12</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
@@ -640,7 +640,7 @@ function __releaseSplash(){
 window.addEventListener("error",function(ev){__bootError=ev&&ev.error?ev.error:new Error(ev&&ev.message||"Startfehler");__releaseSplash()});
 window.addEventListener("unhandledrejection",function(ev){__bootError=ev&&ev.reason?ev.reason:new Error("Startfehler");__releaseSplash()});
 setTimeout(__releaseSplash,900);
-var APP_VERSION="1.4.11";
+var APP_VERSION="1.4.12";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
@@ -731,9 +731,10 @@ function accountBalanceAtReading(index){
 function lastReadingMoneyTrend(){
  var a=sorted().filter(function(e){return e.imp!=null});
  if(a.length<2)return null;
- var cur=accountBalanceAtReading(a.length-1),prev=accountBalanceAtReading(a.length-2);
+ var cur=accountBalanceAtReading(a.length-1),prev=accountBalanceAtReading(a.length-2),pa=a[a.length-2],pb=a[a.length-1];
  if(!cur||!prev)return null;
- return{balance:cur.balance-prev.balance,costImpact:-(cur.totalCost-prev.totalCost),costAdded:cur.totalCost-prev.totalCost,from:prev.date,to:cur.date}
+ var costAdded=cur.totalCost-prev.totalCost,paymentAdded=cur.paid-prev.paid,energyAdded=cur.energy-prev.energy,baseAdded=cur.base-prev.base;
+ return{balance:cur.balance-prev.balance,costImpact:-costAdded,costAdded:costAdded,paymentAdded:paymentAdded,energyAdded:energyAdded,baseAdded:baseAdded,from:prev.date,to:cur.date,impFrom:Number(pa.imp),impTo:Number(pb.imp),kwh:Number(pb.imp)-Number(pa.imp),days:days(prev.date,cur.date)}
 }
 function lastPvBenefit(){
  var p=sorted().filter(function(e){return e.pvProd!=null});
@@ -745,23 +746,27 @@ function lastPvBenefit(){
  var own=Math.max(0,prod-feed),saved=intervalEnergyCost(a.date,b.date,own),revenue=intervalFeedRevenue(a.date,b.date,feed);
  return{value:saved+revenue,saved:saved,revenue:revenue,from:a.date,to:b.date}
 }
-function setMoneyTrend(id,delta,label){
+function setMoneyTrend(id,delta,label,badWhenPositive){
  var el=document.getElementById(id);if(!el)return;
  if(delta==null||!isFinite(Number(delta))){el.className="valueTrend";el.textContent="";return}
- var v=Number(delta),eps=.005,cls=v>eps?"up":v<-eps?"down":"flat",arrow=v>eps?"▲":v<-eps?"▼":"•",sign=v>eps?"+":v<-eps?"−":"";
+ var v=Number(delta),eps=.005,positive=v>eps,negative=v<-eps,cls=positive?(badWhenPositive?"down":"up"):negative?(badWhenPositive?"up":"down"):"flat",arrow=positive?"▲":negative?"▼":"•",sign=positive?"+":negative?"−":"";
  el.className="valueTrend show "+cls;
  el.innerHTML="<span class='trendArrow'>"+arrow+"</span><b>"+sign+euro(Math.abs(v))+"</b><span>"+esc(label||"seit letzter Ablesung")+"</span>"
 }
+function shortTrendRange(mt){return mt&&mt.from&&mt.to?dateDE(mt.from)+" → "+dateDE(mt.to):"seit letzter Ablesung"}
 var balanceTrendMode="account";
 function renderBalanceTrend(moneyTrend){
- var mt=moneyTrend||lastReadingMoneyTrend(),costMode=balanceTrendMode==="cost";
- setMoneyTrend("balanceTrend",mt?(costMode?mt.costImpact:mt.balance):null,costMode?"Stromkosten seit letzter Ablesung":"seit letzter Ablesung");
+ var mt=moneyTrend||lastReadingMoneyTrend(),costMode=balanceTrendMode==="cost",range=shortTrendRange(mt);
+ setMoneyTrend("balanceTrend",mt?(costMode?mt.costImpact:mt.balance):null,costMode?"Kosten · "+range:"Stromkonto · "+range);
  var el=document.getElementById("balanceTrend");if(!el)return;
  el.classList.add("trendToggle");
  el.setAttribute("role","button");
  el.setAttribute("tabindex","0");
- el.setAttribute("title",costMode?"Tippen: zurück zur Veränderung des Stromkontos":"Tippen: nur die neuen Stromkosten anzeigen");
- el.setAttribute("aria-label",costMode?"Stromkosten seit letzter Ablesung. Tippen für Stromkonto-Veränderung.":"Stromkonto-Veränderung seit letzter Ablesung. Tippen für Stromkosten.");
+ el.setAttribute("title",costMode?"Tippen: zurück zur Veränderung des Stromkontos":"Tippen: Auswirkung der neuen Stromkosten anzeigen");
+ if(mt){
+   var detail="Vergleich "+range+". Abschläge "+(mt.paymentAdded>=0?"+":"−")+euro(Math.abs(mt.paymentAdded))+", neue Stromkosten "+euro(mt.costAdded)+", Stromkonto "+(mt.balance>=0?"+":"−")+euro(Math.abs(mt.balance))+".";
+   el.setAttribute("aria-label",detail+" Tippen zum Wechseln.");
+ }else el.setAttribute("aria-label","Noch kein Vergleich verfügbar.");
 }
 function yearProjection(){var a=sorted().filter(function(e){return e.imp!=null});if(a.length<2)return null;var last=a[a.length-1],year=Number(last.date.slice(0,4)),ms=monthlyStats().filter(function(x){return x.key.slice(0,4)===String(year)}),actual=ms.reduce(function(t,x){return t+Number(x.cost||0)},0),end=year+"-12-31",remain=days(last.date,end),trend=recentTrend(90)||recentTrend(30),projected=actual;if(remain>0&&trend){dayLoop(last.date,end,function(ds){var t=tariffAt(ds);projected+=trend.daily*(Number(t.workRate)||0)+(Number(t.baseAnnual)||0)/365})}var paid=paidForYear(year,end);return{balance:paid-projected,cost:projected,paid:paid,days:remain}}
 function pvAnalytics(){var p=sorted().filter(function(e){return e.pvProd!=null});if(p.length<2)return null;var first=p[0],last=p[p.length-1],prod=last.pvProd-first.pvProd;var feedEntries=sorted().filter(function(e){return e.feed!=null&&e.date>=first.date&&e.date<=last.date});if(feedEntries.length<2)return null;var feed=feedEntries[feedEntries.length-1].feed-feedEntries[0].feed;var own=Math.max(0,prod-feed);var impEntries=sorted().filter(function(e){return e.imp!=null&&e.date>=first.date&&e.date<=last.date});var imp=impEntries.length>=2?impEntries[impEntries.length-1].imp-impEntries[0].imp:0;var home=imp+own;var aut=home>0?own/home*100:0;var value=own*currentTariff().workRate+feed*currentTariff().feedRate;var without=(imp+own)*state.settings.workRate+days(first.date,last.date)*(state.settings.baseAnnual/365);return{prod:prod,feed:feed,own:own,ownPct:prod>0?own/prod*100:0,aut:aut,value:value,without:without,first:first,last:last}}
@@ -849,7 +854,7 @@ async function runAppSelfTest(){var btn=document.getElementById("runSelfTest"),o
  try{var db=await openBackupDB(),stores=Array.from(db.objectStoreNames),ok=stores.indexOf("snapshots")>=0&&stores.indexOf("photos")>=0;db.close();out.push(testResult("IndexedDB",ok?"ok":"bad",ok?"Backup- und Foto-Speicher vorhanden.":"Benötigte Speicherbereiche fehlen."))}catch(e){out.push(testResult("IndexedDB","bad","Lokale Datenbank konnte nicht geöffnet werden."))}
  try{var st=await photoStats();out.push(testResult("Foto-Archiv","ok",st.count+" Foto(s), "+formatBytes(st.bytes)+" lesbar."))}catch(e){out.push(testResult("Foto-Archiv","bad","Foto-Archiv konnte nicht gelesen werden."))}
  try{var ph=await getAllPhotos(),sample=ph.length?await blobToDataURL(ph[0].blob):null,raw=JSON.stringify({format:"stromtagebuch-backup-v2",state:state,audit:auditList(),photoSample:sample}),parsed=JSON.parse(raw),ok2=!!(parsed.state&&parsed.state.entries)&&(!sample||String(parsed.photoSample).indexOf("data:image/")===0);out.push(testResult("Vollbackup",ok2?"ok":"bad",ok2?("Daten und "+ph.length+" Foto(s) sind für das Vollbackup lesbar."):"Backup-Datenprüfung fehlgeschlagen."))}catch(e){out.push(testResult("Vollbackup","bad","Daten/Fotos konnten nicht für ein Vollbackup verarbeitet werden."))}
- try{var ms=monthlyStats(),hm=heatMonthlyStats(),numbers=ms.every(function(x){return isFinite(Number(x.imp))&&isFinite(Number(x.cost))})&&Object.keys(hm).every(function(k){return isFinite(Number(hm[k].heat))}),bal=accountBalance();out.push(testResult("Berechnungen",numbers?"ok":"bad",numbers?("Monats-, Stromkonto- und Wärmepumpenberechnung OK"+(bal?" · Stromkonto "+euro(bal.balance):"")+"."):"Ungültige Zahl in einer Kernberechnung gefunden."))}catch(e){out.push(testResult("Berechnungen","bad","Berechnungsfunktionen haben einen Fehler ausgelöst: "+String(e&&e.message||e)))}
+ try{var ms=monthlyStats(),hm=heatMonthlyStats(),numbers=ms.every(function(x){return isFinite(Number(x.imp))&&isFinite(Number(x.cost))})&&Object.keys(hm).every(function(k){return isFinite(Number(hm[k].heat))}),bal=accountBalance(),mt=lastReadingMoneyTrend(),trendOk=!mt||Math.abs((mt.paymentAdded-mt.costAdded)-mt.balance)<.011;if(!trendOk)numbers=false;out.push(testResult("Berechnungen",numbers?"ok":"bad",numbers?("Monats-, Stromkonto-, Trend- und Wärmepumpenberechnung OK"+(bal?" · Stromkonto "+euro(bal.balance):"")+"."):"Ungültige Zahl oder unplausibler Stromkonto-Trend gefunden."))}catch(e){out.push(testResult("Berechnungen","bad","Berechnungsfunktionen haben einen Fehler ausgelöst: "+String(e&&e.message||e)))}
  var sw=("serviceWorker" in navigator),ctrl=sw&&!!navigator.serviceWorker.controller;out.push(testResult("Offline-App",ctrl?"ok":sw?"warn":"bad",ctrl?"Service Worker steuert die App.":sw?"Service Worker unterstützt, aber aktuell noch nicht aktiv.":"Browser unterstützt keinen Service Worker."));
  try{if("caches" in window){var keys=await caches.keys(),found=keys.filter(function(k){return k.indexOf("stromtagebuch")===0});out.push(testResult("Offline-Cache",found.length?"ok":"warn",found.length?found.join(", "):"Noch kein Stromtagebuch-Cache gefunden."))}else out.push(testResult("Offline-Cache","warn","Cache API nicht verfügbar."))}catch(e){out.push(testResult("Offline-Cache","warn","Cache-Status konnte nicht gelesen werden."))}
  try{if(navigator.storage&&navigator.storage.estimate){var est=await navigator.storage.estimate(),used=est.usage||0,quota=est.quota||0,pct=quota?used/quota*100:0;out.push(testResult("Gerätespeicher",pct<80?"ok":"warn",formatBytes(used)+" von "+formatBytes(quota)+" Browser-Speicher genutzt ("+n(pct,1)+" %)."))}else out.push(testResult("Gerätespeicher","warn","Speicherquote kann auf diesem Browser nicht ausgelesen werden."))}catch(e){out.push(testResult("Gerätespeicher","warn","Speichernutzung konnte nicht geprüft werden."))}
@@ -929,7 +934,7 @@ function render(){
  var bal=accountBalance();var be=document.getElementById("balance");var bh=document.getElementById("balanceHint");if(bal){be.textContent=(bal.balance>=0?"+":"")+euro(bal.balance)+(bal.balance>=0?" im Plus":" im Minus");be.className="dashMoney "+(bal.balance>=0?"positive":"negative");bh.textContent="Abschläge bis "+dateDE(bal.paidThrough)+": "+euro(bal.paid)+" · Stromkosten bis "+dateDE(bal.date)+": "+euro(bal.totalCost)+" (inkl. "+euro(bal.base)+" Grundpreis) · PV-Vergütung separat";document.getElementById("balancePaid").textContent=euro(bal.paid);document.getElementById("balanceCost").textContent=euro(bal.totalCost);document.getElementById("balanceResult").textContent=(bal.balance>=0?"+":"")+euro(bal.balance)}else{be.textContent="–";be.className="dashMoney";bh.textContent="Abschläge minus Stromkosten inkl. Grundpreis · PV-Vergütung separat";document.getElementById("balancePaid").textContent="–";document.getElementById("balanceCost").textContent="–";document.getElementById("balanceResult").textContent="–"}
  var moneyTrend=lastReadingMoneyTrend();
  renderBalanceTrend(moneyTrend);
- setMoneyTrend("balanceCostTrend",moneyTrend?moneyTrend.costImpact:null,"seit letzter Ablesung");
+ setMoneyTrend("balanceCostTrend",moneyTrend?moneyTrend.costAdded:null,moneyTrend?"neu · "+shortTrendRange(moneyTrend):"seit letzter Ablesung",true);
  var intervalCostImpact=di?-intervalEnergyCost(di.a.date,di.b.date,di.v):null;
  var intervalPvGain=df?intervalFeedRevenue(df.a.date,df.b.date,df.v):null;
  setMoneyTrend("periodCostTrend",intervalCostImpact,"Auswirkung aufs Plus");
