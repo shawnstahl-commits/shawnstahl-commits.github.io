@@ -639,7 +639,7 @@ function __releaseSplash(){
 window.addEventListener("error",function(ev){__bootError=ev&&ev.error?ev.error:new Error(ev&&ev.message||"Startfehler");__releaseSplash()});
 window.addEventListener("unhandledrejection",function(ev){__bootError=ev&&ev.reason?ev.reason:new Error("Startfehler");__releaseSplash()});
 setTimeout(__releaseSplash,900);
-var APP_VERSION="1.4.9";
+var APP_VERSION="1.4.10";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
