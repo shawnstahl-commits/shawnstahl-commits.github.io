@@ -233,11 +233,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{
     <button data-go="add"><span class="ico">＋</span>Freie Eingabe</button>
     <button data-go="notes"><span class="ico">📝</span>Ereignisse</button>
     <button data-go="settings"><span class="ico">⚙️</span>Einstellungen</button>
-    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.8</span></div>
+    <div class="appFooter">Stromtagebuch <span class="versionBadge">v1.4.9</span></div>
   </div>
 </aside>
 <div class="wrap">
-<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.8</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
+<header class="top"><div class="toprow"><button class="menuBtn" id="menuOpen" aria-label="Menü öffnen">☰</button><div class="brandBlock"><div class="brand">⚡ Stromtagebuch <span class="versionBadge">v1.4.9</span></div><div class="sub" id="pageSub">Auf einen Blick</div></div><button class="icon" id="theme">◐</button></div></header>
 <main>
 <div class="updateBanner noPrint" id="updateBanner"><div><b>✨ Neue App-Version verfügbar</b><div class="hint">Neu laden, um die aktuelle Version zu verwenden.</div></div><button class="primary" id="reloadUpdate">Aktualisieren</button></div>
 <section class="view active" data-view="home">
@@ -498,7 +498,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 
 
 <section class="view" data-view="year">
-<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.8</span></div>
+<div class="viewTitle"><h2>🗓️ Jahresübersicht</h2><span class="pill">v1.4.9</span></div>
 <div class="form noPrint"><label>Jahr auswählen</label><select class="input" id="yearSelect"></select></div>
 <div class="yearHero" style="margin-top:10px"><div class="label" style="color:rgba(255,255,255,.7)">JAHRESERGEBNIS STROMKONTO</div><div class="healthScore" id="yearBalance">–</div><div class="hint" id="yearBalanceHint">Abschläge minus Stromkosten · EWE separat</div></div>
 <div class="yearMetricGrid">
@@ -587,7 +587,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{
 <div class="hint" style="margin-top:10px">Die App sichert lokal auf zwei Wegen: localStorage + IndexedDB. Das <b>Komplett-Backup enthält ab v1.3 auch deine Zählerfotos</b>, damit sie auf ein neues Gerät übernommen werden können.</div>
 </div>
 <h2>Daten</h2><div class="card"><div class="actions"><button class="secondary" id="printReport">Monatsbericht / PDF</button><button class="secondary" id="csv">CSV exportieren</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">CSV importieren<input type="file" id="csvImport" accept=".csv,text/csv" hidden></label><button class="secondary" id="backup">Vollbackup inkl. Fotos</button><label class="secondary" style="display:inline-block;margin:0;cursor:pointer">Backup laden<input type="file" id="restore" accept=".json" hidden></label><button class="danger" id="reset">Startdaten wiederherstellen</button></div><div class="hint" style="margin-top:12px">Deine Daten werden lokal gespeichert und zusätzlich automatisch als letzte Gerätesicherung gespiegelt.</div><div class="importPreview" id="csvImportStatus" style="display:none"></div></div>
-<div class="appFooter">Stromtagebuch <b>v1.4.8</b> · lokal & kostenlos</div>
+<div class="appFooter">Stromtagebuch <b>v1.4.9</b> · lokal & kostenlos</div>
 </section>
 </main>
 </div>
@@ -639,7 +639,7 @@ function __releaseSplash(){
 window.addEventListener("error",function(ev){__bootError=ev&&ev.error?ev.error:new Error(ev&&ev.message||"Startfehler");__releaseSplash()});
 window.addEventListener("unhandledrejection",function(ev){__bootError=ev&&ev.reason?ev.reason:new Error("Startfehler");__releaseSplash()});
 setTimeout(__releaseSplash,900);
-var APP_VERSION="1.4.8";
+var APP_VERSION="1.4.9";
 var DEFAULTS={settings:{workRate:.2128,baseAnnual:176.91,monthlyPayment:168,feedRate:.07,feedStart:0,pvKwp:12.15,pvStart:"2026-04-14",dark:false,monthlyReminder:true,backupReminder:true},heatLogs:[],heatMeter:[{date:"2026-10-02",reading:20210.16,note:"Zählerschrank · Startwert"}],pvSnapshot:{date:"2026-10-02",generation:9150,selfConsumed:1450,exported:7710,totalConsumption:2820,gridImport:1370,selfConsumptionPct:15.81,exportPct:84.19,pvCoveragePct:51.29,gridCoveragePct:48.71,appRevenue:837.24,currentMonth:25.59},pvMonths:[],ewePayments:[],evLogs:[],events:[{date:"2026-04-14",text:"PV-Anlage in Betrieb genommen"},{date:"2026-04-30",text:"Heizung für Sommer ausgeschaltet"}],entries:[
 {date:"2026-02-01",imp:6437,feed:null,note:"Start"},
 {date:"2026-02-23",imp:7681,feed:null,note:""},
@@ -938,7 +938,14 @@ function render(){
  var hb=eweBalance(),hoe=document.getElementById("homeEweOpen"),hoh=document.getElementById("homeEweHint");if(hb){hoe.textContent=euro(Math.max(0,hb.open));hoe.className="value "+(hb.open>=0?"good":"orange");hoh.textContent=n(hb.kwh)+" kWh · "+(hb.paid?euro(hb.paid)+" erhalten":"noch keine Auszahlung erfasst")}else{hoe.textContent="–";hoh.textContent="Noch kein 2.8.0-Wert"}
  var hsd=document.getElementById("homeStatusDate");if(hsd)hsd.textContent=last?"Stromstand "+dateDE(last.date):"noch keine Ablesung";
  var flowSum=(di?di.v:0)+(df?df.v:0),feedShare=flowSum>0?(df?df.v:0)/flowSum*100:0;document.getElementById("flowMeter").style.width=Math.max(0,Math.min(100,feedShare))+"%";document.getElementById("flowHint").textContent=di&&df?n(di.v)+" kWh Netzbezug · "+n(df.v)+" kWh Einspeisung":"Für den Vergleich brauchen wir passende Bezugs- und Einspeisezeiträume.";
- renderMonthBars(ms);renderRows();renderAudit();renderSettings();renderEnergy();renderPvMonths();renderPvYearTable();renderReport();renderYear();renderHealth();renderBillingHistory();renderSmartCard();prepAdd();updateReminder();backupStatus();renderPhotoStorage();enhanceHelpButtons();
+ safeRenderModule("Monatsbalken",function(){renderMonthBars(ms)});safeRenderModule("Verlauf",renderRows);safeRenderModule("Änderungsverlauf",renderAudit);safeRenderModule("Einstellungen",renderSettings);safeRenderModule("Energie",renderEnergy);safeRenderModule("PV-Monate",renderPvMonths);safeRenderModule("PV-Jahr",renderPvYearTable);safeRenderModule("Monatsbericht",renderReport);safeRenderModule("Jahresübersicht",renderYear);safeRenderModule("Systemcheck",renderHealth);safeRenderModule("Abrechnungen",renderBillingHistory);safeRenderModule("Smart-Hinweis",renderSmartCard);safeRenderModule("Freie Eingabe",prepAdd);safeRenderModule("Erinnerung",updateReminder);safeRenderModule("Backupstatus",backupStatus);safeRenderModule("Fotoarchiv",renderPhotoStorage);safeRenderModule("Hilfeknöpfe",enhanceHelpButtons);
+}
+function safeRenderModule(name,fn){
+ try{fn()}
+ catch(err){
+   console.error("Stromtagebuch-Modul "+name,err);
+   try{localStorage.setItem("stromtagebuch_last_render_error",JSON.stringify({time:new Date().toISOString(),module:name,message:String(err&&err.message||err)}))}catch(_e){}
+ }
 }
 function prepAdd(){var a=sorted(),last=a[a.length-1],hc=heatCurrent(),snap=state.pvSnapshot;if(!document.getElementById("date").value)document.getElementById("date").value=new Date().toISOString().slice(0,10);var bits=[];if(last)bits.push("Strom "+dateDE(last.date)+" · 1.8.0 "+n(last.imp)+" · 2.8.0 "+(last.feed==null?"–":n(last.feed)));if(hc)bits.push("WP "+dateDE(hc.date)+" · "+n(hc.reading,2)+" kWh");if(snap)bits.push("PV-App "+dateDE(snap.date)+" · Erzeugung "+n(snap.generation)+" kWh");document.getElementById("prev").innerHTML=bits.length?bits.map(function(x){return "<div style='padding:4px 0'>"+x+"</div>"}).join(""):"–";var hh=document.getElementById("heatCentralHint");if(hh&&hc)hh.textContent="Letzter WP-Zählerstand: "+n(hc.reading,2)+" kWh am "+dateDE(hc.date);validate()}
 ["date","imp","feed","pvProd","heatCentral"].forEach(function(id){document.getElementById(id).addEventListener("input",validate)})
@@ -1512,14 +1519,15 @@ if("serviceWorker" in navigator){
 __releaseSplash();
 try{
  render();
+ try{localStorage.removeItem("stromtagebuch_startup_error")}catch(_e){}
  var requestedView=new URLSearchParams(location.search).get("view");
  if(["home","read","report","year","ewe","billing","pv","heat","ev","history","health","add","notes","settings"].indexOf(requestedView)>=0)go(requestedView);
 }catch(err){
- __bootError=err;console.error(err);
+ __bootError=err;console.error(err);try{localStorage.setItem("stromtagebuch_startup_error",JSON.stringify({time:new Date().toISOString(),message:String(err&&err.message||err)}))}catch(_e){};
  var warn=document.createElement("div");
  warn.id="startupRecovery";
  warn.style.cssText="position:fixed;z-index:9999;left:12px;right:12px;top:12px;background:#fff3cd;color:#5f4600;border:1px solid #e6c65b;border-radius:14px;padding:12px;font:600 13px/1.35 system-ui;box-shadow:0 8px 30px rgba(0,0,0,.22)";
- warn.textContent="Die App wurde im Reparaturmodus geöffnet. Deine gespeicherten Daten bleiben erhalten.";
+ warn.textContent="Ein Bereich konnte beim Start nicht vollständig geladen werden. Deine Daten sind sicher. Fehler: "+String(err&&err.message||err);
  document.body.appendChild(warn);
  setTimeout(function(){if(warn&&warn.parentNode)warn.remove()},7000);
 }
