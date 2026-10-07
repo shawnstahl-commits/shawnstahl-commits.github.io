@@ -1,5 +1,5 @@
-const CACHE="stromtagebuch-v39";
-const OCR_CACHE="stromtagebuch-ocr-v9";
+const CACHE="stromtagebuch-v40";
+const OCR_CACHE="stromtagebuch-ocr-v10";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./icon.svg"];
 
 self.addEventListener("install",event=>{
