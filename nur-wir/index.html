@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#170d1d">
+<meta name="description" content="Nur Wir – ein liebevolles, freches Paarspiel für zwei. Ohne App, Anmeldung oder Kosten.">
+<title>Nur Wir ✦ Ein Spiel für Zwei</title>
+<style>
+:root{color-scheme:dark;--bg:#160e1d;--ink:#fff8f5;--muted:#cdbbcf;--soft:#aa91b2;--pink:#ff9fba;--pink2:#ff7299;--gold:#f3cda5;--card:#291b31;--line:rgba(255,220,239,.15)}
+*{box-sizing:border-box}html{min-height:100%;background:var(--bg)}body{margin:0;min-height:100vh;min-height:100dvh;color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse 70% 30% at 12% 2%,#563049 0%,transparent 73%),radial-gradient(ellipse 75% 42% at 95% 60%,#40243b 0%,transparent 78%),linear-gradient(170deg,#1a1121,#130d1b);overflow-x:hidden}
+button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible{outline:3px solid #f6b9d1;outline-offset:3px}
+.page{width:min(100%,480px);margin:0 auto;min-height:100dvh;padding:24px 20px max(30px,env(safe-area-inset-bottom));display:flex;flex-direction:column}
+.screen[hidden]{display:none!important}.intro{animation:fade .35s ease both}
+.brand-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:17px}
+.brand{display:flex;align-items:center;gap:9px;font-size:12px;letter-spacing:2.1px;font-weight:800;color:#ffe6ef}
+.brand-mark{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#ef729e,#c85b81);font-size:15px;box-shadow:0 4px 20px #e46f9a44}
+.small-pill{font-size:11px;color:#ead6e3;border:1px solid var(--line);padding:7px 10px;border-radius:20px;white-space:nowrap;background:#ffffff06}
+.hero-art{position:relative;margin:13px auto 7px;width:152px;height:135px;display:grid;place-items:center}
+.halo{position:absolute;width:114px;height:114px;border-radius:50%;background:radial-gradient(circle,#ff9dbc37,transparent 68%);filter:blur(4px)}
+.orbit{position:absolute;inset:10px;border:1px solid #fac4d82b;border-radius:50%;transform:rotate(-18deg) scaleX(1.2)}
+.heart{font-size:74px;line-height:1;filter:drop-shadow(0 12px 20px #ea6f9a39);transform:rotate(-8deg)}
+.spark{position:absolute;color:#f7ca98}.spark.a{top:8px;right:5px;font-size:22px}.spark.b{bottom:15px;left:8px;font-size:15px}.spark.c{top:24px;left:8px;font-size:10px}
+h1{font-size:clamp(43px,10vw,56px);letter-spacing:-2.2px;line-height:1.05;text-align:center;margin:0 0 12px;font-weight:850}
+h1 em{font-style:normal;color:var(--pink)}
+.sub{max-width:350px;text-align:center;margin:0 auto 24px;color:var(--muted);font-size:14px;line-height:1.65}
+.panel{border:1px solid var(--line);background:linear-gradient(145deg,#ffffff0b,#ffffff03);border-radius:24px;padding:18px;box-shadow:0 16px 45px #0a06101b}
+.heading{display:flex;align-items:center;justify-content:space-between;margin:0 0 13px}.heading span:first-child{font-weight:760;font-size:14px}.heading span:last-child{color:var(--soft);font-size:11px}
+.names{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:19px}
+.name-label{display:block;font-size:11px;color:#cfb8cc;margin:0 0 6px 2px}
+.name{width:100%;min-width:0;background:#1b1224;color:#fff9fb;border:1px solid #76576b77;border-radius:12px;padding:12px 10px;font-size:14px;outline:0}
+.name::placeholder{color:#9e899c}
+.levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:17px}
+.level{padding:12px 3px 10px;border:1.5px solid #ffffff1a;background:#1b1425;border-radius:15px;text-align:center;transition:transform .15s,border-color .15s,background .15s;min-width:0}
+.level.selected{background:linear-gradient(135deg,#78394d99,#47283e);border-color:#ff9fba;box-shadow:inset 0 0 0 1px #ff9fba22}
+.level:active{transform:scale(.97)}.level .emoji{font-size:23px;display:block;line-height:1.3}.level strong{font-size:12px;display:block;white-space:nowrap}.level small{font-size:10px;color:#d0adbe;display:block;margin-top:2px}
+.mode{display:flex;gap:6px;border:1px solid #ffffff13;background:#1b1423;border-radius:13px;padding:4px;margin-bottom:18px}
+.mode button{flex:1;min-width:0;padding:10px 3px;font-size:11px;color:#ddc4d1;border-radius:9px;border:0;background:transparent;white-space:nowrap}
+.mode button.selected{background:#5d374d;color:#fff;box-shadow:0 2px 9px #0004;font-weight:750}
+.primary{width:100%;border:0;border-radius:16px;padding:17px;background:linear-gradient(110deg,#ff9ab9,#f77a9f);color:#421827;font-size:15px;font-weight:850;box-shadow:0 12px 28px #fc80a12c;transition:transform .15s,filter .15s}
+.primary:active{transform:scale(.985)}.primary:hover{filter:brightness(1.06)}
+.consent{font-size:11px;color:#d7c2cf;text-align:center;line-height:1.55;margin:17px auto 3px;max-width:360px}
+.footer{margin-top:auto;padding-top:20px;text-align:center;color:#927e96;font-size:11px}
+.game-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px}.back{border:1px solid #ffffff22;border-radius:12px;padding:9px 12px;background:#ffffff0a;color:#e9d5e2;font-size:12px}.step{color:#d8bed0;font-size:12px;font-variant-numeric:tabular-nums}
+.progress{height:5px;background:#ffffff12;border-radius:20px;overflow:hidden;margin:18px 0 29px}.progress>div{height:100%;width:0;background:linear-gradient(90deg,#f6cfaa,#ff83ae);border-radius:20px;transition:width .3s}
+.turn{text-align:center;color:var(--gold);letter-spacing:2px;font-size:11px;text-transform:uppercase;font-weight:750;margin-bottom:8px}
+.player{text-align:center;font-size:clamp(30px,9vw,43px);font-weight:850;letter-spacing:-.8px;line-height:1.2;overflow-wrap:anywhere;margin:0 0 10px}
+.invite{text-align:center;color:#e1c8d7;font-size:13px;margin:0 0 22px}
+.game-card{position:relative;isolation:isolate;overflow:hidden;min-height:350px;border:1px solid #eab0cc4d;border-radius:26px;background:radial-gradient(ellipse 80% 55% at 85% 0%,#aa527158,transparent 75%),radial-gradient(ellipse 80% 60% at 10% 100%,#72415e75,transparent 75%),linear-gradient(155deg,#49253e,#28182d);padding:28px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 20px 55px #0e071b55, inset 0 1px #ffffff20}
+.game-card:before,.game-card:after{content:'✦';position:absolute;color:#f9c8b044;font-size:64px;z-index:-1}.game-card:before{left:-5px;top:5px}.game-card:after{right:10px;bottom:2px;font-size:44px}
+.game-card.pop{animation:slideIn .32s cubic-bezier(.16,.9,.38,1)}
+.card-icon{width:62px;height:62px;border:1px solid #ffd9e16c;display:grid;place-items:center;border-radius:50%;font-size:30px;background:#ffffff0c;margin-bottom:19px}
+.type{color:#ffcadb;text-transform:uppercase;font-size:11px;letter-spacing:2.5px;font-weight:750;margin-bottom:19px}
+.card-text{font-size:clamp(22px,6.1vw,28px);font-weight:700;text-align:center;line-height:1.4;letter-spacing:-.4px;overflow-wrap:anywhere}
+.card-flourish{color:#e4a8c4b3;letter-spacing:10px;font-size:13px;margin-top:26px}
+.next{margin-top:23px}.secondary-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.secondary{background:#ffffff0a;border:1px solid #ffffff24;border-radius:14px;color:#dfc5d4;padding:14px 10px;font-size:13px}
+.secondary:active{background:#ffffff18}
+.end{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}
+.end .big{font-size:76px;margin-bottom:12px}.end h2{font-size:36px;line-height:1.12;margin:0 0 13px}.end p{color:var(--muted);font-size:14px;line-height:1.7;margin:0 0 25px}
+.stats{text-align:center;color:#bfa7bc;font-size:11px;margin:17px 0 0}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes slideIn{from{opacity:.45;transform:translateY(11px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:350px){.page{padding-inline:14px}.panel{padding:14px}.levels{gap:5px}.level strong{font-size:11px}.game-card{min-height:320px;padding:20px 15px}.card-text{font-size:21px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<main class="page">
+<section class="screen intro" id="home">
+ <div class="brand-top"><div class="brand"><span class="brand-mark" aria-hidden="true">♥</span> NUR WIR</div><span class="small-pill">✦ Ein Spiel für zwei</span></div>
+ <div class="hero-art" aria-hidden="true"><div class="halo"></div><div class="orbit"></div><span class="heart">💗</span><span class="spark a">✧</span><span class="spark b">✧</span><span class="spark c">✧</span></div>
+ <h1>Ein Abend.<br><em>Nur wir zwei.</em></h1>
+ <p class="sub">Ein bisschen Herzklopfen, freche Fragen und schöne Momente. Einfach zu zweit spielen – ganz ohne Regeln lernen.</p>
+ <div class="panel">
+  <div class="heading"><span>Wer spielt mit?</span><span>Für 2 Erwachsene</span></div>
+  <div class="names">
+   <label><span class="name-label">Person 1</span><input class="name" id="name1" maxlength="20" placeholder="Dein Name" autocomplete="off"></label>
+   <label><span class="name-label">Person 2</span><input class="name" id="name2" maxlength="20" placeholder="Dein Lieblingsmensch" autocomplete="off"></label>
+  </div>
+  <div class="heading"><span>Wie wird euer Abend?</span><span>Ihr entscheidet</span></div>
+  <div class="levels" role="group" aria-label="Spielstufe">
+   <button class="level" data-level="romantisch" aria-pressed="false"><span class="emoji">🌷</span><strong>Romantisch</strong><small>zum Näherkommen</small></button>
+   <button class="level selected" data-level="frech" aria-pressed="true"><span class="emoji">😉</span><strong>Frech</strong><small>mit Kribbeln</small></button>
+   <button class="level" data-level="prickelnd" aria-pressed="false"><span class="emoji">🔥</span><strong>Prickelnd</strong><small>mit Spannung</small></button>
+  </div>
+  <div class="heading"><span>Was möchtet ihr spielen?</span><span></span></div>
+  <div class="mode" role="group" aria-label="Kartentyp">
+   <button class="selected" data-mode="alle" aria-pressed="true">Alles gemischt</button>
+   <button data-mode="frage" aria-pressed="false">Nur Fragen</button>
+   <button data-mode="aufgabe" aria-pressed="false">Nur Aufgaben</button>
+  </div>
+  <button class="primary" id="start">Spiel starten <span aria-hidden="true">♥</span></button>
+ </div>
+ <p class="consent">♡ Nur was sich für euch beide gut anfühlt. Jede Karte darf ohne Begründung übersprungen werden.</p>
+ <div class="footer">Privat · Keine Anmeldung · Keine Datenspeicherung</div>
+</section>
+<section class="screen" id="game" hidden aria-live="polite">
+ <div class="game-top"><button class="back" id="quit">← Zurück</button><span class="step" id="step">Karte 1 / 60</span></div>
+ <div class="progress" aria-hidden="true"><div id="progressFill"></div></div>
+ <div class="turn">Du bist dran</div>
+ <h2 class="player" id="player"></h2>
+ <p class="invite">Diese Karte gehört dir ✨</p>
+ <div class="game-card" id="gameCard">
+  <div class="card-icon" id="cardIcon" aria-hidden="true">💌</div>
+  <div class="type" id="cardType">FRAGE</div>
+  <div class="card-text" id="cardText"></div>
+  <div class="card-flourish" aria-hidden="true">✦ ♥ ✦</div>
+ </div>
+ <button class="primary next" id="next">Nächste Karte →</button>
+ <div class="secondary-row"><button class="secondary" id="skip">↷ Überspringen</button><button class="secondary" id="restart">↻ Neue Runde</button></div>
+ <p class="stats">Kein Zeitdruck. Ihr bestimmt das Tempo.</p>
+ <div class="footer">NUR WIR ♥</div>
+</section>
+<section class="screen end" id="done" hidden>
+ <div class="big" aria-hidden="true">💞</div><h2>Die Karten sind aus.<br>Der Abend nicht.</h2>
+ <p>Ihr habt euch die Zeit füreinander genommen. Wenn ihr mögt, mischen wir noch einmal neu.</p>
+ <button class="primary" id="again">Noch eine Runde ♥</button>
+ <button class="secondary" id="goHome" style="margin-top:12px;width:100%">Spielstufe ändern</button>
+ <div class="footer">Nur wir zwei. ✨</div>
+</section>
+</main>
+<script>
+(function(){
+"use strict";
+const raw={
+ romantisch:{
+  frage:[
+   "Was war das Erste, das dir an mir aufgefallen ist?",
+   "Welcher kleine Moment mit mir macht dich immer noch glücklich?",
+   "An welchen gemeinsamen Tag denkst du besonders gern zurück?",
+   "Was sollte ich dir viel öfter sagen?",
+   "Was kann ich tun, damit du dich heute richtig geliebt fühlst?",
+   "Worauf freust du dich am meisten, wenn du an unsere Zukunft denkst?",
+   "Welche Angewohnheit von mir findest du heimlich süß?",
+   "Was war unser schönstes spontanes Erlebnis?",
+   "Bei welchem Lied musst du sofort an uns denken?",
+   "Wann fühlst du dich mir besonders nahe?",
+   "Welche unserer gemeinsamen Erinnerungen würdest du gern noch einmal erleben?",
+   "Was magst du besonders an unserem Alltag zusammen?",
+   "Welche drei Wörter beschreiben uns am besten?",
+   "Welches Kompliment von mir ist dir im Kopf geblieben?",
+   "Was würdest du gern noch mit mir ausprobieren, das wir bisher nicht gemacht haben?"
+  ],
+  aufgabe:[
+   "Schau deinem Gegenüber 20 Sekunden lang in die Augen, ohne etwas zu sagen.",
+   "Mach deinem Gegenüber drei ehrliche Komplimente.",
+   "Umarme dein Gegenüber so lange, wie es für euch beide schön ist.",
+   "Gib deinem Gegenüber einen liebevollen Kuss.",
+   "Nimm die Hand deines Gegenübers und erzähle eine schöne gemeinsame Erinnerung.",
+   "Zeig mit einer Geste, wie sehr du dein Gegenüber schätzt.",
+   "Sage einen Satz, den dein Gegenüber heute hören sollte.",
+   "Lehne deinen Kopf an die Schulter deines Gegenübers und genießt zehn Sekunden Stille.",
+   "Erfinde einen neuen liebevollen Spitznamen.",
+   "Plane spontan ein kleines Date, das ihr bald gemeinsam erleben könnt.",
+   "Flüstere deinem Gegenüber zu, was du an ihm besonders gern hast.",
+   "Lass dein Gegenüber einen Kussplatz auf deiner Wange aussuchen.",
+   "Massiere die Schultern deines Gegenübers für 30 Sekunden, wenn es mag.",
+   "Legt für eine halbe Minute die Handys weg und seid ganz füreinander da.",
+   "Beende den Satz laut: 'Mit dir fühlt sich ... besonders schön an.'"
+  ]
+ },
+ frech:{
+  frage:[
+   "Was findest du an mir besonders anziehend?",
+   "Welcher Blick von mir bringt dich zum Grinsen?",
+   "Was war unser lustigster Flirtmoment?",
+   "Mit welchem Kompliment könnte ich dich sofort verlegen machen?",
+   "Welches Outfit an mir findest du am schönsten?",
+   "Was war dein erster heimlicher Gedanke bei unserem Kennenlernen?",
+   "Wann habe ich dich zuletzt positiv überrascht?",
+   "Welches gemeinsame Date würde uns wieder wie frisch verliebt fühlen lassen?",
+   "Welche meiner Gesten findest du besonders charmant?",
+   "Wie würdest du versuchen, mich heute noch einmal zu erobern?",
+   "Was bringt dich schneller zum Lächeln: mein Blick oder mein Humor?",
+   "Welcher Kuss zwischen uns ist dir besonders in Erinnerung geblieben?",
+   "Was wolltest du mich schon lange mal fragen?",
+   "Welche kleine Mutprobe würdest du uns beiden zutrauen?",
+   "Was ist deine liebste Art, mit mir zu flirten?"
+  ],
+  aufgabe:[
+   "Flirte 20 Sekunden mit deinem Gegenüber, als wäre es euer erstes Date.",
+   "Gib deinem Gegenüber einen Kuss und lass dir dabei Zeit.",
+   "Flüstere deinem Gegenüber etwas charmant Freches ins Ohr.",
+   "Mach deinem Gegenüber ein Kompliment, bei dem es rot werden könnte.",
+   "Lass dein Gegenüber entscheiden: ein langer Kuss oder eine enge Umarmung.",
+   "Zeig deinen besten verführerischen Blick – ohne zu lachen.",
+   "Halte für 15 Sekunden Händchen und schau deinem Gegenüber dabei in die Augen.",
+   "Tanze 30 Sekunden langsam mit deinem Gegenüber – auch ohne Musik.",
+   "Setz dich ganz nah neben dein Gegenüber und sag, was du gerade fühlst.",
+   "Gib deinem Gegenüber drei kleine Küsse auf frei gewählte, angenehme Stellen wie Stirn, Wange oder Hand.",
+   "Beschreibe mit genau fünf Wörtern, warum du dein Gegenüber toll findest.",
+   "Flüstere einen romantischen Wunsch für euren nächsten Abend zu zweit.",
+   "Lass dein Gegenüber einen Song für euren nächsten langsamen Tanz aussuchen.",
+   "Gib deinem Gegenüber eine kurze Handmassage, wenn es mag.",
+   "Versuch dein Gegenüber mit einem einzigen Satz zum Lächeln zu bringen."
+  ]
+ },
+ prickelnd:{
+  frage:[
+   "Was sorgt bei dir am schnellsten für Herzklopfen?",
+   "Welche Art von Kuss magst du besonders gern?",
+   "Welche Berührung empfindest du als besonders angenehm?",
+   "Was macht für dich einen richtig sinnlichen Abend aus?",
+   "Wie zeigst du mir am liebsten, dass du mich begehrenswert findest?",
+   "Welcher Moment zwischen uns hat sich besonders aufregend angefühlt?",
+   "Was wünschst du dir öfter, wenn wir Zeit nur für uns haben?",
+   "Was lässt dich besonders begehrt und gesehen fühlen?",
+   "Was ist für dich reizvoller: Vorfreude oder Überraschung?",
+   "Welche romantische Fantasie würdest du gern einmal mit mir besprechen?",
+   "Welches Ambiente bringt dich am ehesten in Kuschelstimmung?",
+   "Was findest du aufregender: ein langer Blick oder ein unerwartetes Kompliment?",
+   "Wie möchtest du sagen können, wenn du etwas langsamer angehen willst?",
+   "Was könnten wir beide Neues ausprobieren, womit wir uns wohlfühlen?",
+   "Welche Form von Nähe würdest du heute gern besonders genießen?"
+  ],
+  aufgabe:[
+   "Gib deinem Gegenüber einen besonders langsamen Kuss, wenn es mag.",
+   "Flüstere deinem Gegenüber zu, was du heute besonders schön an ihm findest.",
+   "Lass dein Gegenüber wählen: Nackenmassage oder zärtliche Umarmung.",
+   "Halte den Blickkontakt für 20 Sekunden und lächle erst am Schluss.",
+   "Streiche deinem Gegenüber sanft über die Hand und frag, ob sich das gut anfühlt.",
+   "Beschreibe ein Date, das sich für euch beide besonders aufregend anfühlen würde.",
+   "Setzt euch eng nebeneinander und hört eine halbe Minute nur auf euren Atem.",
+   "Gib deinem Gegenüber einen sanften Kuss auf eine gemeinsam vereinbarte Stelle.",
+   "Sag deinem Gegenüber ganz leise, warum du es begehrenswert findest.",
+   "Lass dein Gegenüber dir für 30 Sekunden eine angenehme Rückenmassage geben – wenn ihr beide möchtet.",
+   "Frag dein Gegenüber, welche Art von Nähe es sich gerade wünscht, und schenke sie ihm, wenn ihr beide einverstanden seid.",
+   "Nimm beide Hände deines Gegenübers und geh einen kleinen Schritt näher.",
+   "Sag mit leiser Stimme, worauf du dich bei eurem nächsten Abend zu zweit freust.",
+   "Gib deinem Gegenüber einen Kuss, der sich nach einem zweiten Date anfühlt.",
+   "Wähle einen Song und wiegt euch gemeinsam ganz langsam dazu."
+  ]
+ }
+};
+const home=document.getElementById("home"), game=document.getElementById("game"), done=document.getElementById("done");
+const levels=[...document.querySelectorAll("[data-level]")], modes=[...document.querySelectorAll("[data-mode]")];
+let level="frech",mode="alle",pile=[],current=0,people=["Du","Dein Lieblingsmensch"];
+function select(arr, key, value){arr.forEach(b=>{const on=b.dataset[key]===value;b.classList.toggle("selected",on);b.setAttribute("aria-pressed",String(on));});}
+levels.forEach(b=>b.addEventListener("click",()=>{level=b.dataset.level;select(levels,"level",level);}));
+modes.forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.mode;select(modes,"mode",mode);}));
+function display(which){home.hidden=which!=="home";game.hidden=which!=="game";done.hidden=which!=="done";window.scrollTo({top:0,behavior:"instant"});}
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function setup(){
+ const n1=document.getElementById("name1").value.trim(),n2=document.getElementById("name2").value.trim();
+ people=[n1||"Du",n2||"Dein Lieblingsmensch"];
+ pile=[];
+ ["frage","aufgabe"].forEach(kind=>{if(mode==="alle"||mode===kind){raw[level][kind].forEach(text=>pile.push({kind,text}));}});
+ shuffle(pile);current=0;display("game");show();
+}
+function show(){
+ if(current>=pile.length){display("done");return;}
+ const card=pile[current],box=document.getElementById("gameCard");
+ document.getElementById("step").textContent="Karte "+(current+1)+" / "+pile.length;
+ document.getElementById("progressFill").style.width=((current+1)/pile.length*100)+"%";
+ document.getElementById("player").textContent=people[current%2];
+ document.getElementById("cardIcon").textContent=card.kind==="frage"?"💌":"✨";
+ document.getElementById("cardType").textContent=card.kind==="frage"?"EINE FRAGE AN DICH":"DEINE AUFGABE";
+ document.getElementById("cardText").textContent=card.text;
+ box.classList.remove("pop");void box.offsetWidth;box.classList.add("pop");
+ window.scrollTo({top:0,behavior:"instant"});
+}
+function next(){current++;show();}
+document.getElementById("start").addEventListener("click",setup);
+document.getElementById("next").addEventListener("click",next);
+document.getElementById("skip").addEventListener("click",next);
+document.getElementById("quit").addEventListener("click",()=>display("home"));
+document.getElementById("restart").addEventListener("click",()=>{shuffle(pile);current=0;show();});
+document.getElementById("again").addEventListener("click",()=>{shuffle(pile);current=0;display("game");show();});
+document.getElementById("goHome").addEventListener("click",()=>display("home"));
+})();
+</script>
+</body>
+</html>
