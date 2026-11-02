@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#b95642">
+<meta name="description" content="Dein einfaches Rezeptbuch für Backrezepte und Desserts – Arbeit und Zuhause.">
+<title>Mein Rezeptbuch – Backen & Desserts</title>
+<style>
+:root{--bg:#fdf8f3;--paper:#fff;--ink:#332c2a;--muted:#786f6a;--line:#eadfd7;--accent:#b95642;--accent2:#fff0e9;--green:#42765e;--shadow:0 10px 30px #3822190e}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}
+.wrap{width:min(900px,calc(100% - 32px));margin:auto}
+header{background:#fffaf7d9;backdrop-filter:blur(13px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.header-inner{display:flex;gap:12px;align-items:center;min-height:68px}.mark{width:42px;height:42px;display:grid;place-items:center;border-radius:15px;background:var(--accent2);font-size:23px}
+.brand{font-size:18px;font-weight:850;line-height:1.15;letter-spacing:-.025em}.brand small{display:block;color:var(--muted);font-size:12px;font-weight:500;letter-spacing:0;margin-top:4px}
+main{padding:26px 0 90px}.intro{margin-bottom:22px}.intro h1{font-size:clamp(29px,7vw,43px);line-height:1.07;letter-spacing:-.045em;margin:4px 0 8px}.intro p{color:var(--muted);margin:0}
+.segment{display:grid;grid-template-columns:1fr 1fr;background:#f3eae4;padding:5px;border-radius:17px;gap:5px;margin:0 0 21px}
+.segment button{border:0;background:transparent;border-radius:13px;padding:13px 8px;font-weight:800;color:#675953}.segment button[aria-pressed=true]{background:#fff;color:var(--accent);box-shadow:0 3px 12px #50372b14}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.topline h2{font-size:23px;letter-spacing:-.035em;margin:0}.count{font-size:13px;color:var(--muted)}
+.btn{border:1px solid transparent;border-radius:13px;padding:12px 15px;font-weight:750;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;text-align:center}
+.btn.primary{color:white;background:var(--accent)}.btn.soft{background:var(--accent2);color:#934a3c}.btn.outline{background:white;color:var(--ink);border-color:var(--line)}.btn.danger{background:#fff1ef;color:#ac3e35}.btn.tiny{font-size:13px;padding:8px 10px;min-height:36px}
+.toolbar{display:grid;grid-template-columns:1fr minmax(130px,180px);gap:10px;margin:16px 0}
+input,textarea,select{background:#fff;color:var(--ink);border:1px solid #dacbc2;border-radius:13px;padding:12px 13px;width:100%;min-width:0}
+input:focus,textarea:focus,select:focus{outline:3px solid #f0bca9;outline-offset:1px}
+textarea{resize:vertical;line-height:1.55;min-height:125px}textarea.steps{min-height:150px}
+label{font-size:13px;color:#625851;font-weight:750;display:block;margin-bottom:7px}
+fieldset{border:0;margin:0;padding:0}.recipes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.recipe-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:9px;width:100%;min-height:155px}
+.recipe-card:focus-visible{outline:3px solid #bb6a57}.recipe-card .emoji{font-size:28px}.recipe-card .cat{color:var(--accent);font-size:12px;font-weight:800}.recipe-card .name{font-size:20px;font-weight:800;letter-spacing:-.025em;line-height:1.15}.recipe-card .meta{color:var(--muted);font-size:13px;margin-top:auto}
+.empty{border:2px dashed #e4d8cf;border-radius:22px;text-align:center;padding:45px 15px;background:#fffaf8}.empty .big{font-size:41px}.empty h3{font-size:20px;margin:10px 0 6px}.empty p{color:var(--muted);margin:0 auto 18px;max-width:280px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow);margin:0 0 16px}
+.panel h2{font-size:25px;margin:0 0 6px;letter-spacing:-.035em}.panel h3{font-size:18px;margin:17px 0 10px}.sub{color:var(--muted);font-size:14px;margin:0 0 17px}
+.pill{font-size:12px;font-weight:800;border-radius:100px;padding:5px 9px;display:inline-block;background:#f9e9df;color:#99503f}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.field{margin-bottom:15px}.form-grid .field{margin-bottom:0}.form-grid+.field,.form-grid+.note{margin-top:15px}
+.note{font-size:13px;color:var(--muted)}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.actions .btn{flex:1}
+.divider{border-top:1px solid var(--line);margin:20px 0}
+#screenList{display:none}#editor{display:none}#reader{display:none}
+.inline{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.inline>input{width:105px}.inline>select{width:150px}
+.ingredient-list{list-style:none;margin:15px 0;padding:0}.ingredient-list li{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid #f1e9e4;align-items:baseline}
+.qty{min-width:100px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}.ingredient-list .desc{flex:1}
+.steps-view{white-space:pre-wrap;line-height:1.75;font-size:16px;overflow-wrap:anywhere}
+.file-btn{border:2px dashed #d9b6a8;border-radius:16px;display:block;padding:17px;text-align:center;background:#fff9f6;color:#924b39;font-weight:750;cursor:pointer}
+.file-btn input{position:absolute;opacity:0;width:1px;height:1px;padding:0}.file-btn:focus-within{outline:3px solid #f0bca9}
+#ocrImage{width:100%;max-height:220px;object-fit:contain;background:#f7f0ec;border-radius:12px;display:none;margin:13px auto}
+.status{color:var(--muted);font-size:14px;min-height:20px;margin-top:9px}
+.error{color:#a0322f}.good{color:var(--green)}.ocr-review{display:none;margin-top:14px}
+.ocr-review textarea{min-height:170px}.small{font-size:13px;color:var(--muted)}
+.tools{border-top:1px solid var(--line);padding-top:20px;margin-top:35px}.tools details{background:white;border:1px solid var(--line);border-radius:16px;padding:15px}
+.tools summary{font-weight:750;cursor:pointer}.tools .inline{margin-top:12px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:30;background:#302a27;color:white;padding:12px 18px;border-radius:13px;max-width:calc(100% - 32px);box-shadow:0 6px 24px #0003;font-size:14px}
+.back{border:0;background:transparent;padding:4px 0;color:var(--accent);font-weight:800;margin-bottom:14px}
+.accent-card{background:#fff6ee;border-color:#efdfce}
+@media(max-width:600px){.recipes{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.toolbar{grid-template-columns:1fr 125px}.panel{padding:17px}.qty{min-width:90px}.recipe-card{min-height:128px}.actions .btn{flex-basis:45%}.wrap{width:calc(100% - 26px)}main{padding-top:18px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header><div class="wrap header-inner"><div class="mark" aria-hidden="true">🧁</div><div class="brand">Mein Rezeptbuch<small>Backen & Desserts</small></div></div></header>
+<main class="wrap">
+<section id="screenList">
+<div class="intro"><h1>Alles an einem Ort.<br>Einfach lecker.</h1><p>Deine süßen Rezepte für die Arbeit und für Zuhause.</p></div>
+<div class="segment" role="group" aria-label="Rezeptbereich"><button id="tabWork" aria-pressed="true" type="button">👨‍🍳 Arbeit</button><button id="tabHome" aria-pressed="false" type="button">🏡 Zuhause</button></div>
+<div class="topline"><div><h2 id="areaTitle">Für die Arbeit</h2><div class="count" id="counter">0 Rezepte</div></div><button class="btn primary" id="newBtn" type="button">+ Rezept</button></div>
+<div class="toolbar"><input id="search" type="search" placeholder="🔎 Rezept suchen …" aria-label="Rezepte suchen"><select id="filter" aria-label="Kategorie filtern"><option value="">Alle Kategorien</option><option>Dessert</option><option>Kuchen & Torten</option><option>Gebäck</option><option>Teige & Cremes</option><option>Sonstiges</option></select></div>
+<div class="recipes" id="cards"></div>
+<div class="empty" id="empty"><div class="big">🍰</div><h3>Noch kein Rezept hier</h3><p>Trage dein erstes Rezept ein oder lies es aus einem Screenshot ein.</p><button class="btn primary" id="emptyBtn" type="button">Erstes Rezept anlegen</button></div>
+<div class="tools"><details><summary>⚙️ Sicherung & Daten</summary><p class="small">Rezepte werden in diesem Browser gespeichert, nicht automatisch auf anderen Geräten. Sichere sie gelegentlich, damit bei einem Browserwechsel nichts verloren geht.</p><div class="inline"><button id="exportBtn" class="btn outline" type="button">Sicherung speichern</button><label class="btn outline" style="margin:0;cursor:pointer">Sicherung einlesen<input type="file" id="importJson" accept=".json,application/json" style="position:absolute;width:1px;height:1px;opacity:0" aria-label="Gesicherte Rezepte auswählen"></label></div><p class="small">Bei der Wiederherstellung werden die vorhandenen Rezepte ergänzt bzw. bei gleicher ID aktualisiert.</p></details></div>
+</section>
+<section id="editor">
+<button class="back" id="editBack" type="button">← Alle Rezepte</button>
+<div class="panel"><h2 id="editorTitle">Neues Rezept</h2><p class="sub">Du kannst dein Rezept eintippen oder aus einem Screenshot übernehmen.</p>
+<div class="field"><label for="title">Rezeptname *</label><input id="title" type="text" placeholder="z. B. Quarkdessert mit Beeren" maxlength="120"></div>
+<div class="form-grid">
+<div class="field"><label for="area">Bereich</label><select id="area"><option value="work">👨‍🍳 Arbeit</option><option value="home">🏡 Zuhause</option></select></div>
+<div class="field"><label for="category">Kategorie</label><select id="category"><option>Dessert</option><option>Kuchen & Torten</option><option>Gebäck</option><option>Teige & Cremes</option><option>Sonstiges</option></select></div>
+<div class="field"><label for="baseAmount">Menge für *</label><input id="baseAmount" type="number" min="0.1" step="any" inputmode="decimal" value="20"></div>
+<div class="field"><label for="baseUnit">Einheit</label><select id="baseUnit"><option>Portionen</option><option>Stück</option><option>Gläser</option><option>Personen</option><option>Bleche</option><option>Formen</option></select></div>
+</div>
+<div class="field" style="margin-top:17px"><label for="ingredients">Zutaten (eine Zutat pro Zeile) *</label><textarea id="ingredients" placeholder="500 g Quark&#10;250 ml Sahne&#10;80 g Zucker&#10;1 Pck Vanillezucker"></textarea><div class="note">Zum Umrechnen die Menge an den Anfang schreiben, z. B. „250 g Mehl“ oder „3 Eier“.</div></div>
+<div class="field"><label for="steps">Zubereitung</label><textarea id="steps" class="steps" placeholder="1. Sahne steif schlagen.&#10;2. Quark mit Zucker verrühren.&#10;3. Alles vorsichtig vermengen."></textarea></div>
+<div class="field"><label for="notes">Notizen (optional)</label><textarea id="notes" style="min-height:76px" placeholder="z. B. Kühlzeit, Backtemperatur oder Tipps"></textarea></div>
+<div class="divider"></div>
+<h3>📷 Aus Screenshot übernehmen</h3><p class="small">Wähle ein Bild mit lesbarem Rezepttext. Die Texterkennung läuft direkt im Browser. Bitte kontrolliere Mengen und Zutaten anschließend.</p>
+<label class="file-btn" for="screenshot">📸 Screenshot oder Rezeptfoto auswählen<input type="file" accept="image/*" id="screenshot"></label>
+<img id="ocrImage" alt="Vorschau des ausgewählten Screenshots">
+<div id="ocrStatus" class="status" role="status"></div>
+<div id="ocrReview" class="ocr-review"><label for="ocrText">Erkannter Text – hier korrigieren</label><textarea id="ocrText"></textarea><div class="actions"><button id="useOcr" class="btn soft" type="button">Text ins Rezept übernehmen</button></div><div class="note">Danach kannst du Rezeptname, Zutaten und Zubereitung vor dem Speichern verbessern.</div></div>
+<div class="actions"><button class="btn primary" type="button" id="saveBtn">✓ Rezept speichern</button><button class="btn outline" type="button" id="cancelBtn">Abbrechen</button></div>
+</div></section>
+<section id="reader">
+<button class="back" id="readBack" type="button">← Alle Rezepte</button>
+<div class="panel"><span class="pill" id="viewBadge">Dessert</span><h2 style="margin-top:10px" id="viewTitle"></h2>
+<div class="sub" id="viewMeta"></div>
+<div class="panel accent-card" style="padding:14px;margin-bottom:15px"><label for="targetAmount" style="margin:0 0 9px">Menge umrechnen</label><div class="inline"><input id="targetAmount" type="number" min="0.1" step="any" inputmode="decimal"><strong id="targetUnit"></strong><button id="resetAmount" class="btn tiny soft" type="button">Originalmenge</button></div><div class="note">Die Zutaten passen sich automatisch an.</div></div>
+<h3>Zutaten</h3><ul class="ingredient-list" id="viewIngredients"></ul>
+<h3>Zubereitung</h3><div class="steps-view" id="viewSteps"></div>
+<div id="viewNotesWrap" style="display:none"><h3>Notizen</h3><div class="steps-view" id="viewNotes"></div></div>
+<div class="actions"><button class="btn soft" type="button" id="editBtn">✏️ Bearbeiten</button><button class="btn outline" type="button" id="copyBtn">📋 Zutaten kopieren</button><button class="btn outline" type="button" id="moveBtn">↔ Für anderen Bereich</button><button class="btn danger" type="button" id="deleteBtn">Löschen</button></div>
+</div></section>
+</main><div id="toast" class="toast" role="status" style="display:none"></div>
+<script>
+(function(){
+"use strict";
+var KEY="mein-rezeptbuch-v1";
+var recipes=[];
+var activeArea="work";
+var currentId=null;
+var editingId=null;
+var toastTimeout=null;
+var selectedImageUrl=null;
+var $=function(id){return document.getElementById(id);};
+function notify(msg){var el=$("toast");el.textContent=msg;el.style.display="block";clearTimeout(toastTimeout);toastTimeout=setTimeout(function(){el.style.display="none";},3000);}
+function safe(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function normal(s){return String(s||"").trim();}
+function number(s){return Number(String(s).replace(",", "."));}
+function fmt(n){if(!Number.isFinite(n))return "";var v=Math.round((n+Number.EPSILON)*100)/100;return new Intl.NumberFormat("de-DE",{maximumFractionDigits:2}).format(v);}
+function guid(){return (crypto.randomUUID?crypto.randomUUID():"r"+Date.now().toString(36)+Math.random().toString(36).slice(2));}
+function saveAll(){try{localStorage.setItem(KEY,JSON.stringify(recipes));return true;}catch(e){notify("Speichern nicht möglich: Browserspeicher voll oder gesperrt.");return false;}}
+function loadAll(){try{var data=JSON.parse(localStorage.getItem(KEY)||"[]");recipes=Array.isArray(data)?data.filter(validRecipe):[];}catch(e){recipes=[];notify("Gespeicherte Rezepte konnten nicht gelesen werden.");}}
+function validRecipe(r){return r&&typeof r==="object"&&typeof r.title==="string"&&["work","home"].includes(r.area)&&typeof r.ingredients==="string";}
+function showScreen(s){["screenList","editor","reader"].forEach(function(id){$(id).style.display=id===s?"block":"none";});window.scrollTo(0,0);}
+function setArea(a){activeArea=a; $("tabWork").setAttribute("aria-pressed",a==="work");$("tabHome").setAttribute("aria-pressed",a==="home");$("areaTitle").textContent=a==="work"?"Für die Arbeit":"Für Zuhause";renderList();}
+function emoji(cat){return cat==="Dessert"?"🍮":cat==="Kuchen & Torten"?"🎂":cat==="Gebäck"?"🥐":cat==="Teige & Cremes"?"🥣":"🍴";}
+function renderList(){var search=normal($("search").value).toLocaleLowerCase("de-DE");var cat=$("filter").value;var arr=recipes.filter(function(r){return r.area===activeArea&&(!cat||r.category===cat)&&(!search||[r.title,r.ingredients,r.notes,r.category].join(" ").toLocaleLowerCase("de-DE").includes(search));}).sort(function(a,b){return (b.updated||0)-(a.updated||0);});
+$("counter").textContent=arr.length+" "+(arr.length===1?"Rezept":"Rezepte");
+$("cards").innerHTML=arr.map(function(r){return '<button class="recipe-card" type="button" data-id="'+safe(r.id)+'"><span class="emoji">'+emoji(r.category)+'</span><span class="cat">'+safe(r.category||"Rezept")+'</span><span class="name">'+safe(r.title)+'</span><span class="meta">Für '+safe(fmt(r.baseAmount||1))+' '+safe(r.baseUnit||"Portionen")+'</span></button>';}).join("");
+$("empty").style.display=arr.length?"none":"block";$("empty").querySelector("h3").textContent=search||cat?"Keine passenden Rezepte":"Noch kein Rezept hier";
+$("empty").querySelector("p").textContent=search||cat?"Ändere die Suche oder die Kategorie.":"Trage dein erstes Rezept ein oder lies es aus einem Screenshot ein.";
+$("emptyBtn").style.display=search||cat?"none":"inline-flex";
+}
+function resetScreenshot(){if(selectedImageUrl){URL.revokeObjectURL(selectedImageUrl);selectedImageUrl=null;}$("screenshot").value="";$("ocrImage").style.display="none";$("ocrImage").removeAttribute("src");$("ocrStatus").textContent="";$("ocrReview").style.display="none";$("ocrText").value="";}
+function openEditor(id){editingId=id||null;var r=recipes.find(function(x){return x.id===id;});$("editorTitle").textContent=r?"Rezept bearbeiten":"Neues Rezept";$("title").value=r?r.title:"";$("area").value=r?r.area:activeArea;$("category").value=r?r.category:"Dessert";$("baseAmount").value=r?r.baseAmount:(activeArea==="work"?20:4);$("baseUnit").value=r?r.baseUnit:"Portionen";$("ingredients").value=r?r.ingredients:"";$("steps").value=r?r.steps||"":"";$("notes").value=r?r.notes||"":"";resetScreenshot();showScreen("editor");$("title").focus();}
+function saveEditor(){var title=normal($("title").value);var ingredients=normal($("ingredients").value);var amount=number($("baseAmount").value);
+if(!title){notify("Bitte einen Rezeptnamen eingeben.");$("title").focus();return;}if(!ingredients){notify("Bitte Zutaten eintragen.");$("ingredients").focus();return;}if(!Number.isFinite(amount)||amount<=0){notify("Bitte eine gültige Ausgangsmenge eingeben.");$("baseAmount").focus();return;}
+var old=recipes.find(function(r){return r.id===editingId;});var r={id:editingId||guid(),title:title,area:$("area").value,category:$("category").value,baseAmount:amount,baseUnit:$("baseUnit").value,ingredients:ingredients,steps:normal($("steps").value),notes:normal($("notes").value),created:old?old.created:Date.now(),updated:Date.now()};
+if(old){recipes[recipes.indexOf(old)]=r;}else recipes.push(r);
+if(!saveAll())return;activeArea=r.area;resetScreenshot();currentId=r.id;setArea(activeArea);openReader(r.id);notify("Rezept gespeichert ✓");}
+var UNITS="kg|mg|g|ml|cl|dl|l|EL|TL|Pck\\.?|Päckchen|Packung|Prisen?|Stk\\.?|Stück|Dosen?|Becher|Tassen?|Blätter|Blatt|Scheiben?|Eier|Ei|Eigelb|Eiweiß";
+var reStart=new RegExp("^\\s*(\\d+(?:[.,]\\d+)?|\\d+\\s*\\/\\s*\\d+)\\s*("+UNITS+")(?:\\s+|$)","i");
+var reEnd=new RegExp("^(.*?)\\s+(\\d+(?:[.,]\\d+)?)\\s*("+UNITS+")\\s*$","i");
+function parseNum(s){if(s.indexOf("/")>=0){var p=s.split("/");return number(p[0])/number(p[1]);}return number(s);}
+function parseIngredient(line){var text=normal(line).replace(/^[•●–-]\s*/,"");var m=text.match(reStart);if(m)return {qty:parseNum(m[1]),unit:m[2],name:normal(text.slice(m[0].length))};m=text.match(/^\s*(\d+(?:[.,]\d+)?)\s+(.+)$/);if(m)return {qty:number(m[1]),unit:"",name:normal(m[2])};m=text.match(reEnd);if(m)return {qty:number(m[2]),unit:m[3],name:normal(m[1])};return {qty:null,unit:"",name:text};}
+function scaleIngredient(line,factor){var p=parseIngredient(line);if(p.qty===null||!Number.isFinite(p.qty))return {qty:"",name:p.name};var n=p.qty*factor;var unit=p.unit;
+if(unit.toLowerCase()==="g"&&n>=1000){n=n/1000;unit="kg";}else if(unit.toLowerCase()==="kg"&&n<1){n=n*1000;unit="g";}else if(unit.toLowerCase()==="ml"&&n>=1000){n=n/1000;unit="l";}else if(unit.toLowerCase()==="l"&&n<1){n=n*1000;unit="ml";}
+return {qty:fmt(n)+(unit?" "+unit:""),name:p.name};}
+function calcLines(r,target){var factor=target/(Number(r.baseAmount)||1);return r.ingredients.split(/\r?\n/).map(normal).filter(Boolean).map(function(x){return scaleIngredient(x,factor);});}
+function openReader(id){var r=recipes.find(function(x){return x.id===id;});if(!r){showScreen("screenList");return;}currentId=id;activeArea=r.area;$("viewBadge").textContent=(r.area==="work"?"👨‍🍳 Arbeit · ":"🏡 Zuhause · ")+(r.category||"Rezept");$("viewTitle").textContent=r.title;$("viewMeta").textContent="Originalrezept für "+fmt(r.baseAmount)+" "+(r.baseUnit||"Portionen");$("targetAmount").value=r.baseAmount;$("targetUnit").textContent=r.baseUnit||"Portionen";$("viewSteps").textContent=r.steps||"Keine Zubereitung hinterlegt.";$("viewNotesWrap").style.display=r.notes?"block":"none";$("viewNotes").textContent=r.notes||"";$("moveBtn").textContent=r.area==="work"?"↔ Kopie für Zuhause":"↔ Kopie für die Arbeit";renderIngredients();showScreen("reader");}
+function renderIngredients(){var r=recipes.find(function(x){return x.id===currentId;});if(!r)return;var target=number($("targetAmount").value);$("viewIngredients").innerHTML=Number.isFinite(target)&&target>0?calcLines(r,target).map(function(x){return '<li><span class="qty">'+safe(x.qty)+'</span><span class="desc">'+safe(x.name)+'</span></li>';}).join(""):'<li>Bitte eine Menge größer als 0 eingeben.</li>';}
+function copyIngredients(){var r=recipes.find(function(x){return x.id===currentId;});if(!r)return;var target=number($("targetAmount").value);if(!(target>0))return notify("Bitte gültige Menge eingeben.");var lines=calcLines(r,target).map(function(x){return (x.qty+" "+x.name).trim();});var result=r.title+" – "+fmt(target)+" "+r.baseUnit+"\n"+lines.join("\n");if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(result).then(function(){notify("Zutatenliste kopiert ✓");}).catch(function(){fallbackCopy(result);});}else fallbackCopy(result);}
+function fallbackCopy(t){var e=document.createElement("textarea");e.value=t;document.body.appendChild(e);e.select();try{document.execCommand("copy");notify("Zutatenliste kopiert ✓");}catch(err){notify("Kopieren nicht verfügbar.");}e.remove();}
+function duplicate(){var r=recipes.find(function(x){return x.id===currentId;});if(!r)return;var other=r.area==="work"?"home":"work";var suggested=other==="home"?4:20;var target=Number(prompt("Für wie viele "+(r.baseUnit||"Portionen")+" soll die Kopie sein?",String(suggested).replace(".",",")));if(!Number.isFinite(target)||target<=0)return;
+var cp=Object.assign({},r,{id:guid(),area:other,baseAmount:target,ingredients:calcLines(r,target).map(function(x){return (x.qty+" "+x.name).trim();}).join("\n"),created:Date.now(),updated:Date.now()});recipes.push(cp);if(!saveAll())return;activeArea=other;setArea(other);openReader(cp.id);notify("Kopie im anderen Bereich gespeichert ✓");}
+function deleteCurrent(){var r=recipes.find(function(x){return x.id===currentId;});if(!r||!confirm('Rezept "'+r.title+'" wirklich löschen?'))return;recipes=recipes.filter(function(x){return x.id!==currentId;});if(!saveAll())return;currentId=null;setArea(activeArea);showScreen("screenList");notify("Rezept gelöscht.");}
+function isIngredient(line){return /^\s*[•*\-]?\s*(?:\d+([.,]\d+)?|\d+\s*\/\s*\d+)\s*(?:kg|g|mg|ml|cl|dl|l|EL|TL|Pck|Päckchen|Prise|Stück|Stk|Eier|Ei|Eigelb|Eiweiß|Becher|Dose|Tasse|Blatt|Packung)\b/i.test(line)||/^(?:Mehl|Zucker|Butter|Sahne|Quark|Milch|Salz|Öl|Backpulver|Vanillezucker|Schokolade|Eier|Ei|Früchte|Beeren|Wasser|Kakao)\b.{0,60}\d+\s*(g|kg|ml|l|EL|TL)\b/i.test(line);}
+function extractText(t){var lines=t.replace(/\r/g,"").split("\n").map(function(x){return normal(x).replace(/[ \t]+/g," ");}).filter(Boolean);var result={title:"",amount:null,unit:null,ingredients:[],steps:[]};var section="";var unused=[];var headings=/^(zutaten|zubereitung|anleitung|so geht'?s|so wird'?s gemacht|zubereiten|vorbereitung|zutatenliste|ingredients|instructions)\s*:?\s*$/i;
+lines.forEach(function(line,index){var m=line.match(/(?:für|ergibt|ca\.?\s*)?\s*(\d+(?:[.,]\d+)?)\s*(Portionen|Personen|Stück|Gläser|Bleche|Formen)\b/i);if(m&&!result.amount){result.amount=number(m[1]);result.unit=m[2].charAt(0).toUpperCase()+m[2].slice(1).toLowerCase();}
+var h=line.match(headings);if(h){section=/zutat|ingredient/i.test(h[1])?"ingredients":"steps";return;}
+if(!result.title&&index<4&&!isIngredient(line)&&!/^(für\s+)?\d+\s*(portionen|personen|stück|gläser|bleche|formen)/i.test(line)&&line.length<95&&!/^\d+\./.test(line)){result.title=line;return;}
+if(isIngredient(line)&&section!=="steps"){result.ingredients.push(line.replace(/^[•●*]\s*/,""));return;}
+if(section==="ingredients"&&/^[-•●]/.test(line)){result.ingredients.push(line.replace(/^[-•●]\s*/,""));return;}
+if(section==="steps"||/^\d+[.)]\s+/.test(line)){result.steps.push(line);return;}
+unused.push(line);
+});
+if(!result.ingredients.length){unused.forEach(function(x){if(isIngredient(x))result.ingredients.push(x);else result.steps.push(x);});}
+else result.steps=result.steps.concat(unused);
+return result;}
+function useOcr(){var raw=normal($("ocrText").value);if(!raw)return notify("Kein Text erkannt. Bitte Rezept selbst eingeben.");var x=extractText(raw);if(x.title&&!normal($("title").value))$("title").value=x.title;if(x.amount&&x.amount>0){$("baseAmount").value=x.amount;if(["Portionen","Personen","Stück","Gläser","Bleche","Formen"].includes(x.unit))$("baseUnit").value=x.unit;}
+if(x.ingredients.length){var joined=x.ingredients.join("\n");$("ingredients").value=normal($("ingredients").value)?$("ingredients").value+"\n"+joined:joined;}
+if(x.steps.length){$("steps").value=normal($("steps").value)?$("steps").value+"\n"+x.steps.join("\n"):x.steps.join("\n");}
+notify("Text übernommen – bitte Zutaten prüfen.");$("ingredients").scrollIntoView({behavior:"smooth",block:"center"});}
+function loadOCR(){return new Promise(function(resolve,reject){if(window.Tesseract){resolve();return;}var s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";s.onload=resolve;s.onerror=function(){reject(new Error("Bibliothek konnte nicht geladen werden."));};document.head.appendChild(s);});}
+async function readImage(file){if(!file)return;if(!file.type.startsWith("image/"))return notify("Bitte ein Bild auswählen.");if(selectedImageUrl)URL.revokeObjectURL(selectedImageUrl);selectedImageUrl=URL.createObjectURL(file);$("ocrImage").src=selectedImageUrl;$("ocrImage").style.display="block";$("ocrReview").style.display="none";$("ocrText").value="";$("ocrStatus").className="status";$("ocrStatus").textContent="Lade Texterkennung …";$("screenshot").disabled=true;
+var worker=null;try{await loadOCR();worker=await Tesseract.createWorker("deu+eng",1,{logger:function(m){if(m.status==="recognizing text")$("ocrStatus").textContent="Erkenne Text: "+Math.round((m.progress||0)*100)+" %";else if(m.status)$("ocrStatus").textContent="Texterkennung: "+m.status;}});var output=await worker.recognize(file);var text=normal(output.data.text);$("ocrText").value=text;$("ocrReview").style.display="block";$("ocrStatus").className="status "+(text?"good":"error");$("ocrStatus").textContent=text?"Text erkannt! Jetzt kontrollieren und übernehmen.":"Es wurde kein Text erkannt. Du kannst ihn unten selbst eintippen.";
+}catch(e){$("ocrStatus").className="status error";$("ocrStatus").textContent="Erkennung fehlgeschlagen. Bitte Internetverbindung prüfen oder Rezept direkt eintippen.";console.error(e);}
+finally{if(worker)try{await worker.terminate();}catch(e){}$("screenshot").disabled=false;}}
+function exportData(){var blob=new Blob([JSON.stringify({version:1,recipes:recipes,exported:new Date().toISOString()},null,2)],{type:"application/json"});var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;a.download="mein-rezeptbuch-sicherung.json";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},2000);notify("Sicherung erstellt.");}
+async function importData(file){if(!file)return;try{var data=JSON.parse(await file.text());var arr=Array.isArray(data)?data:data.recipes;if(!Array.isArray(arr))throw Error("Keine Rezeptliste");var good=arr.filter(validRecipe).map(function(x){return {id:String(x.id||guid()),title:String(x.title).slice(0,120),area:x.area,category:String(x.category||"Sonstiges"),baseAmount:Number(x.baseAmount)||1,baseUnit:String(x.baseUnit||"Portionen"),ingredients:x.ingredients,steps:String(x.steps||""),notes:String(x.notes||""),created:Number(x.created)||Date.now(),updated:Number(x.updated)||Date.now()};});if(!good.length)throw Error("Keine gültigen Rezepte");if(!confirm(good.length+" Rezepte aus Sicherung einlesen?"))return;good.forEach(function(r){var i=recipes.findIndex(function(x){return x.id===r.id;});if(i<0)recipes.push(r);else recipes[i]=r;});saveAll();renderList();notify(good.length+" Rezepte eingelesen ✓");}catch(e){notify("Ungültige Sicherungsdatei.");}finally{$("importJson").value="";}}
+$("tabWork").addEventListener("click",function(){setArea("work");});$("tabHome").addEventListener("click",function(){setArea("home");});$("newBtn").addEventListener("click",function(){openEditor();});$("emptyBtn").addEventListener("click",function(){openEditor();});$("search").addEventListener("input",renderList);$("filter").addEventListener("change",renderList);
+$("cards").addEventListener("click",function(e){var b=e.target.closest("[data-id]");if(b)openReader(b.getAttribute("data-id"));});
+$("saveBtn").addEventListener("click",saveEditor);$("cancelBtn").addEventListener("click",function(){resetScreenshot();setArea(activeArea);showScreen("screenList");});$("editBack").addEventListener("click",function(){resetScreenshot();setArea(activeArea);showScreen("screenList");});
+$("readBack").addEventListener("click",function(){setArea(activeArea);showScreen("screenList");});$("targetAmount").addEventListener("input",renderIngredients);$("resetAmount").addEventListener("click",function(){var r=recipes.find(function(x){return x.id===currentId;});if(r){$("targetAmount").value=r.baseAmount;renderIngredients();}});
+$("editBtn").addEventListener("click",function(){openEditor(currentId);});$("copyBtn").addEventListener("click",copyIngredients);$("moveBtn").addEventListener("click",duplicate);$("deleteBtn").addEventListener("click",deleteCurrent);
+$("screenshot").addEventListener("change",function(e){readImage(e.target.files[0]);});$("useOcr").addEventListener("click",useOcr);$("exportBtn").addEventListener("click",exportData);$("importJson").addEventListener("change",function(e){importData(e.target.files[0]);});
+loadAll();setArea("work");showScreen("screenList");
+})();
+</script></body></html>
