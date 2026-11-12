@@ -14,7 +14,7 @@
     {phrases:["kuendigung","kuendigen","entlassen","entlassung","betriebsbedingte kuendigung"],refs:[["102","1",""],["102","2",""],["102","3",""]],note:"§ 102 enthält die Beteiligungsregeln des Betriebsrats bei Kündigungen, einschließlich Anhörung, Fristen und möglichem Widerspruch. Maßgeblich ist die jeweilige Art der Kündigung."},
     {phrases:["einstellung","einstellen","versetzung","umgruppierung","eingruppierung","personal einstellen"],refs:[["99","1",""],["99","2",""]],note:"§ 99 regelt Beteiligung und Zustimmungsverweigerungsgründe bei bestimmten personellen Einzelmaßnahmen. Beachte insbesondere die betrieblichen Voraussetzungen der Norm."},
     {phrases:["schulung","seminar","lehrgang","betriebsratsschulung","betriebsratsseminar","fortbildung fuer betriebsrat"],refs:[["37","6",""],["40","1",""]],note:"§ 37 Abs. 6 regelt bestimmte Schulungs- und Bildungsveranstaltungen; § 40 Abs. 1 behandelt die durch die Betriebsratstätigkeit entstehenden Kosten. Konkrete Reisekostenfragen sind nicht automatisch allein damit abschließend geklärt."},
-    {phrases:["reisekosten","fahrtkosten","zugticket","fahrkarte","hotel kosten","uebernachtungskosten","dienstreise","kosten fuer betriebsrat"],refs:[["40","1",""],["37","6",""]],note:"§ 40 Abs. 1 bestimmt die Kostentragung für die Betriebsratstätigkeit. Für konkrete Reisemittel, Erstattungsumfang und Abrechnung können zusätzliche Regeln und Umstände entscheidend sein."},
+    {phrases:["reisekosten","fahrtkosten","anreise","auto oder zug","kostenerstattung","erstattung","zugticket","fahrkarte","hotel kosten","uebernachtungskosten","dienstreise","kosten fuer betriebsrat"],refs:[["40","1",""],["37","6",""]],note:"§ 40 Abs. 1 bestimmt die Kostentragung für die Betriebsratstätigkeit. Für konkrete Reisemittel, Erstattungsumfang und Abrechnung können zusätzliche Regeln und Umstände entscheidend sein."},
     {phrases:["sachmittel","bueroausstattung","buero fuer betriebsrat","computer fuer betriebsrat","laptop fuer betriebsrat"],refs:[["40","2",""]],note:"§ 40 Abs. 2 nennt Räume, sachliche Mittel, Informations- und Kommunikationstechnik und Büropersonal im erforderlichen Umfang."},
     {phrases:["nicht informiert","information verweigert","auskunft verweigert","unterlagen bekommen","unterlagen verweigert","unterrichtungsrecht","informationen erhalten"],refs:[["80","2",""]],note:"§ 80 Abs. 2 behandelt die rechtzeitige und umfassende Unterrichtung sowie erforderliche Unterlagen zur Durchführung der Betriebsratsaufgaben."},
     {phrases:["betriebsratssitzung","tagesordnung","verschiedenes","einladung zur sitzung","sitzung einberufen","sitzung einladung"],refs:[["29","2",""],["30","",""],["33","",""]],note:"§ 29 betrifft die Einberufung und Tagesordnung der Betriebsratssitzung. Für Beschlüsse können zusätzlich §§ 30 und 33 wichtig sein."},
@@ -91,7 +91,8 @@
       if(sections.length<125)throw Error("Nicht alle Paragraphen konnten geladen werden");
       map=new Map(sections.map(s=>[s.id,s]));
       const ver=extractVersion(doc);
-      $("stand").textContent="Änderung: 19.07.2024";
+      const lastChange=ver.match(/\b(\d{1,2}\.\d{1,2}\.\d{4})\b/);
+      $("stand").textContent=lastChange?"Änderung: "+lastChange[1]:"Stand online prüfen";
       $("normcount").textContent=sections.length;
       $("sectionCount").textContent=sections.length+" Normen";
       $("legal-version").textContent="Gesetzesdaten: "+ver+". Abgleich mit der offiziellen Website bei wichtigen Entscheidungen erforderlich.";
@@ -153,7 +154,7 @@
         for(const c of candidates){
           const dt=Array.from(c.getElementsByTagName("DT")).find(x=>x.textContent.trim()===nr+".");
           if(dt&&dt.nextElementSibling&&dt.nextElementSibling.localName.toLowerCase()==="dd"){
-            const lead=c.textContent.trim().split(nr+".")[0].slice(0,220);
+            const lead=cleanText(c.firstChild?.nodeValue||"").slice(0,220);
             const item=cleanText(xmlText(dt)+xmlText(dt.nextElementSibling));
             return (lead?"("+abs+") "+lead.replace(/^\(\d+\)\s*/,"").trim()+"\n":"")+item;
           }
