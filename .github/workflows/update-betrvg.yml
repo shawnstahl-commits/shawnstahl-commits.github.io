@@ -1,0 +1,58 @@
+name: BetrVG Gesetzestext aktualisieren
+
+on:
+  schedule:
+    - cron: '24 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-betrvg:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository laden
+        uses: actions/checkout@v4
+      - name: Offizielle XML-Fassung herunterladen und prüfen
+        run: |
+          python3 - <<'PY'
+          import io
+          import zipfile
+          import pathlib
+          import urllib.request
+          import xml.etree.ElementTree as ET
+
+          url = "https://www.gesetze-im-internet.de/betrvg/xml.zip"
+          req = urllib.request.Request(url, headers={"User-Agent":"BetrVG-Rechtshelfer/1.0 (Source sync; https://www.gesetze-im-internet.de/betrvg/)"})
+          with urllib.request.urlopen(req, timeout=45) as res:
+              raw_zip = res.read()
+          with zipfile.ZipFile(io.BytesIO(raw_zip)) as z:
+              candidates = [n for n in z.namelist() if n.lower().endswith(".xml")]
+              if len(candidates) != 1:
+                  raise SystemExit("Erwartete genau eine XML-Datei, gefunden: " + str(candidates))
+              data = z.read(candidates[0])
+          root = ET.fromstring(data)
+          if root.tag != "dokumente":
+              raise SystemExit("XML-Format ist nicht das erwartete Gesetze-im-Internet Format")
+          allnorm = root.findall("./norm")
+          ids = [(n.findtext("./metadaten/enbez") or "") for n in allnorm]
+          if len([v for v in ids if v.startswith("§ ")]) < 125 or "§ 87" not in ids or "§ 40" not in ids:
+              raise SystemExit("Plausibilitätsprüfung fehlgeschlagen – bisherige Version bleibt bestehen")
+          version_text = b"".join(data.split())
+          if b"Mitbestimmungsrechte" not in data:
+              raise SystemExit("§ 87 Text nicht gefunden")
+          pathlib.Path("betrvg/betrvg.xml").write_bytes(data)
+          print("BetrVG geprüft:", len(allnorm), "Normen, Bytes:", len(data))
+          PY
+      - name: Nur geprüfte Änderungen übernehmen
+        run: |
+          if ! git diff --quiet -- betrvg/betrvg.xml; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add betrvg/betrvg.xml
+            git commit -m "BetrVG: amtlichen XML-Gesetzestext aktualisieren"
+            git push
+          else
+            echo "Keine Gesetzesänderung"
+          fi
